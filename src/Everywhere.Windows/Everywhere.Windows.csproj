@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net9.0-windows</TargetFramework>
+        <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Avalonia.Desktop"/>
+        <PackageReference Include="Microsoft.Windows.CsWin32"/>
+        <PackageReference Include="FlaUI.UIA3"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Everywhere\Everywhere.csproj"/>
+    </ItemGroup>
+</Project>

@@ -1,0 +1,32 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <SemanticKernelVersion>1.47.0</SemanticKernelVersion>
+    <AvaloniaVersion>11.2.4</AvaloniaVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Base packages -->
+    <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageVersion Include="Microsoft.SemanticKernel" Version="$(SemanticKernelVersion)" />
+    <PackageVersion Include="Microsoft.SemanticKernel.Connectors.OpenAI" Version="$(SemanticKernelVersion)" />
+    <!-- Avalonia packages -->
+    <PackageVersion Include="Avalonia" Version="$(AvaloniaVersion)" />
+    <PackageVersion Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
+    <PackageVersion Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
+    <PackageVersion Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)" />
+    <PackageVersion Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
+    <PackageVersion Include="Avalonia.ReactiveUI" Version="$(AvaloniaVersion)" />
+    <!-- Windows packages -->
+    <PackageVersion Include="Microsoft.Windows.CsWin32" Version="0.3.183">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageVersion>
+    <PackageVersion Include="FlaUI.UIA3" Version="4.0.0" />
+    <!-- NUnit packages -->
+    <PackageVersion Include="coverlet.collector" Version="6.0.3" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageVersion Include="NUnit" Version="4.3.2" />
+    <PackageVersion Include="NUnit.Analyzers" Version="4.5.0" />
+    <PackageVersion Include="NUnit3TestAdapter" Version="4.6.0" />
+  </ItemGroup>
+</Project>
