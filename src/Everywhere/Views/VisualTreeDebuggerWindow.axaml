@@ -1,20 +1,21 @@
-<v:ReactiveUserControl
-    x:Class="Everywhere.Views.MainView" xmlns="https://github.com/avaloniaui"
+<v:ReactiveSukiWindow
+    x:Class="Everywhere.Views.VisualTreeDebuggerWindow" xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:i="clr-namespace:Everywhere.Interfaces" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:v="clr-namespace:Everywhere.Views" xmlns:vm="clr-namespace:Everywhere.ViewModels"
     d:DesignHeight="450" d:DesignWidth="800"
-    x:DataType="vm:MainViewModel" x:TypeArguments="vm:MainViewModel"
-    Background="Black" mc:Ignorable="d">
-
+    Title="VisualTreeDebugger" x:DataType="vm:VisualTreeDebuggerWindowViewModel"
+    x:TypeArguments="vm:VisualTreeDebuggerWindowViewModel" Background="Black"
+    Icon="/Assets/avalonia-logo.ico" mc:Ignorable="d">
     <TreeView ItemsSource="{Binding RootElements}" PointerMoved="HandleTreeViewPointerMoved">
         <TreeView.ItemTemplate>
             <TreeDataTemplate DataType="i:IVisualElement" ItemsSource="{Binding Children}">
                 <TextBlock>
+                    <Run Text="{Binding Id}"/>
                     <Run FontWeight="Bold" Text="{Binding Type, StringFormat={}[{0}]}"/>
                     <Run Text="{Binding Name}"/>
                 </TextBlock>
             </TreeDataTemplate>
         </TreeView.ItemTemplate>
     </TreeView>
-</v:ReactiveUserControl>
+</v:ReactiveSukiWindow>

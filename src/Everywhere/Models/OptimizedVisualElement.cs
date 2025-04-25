@@ -4,21 +4,11 @@ namespace Everywhere.Models;
 
 public class OptimizedVisualElement(IVisualElement original) : IVisualElement
 {
+    public string Id => original.Id;
+
     public IVisualElement? Parent { get; private init; }
 
-    public IEnumerable<IVisualElement> Children
-    {
-        get
-        {
-            if (optimizedChildren == null)
-            {
-                optimizedChildren = [];
-                OptimizeAndFlattenChildren(original);
-            }
-
-            return optimizedChildren;
-        }
-    }
+    public IEnumerable<IVisualElement> Children => GetOptimizedChildren(original);
 
     public VisualElementType Type => original.Type;
 
@@ -36,9 +26,7 @@ public class OptimizedVisualElement(IVisualElement original) : IVisualElement
 
     public uint ProcessId => original.ProcessId;
 
-    private List<IVisualElement>? optimizedChildren;
-
-    private void OptimizeAndFlattenChildren(IVisualElement element)
+    private static IEnumerable<IVisualElement> GetOptimizedChildren(IVisualElement element)
     {
         foreach (var child in element.Children)
         {
@@ -50,14 +38,17 @@ public class OptimizedVisualElement(IVisualElement original) : IVisualElement
             {
                 // Flatten the panel if it has no name and no text
                 // Skip the panel and add its children directly
-                OptimizeAndFlattenChildren(child);
+                foreach (var optimizedChild in GetOptimizedChildren(child))
+                {
+                    yield return optimizedChild;
+                }
             }
             else if (ShouldIncludeElement(child))
             {
-                optimizedChildren!.Add(new OptimizedVisualElement(child)
+                yield return new OptimizedVisualElement(child)
                 {
                     Parent = element
-                });
+                };
             }
         }
     }
@@ -82,7 +73,7 @@ public class OptimizedVisualElement(IVisualElement original) : IVisualElement
         return type switch
         {
             VisualElementType.Button => true,
-            VisualElementType.TextBox => true,
+            VisualElementType.TextEdit => true,
             VisualElementType.CheckBox => true,
             VisualElementType.RadioButton => true,
             VisualElementType.ComboBox => true,
@@ -103,7 +94,7 @@ public class OptimizedVisualElement(IVisualElement original) : IVisualElement
     {
         return type switch
         {
-            VisualElementType.Document => true,
+            VisualElementType.TextEdit => true,
             VisualElementType.Table => true,
             VisualElementType.TableRow => true,
             VisualElementType.Image => true,

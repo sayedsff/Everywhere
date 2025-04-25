@@ -7,6 +7,7 @@
   <ItemGroup>
     <!-- Base packages -->
     <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageVersion Include="IconPacks.Avalonia.Material" Version="1.0.0" />
     <PackageVersion Include="Microsoft.SemanticKernel" Version="$(SemanticKernelVersion)" />
     <PackageVersion Include="Microsoft.SemanticKernel.Connectors.OpenAI" Version="$(SemanticKernelVersion)" />
     <!-- Avalonia packages -->

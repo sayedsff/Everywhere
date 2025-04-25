@@ -18,4 +18,8 @@
     <ItemGroup>
         <ProjectReference Include="..\Everywhere\Everywhere.csproj"/>
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Interop\" />
+    </ItemGroup>
 </Project>

@@ -3,11 +3,11 @@ using Avalonia.Input;
 
 namespace Everywhere.Views;
 
-public partial class MainView : ReactiveUserControl<MainViewModel>
+public partial class VisualTreeDebuggerWindow : ReactiveSukiWindow<VisualTreeDebuggerWindowViewModel>
 {
     private readonly nint visualElementMask;
 
-    public MainView()
+    public VisualTreeDebuggerWindow()
     {
         InitializeComponent();
 
@@ -45,10 +45,10 @@ public partial class MainView : ReactiveUserControl<MainViewModel>
                 SetWindowPos(
                     visualElementMask,
                     IntPtr.Zero,
-                    (int)boundingRectangle.X,
-                    (int)boundingRectangle.Y,
-                    (int)boundingRectangle.Width,
-                    (int)boundingRectangle.Height,
+                    boundingRectangle.X,
+                    boundingRectangle.Y,
+                    boundingRectangle.Width,
+                    boundingRectangle.Height,
                     SWP_NOZORDER
                 );
                 break;

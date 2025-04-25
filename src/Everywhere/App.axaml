@@ -1,10 +1,8 @@
-<Application xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="Everywhere.App"
-             RequestedThemeVariant="Default">
-             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
-  
+<Application
+    x:Class="Everywhere.App" xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:suki="https://github.com/kikipoulet/SukiUI">
     <Application.Styles>
-        <FluentTheme />
+        <suki:SukiTheme ThemeColor="Blue"/>
+        <StyleInclude Source="avares://IconPacks.Avalonia.Material/Material.axaml"/>
     </Application.Styles>
 </Application>

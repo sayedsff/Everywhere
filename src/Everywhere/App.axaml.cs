@@ -18,11 +18,10 @@ public class App : Application
         {
             case IClassicDesktopStyleApplicationLifetime desktop:
                 DisableAvaloniaDataAnnotationValidation();
-                desktop.MainWindow = ServiceLocator.Resolve<MainWindow>();
+                desktop.MainWindow = ServiceLocator.Resolve<VisualTreeDebuggerWindow>();
                 break;
-            case ISingleViewApplicationLifetime singleViewPlatform:
-                singleViewPlatform.MainView = ServiceLocator.Resolve<MainView>();
-                break;
+            default:
+                throw new NotSupportedException($"The application life time {ApplicationLifetime} is not supported.");
         }
 
         base.OnFrameworkInitializationCompleted();

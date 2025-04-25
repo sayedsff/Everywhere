@@ -112,7 +112,10 @@ public abstract partial class BusyViewModelBase : ReactiveViewModelBase
             if (!enqueueIfBusy && IsBusy) return;
 
             Task taskToWait;
-            if (currentTask != null) // enqueueIfBusy is true
+            if (currentTask is
+                {
+                    Status: TaskStatus.WaitingToRun or TaskStatus.Running or TaskStatus.WaitingForChildrenToComplete
+                })
             {
                 taskToWait = currentTask;
                 currentTask = currentTask.ContinueWith(

@@ -4,6 +4,11 @@ namespace Everywhere.Interfaces;
 
 public interface IVisualElement
 {
+    /// <summary>
+    /// Unique identifier in one Visual Tree.
+    /// </summary>
+    string Id { get; }
+
     IVisualElement? Parent { get; }
 
     IEnumerable<IVisualElement> Children { get; }
@@ -26,19 +31,19 @@ public interface IVisualElement
 
 public static class VisualElementExtension
 {
-    public static IEnumerable<IVisualElement> EnumerateDescendants(this IVisualElement element)
+    public static IEnumerable<IVisualElement> GetDescendants(this IVisualElement element)
     {
         foreach (var child in element.Children)
         {
             yield return child;
-            foreach (var descendant in child.EnumerateDescendants())
+            foreach (var descendant in child.GetDescendants())
             {
                 yield return descendant;
             }
         }
     }
 
-    public static IEnumerable<IVisualElement> EnumerateAncestors(this IVisualElement element)
+    public static IEnumerable<IVisualElement> GetAncestors(this IVisualElement element)
     {
         var current = element.Parent;
         while (current != null)

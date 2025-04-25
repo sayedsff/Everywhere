@@ -3,9 +3,8 @@
 public enum VisualElementType
 {
     Unknown,
-    TextBlock,
-    TextBox,
-    Document,
+    Label,
+    TextEdit,
     Button,
     Hyperlink,
     Image,

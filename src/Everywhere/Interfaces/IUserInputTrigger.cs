@@ -1,8 +1,8 @@
-﻿using Avalonia.Input;
-
-namespace Everywhere.Interfaces;
+﻿namespace Everywhere.Interfaces;
 
 public interface IUserInputTrigger
 {
-    event Action ActionPanelRequested;
+    event Action PointerActionTriggered;
+
+    event Action KeyboardActionTriggered;
 }

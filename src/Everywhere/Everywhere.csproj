@@ -12,6 +12,7 @@
             <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
         </PackageReference>
         <PackageReference Include="CommunityToolkit.Mvvm"/>
+        <PackageReference Include="IconPacks.Avalonia.Material" />
         <PackageReference Include="Microsoft.SemanticKernel" />
         <PackageReference Include="Microsoft.SemanticKernel.Connectors.OpenAI" />
     </ItemGroup>

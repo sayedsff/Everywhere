@@ -1,0 +1,70 @@
+﻿<v:ReactiveWindow
+    x:Class="Everywhere.Views.PointerActionWindow" xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:suki="https://github.com/kikipoulet/SukiUI"
+    xmlns:v="clr-namespace:Everywhere.Views" xmlns:vm="clr-namespace:Everywhere.ViewModels"
+    d:DesignHeight="450" d:DesignWidth="800"
+    x:DataType="vm:PointerActionWindowViewModel" x:TypeArguments="vm:PointerActionWindowViewModel"
+    CanResize="False" ExtendClientAreaChromeHints="NoChrome"
+    ExtendClientAreaTitleBarHeightHint="-1" ExtendClientAreaToDecorationsHint="True"
+    SizeToContent="WidthAndHeight" Topmost="True"
+    TransparencyLevelHint="AcrylicBlur" WindowStartupLocation="Manual"
+    mc:Ignorable="d">
+
+    <Panel Margin="8">
+        <Panel.Transitions>
+            <Transitions>
+                <DoubleTransition
+                    Easing="CubicEaseInOut" Property="Width"
+                    Duration="0:0:0.4"/>
+                <DoubleTransition
+                    Easing="CubicEaseInOut" Property="Height"
+                    Duration="0:0:0.4"/>
+            </Transitions>
+        </Panel.Transitions>
+
+        <suki:BusyArea IsBusy="{Binding IsBusy}" IsVisible="{Binding !IsGenerating}">
+            <Menu ItemsSource="{Binding Actions}">
+                <Menu.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Vertical"/>
+                    </ItemsPanelTemplate>
+                </Menu.ItemsPanel>
+            </Menu>
+        </suki:BusyArea>
+
+        <Grid
+            Width="600"
+            IsVisible="{Binding IsGenerating}"
+            RowDefinitions="Auto,9,300,Auto">
+            <TextBlock
+                Grid.Row="0"
+                IsVisible="{Binding IsBusy}"
+                Text="AI is generating..."/>
+            <TextBlock
+                Grid.Row="0"
+                IsVisible="{Binding !IsBusy}"
+                Text="Generation finished"/>
+
+            <Border
+                Grid.Row="1" Height="1"
+                VerticalAlignment="Center"
+                Background="{DynamicResource SukiBorderBrush}"/>
+
+            <ScrollViewer
+                Grid.Row="2" HorizontalScrollBarVisibility="Disabled"
+                VerticalScrollBarVisibility="Auto">
+                <TextBlock Inlines="{Binding GeneratedInlineCollection}" TextWrapping="Wrap"/>
+            </ScrollViewer>
+
+            <StackPanel
+                Grid.Row="3"
+                IsVisible="{Binding !IsBusy}"
+                Orientation="Vertical">
+                <Button Command="{Binding AcceptCommand}" Content="Accept"/>
+                <Button Command="{Binding RetryCommand}" Content="Retry"/>
+                <Button Command="{Binding CancelCommand}" Content="Cancel"/>
+            </StackPanel>
+        </Grid>
+    </Panel>
+</v:ReactiveWindow>

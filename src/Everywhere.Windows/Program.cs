@@ -1,9 +1,11 @@
 ﻿using Avalonia;
+using Everywhere.Extensions;
 using Everywhere.Interfaces;
 using Everywhere.ViewModels;
 using Everywhere.Views;
 using Everywhere.Windows.Services;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.SemanticKernel;
 using SukiUI.Dialogs;
 using SukiUI.Toasts;
 
@@ -22,12 +24,17 @@ public static class Program
                 .AddSingleton<ISukiDialogManager, SukiDialogManager>()
                 .AddSingleton<ISukiToastManager, SukiToastManager>()
 
-                .AddSingleton<MainViewModel>()
-                .AddSingleton<MainView>()
-                .AddSingleton<MainWindow>()
+                .AddSingleton<VisualTreeDebuggerWindowViewModel>()
+                .AddSingleton<VisualTreeDebuggerWindow>()
+                .AddTransient<PointerActionWindowViewModel>()
+                .AddTransient<PointerActionWindow>()
 
                 .AddSingleton<IVisualElementContext, UIA3VisualElementContext>()
                 .AddSingleton<IUserInputTrigger, Win32UserInputTrigger>()
+                .AddOpenAIChatCompletion(
+                    modelId: "gpt-4o",
+                    apiKey: Environment.GetEnvironmentVariable("NODIS_API_KEY", EnvironmentVariableTarget.User).NotNull("NODIS_API_KEY is not set")
+                )
             );
 
         BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);

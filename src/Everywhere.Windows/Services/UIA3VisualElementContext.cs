@@ -1,4 +1,5 @@
-﻿using Windows.Win32;
+﻿using System.Diagnostics;
+using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Avalonia;
@@ -38,8 +39,11 @@ public class UIA3VisualElementContext : IVisualElementContext
         return null;
     }
 
+    [DebuggerDisplay("{DebuggerDisplay,nq}")]
     private class UIAutomationVisualElement(AutomationElement element) : IVisualElement
     {
+        public string Id { get; } = string.Join('.', element.Properties.RuntimeId.ValueOrDefault);
+
         public IVisualElement? Parent
         {
             get
@@ -66,13 +70,13 @@ public class UIA3VisualElementContext : IVisualElementContext
         {
             ControlType.AppBar => VisualElementType.Menu,
             ControlType.Button => VisualElementType.Button,
-            ControlType.Calendar => VisualElementType.TextBlock,
+            ControlType.Calendar => VisualElementType.Label,
             ControlType.CheckBox => VisualElementType.CheckBox,
             ControlType.ComboBox => VisualElementType.ComboBox,
             ControlType.DataGrid => VisualElementType.DataGrid,
             ControlType.DataItem => VisualElementType.DataGridItem,
-            ControlType.Document => VisualElementType.Document,
-            ControlType.Edit => VisualElementType.TextBox,
+            ControlType.Document => VisualElementType.TextEdit,
+            ControlType.Edit => VisualElementType.TextEdit,
             ControlType.Group => VisualElementType.Panel,
             ControlType.Header => VisualElementType.TableRow,
             ControlType.HeaderItem => VisualElementType.TableRow,
@@ -96,7 +100,7 @@ public class UIA3VisualElementContext : IVisualElementContext
             ControlType.Tab => VisualElementType.TabControl,
             ControlType.TabItem => VisualElementType.TabItem,
             ControlType.Table => VisualElementType.Table,
-            ControlType.Text => VisualElementType.TextBlock,
+            ControlType.Text => VisualElementType.Label,
             ControlType.Thumb => VisualElementType.Slider,
             ControlType.TitleBar => VisualElementType.Panel,
             ControlType.ToolBar => VisualElementType.Panel,
@@ -149,7 +153,7 @@ public class UIA3VisualElementContext : IVisualElementContext
 
                     element.Focus();
                     valuePattern.SetValue(value);
-                    return true;
+                    return valuePattern.Value.ValueOrDefault == value;
                 }
 
                 bool TrySetValueWithSendInput()
@@ -179,8 +183,8 @@ public class UIA3VisualElementContext : IVisualElementContext
 
         public uint ProcessId => (uint)element.FrameworkAutomationElement.ProcessId.ValueOrDefault;
 
-        public override string ToString() =>
-            $"[{element.ControlType}] {(string.IsNullOrWhiteSpace(Text) ? "(Empty)" : Text)} - {element.Properties.FullDescription} - {element.Properties.HelpText}";
+        private string DebuggerDisplay =>
+            $"[{element.ControlType}] {(string.IsNullOrWhiteSpace(Name) ? "(Empty)" : Name)} - {(string.IsNullOrWhiteSpace(Text) ? "(Empty)" : Text)}";
 
         private unsafe static void SendUnicodeString(string text)
         {
