@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 #include "TextService.h"
+#include "TextServiceFactory.h"
 
 STDAPI TextServiceFactory::QueryInterface(REFIID riid, _Outptr_ void **ppvObj)
 {

@@ -1,42 +1,104 @@
 ﻿#pragma once
 #include "pch.h"
+#include "ComObject.h"
 
 class TextService final :
-    public ITfTextInputProcessorEx,
-    public ITfThreadMgrEventSink
+    public ComObject<
+        TextService,
+        IServerMessageSink,
+        ITfTextInputProcessor,
+        ITfThreadMgrEventSink,
+        ITfTextEditSink>
 {
 public:
-    TextService(): refCount(0), pThreadMgr(nullptr), clientId(0), dwActiveId(0), threadMgrEventSinkCookie(0)
+    TextService() :
+        clientId(0), rpc(nullptr), gitCookie(0),
+        threadMgrEventSinkCookie(TF_INVALID_COOKIE), textEditSinkCookie(TF_INVALID_COOKIE)
     {
-        AddRef();
+        DEBUG_LOG(L"TextService::TextService");
+        if (FAILED(CoCreateFreeThreadedMarshaler(static_cast<IServerMessageSink *>(this), &pFtm)))
+        {
+            DEBUG_LOG(L"TextService::TextService, CoCreateFreeThreadedMarshaler failed");
+        }
+    }
+
+    ~TextService() override
+    {
+        DEBUG_LOG(L"TextService::~TextService");
+        if (rpc)
+        {
+            delete rpc;
+            rpc = nullptr;
+        }
     }
 
     // IUnknown
-    STDMETHODIMP QueryInterface(REFIID riid, _Outptr_ void **ppvObj) override;
-    STDMETHODIMP_(ULONG) AddRef() override;
-    STDMETHODIMP_(ULONG) Release() override;
+    BEGIN_INTERFACE_TABLE(TextService)
+        INTERFACE_ENTRY_IUNKNOWN(ITfTextInputProcessor)
+        INTERFACE_ENTRY(IServerMessageSink)
+        INTERFACE_ENTRY(ITfTextInputProcessor)
+        INTERFACE_ENTRY(ITfThreadMgrEventSink)
+        INTERFACE_ENTRY(ITfTextEditSink)
+        if (riid == IID_IMarshal && pFtm)
+        {
+            return pFtm->QueryInterface(riid, ppv);
+        }
+    END_INTERFACE_TABLE()
+
+    // IServerMessageSink
+    HRESULT OnServerMessage(const ServerMessage *msg) override;
 
     // ITfTextInputProcessor
     STDMETHODIMP Activate(ITfThreadMgr *ptim, TfClientId tid) override;
-    STDMETHODIMP ActivateEx(ITfThreadMgr *ptim, TfClientId tid, DWORD dwFlags) override;
     STDMETHODIMP Deactivate() override;
 
     // ITfThreadMgrEventSink
-    STDMETHODIMP OnInitDocumentMgr(_In_ ITfDocumentMgr *pDocMgr) override;
-    STDMETHODIMP OnUninitDocumentMgr(_In_ ITfDocumentMgr *pDocMgr) override;
-    STDMETHODIMP OnSetFocus(_In_ ITfDocumentMgr *pDocMgrFocus, _In_ ITfDocumentMgr *pDocMgrPrevFocus) override;
-    STDMETHODIMP OnPushContext(_In_ ITfContext *pContext) override;
-    STDMETHODIMP OnPopContext(_In_ ITfContext *pContext) override;
+    STDMETHODIMP OnInitDocumentMgr(ITfDocumentMgr *pDocMgr) override;
+    STDMETHODIMP OnUninitDocumentMgr(ITfDocumentMgr *pDocMgr) override;
+    STDMETHODIMP OnSetFocus(ITfDocumentMgr *pDocMgrFocus, ITfDocumentMgr *pDocMgrPrevFocus) override;
+    STDMETHODIMP OnPushContext(ITfContext *pContext) override;
+    STDMETHODIMP OnPopContext(ITfContext *pContext) override;
 
-private:
+    // ITfTextEditSink
+    STDMETHODIMP OnEndEdit(ITfContext *pContext, TfEditCookie ecReadOnly, ITfEditRecord *pEditRecord) override;
+
+protected:
+    class CEditSession final : public ComObject<CEditSession, ITfEditSession>
+    {
+    public:
+        CEditSession(TextService *pTextService, ITfContext *pContext, const ServerMessage *msg)
+            : pTextService(pTextService), pContext(pContext), msg(msg)
+        {
+            assert(pTextService != nullptr);
+            assert(pContext != nullptr);
+            assert(msg != nullptr);
+        }
+
+        // IUnknown
+        BEGIN_INTERFACE_TABLE(TextService)
+            INTERFACE_ENTRY_IUNKNOWN(ITfEditSession)
+            INTERFACE_ENTRY(ITfEditSession)
+        END_INTERFACE_TABLE()
+
+        // ITfEditSession
+        STDMETHODIMP DoEditSession(TfEditCookie ec) override;
+
+    private:
+        TextService *pTextService;
+        ITfContext *pContext;
+        const ServerMessage *msg;
+    };
+
+    HRESULT InitRpc();
     HRESULT InitThreadMgrEventSink();
+    HRESULT InitTextEditSink(ITfDocumentMgr *pDocMgr);
 
-private:
-    LONG refCount;
-
-    ITfThreadMgr *pThreadMgr;
+    CComPtr<ITfThreadMgr> pThreadMgr;
     TfClientId clientId;
-    DWORD dwActiveId;
-
+    CComPtr<IUnknown> pFtm;
+    Rpc *rpc;
+    DWORD gitCookie;
     DWORD threadMgrEventSinkCookie;
+    DWORD textEditSinkCookie;
+    std::map<CComPtr<ITfContext>, CComPtr<IUnknown>> contexts;
 };

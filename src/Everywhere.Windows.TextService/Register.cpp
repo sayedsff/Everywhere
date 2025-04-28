@@ -1,15 +1,11 @@
 #include "pch.h"
 #include <olectl.h>
+#include "TextServiceFactory.h"
 
 static constexpr WCHAR RegInfoPrefixClsid[] = L"CLSID\\";
 static constexpr WCHAR RegInfoKeyInProSvr32[] = L"InProcServer32";
 static constexpr WCHAR RegInfoKeyThreadModel[] = L"ThreadingModel";
 static constexpr WCHAR TextServiceDesc[] = L"Everywhere";
-
-HMODULE globalDllHandle;
-LONG globalDllRefCount = -1;
-CRITICAL_SECTION globalCriticalSection;
-TextServiceFactory *textServiceFactory = nullptr;
 
 // https://learn.microsoft.com/zh-cn/windows/win32/api/msctf/ns-msctf-tf_inputprocessorprofile
 static const GUID SupportCategories[] =
@@ -18,33 +14,6 @@ static const GUID SupportCategories[] =
     GUID_TFCAT_TIPCAP_COMLESS,
     GUID_TFCAT_TIPCAP_IMMERSIVESUPPORT,
 };
-
-LONG DllAddRef()
-{
-    DEBUG_LOG("DllAddRef, globalDllRefCount: %d\n", globalDllRefCount);
-
-    return InterlockedIncrement(&globalDllRefCount);
-}
-
-LONG DllRelease()
-{
-    DEBUG_LOG("DllRelease, globalDllRefCount: %d\n", globalDllRefCount);
-
-    const auto refCount = InterlockedDecrement(&globalDllRefCount);
-    if (refCount < 0)
-    {
-        EnterCriticalSection(&globalCriticalSection);
-        if (textServiceFactory != nullptr)
-        {
-            delete textServiceFactory;
-            textServiceFactory = nullptr;
-        }
-        LeaveCriticalSection(&globalCriticalSection);
-
-        assert(globalDllRefCount == -1);
-    }
-    return refCount;
-}
 
 static LONG RecurseDeleteKey(_In_ const HKEY hParentKey, _In_ const LPCTSTR lpszKey)
 {
