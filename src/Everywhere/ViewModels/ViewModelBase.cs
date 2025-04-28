@@ -101,7 +101,7 @@ public abstract partial class BusyViewModelBase : ReactiveViewModelBase
 
     protected async Task ExecuteBusyTaskAsync(
         Func<Task> task,
-        ExceptionHandler? exceptionHandler = null,
+        IExceptionHandler? exceptionHandler = null,
         bool enqueueIfBusy = false,
         CancellationToken cancellationToken = default)
     {
@@ -138,7 +138,7 @@ public abstract partial class BusyViewModelBase : ReactiveViewModelBase
             }
             catch (Exception e) when (exceptionHandler != null)
             {
-                exceptionHandler.Invoke(e);
+                exceptionHandler.HandleException(e);
             }
             finally
             {

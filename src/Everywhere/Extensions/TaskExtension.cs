@@ -2,10 +2,6 @@
 
 public static class TaskExtension
 {
-    public delegate void ExceptionHandler(Exception e);
-
-    public static event ExceptionHandler? UnhandledExceptionThrown;
-
     /// <summary>
     /// 将一个Task与异常处理器绑定，当Task抛出异常时，异常会被处理器处理。如果没有指定异常处理器，则会抛出异常。
     /// </summary>
@@ -24,20 +20,9 @@ public static class TaskExtension
             await task;
         }
         catch (OperationCanceledException) { }
-        catch (Exception e)
+        catch (Exception e) when (exceptionHandler != null)
         {
-            if (exceptionHandler != null)
-            {
-                exceptionHandler.HandleException(e, message, source);
-            }
-            else if (UnhandledExceptionThrown != null)
-            {
-                UnhandledExceptionThrown.Invoke(new AggregateException(source?.ToString(), e));
-            }
-            else
-            {
-                throw;
-            }
+            exceptionHandler.HandleException(e, message, source);
         }
     }
 

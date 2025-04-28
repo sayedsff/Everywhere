@@ -16,15 +16,13 @@ public class OptimizedVisualElement(IVisualElement original) : IVisualElement
 
     public string? Name => original.Name;
 
-    public string? Text
-    {
-        get => original.Text;
-        set => original.Text = value;
-    }
-
     public PixelRect BoundingRectangle => original.BoundingRectangle;
 
     public uint ProcessId => original.ProcessId;
+
+    public string? GetText(int maxLength = -1) => original.GetText(maxLength);
+
+    public void SetText(string text, bool append) => original.SetText(text, append);
 
     private static IEnumerable<IVisualElement> GetOptimizedChildren(IVisualElement element)
     {
@@ -62,7 +60,7 @@ public class OptimizedVisualElement(IVisualElement original) : IVisualElement
 
         // Check if the element has a name or text
         if (!string.IsNullOrEmpty(element.Name) ||
-            !string.IsNullOrEmpty(element.Text))
+            element.GetText(0) != null)
             return true;
 
         return false;

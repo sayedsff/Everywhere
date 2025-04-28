@@ -29,8 +29,9 @@ public static class Program
                 .AddTransient<PointerActionWindowViewModel>()
                 .AddTransient<PointerActionWindow>()
 
-                .AddSingleton<IVisualElementContext, UIA3VisualElementContext>()
+                .AddSingleton<IVisualElementContext, Win32VisualElementContext>()
                 .AddSingleton<IUserInputTrigger, Win32UserInputTrigger>()
+                .AddSingleton<IPlatformHandleHelper, Win32PlatformHandleHelper>()
                 .AddOpenAIChatCompletion(
                     modelId: "gpt-4o",
                     apiKey: Environment.GetEnvironmentVariable("NODIS_API_KEY", EnvironmentVariableTarget.User).NotNull("NODIS_API_KEY is not set")

@@ -1,16 +1,10 @@
-﻿using Avalonia.Interactivity;
-
-namespace Everywhere.Views;
+﻿namespace Everywhere.Views;
 
 public partial class PointerActionWindow : ReactiveWindow<PointerActionWindowViewModel>
 {
-    public PointerActionWindow()
+    public PointerActionWindow(IPlatformHandleHelper platformHandleHelper)
     {
         InitializeComponent();
-    }
-
-    protected override void OnLoaded(RoutedEventArgs e)
-    {
-        base.OnLoaded(e);
+        platformHandleHelper.InitializeFloatingWindow(this);
     }
 }

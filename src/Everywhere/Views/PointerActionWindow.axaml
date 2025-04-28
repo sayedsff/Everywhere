@@ -5,32 +5,48 @@
     xmlns:v="clr-namespace:Everywhere.Views" xmlns:vm="clr-namespace:Everywhere.ViewModels"
     d:DesignHeight="450" d:DesignWidth="800"
     x:DataType="vm:PointerActionWindowViewModel" x:TypeArguments="vm:PointerActionWindowViewModel"
+    Background="{x:Null}"
     CanResize="False" ExtendClientAreaChromeHints="NoChrome"
-    ExtendClientAreaTitleBarHeightHint="-1" ExtendClientAreaToDecorationsHint="True"
-    SizeToContent="WidthAndHeight" Topmost="True"
-    TransparencyLevelHint="AcrylicBlur" WindowStartupLocation="Manual"
-    mc:Ignorable="d">
+    ExtendClientAreaTitleBarHeightHint="0" ExtendClientAreaToDecorationsHint="True"
+    ShowActivated="False" SizeToContent="WidthAndHeight"
+    Topmost="True" TransparencyLevelHint="AcrylicBlur"
+    WindowStartupLocation="Manual" mc:Ignorable="d">
 
-    <Panel Margin="8">
-        <Panel.Transitions>
-            <Transitions>
-                <DoubleTransition
-                    Easing="CubicEaseInOut" Property="Width"
-                    Duration="0:0:0.4"/>
-                <DoubleTransition
-                    Easing="CubicEaseInOut" Property="Height"
-                    Duration="0:0:0.4"/>
-            </Transitions>
-        </Panel.Transitions>
+    <Panel>
+        <!-- <Panel.Transitions> -->
+        <!--     <Transitions> -->
+        <!--  <DoubleTransition  -->
+        <!--  Easing="CubicEaseInOut" Property="Width"  -->
+        <!--  Duration="0:0:0.4"/>  -->
+        <!--  <DoubleTransition  -->
+        <!--  Easing="CubicEaseInOut" Property="Height"  -->
+        <!--  Duration="0:0:0.4"/>  -->
+        <!--     </Transitions> -->
+        <!-- </Panel.Transitions> -->
+
+        <ExperimentalAcrylicBorder IsHitTestVisible="False">
+            <ExperimentalAcrylicBorder.Material>
+                <ExperimentalAcrylicMaterial
+                    BackgroundSource="Digger" MaterialOpacity="0.65"
+                    TintColor="Black" TintOpacity="1"/>
+            </ExperimentalAcrylicBorder.Material>
+        </ExperimentalAcrylicBorder>
 
         <suki:BusyArea IsBusy="{Binding IsBusy}" IsVisible="{Binding !IsGenerating}">
-            <Menu ItemsSource="{Binding Actions}">
-                <Menu.ItemsPanel>
+            <ItemsControl ItemsSource="{Binding Actions}">
+                <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <StackPanel Orientation="Vertical"/>
                     </ItemsPanelTemplate>
-                </Menu.ItemsPanel>
-            </Menu>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.ItemContainerTheme>
+                    <ControlTheme BasedOn="{StaticResource SukiMenuItemStyle}" TargetType="MenuItem">
+                        <Setter Property="CornerRadius" Value="4"/>
+                        <Setter Property="Padding" Value="12,8"/>
+                    </ControlTheme>
+                </ItemsControl.ItemContainerTheme>
+            </ItemsControl>
         </suki:BusyArea>
 
         <Grid

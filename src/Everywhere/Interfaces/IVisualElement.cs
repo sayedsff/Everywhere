@@ -19,14 +19,24 @@ public interface IVisualElement
 
     string? Name { get; }
 
-    string? Text { get; set; }
-
     /// <summary>
     /// Relative to the screen pixels, regardless of the parent element.
     /// </summary>
     PixelRect BoundingRectangle { get; }
 
     uint ProcessId { get; }
+
+    /// <summary>
+    /// get text content of the visual element.
+    /// </summary>
+    /// <param name="maxLength">allowed max length of the text, -1 means no limit.</param>
+    /// <returns></returns>
+    /// <remarks>
+    /// set maxLength to 0 and check if the text is empty to check if the element is empty, with minimal performance impact.
+    /// </remarks>
+    string? GetText(int maxLength = -1);
+
+    void SetText(string text, bool append);
 }
 
 public static class VisualElementExtension

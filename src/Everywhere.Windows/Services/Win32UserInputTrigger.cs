@@ -24,6 +24,10 @@ public unsafe class Win32UserInputTrigger : IUserInputTrigger
 
         public static event Action? HotkeyPressed;
 
+        // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
+        // GC will not collect this delegate
+        private static readonly WNDPROC LpHotKeyWndProc;
+
         #endregion
 
         #region MouseHook
@@ -43,6 +47,7 @@ public unsafe class Win32UserInputTrigger : IUserInputTrigger
             using var hModule = PInvoke.GetModuleHandle(null);
 
             // Set up the hotkey
+            LpHotKeyWndProc = HotKeyWndProc;
             fixed (char* lpClassName = "Everywhere.HotKeyWindowClass")
             fixed (char* lpWindowName = "Everywhere.HotKeyWindow")
             {
@@ -50,7 +55,7 @@ public unsafe class Win32UserInputTrigger : IUserInputTrigger
                     new WNDCLASSEXW
                     {
                         cbSize = (uint)Marshal.SizeOf<WNDCLASSEXW>(),
-                        lpfnWndProc = HotKeyWndProc,
+                        lpfnWndProc = LpHotKeyWndProc,
                         hInstance = (HINSTANCE)hModule.DangerousGetHandle(),
                         lpszClassName = lpClassName
                     });

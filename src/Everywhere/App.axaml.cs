@@ -20,8 +20,6 @@ public class App : Application
                 DisableAvaloniaDataAnnotationValidation();
                 desktop.MainWindow = ServiceLocator.Resolve<VisualTreeDebuggerWindow>();
                 break;
-            default:
-                throw new NotSupportedException($"The application life time {ApplicationLifetime} is not supported.");
         }
 
         base.OnFrameworkInitializationCompleted();

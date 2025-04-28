@@ -1,12 +1,10 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace Everywhere.Interfaces;
-
-public delegate void ExceptionHandler(Exception exception, string? message = null, [CallerMemberName] object? source = null);
+﻿namespace Everywhere.Interfaces;
 
 public interface IExceptionHandler
 {
     void HandleException(Exception exception, string? message = null, [CallerMemberName] object? source = null);
+
+    public static IExceptionHandler DangerouslyIgnoreAllException { get; } = new AnonymousExceptionHandler(static (_, _, _) => { });
 }
 
 public class AnonymousExceptionHandler(Action<Exception, string?, object?> handler) : IExceptionHandler

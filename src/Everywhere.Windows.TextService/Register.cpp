@@ -125,6 +125,69 @@ static BOOL RegisterProfiles()
 {
     DEBUG_LOG(L"RegisterProfiles Start");
 
+    LSTATUS lr;
+    HKEY hKey = nullptr;
+    DWORD dwDisposition = 0;
+    if ((lr = RegCreateKeyExW(
+        HKEY_LOCAL_MACHINE,
+        L"SYSTEM\\CurrentControlSet\\Control\\Keyboard Layouts\\11450409",
+        0,
+        nullptr,
+        REG_OPTION_NON_VOLATILE,
+        KEY_WRITE | KEY_WOW64_64KEY,
+        nullptr,
+        &hKey,
+        &dwDisposition
+    )) != ERROR_SUCCESS)
+    {
+        DEBUG_LOG(L"RegCreateKeyExW failed: %08X", lr);
+        return FALSE;
+    }
+
+    if (constexpr WCHAR value[] = L"@%SystemRoot%\\system32\\input.dll,-5000"; (lr = RegSetValueExW(
+        hKey,
+        L"Layout Display Name",
+        0,
+        REG_EXPAND_SZ,
+        reinterpret_cast<const BYTE *>(value),
+        ARRAYSIZE(value) * sizeof(WCHAR)
+    )) != ERROR_SUCCESS)
+    {
+        DEBUG_LOG(L"RegSetValueExW failed: %08X", lr);
+        RegCloseKey(hKey);
+        return FALSE;
+    }
+
+    if (constexpr WCHAR value[] = L"KBDUS.DLL"; (lr = RegSetValueExW(
+        hKey,
+        L"Layout File",
+        0,
+        REG_SZ,
+        reinterpret_cast<const BYTE *>(value),
+        ARRAYSIZE(value) * sizeof(WCHAR)
+    )) != ERROR_SUCCESS)
+    {
+        DEBUG_LOG(L"RegSetValueExW failed: %08X", lr);
+        RegCloseKey(hKey);
+        return FALSE;
+    }
+
+    if (constexpr WCHAR value[] = L"Everywhere"; (lr = RegSetValueExW(
+        hKey,
+        L"Layout Text",
+        0,
+        REG_SZ,
+        reinterpret_cast<const BYTE *>(value),
+        ARRAYSIZE(value) * sizeof(WCHAR)
+    )) != ERROR_SUCCESS)
+    {
+        DEBUG_LOG(L"RegSetValueExW failed: %08X", lr);
+        RegCloseKey(hKey);
+        return FALSE;
+    }
+
+    RegCloseKey(hKey);
+
     // https://github.com/ChineseInputMethod/Interface/blob/master/TSFmanager/ITfInputProcessorProfileMgr.md
     HRESULT hr;
     ITfInputProcessorProfileMgr *pITfInputProcessorProfileMgr = nullptr;
@@ -139,10 +202,19 @@ static BOOL RegisterProfiles()
     }
 
     // https://learn.microsoft.com/zh-cn/windows/win32/api/msctf/nf-msctf-itfinputprocessorprofilemgr-registerprofile
+    // This actually adds the profile to the registry.
+    // [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\CTF\TIP\{CLSID_TextService}\LanguageProfile\{TEXTSERVICE_LANGID}\{GUID_Profile}]
+    const auto hkl = LoadKeyboardLayout(L"11450409", KLF_ACTIVATE);
+    if (hkl == nullptr)
+    {
+        DEBUG_LOG(L"LoadKeyboardLayout failed: %08X", GetLastError());
+        return FALSE;
+    }
+
     hr = pITfInputProcessorProfileMgr->RegisterProfile(
         CLSID_TextService, TEXTSERVICE_LANGID, GUID_Profile,
-        TextServiceDesc, sizeof(TextServiceDesc) / sizeof(WCHAR),
-        nullptr, 0, 0, nullptr, 0,
+        TextServiceDesc, ARRAYSIZE(TextServiceDesc),
+        nullptr, 0, 0, hkl, 0,
         TRUE, TF_RP_HIDDENINSETTINGUI);
 
     if (pITfInputProcessorProfileMgr)
@@ -155,6 +227,10 @@ static BOOL RegisterProfiles()
 
 void UnregisterProfiles()
 {
+    RegDeleteTree(
+        HKEY_LOCAL_MACHINE,
+        L"SYSTEM\\CurrentControlSet\\Control\\Keyboard Layouts\\0d000721");
+
     ITfInputProcessorProfileMgr *pITfInputProcessorProfileMgr = nullptr;
     const auto hr = CoCreateInstance(
         CLSID_TF_InputProcessorProfiles, nullptr, CLSCTX_INPROC_SERVER,
@@ -218,10 +294,10 @@ _Check_return_
 STDAPI DllGetClassObject(
     _In_ REFCLSID rclsid,
     _In_ REFIID riid,
-    _Outptr_ void** ppv)
+    _Outptr_ void **ppv)
 {
     if ((IsEqualIID(riid, IID_IClassFactory) ||
-        IsEqualIID(riid, IID_IUnknown)) &&
+            IsEqualIID(riid, IID_IUnknown)) &&
         IsEqualGUID(rclsid, CLSID_TextService))
     {
         *ppv = static_cast<IClassFactory *>(textServiceFactory);

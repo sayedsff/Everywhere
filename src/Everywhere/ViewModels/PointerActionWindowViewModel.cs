@@ -26,10 +26,11 @@ public partial class PointerActionWindowViewModel : BusyViewModelBase
     private readonly IVisualElementContext visualElementContext;
     private readonly IChatCompletionService chatCompletionService;
     private readonly List<MenuItem> textEditActions;
+    private readonly List<MenuItem> testActions;
     private readonly StringBuilder generatedTextBuilder = new();
 
     private Task? generateTask;
-    private bool shouldAppendText;
+    private bool appendText;
 
     public PointerActionWindowViewModel(IVisualElementContext visualElementContext, IChatCompletionService chatCompletionService)
     {
@@ -75,6 +76,50 @@ public partial class PointerActionWindowViewModel : BusyViewModelBase
                 }
             }
         ];
+
+        testActions =
+        [
+            new MenuItem
+            {
+                Header = "Append",
+                Command = new RelayCommand(
+                    () => PointerOverElement?.SetText("Hello world", true))
+            },
+            new MenuItem
+            {
+                Header = "Replace",
+                Command = new RelayCommand(
+                    () => PointerOverElement?.SetText("Hello world", false))
+            },
+            new MenuItem
+            {
+                Header = "Manbo",
+            },
+            new MenuItem
+            {
+                Header = "Manbo",
+            },
+            new MenuItem
+            {
+                Header = "Manbo",
+            },
+            new MenuItem
+            {
+                Header = "Manbo",
+            },
+            new MenuItem
+            {
+                Header = "Manbo",
+            },
+            new MenuItem
+            {
+                Header = "Manbo",
+            },
+            new MenuItem
+            {
+                Header = "Manbo",
+            },
+        ];
     }
 
     [RelayCommand]
@@ -84,7 +129,7 @@ public partial class PointerActionWindowViewModel : BusyViewModelBase
             {
                 if (PointerOverElement is not { } pointerOverElement) return;
 
-                shouldAppendText = true;
+                appendText = true;
                 await GenerateAsync(pointerOverElement, "Continue writing");
             }));
 
@@ -95,7 +140,7 @@ public partial class PointerActionWindowViewModel : BusyViewModelBase
             {
                 if (PointerOverElement is not { } pointerOverElement) return;
 
-                shouldAppendText = false;
+                appendText = false;
                 await GenerateAsync(pointerOverElement, $"Change tone to {tone}");
             }));
 
@@ -105,15 +150,7 @@ public partial class PointerActionWindowViewModel : BusyViewModelBase
             () =>
             {
                 if (PointerOverElement is not { } pointerOverElement) return;
-
-                if (shouldAppendText)
-                {
-                    pointerOverElement.Text += generatedTextBuilder.ToString();
-                }
-                else
-                {
-                    pointerOverElement.Text = generatedTextBuilder.ToString();
-                }
+                pointerOverElement.SetText(generatedTextBuilder.ToString(), appendText);
             }));
 
     [RelayCommand]
@@ -189,15 +226,15 @@ public partial class PointerActionWindowViewModel : BusyViewModelBase
             visualTreeYamlBuilder.AppendLine($"id: {currentElement.Id}");
             var indent = new string(' ', indentLevel * 2);
             visualTreeYamlBuilder.AppendLine($"{indent}type: {currentElement.Type}");
-            if (!string.IsNullOrEmpty(currentElement.Name))
+            if (!string.IsNullOrWhiteSpace(currentElement.Name))
             {
                 visualTreeYamlBuilder.Append($"{indent}name: ");
                 AppendEscapedText(indent, currentElement.Name);
             }
-            if (!string.IsNullOrEmpty(currentElement.Text))
+            if (currentElement.GetText() is { } text && !string.IsNullOrWhiteSpace(text))
             {
                 visualTreeYamlBuilder.Append($"{indent}text: ");
-                AppendEscapedText(indent, currentElement.Text);
+                AppendEscapedText(indent, text);
             }
             foreach (var child in currentElement.Children.Where(e => e.Type is not VisualElementType.Button and not VisualElementType.Image))
             {
@@ -231,8 +268,8 @@ public partial class PointerActionWindowViewModel : BusyViewModelBase
                     PointerOverElement = visualElementContext.PointerOverElement;
                     Actions = PointerOverElement switch
                     {
-                        { Type: VisualElementType.TextEdit } => textEditActions,
-                        _ => textEditActions
+                        { Type: VisualElementType.TextEdit } => testActions,
+                        _ => testActions
                     };
                 },
                 cancellationToken),
