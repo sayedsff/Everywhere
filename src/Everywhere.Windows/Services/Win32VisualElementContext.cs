@@ -320,9 +320,9 @@ public class Win32VisualElementContext : IVisualElementContext
             {
                 await ActivateTextServiceOnTargetWindow(hWnd);
 
-                for (var i = 0; i < 6; i++)
+                for (var i = 0; i < 5; i++)
                 {
-                    await Task.Delay(500, cancellationToken);
+                    await Task.Delay(100 * (2 * i + 1), cancellationToken);
                     if (clientStreams.TryGetValue(pid, out stream)) break;
                 }
 
@@ -464,7 +464,7 @@ public class Win32VisualElementContext : IVisualElementContext
                             hWnd,
                             0x0050, // WM_INPUTLANGCHANGEREQUEST
                             1,
-                            new IntPtr(&previousHkl));
+                            new IntPtr(previousHkl.Value));
                     }
                     finally
                     {

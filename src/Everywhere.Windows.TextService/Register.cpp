@@ -204,18 +204,12 @@ static BOOL RegisterProfiles()
     // https://learn.microsoft.com/zh-cn/windows/win32/api/msctf/nf-msctf-itfinputprocessorprofilemgr-registerprofile
     // This actually adds the profile to the registry.
     // [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\CTF\TIP\{CLSID_TextService}\LanguageProfile\{TEXTSERVICE_LANGID}\{GUID_Profile}]
-    const auto hkl = LoadKeyboardLayout(L"11450409", KLF_ACTIVATE);
-    if (hkl == nullptr)
-    {
-        DEBUG_LOG(L"LoadKeyboardLayout failed: %08X", GetLastError());
-        return FALSE;
-    }
-
     hr = pITfInputProcessorProfileMgr->RegisterProfile(
         CLSID_TextService, TEXTSERVICE_LANGID, GUID_Profile,
         TextServiceDesc, ARRAYSIZE(TextServiceDesc),
-        nullptr, 0, 0, hkl, 0,
-        TRUE, TF_RP_HIDDENINSETTINGUI);
+        nullptr, 0, 0,
+        reinterpret_cast<HKL>(strtoul("11450409", nullptr, 16)),
+        0, TRUE, TF_RP_HIDDENINSETTINGUI);
 
     if (pITfInputProcessorProfileMgr)
     {
