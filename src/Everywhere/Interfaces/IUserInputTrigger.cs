@@ -2,7 +2,10 @@
 
 public interface IUserInputTrigger
 {
-    event Action PointerActionTriggered;
+    public delegate void PointerHotkeyActivatedHandler(PixelPoint point);
+    public delegate void KeyboardHotkeyActivatedHandler();
 
-    event Action KeyboardActionTriggered;
+    event PointerHotkeyActivatedHandler PointerHotkeyActivated;
+
+    event KeyboardHotkeyActivatedHandler KeyboardHotkeyActivated;
 }

@@ -4,150 +4,146 @@ using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Windows.Win32.UI.WindowsAndMessaging;
+using Avalonia;
+using Avalonia.Threading;
+using Everywhere.Extensions;
 using Everywhere.Interfaces;
 
 namespace Everywhere.Windows.Services;
 
 public unsafe class Win32UserInputTrigger : IUserInputTrigger
 {
-    public event Action? PointerActionTriggered;
-
-    public event Action? KeyboardActionTriggered
+    public event IUserInputTrigger.KeyboardHotkeyActivatedHandler KeyboardHotkeyActivated
     {
-        add => TriggerImpl.HotkeyPressed += value;
-        remove => TriggerImpl.HotkeyPressed -= value;
+        add => keyboardHotkeyActivated += value;
+        remove => keyboardHotkeyActivated -= value;
     }
 
-    private static class TriggerImpl
+    private static IUserInputTrigger.KeyboardHotkeyActivatedHandler? keyboardHotkeyActivated;
+
+    public event IUserInputTrigger.PointerHotkeyActivatedHandler PointerHotkeyActivated
     {
-        #region Hotkey
+        add => pointerHotkeyActivated += value;
+        remove => pointerHotkeyActivated -= value;
+    }
 
-        public static event Action? HotkeyPressed;
+    private static IUserInputTrigger.PointerHotkeyActivatedHandler? pointerHotkeyActivated;
 
-        // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
-        // GC will not collect this delegate
-        private static readonly WNDPROC LpHotKeyWndProc;
+    private static HWND hotkeyWindowHWnd;
+    private static uint pressedXButton;
+    private static bool isXButtonEventTriggered;
 
-        #endregion
+    private const nuint TimerId = 1;
+    private const nuint InjectExtra = 0x0d000721;
 
-        #region MouseHook
+    static Win32UserInputTrigger()
+    {
+        new Thread(HookThreadWork).With(t => t.SetApartmentState(ApartmentState.STA)).Start();
+    }
 
-        private static readonly UnhookWindowsHookExSafeHandle MouseHookHandle;
-        private static readonly Timer MouseHookTimer;
-
-        private static bool isProcessingMouseHook;
-        private static uint pressedXButton;
-        private static bool isXButtonEventTriggered;
-
-        #endregion
-
-        static TriggerImpl()
+    private static void HookThreadWork()
+    {
+        using var hModule = PInvoke.GetModuleHandle(null);
+        hotkeyWindowHWnd = PInvoke.CreateWindowEx(
+            WINDOW_EX_STYLE.WS_EX_NOACTIVATE,
+            "STATIC",
+            "Everywhere.HotKeyWindow",
+            WINDOW_STYLE.WS_POPUP,
+            0,
+            0,
+            0,
+            0,
+            HWND.Null,
+            null,
+            hModule,
+            null);
+        if (hotkeyWindowHWnd.IsNull)
         {
-            HWND hotkeyWindowHWnd;
-            using var hModule = PInvoke.GetModuleHandle(null);
-
-            // Set up the hotkey
-            LpHotKeyWndProc = HotKeyWndProc;
-            fixed (char* lpClassName = "Everywhere.HotKeyWindowClass")
-            fixed (char* lpWindowName = "Everywhere.HotKeyWindow")
-            {
-                var result = PInvoke.RegisterClassEx(
-                    new WNDCLASSEXW
-                    {
-                        cbSize = (uint)Marshal.SizeOf<WNDCLASSEXW>(),
-                        lpfnWndProc = LpHotKeyWndProc,
-                        hInstance = (HINSTANCE)hModule.DangerousGetHandle(),
-                        lpszClassName = lpClassName
-                    });
-                if (result == 0)
-                {
-                    Marshal.ThrowExceptionForHR(Marshal.GetLastWin32Error());
-                }
-
-                hotkeyWindowHWnd = PInvoke.CreateWindowEx(
-                    WINDOW_EX_STYLE.WS_EX_NOACTIVATE,
-                    lpClassName,
-                    lpWindowName,
-                    WINDOW_STYLE.WS_POPUP,
-                    0,
-                    0,
-                    0,
-                    0,
-                    HWND.Null,
-                    HMENU.Null,
-                    (HINSTANCE)hModule.DangerousGetHandle(),
-                    null);
-                if (hotkeyWindowHWnd.IsNull)
-                {
-                    Marshal.ThrowExceptionForHR(Marshal.GetLastWin32Error());
-                }
-            }
-
-            PInvoke.RegisterHotKey(
-                hotkeyWindowHWnd,
-                0,
-                HOT_KEY_MODIFIERS.MOD_CONTROL,
-                (uint)VIRTUAL_KEY.VK_TAB
-            );
-
-            // Set up the low-level mouse hook
-            MouseHookHandle = new UnhookWindowsHookExSafeHandle();
-            // mouseHookHandle = PInvoke.SetWindowsHookEx(
-            //     WINDOWS_HOOK_ID.WH_MOUSE_LL,
-            //     MouseHookProc,
-            //     PInvoke.GetModuleHandle(hModule.ModuleName),
-            //     0);
-            MouseHookTimer = new Timer(MouseHookTimerCallback, null, Timeout.Infinite, Timeout.Infinite);
+            Marshal.ThrowExceptionForHR(Marshal.GetLastWin32Error());
         }
 
-        #region HotKey
+        // Set up the hotkey
+        PInvoke.RegisterHotKey(
+            hotkeyWindowHWnd,
+            0,
+            HOT_KEY_MODIFIERS.MOD_CONTROL,
+            (uint)VIRTUAL_KEY.VK_TAB
+        );
 
-        private static LRESULT HotKeyWndProc(HWND hWnd, uint msg, WPARAM wParam, LPARAM lParam)
+        var mouseHookProc = new HOOKPROC(MouseHookProc);
+        var mouseHookProcHandle = GCHandle.Alloc(mouseHookProc);
+        PInvoke.SetWindowsHookEx(
+            WINDOWS_HOOK_ID.WH_MOUSE_LL,
+            mouseHookProc,
+            hModule,
+            0);
+
+        MSG msg;
+        while (PInvoke.GetMessage(&msg, HWND.Null, 0, 0) != 0)
         {
-            if (msg == PInvoke.WM_HOTKEY)
+            switch (msg.message)
             {
-                HotkeyPressed?.Invoke();
-                return new LRESULT(1);
-            }
-
-            return PInvoke.DefWindowProc(hWnd, msg, wParam, lParam);
-        }
-
-        #endregion
-
-        #region Mouse Hook
-
-        private static LRESULT MouseHookProc(int code, WPARAM wParam, LPARAM lParam)
-        {
-            if (isProcessingMouseHook) return PInvoke.CallNextHookEx(MouseHookHandle, code, wParam, lParam);
-            if (code < 0) return PInvoke.CallNextHookEx(MouseHookHandle, code, wParam, lParam);
-
-            isProcessingMouseHook = true;
-            try
-            {
-                ref var hookStruct = ref Unsafe.AsRef<MSLLHOOKSTRUCT>(lParam.Value.ToPointer());
-                var button = hookStruct.mouseData >> 16 & 0xFFFF;
-
-                switch (wParam.Value)
+                case PInvoke.WM_HOTKEY:
                 {
-                    case PInvoke.WM_XBUTTONDOWN when button is PInvoke.XBUTTON1:
-                    {
-                        pressedXButton = button;
-                        MouseHookTimer.Change(TimeSpan.FromSeconds(0.5), Timeout.InfiniteTimeSpan);
-                        return new LRESULT(1); // block XButton1 down event
-                    }
-                    case PInvoke.WM_XBUTTONUP when button == pressedXButton:
-                    {
-                        pressedXButton = 0;
-                        MouseHookTimer.Change(Timeout.Infinite, Timeout.Infinite);
+                    Dispatcher.UIThread.Post(() => keyboardHotkeyActivated?.Invoke());
+                    break;
+                }
+                case PInvoke.WM_TIMER when msg.wParam == TimerId:
+                {
+                    isXButtonEventTriggered = true;
+                    PInvoke.KillTimer(hotkeyWindowHWnd, TimerId);
 
-                        if (isXButtonEventTriggered)
+                    Dispatcher.UIThread.Post(
+                        () =>
                         {
-                            isXButtonEventTriggered = false;
-                            return new LRESULT(1); // block XButton1 up event
-                        }
+                            if (pointerHotkeyActivated is not { } handler) return;
+                            PInvoke.GetCursorPos(out var point);
+                            handler.Invoke(new PixelPoint(point.X, point.Y));
+                        });
+                    break;
+                }
+            }
 
-                        // send XButton1 down and up event to the system
+            PInvoke.DispatchMessage(&msg);
+        }
+
+        mouseHookProcHandle.Free();
+    }
+
+    private static LRESULT MouseHookProc(int code, WPARAM wParam, LPARAM lParam)
+    {
+        if (code < 0) return PInvoke.CallNextHookEx(null, code, wParam, lParam);
+
+        ref var hookStruct = ref Unsafe.AsRef<MSLLHOOKSTRUCT>(lParam.Value.ToPointer());
+        if (hookStruct.dwExtraInfo == InjectExtra)
+            return PInvoke.CallNextHookEx(null, code, wParam, lParam);
+
+        var button = hookStruct.mouseData >> 16 & 0xFFFF;
+        switch (wParam.Value)
+        {
+            case PInvoke.WM_XBUTTONDOWN when button is PInvoke.XBUTTON1:
+            {
+                pressedXButton = button;
+                PInvoke.SetTimer(hotkeyWindowHWnd, TimerId, 500, null);
+                return new LRESULT(1); // block XButton1 down event
+            }
+            case PInvoke.WM_XBUTTONUP when button == pressedXButton:
+            {
+                pressedXButton = 0;
+
+                if (isXButtonEventTriggered)
+                {
+                    isXButtonEventTriggered = false;
+                    return new LRESULT(1); // block XButton1 up event
+                }
+
+                PInvoke.KillTimer(hotkeyWindowHWnd, TimerId);
+
+                // send XButton1 down and up event to the system in new thread
+                // otherwise it will cause a deadlock
+                Task.Run(
+                    () =>
+                    {
                         PInvoke.SendInput(
                             [
                                 new INPUT
@@ -158,7 +154,8 @@ public unsafe class Win32UserInputTrigger : IUserInputTrigger
                                         mi = new MOUSEINPUT
                                         {
                                             dwFlags = MOUSE_EVENT_FLAGS.MOUSEEVENTF_XDOWN,
-                                            mouseData = button
+                                            mouseData = button,
+                                            dwExtraInfo = InjectExtra
                                         }
                                     }
                                 },
@@ -170,33 +167,19 @@ public unsafe class Win32UserInputTrigger : IUserInputTrigger
                                         mi = new MOUSEINPUT
                                         {
                                             dwFlags = MOUSE_EVENT_FLAGS.MOUSEEVENTF_XUP,
-                                            mouseData = button
+                                            mouseData = button,
+                                            dwExtraInfo = InjectExtra
                                         }
                                     }
                                 },
                             ],
                             sizeof(INPUT));
+                    });
 
-                        break;
-                    }
-                }
-
-                return PInvoke.CallNextHookEx(MouseHookHandle, code, wParam, lParam);
-            }
-            finally
-            {
-                isProcessingMouseHook = false;
+                break;
             }
         }
 
-        private static void MouseHookTimerCallback(object? _)
-        {
-            isXButtonEventTriggered = true;
-            MouseHookTimer.Change(Timeout.Infinite, Timeout.Infinite);
-            // PointerActionTriggered?.Invoke();
-        }
-
-        #endregion
-
+        return PInvoke.CallNextHookEx(null, code, wParam, lParam);
     }
 }

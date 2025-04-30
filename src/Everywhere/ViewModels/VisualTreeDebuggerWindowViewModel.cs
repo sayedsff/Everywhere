@@ -1,5 +1,5 @@
 ﻿using System.Collections.ObjectModel;
-using Everywhere.Models;
+using Avalonia.Threading;
 using Everywhere.Views;
 
 namespace Everywhere.ViewModels;
@@ -10,7 +10,7 @@ public partial class VisualTreeDebuggerWindowViewModel : ReactiveViewModelBase
 
     public VisualTreeDebuggerWindowViewModel(IUserInputTrigger userInputTrigger, IVisualElementContext visualElementContext)
     {
-        userInputTrigger.KeyboardActionTriggered += () =>
+        userInputTrigger.PointerHotkeyActivated += point =>
         {
             // RootElements.Clear();
             // var element = visualElementContext.PointerOverElement;
@@ -23,7 +23,13 @@ public partial class VisualTreeDebuggerWindowViewModel : ReactiveViewModelBase
             //             .Select(p => p.current)
             //             .First()));
 
-            ServiceLocator.Resolve<PointerActionWindow>().Show();
+            Dispatcher.UIThread.InvokeAsync(
+                () =>
+                {
+                    var window = ServiceLocator.Resolve<PointerActionWindow>();
+                    window.Position = point;
+                    window.Show();
+                });
         };
     }
 }

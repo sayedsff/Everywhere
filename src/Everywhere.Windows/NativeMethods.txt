@@ -8,6 +8,7 @@ RegisterHotKey
 UnregisterHotKey
 VIRTUAL_KEY
 WM_HOTKEY
+WM_TIMER
 
 SetWindowsHookEx
 UnhookWindowsHookEx
@@ -46,3 +47,9 @@ PostMessage
 IsWindow
 GetParent
 GetKeyboardLayout
+
+GetMessage
+TranslateMessage
+DispatchMessage
+SetTimer
+KillTimer
