@@ -2,10 +2,8 @@
 using System.Diagnostics;
 using System.IO.Pipes;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.Marshalling;
 using Windows.Win32;
 using Windows.Win32.Foundation;
-using Windows.Win32.System.Com;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Avalonia;
 using Everywhere.Enums;
@@ -29,10 +27,22 @@ public class Win32VisualElementContext : IVisualElementContext
     private static readonly ITreeWalker TreeWalker = Automation.TreeWalkerFactory.GetRawViewWalker();
     private static readonly TextServiceImpl TextService = new();
 
+    public event IVisualElementContext.KeyboardFocusedElementChangedHandler? KeyboardFocusedElementChanged;
+
     public IVisualElement? KeyboardFocusedElement => TryFrom(Automation.FocusedElement);
 
     public IVisualElement? PointerOverElement => TryFrom(
         static () => PInvoke.GetCursorPos(out var point) ? Automation.FromPoint(point) : null);
+
+    public Win32VisualElementContext()
+    {
+        Automation.RegisterFocusChangedEvent(
+            element =>
+            {
+                if (KeyboardFocusedElementChanged is not { } handler) return;
+                handler(element == null ? null : new VisualElementImpl(element));
+            });
+    }
 
     private static VisualElementImpl? TryFrom(Func<AutomationElement?> factory)
     {
@@ -49,7 +59,6 @@ public class Win32VisualElementContext : IVisualElementContext
         return null;
     }
 
-    [DebuggerDisplay("{DebuggerDisplay,nq}")]
     private class VisualElementImpl(AutomationElement element) : IVisualElement
     {
         public string Id { get; } = string.Join('.', element.Properties.RuntimeId.ValueOrDefault);
@@ -136,7 +145,15 @@ public class Win32VisualElementContext : IVisualElementContext
             }
         }
 
-        public string? Name => element.Properties.Name.ValueOrDefault;
+        public string? Name
+        {
+            get
+            {
+                if (element.Properties.Name.TryGetValue(out var name)) return name;
+                if (element.Patterns.LegacyIAccessible.PatternOrDefault is { } accessiblePattern) return accessiblePattern.Name;
+                return null;
+            }
+        }
 
         public PixelRect BoundingRectangle => new(
             element.BoundingRectangle.X,
@@ -150,6 +167,7 @@ public class Win32VisualElementContext : IVisualElementContext
         {
             if (element.Patterns.Value.PatternOrDefault is { } valuePattern) return valuePattern.Value;
             if (element.Patterns.Text.PatternOrDefault is { } textPattern) return textPattern.DocumentRange.GetText(maxLength);
+            if (element.Patterns.LegacyIAccessible.PatternOrDefault is { } accessiblePattern) return accessiblePattern.Value;
             return null;
         }
 
@@ -178,7 +196,6 @@ public class Win32VisualElementContext : IVisualElementContext
 
             bool TrySetValueWithValuePattern()
             {
-                return false;
                 if (element.Patterns.Value.PatternOrDefault is not { } valuePattern) return false;
 
                 try
@@ -275,8 +292,6 @@ public class Win32VisualElementContext : IVisualElementContext
             public uint pid;
         }
 
-        private string DebuggerDisplay => $"[{element.ControlType}] {Name} - {GetText()}";
-
         private unsafe static void SendUnicodeString(string text)
         {
             var inputs = new Span<INPUT>(new INPUT[text.Length * 2]);
@@ -296,13 +311,12 @@ public class Win32VisualElementContext : IVisualElementContext
             PInvoke.SendInput(inputs, sizeof(INPUT));
             if (inputBlocked) PInvoke.BlockInput(false);
         }
+
+        public override string ToString() => $"[{element.ControlType}] {Name} - {GetText()}";
     }
 
     private class TextServiceImpl : IDisposable
     {
-        public uint FocusedPid { get; private set; }
-        public nint FocusedHWnd { get; private set; }
-
         private readonly CancellationTokenSource cancellationTokenSource = new();
         private readonly ConcurrentDictionary<uint, NamedPipeServerStream> clientStreams = new();
 
