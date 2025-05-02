@@ -3,6 +3,7 @@
         <OutputType>WinExe</OutputType>
         <TargetFramework>net9.0-windows</TargetFramework>
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+        <ApplicationIcon>..\..\img\Everywhere.ico</ApplicationIcon>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -27,5 +28,11 @@
 
     <ItemGroup>
         <Protobuf Include="..\TextService.proto" Link="TextService.proto"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="..\..\img\Everywhere.ico">
+        <Link>Everywhere.ico</Link>
+      </None>
     </ItemGroup>
 </Project>
