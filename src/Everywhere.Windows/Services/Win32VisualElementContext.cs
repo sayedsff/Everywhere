@@ -24,26 +24,24 @@ public class Win32VisualElementContext : IVisualElementContext
 
     private static readonly UIA3Automation Automation = new();
     private static readonly ITreeWalker TreeWalker = Automation.TreeWalkerFactory.GetRawViewWalker();
-    private static readonly TextServiceImpl TextService = new();
+    // private static readonly TextServiceImpl TextService = new();
     private static readonly int CurrentProcessId = (int)PInvoke.GetCurrentProcessId();
 
     public event IVisualElementContext.KeyboardFocusedElementChangedHandler? KeyboardFocusedElementChanged;
 
     public IVisualElement? KeyboardFocusedElement => TryFrom(Automation.FocusedElement);
 
-    public IVisualElement? PointerOverElement => TryFrom(
-        static () => PInvoke.GetCursorPos(out var point) ? Automation.FromPoint(point) : null);
+    public IVisualElement? PointerOverElement => TryFrom(static () => PInvoke.GetCursorPos(out var point) ? Automation.FromPoint(point) : null);
 
     public Win32VisualElementContext()
     {
-        Automation.RegisterFocusChangedEvent(
-            element =>
-            {
-                if (KeyboardFocusedElementChanged is not { } handler) return;
-                var pid = element?.FrameworkAutomationElement.ProcessId.ValueOrDefault ?? 0;
-                if (pid == CurrentProcessId) return;
-                handler(element == null ? null : new VisualElementImpl(element));
-            });
+        Automation.RegisterFocusChangedEvent(element =>
+        {
+            if (KeyboardFocusedElementChanged is not { } handler) return;
+            var pid = element?.FrameworkAutomationElement.ProcessId.ValueOrDefault ?? 0;
+            if (pid == CurrentProcessId) return;
+            handler(element == null ? null : new VisualElementImpl(element));
+        });
     }
 
     private static VisualElementImpl? TryFrom(Func<AutomationElement?> factory)
@@ -64,14 +62,23 @@ public class Win32VisualElementContext : IVisualElementContext
 
     private class VisualElementImpl(AutomationElement element) : IVisualElement
     {
+        private const int CONNECT_E_ADVISELIMIT = unchecked((int)0x80040201);
+
         public string Id { get; } = string.Join('.', element.Properties.RuntimeId.ValueOrDefault ?? []);
 
         public IVisualElement? Parent
         {
             get
             {
-                var parent = TreeWalker.GetParent(element);
-                return parent is null ? null : new VisualElementImpl(parent);
+                try
+                {
+                    var parent = TreeWalker.GetParent(element);
+                    return parent is null ? null : new VisualElementImpl(parent);
+                }
+                catch (COMException ex) when (ex.HResult == CONNECT_E_ADVISELIMIT)
+                {
+                    return null;
+                }
             }
         }
 
@@ -79,72 +86,108 @@ public class Win32VisualElementContext : IVisualElementContext
         {
             get
             {
-                var child = TreeWalker.GetFirstChild(element);
+                AutomationElement? child;
+                try
+                {
+                    child = TreeWalker.GetFirstChild(element);
+                }
+                catch (COMException ex) when (ex.HResult == CONNECT_E_ADVISELIMIT)
+                {
+                    yield break;
+                }
                 while (child is not null)
                 {
                     yield return new VisualElementImpl(child);
-                    child = TreeWalker.GetNextSibling(child);
+                    try
+                    {
+                        child = TreeWalker.GetNextSibling(child);
+                    }
+                    catch (COMException ex) when (ex.HResult == CONNECT_E_ADVISELIMIT)
+                    {
+                        yield break;
+                    }
                 }
             }
         }
 
-        public VisualElementType Type => element.Properties.ControlType.ValueOrDefault switch
+        public VisualElementType Type
         {
-            ControlType.AppBar => VisualElementType.Menu,
-            ControlType.Button => VisualElementType.Button,
-            ControlType.Calendar => VisualElementType.Label,
-            ControlType.CheckBox => VisualElementType.CheckBox,
-            ControlType.ComboBox => VisualElementType.ComboBox,
-            ControlType.DataGrid => VisualElementType.DataGrid,
-            ControlType.DataItem => VisualElementType.DataGridItem,
-            ControlType.Document => VisualElementType.TextEdit,
-            ControlType.Edit => VisualElementType.TextEdit,
-            ControlType.Group => VisualElementType.Panel,
-            ControlType.Header => VisualElementType.TableRow,
-            ControlType.HeaderItem => VisualElementType.TableRow,
-            ControlType.Hyperlink => VisualElementType.Hyperlink,
-            ControlType.Image => VisualElementType.Image,
-            ControlType.List => VisualElementType.ListView,
-            ControlType.ListItem => VisualElementType.ListViewItem,
-            ControlType.Menu => VisualElementType.Menu,
-            ControlType.MenuBar => VisualElementType.Menu,
-            ControlType.MenuItem => VisualElementType.MenuItem,
-            ControlType.Pane => VisualElementType.TopLevel,
-            ControlType.ProgressBar => VisualElementType.ProgressBar,
-            ControlType.RadioButton => VisualElementType.RadioButton,
-            ControlType.ScrollBar => VisualElementType.ScrollBar,
-            ControlType.SemanticZoom => VisualElementType.ListView,
-            ControlType.Separator => VisualElementType.Unknown,
-            ControlType.Slider => VisualElementType.Slider,
-            ControlType.Spinner => VisualElementType.Slider,
-            ControlType.SplitButton => VisualElementType.Button,
-            ControlType.StatusBar => VisualElementType.Panel,
-            ControlType.Tab => VisualElementType.TabControl,
-            ControlType.TabItem => VisualElementType.TabItem,
-            ControlType.Table => VisualElementType.Table,
-            ControlType.Text => VisualElementType.Label,
-            ControlType.Thumb => VisualElementType.Slider,
-            ControlType.TitleBar => VisualElementType.Panel,
-            ControlType.ToolBar => VisualElementType.Panel,
-            ControlType.ToolTip => VisualElementType.Panel,
-            ControlType.Tree => VisualElementType.TreeView,
-            ControlType.TreeItem => VisualElementType.TreeViewItem,
-            ControlType.Window => VisualElementType.TopLevel,
-            _ => VisualElementType.Unknown
-        };
+            get
+            {
+                try
+                {
+                    return element.Properties.ControlType.ValueOrDefault switch
+                    {
+                        ControlType.AppBar => VisualElementType.Menu,
+                        ControlType.Button => VisualElementType.Button,
+                        ControlType.Calendar => VisualElementType.Label,
+                        ControlType.CheckBox => VisualElementType.CheckBox,
+                        ControlType.ComboBox => VisualElementType.ComboBox,
+                        ControlType.DataGrid => VisualElementType.DataGrid,
+                        ControlType.DataItem => VisualElementType.DataGridItem,
+                        ControlType.Document => VisualElementType.TextEdit,
+                        ControlType.Edit => VisualElementType.TextEdit,
+                        ControlType.Group => VisualElementType.Panel,
+                        ControlType.Header => VisualElementType.TableRow,
+                        ControlType.HeaderItem => VisualElementType.TableRow,
+                        ControlType.Hyperlink => VisualElementType.Hyperlink,
+                        ControlType.Image => VisualElementType.Image,
+                        ControlType.List => VisualElementType.ListView,
+                        ControlType.ListItem => VisualElementType.ListViewItem,
+                        ControlType.Menu => VisualElementType.Menu,
+                        ControlType.MenuBar => VisualElementType.Menu,
+                        ControlType.MenuItem => VisualElementType.MenuItem,
+                        ControlType.Pane => VisualElementType.TopLevel,
+                        ControlType.ProgressBar => VisualElementType.ProgressBar,
+                        ControlType.RadioButton => VisualElementType.RadioButton,
+                        ControlType.ScrollBar => VisualElementType.ScrollBar,
+                        ControlType.SemanticZoom => VisualElementType.ListView,
+                        ControlType.Separator => VisualElementType.Unknown,
+                        ControlType.Slider => VisualElementType.Slider,
+                        ControlType.Spinner => VisualElementType.Slider,
+                        ControlType.SplitButton => VisualElementType.Button,
+                        ControlType.StatusBar => VisualElementType.Panel,
+                        ControlType.Tab => VisualElementType.TabControl,
+                        ControlType.TabItem => VisualElementType.TabItem,
+                        ControlType.Table => VisualElementType.Table,
+                        ControlType.Text => VisualElementType.Label,
+                        ControlType.Thumb => VisualElementType.Slider,
+                        ControlType.TitleBar => VisualElementType.Panel,
+                        ControlType.ToolBar => VisualElementType.Panel,
+                        ControlType.ToolTip => VisualElementType.Panel,
+                        ControlType.Tree => VisualElementType.TreeView,
+                        ControlType.TreeItem => VisualElementType.TreeViewItem,
+                        ControlType.Window => VisualElementType.TopLevel,
+                        _ => VisualElementType.Unknown
+                    };
+                }
+                catch (COMException ex) when (ex.HResult == CONNECT_E_ADVISELIMIT)
+                {
+                    return VisualElementType.Unknown;
+                }
+            }
+        }
 
         public VisualElementStates States
         {
             get
             {
-                var states = VisualElementStates.None;
-                if (element.Properties.IsOffscreen.ValueOrDefault) states |= VisualElementStates.Offscreen;
-                if (!element.Properties.IsEnabled.ValueOrDefault) states |= VisualElementStates.Disabled;
-                if (element.Properties.HasKeyboardFocus.ValueOrDefault) states |= VisualElementStates.Focused;
-                if (element.Patterns.SelectionItem.PatternOrDefault is { IsSelected.ValueOrDefault: true }) states |= VisualElementStates.Selected;
-                if (element.Patterns.Value.PatternOrDefault is { IsReadOnly.ValueOrDefault: true }) states |= VisualElementStates.ReadOnly;
-                if (element.Properties.IsPassword.ValueOrDefault) states |= VisualElementStates.Password;
-                return states;
+                try
+                {
+                    var states = VisualElementStates.None;
+                    if (element.Properties.IsOffscreen.ValueOrDefault) states |= VisualElementStates.Offscreen;
+                    if (!element.Properties.IsEnabled.ValueOrDefault) states |= VisualElementStates.Disabled;
+                    if (element.Properties.HasKeyboardFocus.ValueOrDefault) states |= VisualElementStates.Focused;
+                    if (element.Patterns.SelectionItem.PatternOrDefault is { IsSelected.ValueOrDefault: true })
+                        states |= VisualElementStates.Selected;
+                    if (element.Patterns.Value.PatternOrDefault is { IsReadOnly.ValueOrDefault: true }) states |= VisualElementStates.ReadOnly;
+                    if (element.Properties.IsPassword.ValueOrDefault) states |= VisualElementStates.Password;
+                    return states;
+                }
+                catch (COMException ex) when (ex.HResult == CONNECT_E_ADVISELIMIT)
+                {
+                    return VisualElementStates.None;
+                }
             }
         }
 
@@ -165,13 +208,39 @@ public class Win32VisualElementContext : IVisualElementContext
             }
         }
 
-        public PixelRect BoundingRectangle => element.BoundingRectangle.To(r => new PixelRect(
-            r.X,
-            r.Y,
-            r.Width,
-            r.Height));
+        public PixelRect BoundingRectangle
+        {
+            get
+            {
+                try
+                {
+                    return element.BoundingRectangle.To(r => new PixelRect(
+                        r.X,
+                        r.Y,
+                        r.Width,
+                        r.Height));
+                }
+                catch (COMException ex) when (ex.HResult == CONNECT_E_ADVISELIMIT)
+                {
+                    return default;
+                }
+            }
+        }
 
-        public int ProcessId => element.FrameworkAutomationElement.ProcessId.ValueOrDefault;
+        public int ProcessId
+        {
+            get
+            {
+                try
+                {
+                    return element.FrameworkAutomationElement.ProcessId.ValueOrDefault;
+                }
+                catch (COMException ex) when (ex.HResult == CONNECT_E_ADVISELIMIT)
+                {
+                    return 0;
+                }
+            }
+        }
 
         public string? GetText(int maxLength = -1)
         {
@@ -195,21 +264,25 @@ public class Win32VisualElementContext : IVisualElementContext
                 throw new InvalidOperationException("Cannot set text on a disabled or read-only element.");
             }
 
-            element.Focus();
-
-            var pid = element.FrameworkAutomationElement.ProcessId.ValueOrDefault;
-            if (TryGetWindow(element, out var hWnd) || TryGetWindow((uint)pid, out hWnd))
+            try
             {
-                PInvoke.SetForegroundWindow((HWND)hWnd);
-            }
-            else
-            {
-                throw new InvalidOperationException("Cannot set text on an element without a valid window handle or process ID.");
-            }
+                element.Focus();
 
-            _ = TrySetValueWithValuePattern() ||
-                TrySetValueWithTextService() ||
-                TrySetValueWithSendInput();
+                var pid = element.FrameworkAutomationElement.ProcessId.ValueOrDefault;
+                if (TryGetWindow(element, out var hWnd) || TryGetWindow((uint)pid, out hWnd))
+                {
+                    PInvoke.SetForegroundWindow((HWND)hWnd);
+                }
+                else
+                {
+                    throw new InvalidOperationException("Cannot set text on an element without a valid window handle or process ID.");
+                }
+
+                _ = TrySetValueWithValuePattern() ||
+                    // TrySetValueWithTextService() ||
+                    TrySetValueWithSendInput();
+            }
+            catch (COMException ex) when (ex.HResult == CONNECT_E_ADVISELIMIT) { }
 
             bool TrySetValueWithValuePattern()
             {
@@ -227,22 +300,22 @@ public class Win32VisualElementContext : IVisualElementContext
                 }
             }
 
-            bool TrySetValueWithTextService()
-            {
-                TextService.SendAsync(
-                    new ServerMessage
-                    {
-                        SetFocusText = new SetFocusText
-                        {
-                            Text = text,
-                            Append = append
-                        }
-                    },
-                    (uint)pid,
-                    (HWND)hWnd); // todo: async
-
-                return true;
-            }
+            // bool TrySetValueWithTextService()
+            // {
+            //     TextService.SendAsync(
+            //         new ServerMessage
+            //         {
+            //             SetFocusText = new SetFocusText
+            //             {
+            //                 Text = text,
+            //                 Append = append
+            //             }
+            //         },
+            //         (uint)pid,
+            //         (HWND)hWnd); // todo: async
+            //
+            //     return true;
+            // }
 
             bool TrySetValueWithSendInput()
             {
@@ -497,47 +570,46 @@ public class Win32VisualElementContext : IVisualElementContext
         {
             var taskCompletionSource = new TaskCompletionSource();
 
-            new Thread(
-                () =>
+            new Thread(() =>
+            {
+                while (!PInvoke.IsWindow(hWnd))
                 {
-                    while (!PInvoke.IsWindow(hWnd))
+                    hWnd = PInvoke.GetParent(hWnd);
+                    if (hWnd == HWND.Null)
                     {
-                        hWnd = PInvoke.GetParent(hWnd);
-                        if (hWnd == HWND.Null)
-                        {
-                            taskCompletionSource.SetException(new InvalidOperationException("Failed to find a valid window handle."));
-                            return;
-                        }
-                    }
-
-                    var tid = PInvoke.GetCurrentThreadId();
-                    var targetTid = PInvoke.GetWindowThreadProcessId(hWnd, null);
-                    if (!PInvoke.AttachThreadInput(tid, targetTid, true))
-                    {
-                        taskCompletionSource.SetException(Marshal.GetExceptionForHR(Marshal.GetHRForLastWin32Error())!);
+                        taskCompletionSource.SetException(new InvalidOperationException("Failed to find a valid window handle."));
                         return;
                     }
+                }
 
-                    try
-                    {
-                        var previousHkl = PInvoke.GetKeyboardLayout(targetTid);
-                        var hkl = PInvoke.LoadKeyboardLayout("11450409", ACTIVATE_KEYBOARD_LAYOUT_FLAGS.KLF_ACTIVATE);
-                        PInvoke.PostMessage(
-                            hWnd,
-                            0x0050, // WM_INPUTLANGCHANGEREQUEST
-                            1,
-                            hkl.DangerousGetHandle());
-                        PInvoke.PostMessage(
-                            hWnd,
-                            0x0050, // WM_INPUTLANGCHANGEREQUEST
-                            1,
-                            new IntPtr(previousHkl.Value));
-                    }
-                    finally
-                    {
-                        PInvoke.AttachThreadInput(tid, targetTid, false);
-                    }
-                }).With(t => t.SetApartmentState(ApartmentState.STA)).Start();
+                var tid = PInvoke.GetCurrentThreadId();
+                var targetTid = PInvoke.GetWindowThreadProcessId(hWnd, null);
+                if (!PInvoke.AttachThreadInput(tid, targetTid, true))
+                {
+                    taskCompletionSource.SetException(Marshal.GetExceptionForHR(Marshal.GetHRForLastWin32Error())!);
+                    return;
+                }
+
+                try
+                {
+                    var previousHkl = PInvoke.GetKeyboardLayout(targetTid);
+                    var hkl = PInvoke.LoadKeyboardLayout("11450409", ACTIVATE_KEYBOARD_LAYOUT_FLAGS.KLF_ACTIVATE);
+                    PInvoke.PostMessage(
+                        hWnd,
+                        0x0050, // WM_INPUTLANGCHANGEREQUEST
+                        1,
+                        hkl.DangerousGetHandle());
+                    PInvoke.PostMessage(
+                        hWnd,
+                        0x0050, // WM_INPUTLANGCHANGEREQUEST
+                        1,
+                        new IntPtr(previousHkl.Value));
+                }
+                finally
+                {
+                    PInvoke.AttachThreadInput(tid, targetTid, false);
+                }
+            }).With(t => t.SetApartmentState(ApartmentState.STA)).Start();
 
             return taskCompletionSource.Task;
         }
