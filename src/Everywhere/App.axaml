@@ -4,5 +4,14 @@
     <Application.Styles>
         <suki:SukiTheme ThemeColor="Blue"/>
         <StyleInclude Source="avares://IconPacks.Avalonia.Material/Material.axaml"/>
+        <StyleInclude Source="avares://Everywhere/Assets/Styles.axaml"/>
     </Application.Styles>
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <MergeResourceInclude Source="avares://Everywhere/Assets/Resources.axaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
 </Application>

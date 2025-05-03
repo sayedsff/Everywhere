@@ -6,6 +6,5 @@ public interface IUserInputTrigger
     public delegate void KeyboardHotkeyActivatedHandler();
 
     event PointerHotkeyActivatedHandler PointerHotkeyActivated;
-
     event KeyboardHotkeyActivatedHandler KeyboardHotkeyActivated;
 }

@@ -24,7 +24,7 @@ public interface IVisualElement
     /// </summary>
     PixelRect BoundingRectangle { get; }
 
-    uint ProcessId { get; }
+    int ProcessId { get; }
 
     /// <summary>
     /// get text content of the visual element.
@@ -37,6 +37,10 @@ public interface IVisualElement
     string? GetText(int maxLength = -1);
 
     void SetText(string text, bool append);
+
+    event Action<IVisualElement> TextChanged;
+
+    event Action<IVisualElement> BoundingRectangleChanged;
 }
 
 public static class VisualElementExtension

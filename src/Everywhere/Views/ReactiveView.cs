@@ -1,35 +1,37 @@
 ﻿using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
 using SukiUI.Controls;
 
 namespace Everywhere.Views;
 
 public abstract class ReactiveUserControl<TViewModel> : UserControl where TViewModel : ReactiveViewModelBase
 {
-    public TViewModel ViewModel => DataContext.NotNull<TViewModel>();
+    public TViewModel ViewModel { get; }
 
     protected ReactiveUserControl()
     {
-        ServiceLocator.Resolve<TViewModel>().Bind(this);
+        ViewModel = ServiceLocator.Resolve<TViewModel>();
+        ViewModel.Bind(this);
     }
 }
 
 public abstract class ReactiveWindow<TViewModel> : Window where TViewModel : ReactiveViewModelBase
 {
-    public TViewModel ViewModel => DataContext.NotNull<TViewModel>();
+    public TViewModel ViewModel { get; }
 
     protected ReactiveWindow()
     {
-        ServiceLocator.Resolve<TViewModel>().Bind(this);
+        ViewModel = ServiceLocator.Resolve<TViewModel>();
+        ViewModel.Bind(this);
     }
 }
 
 public abstract class ReactiveSukiWindow<TViewModel> : SukiWindow where TViewModel : ReactiveViewModelBase
 {
-    public TViewModel ViewModel => DataContext.NotNull<TViewModel>();
+    public TViewModel ViewModel { get; }
 
     protected ReactiveSukiWindow()
     {
-        ServiceLocator.Resolve<TViewModel>().Bind(this);
+        ViewModel = ServiceLocator.Resolve<TViewModel>();
+        ViewModel.Bind(this);
     }
 }

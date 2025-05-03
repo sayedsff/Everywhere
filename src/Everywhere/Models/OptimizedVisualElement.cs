@@ -18,11 +18,23 @@ public class OptimizedVisualElement(IVisualElement original) : IVisualElement
 
     public PixelRect BoundingRectangle => original.BoundingRectangle;
 
-    public uint ProcessId => original.ProcessId;
+    public int ProcessId => original.ProcessId;
 
     public string? GetText(int maxLength = -1) => original.GetText(maxLength);
 
     public void SetText(string text, bool append) => original.SetText(text, append);
+
+    public event Action<IVisualElement>? TextChanged
+    {
+        add => original.TextChanged += value;
+        remove => original.TextChanged -= value;
+    }
+
+    public event Action<IVisualElement>? BoundingRectangleChanged
+    {
+        add => original.BoundingRectangleChanged += value;
+        remove => original.BoundingRectangleChanged -= value;
+    }
 
     private static IEnumerable<IVisualElement> GetOptimizedChildren(IVisualElement element)
     {
@@ -110,4 +122,8 @@ public class OptimizedVisualElement(IVisualElement original) : IVisualElement
             _ => false
         };
     }
+
+    public override int GetHashCode() => original.GetHashCode();
+    public override bool Equals(object? obj) => original.Equals(obj);
+    public override string? ToString() => original.ToString();
 }

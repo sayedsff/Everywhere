@@ -38,7 +38,12 @@ public unsafe class Win32UserInputTrigger : IUserInputTrigger
 
     static Win32UserInputTrigger()
     {
-        new Thread(HookThreadWork).With(t => t.SetApartmentState(ApartmentState.STA)).Start();
+        new Thread(HookThreadWork).With(
+            t =>
+            {
+                t.SetApartmentState(ApartmentState.STA);
+                t.Name = "HotKeyThread";
+            }).Start();
     }
 
     private static void HookThreadWork()
@@ -72,11 +77,11 @@ public unsafe class Win32UserInputTrigger : IUserInputTrigger
 
         var mouseHookProc = new HOOKPROC(MouseHookProc);
         var mouseHookProcHandle = GCHandle.Alloc(mouseHookProc);
-        PInvoke.SetWindowsHookEx(
-            WINDOWS_HOOK_ID.WH_MOUSE_LL,
-            mouseHookProc,
-            hModule,
-            0);
+        // PInvoke.SetWindowsHookEx(
+        //     WINDOWS_HOOK_ID.WH_MOUSE_LL,
+        //     mouseHookProc,
+        //     hModule,
+        //     0);
 
         MSG msg;
         while (PInvoke.GetMessage(&msg, HWND.Null, 0, 0) != 0)
@@ -107,6 +112,7 @@ public unsafe class Win32UserInputTrigger : IUserInputTrigger
             PInvoke.DispatchMessage(&msg);
         }
 
+        PInvoke.DestroyWindow(hotkeyWindowHWnd);
         mouseHookProcHandle.Free();
     }
 

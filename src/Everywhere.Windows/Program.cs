@@ -26,12 +26,12 @@ public static class Program
 
                 .AddSingleton<VisualTreeDebuggerWindowViewModel>()
                 .AddSingleton<VisualTreeDebuggerWindow>()
-                .AddTransient<PointerActionWindowViewModel>()
-                .AddTransient<PointerActionWindow>()
+                .AddSingleton<AgentFloatingWindowViewModel>()
+                .AddSingleton<AgentFloatingWindow>()
 
                 .AddSingleton<IVisualElementContext, Win32VisualElementContext>()
                 .AddSingleton<IUserInputTrigger, Win32UserInputTrigger>()
-                .AddSingleton<IPlatformHandleHelper, Win32PlatformHandleHelper>()
+                .AddSingleton<IPlatformHelper, Win32PlatformHelper>()
                 .AddOpenAIChatCompletion(
                     modelId: "gpt-4o",
                     apiKey: Environment.GetEnvironmentVariable("NODIS_API_KEY", EnvironmentVariableTarget.User).NotNull("NODIS_API_KEY is not set")

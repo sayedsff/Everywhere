@@ -6,7 +6,7 @@
 
 HRESULT TextService::OnServerMessage(const ServerMessage *msg)
 {
-    return S_OK;
+    DEBUG_LOG(L"TextService::OnServerMessage");
 
     HRESULT hr;
     switch (msg->data_case())

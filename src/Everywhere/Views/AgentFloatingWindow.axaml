@@ -1,0 +1,201 @@
+﻿<v:ReactiveWindow
+    x:Class="Everywhere.Views.AgentFloatingWindow" xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:suki="https://github.com/kikipoulet/SukiUI"
+    xmlns:system="clr-namespace:System;assembly=System.Runtime" xmlns:v="clr-namespace:Everywhere.Views"
+    xmlns:vm="clr-namespace:Everywhere.ViewModels"
+    xmlns:vc="clr-namespace:Everywhere.ValueConverters"
+    x:DataType="vm:AgentFloatingWindowViewModel"
+    x:TypeArguments="vm:AgentFloatingWindowViewModel" Background="Transparent"
+    CanResize="False" SystemDecorations="None"
+    IsOpened="{Binding TargetElement, Converter={x:Static ObjectConverters.IsNotNull}}"
+    ShowInTaskbar="False" SizeToContent="WidthAndHeight"
+    TargetBoundingRect="{Binding TargetBoundingRect}"
+    Topmost="True"
+    WindowStartupLocation="Manual">
+
+    <Grid x:Name="RootGrid" RowDefinitions="*,Auto">
+        <Grid.Resources>
+            <vc:PlacementToCornerRadiusConverter x:Key="PlacementToCornerRadiusConverter"/>
+        </Grid.Resources>
+
+        <Border
+            Grid.Row="0" Grid.RowSpan="2"
+            Background="{DynamicResource AssistantBackgroundBrush}">
+            <Border.CornerRadius>
+                <MultiBinding Converter="{StaticResource PlacementToCornerRadiusConverter}">
+                    <Binding>
+                        <Binding.Source>
+                            <system:Double>4</system:Double>
+                        </Binding.Source>
+                    </Binding>
+                    <Binding>
+                        <Binding.Source>
+                            <system:Double>8</system:Double>
+                        </Binding.Source>
+                    </Binding>
+                    <Binding Path="$self.Bounds.Width"/>
+                    <Binding Path="$parent[v:AgentFloatingWindow].Placement"/>
+                    <Binding Path="IsExpanded"/>
+                </MultiBinding>
+            </Border.CornerRadius>
+
+            <Border.Transitions>
+                <Transitions>
+                    <CornerRadiusTransition
+                        Easing="SineEaseInOut"
+                        Duration="0:0:0.2"
+                        Property="CornerRadius"/>
+                </Transitions>
+            </Border.Transitions>
+        </Border>
+
+        <StackPanel
+            Grid.Row="0" Margin="8"
+            Background="Transparent" Orientation="Horizontal"
+            PointerPressed="HandleTitleBarPointerPressed">
+            <ToggleButton
+                Padding="0" BorderThickness="0"
+                Focusable="False"
+                IsChecked="{Binding IsExpanded, Mode=TwoWay}">
+                <ToggleButton.Effect>
+                    <DropShadowEffect BlurRadius="9" Opacity="0.3"/>
+                </ToggleButton.Effect>
+
+                <Viewbox Width="36" Height="36">
+                    <ContentPresenter Content="{StaticResource AssistantAvatar}"/>
+                </Viewbox>
+            </ToggleButton>
+
+            <TextBlock
+                Margin="8,0,0,0" VerticalAlignment="Center"
+                FontSize="16" FontWeight="Bold"
+                Foreground="{DynamicResource SukiText}"
+                IsHitTestVisible="False"
+                IsVisible="{Binding IsExpanded}"
+                Text="{Binding Title}"/>
+        </StackPanel>
+
+        <Border
+            Grid.Row="0" Height="1"
+            Margin="0,-4,0,4" VerticalAlignment="Bottom"
+            Background="{DynamicResource SukiBorderBrush}"
+            IsVisible="{Binding IsExpanded}"/>
+
+        <Panel Grid.Row="1" IsVisible="{Binding IsExpanded}">
+            <Panel.Styles>
+                <Style Selector="ItemsControl">
+                    <Setter Property="ItemsPanel">
+                        <Setter.Value>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Vertical"/>
+                            </ItemsPanelTemplate>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="Grid.IsSharedSizeScope" Value="True"/>
+                </Style>
+
+                <Style Selector="MenuItem">
+                    <Setter Property="Template">
+                        <ControlTemplate TargetType="MenuItem">
+                            <Border Background="Transparent" Focusable="False">
+                                <Border
+                                    Margin="8,0"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    ClipToBounds="True" CornerRadius="4">
+                                    <Grid Margin="0,8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" SharedSizeGroup="A"/>
+                                            <ColumnDefinition Width="*" SharedSizeGroup="B"/>
+                                            <ColumnDefinition Width="Auto" SharedSizeGroup="C"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <ContentPresenter
+                                            Name="PART_Icon" Grid.Column="0"
+                                            Width="16" Height="16"
+                                            Margin="4,0" HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Content="{TemplateBinding Icon}"
+                                            IsVisible="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+                                        <PathIcon
+                                            Name="PART_RightArrow" Classes="Flippable"
+                                            Grid.Column="2" Width="8"
+                                            Height="8" Margin="4,0"
+                                            HorizontalAlignment="Right" VerticalAlignment="Center"
+                                            Data="{x:Static suki:Icons.ChevronRight}"
+                                            Foreground="{DynamicResource SukiText}"/>
+                                        <ContentPresenter
+                                            Name="PART_HeaderPresenter" Grid.Column="1"
+                                            Margin="4,0" VerticalAlignment="Center"
+                                            Content="{TemplateBinding Header}">
+                                            <ContentPresenter.DataTemplates>
+                                                <DataTemplate DataType="system:String">
+                                                    <TextBlock FontWeight="{DynamicResource DefaultDemiBold}"
+                                                               Text="{Binding}"/>
+                                                </DataTemplate>
+                                            </ContentPresenter.DataTemplates>
+                                        </ContentPresenter>
+
+                                        <Popup
+                                            Name="PART_Popup" Grid.Column="0"
+                                            ClipToBounds="True" HorizontalOffset="-6"
+                                            IsLightDismissEnabled="False"
+                                            IsOpen="{Binding $parent[MenuItem].IsSubMenuOpen}"
+                                            OverlayInputPassThroughElement="{Binding $parent[ItemsControl]}"
+                                            Placement="RightEdgeAlignedTop" VerticalOffset="-15">
+                                            <Panel>
+                                                <!--  <Border  -->
+                                                <!--  Background="{DynamicResource AssistantBackgroundBrush}"  -->
+                                                <!--  CornerRadius="4" IsHitTestVisible="False"  -->
+                                                <!--  Opacity="0.4"/>  -->
+
+                                                <ScrollViewer Margin="8" ClipToBounds="True">
+                                                    <ItemsControl Focusable="False"
+                                                                  ItemsSource="{Binding $parent[MenuItem].Items}"/>
+                                                </ScrollViewer>
+                                            </Panel>
+                                        </Popup>
+                                    </Grid>
+                                </Border>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter>
+                </Style>
+
+                <Style Selector="suki|Loading">
+                    <Setter Property="Foreground" Value="{DynamicResource SukiLowText}"/>
+                </Style>
+            </Panel.Styles>
+
+            <suki:BusyArea
+                Margin="0,0,0,8" ClipToBounds="False"
+                IsBusy="{Binding IsBusy}"
+                IsVisible="{Binding !IsGenerating}">
+                <ItemsControl Focusable="False" ItemsSource="{Binding Actions}"/>
+            </suki:BusyArea>
+
+            <StackPanel
+                Width="400" Margin="8,0,8,8"
+                IsVisible="{Binding IsGenerating}"
+                Orientation="Vertical" Spacing="4">
+                <ScrollViewer
+                    MinHeight="200" MaxHeight="400"
+                    HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                    <TextBlock
+                        Foreground="{DynamicResource SukiText}" Inlines="{Binding GeneratedInlineCollection}"
+                        TextWrapping="WrapWithOverflow"/>
+                </ScrollViewer>
+
+                <Button
+                    Command="{Binding AcceptCommand}"
+                    Content="Accept" Focusable="False"/>
+                <Button
+                    Command="{Binding RetryCommand}"
+                    Content="Retry" Focusable="False"/>
+                <Button
+                    Command="{Binding CancelCommand}"
+                    Content="Cancel" Focusable="False"/>
+            </StackPanel>
+        </Panel>
+    </Grid>
+</v:ReactiveWindow>

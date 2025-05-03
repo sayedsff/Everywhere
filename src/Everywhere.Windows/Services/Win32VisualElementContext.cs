@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using System.Diagnostics;
 using System.IO.Pipes;
 using System.Runtime.InteropServices;
 using Windows.Win32;
@@ -26,6 +25,7 @@ public class Win32VisualElementContext : IVisualElementContext
     private static readonly UIA3Automation Automation = new();
     private static readonly ITreeWalker TreeWalker = Automation.TreeWalkerFactory.GetRawViewWalker();
     private static readonly TextServiceImpl TextService = new();
+    private static readonly int CurrentProcessId = (int)PInvoke.GetCurrentProcessId();
 
     public event IVisualElementContext.KeyboardFocusedElementChangedHandler? KeyboardFocusedElementChanged;
 
@@ -40,6 +40,8 @@ public class Win32VisualElementContext : IVisualElementContext
             element =>
             {
                 if (KeyboardFocusedElementChanged is not { } handler) return;
+                var pid = element?.FrameworkAutomationElement.ProcessId.ValueOrDefault ?? 0;
+                if (pid == CurrentProcessId) return;
                 handler(element == null ? null : new VisualElementImpl(element));
             });
     }
@@ -48,7 +50,8 @@ public class Win32VisualElementContext : IVisualElementContext
     {
         try
         {
-            if (factory() is { } element) return new VisualElementImpl(element);
+            if (factory() is { } element && element.FrameworkAutomationElement.ProcessId.ValueOrDefault != CurrentProcessId)
+                return new VisualElementImpl(element);
         }
         catch (Exception ex)
         {
@@ -61,7 +64,7 @@ public class Win32VisualElementContext : IVisualElementContext
 
     private class VisualElementImpl(AutomationElement element) : IVisualElement
     {
-        public string Id { get; } = string.Join('.', element.Properties.RuntimeId.ValueOrDefault);
+        public string Id { get; } = string.Join('.', element.Properties.RuntimeId.ValueOrDefault ?? []);
 
         public IVisualElement? Parent
         {
@@ -149,26 +152,40 @@ public class Win32VisualElementContext : IVisualElementContext
         {
             get
             {
-                if (element.Properties.Name.TryGetValue(out var name)) return name;
-                if (element.Patterns.LegacyIAccessible.PatternOrDefault is { } accessiblePattern) return accessiblePattern.Name;
-                return null;
+                try
+                {
+                    if (element.Properties.Name.TryGetValue(out var name)) return name;
+                    if (element.Patterns.LegacyIAccessible.PatternOrDefault is { } accessiblePattern) return accessiblePattern.Name;
+                    return null;
+                }
+                catch
+                {
+                    return null;
+                }
             }
         }
 
-        public PixelRect BoundingRectangle => new(
-            element.BoundingRectangle.X,
-            element.BoundingRectangle.Y,
-            element.BoundingRectangle.Width,
-            element.BoundingRectangle.Height);
+        public PixelRect BoundingRectangle => element.BoundingRectangle.To(r => new PixelRect(
+            r.X,
+            r.Y,
+            r.Width,
+            r.Height));
 
-        public uint ProcessId => (uint)element.FrameworkAutomationElement.ProcessId.ValueOrDefault;
+        public int ProcessId => element.FrameworkAutomationElement.ProcessId.ValueOrDefault;
 
         public string? GetText(int maxLength = -1)
         {
-            if (element.Patterns.Value.PatternOrDefault is { } valuePattern) return valuePattern.Value;
-            if (element.Patterns.Text.PatternOrDefault is { } textPattern) return textPattern.DocumentRange.GetText(maxLength);
-            if (element.Patterns.LegacyIAccessible.PatternOrDefault is { } accessiblePattern) return accessiblePattern.Value;
-            return null;
+            try
+            {
+                if (element.Patterns.Value.PatternOrDefault is { } valuePattern) return valuePattern.Value;
+                if (element.Patterns.Text.PatternOrDefault is { } textPattern) return textPattern.DocumentRange.GetText(maxLength);
+                if (element.Patterns.LegacyIAccessible.PatternOrDefault is { } accessiblePattern) return accessiblePattern.Value;
+                return null;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public void SetText(string text, bool append)
@@ -243,6 +260,32 @@ public class Win32VisualElementContext : IVisualElementContext
             }
         }
 
+        #region Events
+
+        public event Action<IVisualElement>? TextChanged;
+
+        public event Action<IVisualElement>? BoundingRectangleChanged;
+
+        private Action<IVisualElement>? textChanged;
+        private Action<IVisualElement>? boundingRectangleChanged;
+
+        private void ConfigurationEvents()
+        {
+            // element.FrameworkAutomationElement.RegisterPropertyChangedEvent(
+            //     TreeScope.Element,
+            //     HandlePropertyChanged,
+            //     element.FrameworkAutomationElement.PropertyIdLibrary.BoundingRectangle);
+            //
+            // void HandlePropertyChanged(AutomationElement e, PropertyId propertyId, object value)
+            // {
+            //     throw new NotImplementedException();
+            // }
+        }
+
+        #endregion
+
+        #region Interop
+
         private static bool TryGetWindow(AutomationElement? element, out nint hWnd)
         {
             while (element != null)
@@ -312,7 +355,17 @@ public class Win32VisualElementContext : IVisualElementContext
             if (inputBlocked) PInvoke.BlockInput(false);
         }
 
-        public override string ToString() => $"[{element.ControlType}] {Name} - {GetText()}";
+        #endregion
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is not VisualElementImpl other) return false;
+            return Id == other.Id;
+        }
+
+        public override int GetHashCode() => Id.GetHashCode();
+
+        public override string ToString() => $"[{element.ControlType}] {Name} - {GetText(128)}";
     }
 
     private class TextServiceImpl : IDisposable

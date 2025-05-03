@@ -15,10 +15,9 @@ public static class CastExtension
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     [return: NotNullIfNotNull(nameof(obj))] 
-    public static T? To<T>(this object? obj)
-    {
-        return (T?)obj;
-    }
+    public static T? To<T>(this object? obj) => (T?)obj;
+
+    public static T2 To<T1, T2>(this T1 obj, Func<T1, T2> converter) => converter(obj);
 
     /// <summary>
     /// 等价于obj as T，谁不喜欢Fluent API呢，还不用加括号
@@ -27,8 +26,5 @@ public static class CastExtension
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static T? As<T>(this object? obj) where T : class
-    {
-        return obj as T;
-    }
+    public static T? As<T>(this object? obj) where T : class => obj as T;
 }
