@@ -69,7 +69,7 @@ public partial class AgentFloatingWindow : ReactiveWindow<AgentFloatingWindowVie
     private void CalculatePositionAndPlacement()
     {
         // 1. Get the available area of all screens
-        var screenBounds = Screens.All.Select(s => s.Bounds).ToReadOnlyList();
+        var screenAreas = Screens.All.Select(s => s.Bounds).ToReadOnlyList();
         var actualSize = Bounds.Size.To(s => new PixelSize((int)(s.Width * DesktopScaling), (int)(s.Height * DesktopScaling)));
 
         // 2. Screen coordinates and this window size of the target element
@@ -108,7 +108,7 @@ public partial class AgentFloatingWindow : ReactiveWindow<AgentFloatingWindowVie
         foreach (var (mode, pos) in candidates)
         {
             var rect = new PixelRect(pos, actualSize);
-            if (screenBounds.Any(area => rect.Contains(area)))
+            if (screenAreas.Any(area => area.Contains(rect)))
             {
                 Position = pos;
                 Placement = mode;
@@ -118,7 +118,7 @@ public partial class AgentFloatingWindow : ReactiveWindow<AgentFloatingWindowVie
 
         // 5. If none of them are met, use the preferred solution and clamp it onto the main screen
         var (fallbackMode, fallbackPos) = candidates[0];
-        var mainArea = screenBounds[0];
+        var mainArea = screenAreas[0];
         Position = ClampToArea(fallbackPos, actualSize, mainArea);
         Placement = fallbackMode;
     }
