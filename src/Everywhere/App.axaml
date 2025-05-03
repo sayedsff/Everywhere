@@ -1,12 +1,6 @@
 <Application
     x:Class="Everywhere.App" xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:suki="https://github.com/kikipoulet/SukiUI">
-    <Application.Styles>
-        <suki:SukiTheme ThemeColor="Blue"/>
-        <StyleInclude Source="avares://IconPacks.Avalonia.Material/Material.axaml"/>
-        <StyleInclude Source="avares://Everywhere/Assets/Styles.axaml"/>
-    </Application.Styles>
-
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -14,4 +8,10 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
+
+    <Application.Styles>
+        <suki:SukiTheme ThemeColor="Blue"/>
+        <StyleInclude Source="avares://IconPacks.Avalonia.Material/Material.axaml"/>
+        <StyleInclude Source="avares://Everywhere/Assets/Styles.axaml"/>
+    </Application.Styles>
 </Application>

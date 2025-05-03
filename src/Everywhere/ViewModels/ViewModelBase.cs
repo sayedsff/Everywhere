@@ -112,10 +112,7 @@ public abstract partial class BusyViewModelBase : ReactiveViewModelBase
             if (!enqueueIfBusy && IsBusy) return;
 
             Task taskToWait;
-            if (currentTask is
-                {
-                    Status: TaskStatus.WaitingToRun or TaskStatus.Running or TaskStatus.WaitingForChildrenToComplete
-                })
+            if (currentTask is { IsCompleted: false })
             {
                 taskToWait = currentTask;
                 currentTask = currentTask.ContinueWith(
@@ -136,6 +133,7 @@ public abstract partial class BusyViewModelBase : ReactiveViewModelBase
                 IsBusy = true;
                 await taskToWait;
             }
+            catch (OperationCanceledException) { }
             catch (Exception e) when (exceptionHandler != null)
             {
                 exceptionHandler.HandleException(e);
