@@ -38,7 +38,7 @@ public partial class AgentFloatingWindow : ReactiveWindow<AgentFloatingWindowVie
     public AgentFloatingWindow(IPlatformHelper platformHelper)
     {
         InitializeComponent();
-        //platformHelper.SetWindowNoFocus(this);
+        platformHelper.SetWindowNoFocus(this);
     }
 
     protected override void OnLoaded(RoutedEventArgs e)

@@ -7,8 +7,8 @@
     x:TypeArguments="vm:AgentFloatingWindowViewModel" Background="Transparent"
     CanResize="False"
     IsOpened="{Binding TargetElement, Converter={x:Static ObjectConverters.IsNotNull}}"
-    ShowInTaskbar="False" SizeToContent="WidthAndHeight"
-    SystemDecorations="None"
+    ShowActivated="False" ShowInTaskbar="False"
+    SizeToContent="WidthAndHeight" SystemDecorations="None"
     TargetBoundingRect="{Binding TargetBoundingRect}"
     Topmost="True" WindowStartupLocation="Manual">
 

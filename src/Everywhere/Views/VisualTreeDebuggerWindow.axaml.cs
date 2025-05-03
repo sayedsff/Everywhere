@@ -1,36 +1,58 @@
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Media;
+using Avalonia.Threading;
 
 namespace Everywhere.Views;
 
 public partial class VisualTreeDebuggerWindow : ReactiveSukiWindow<VisualTreeDebuggerWindowViewModel>
 {
-    private readonly nint visualElementMask;
+    private readonly Window treeViewFocusMask;
 
-    public VisualTreeDebuggerWindow()
+    public VisualTreeDebuggerWindow(IVisualElementContext visualElementContext)
     {
         InitializeComponent();
 
-        visualElementMask = CreateWindowEx(
-            WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_TOPMOST,
-            "STATIC",
-            null,
-            WS_POPUP | WS_VISIBLE,
-            0,
-            0,
-            0,
-            0,
-            IntPtr.Zero,
-            IntPtr.Zero,
-            GetModuleHandle(null),
-            IntPtr.Zero
-        );
-        SetLayeredWindowAttributes(
-            visualElementMask,
-            0,
-            128,
-            LWA_ALPHA | LWA_COLORKEY
-        );
+        treeViewFocusMask = new Window
+        {
+            Topmost = true,
+            IsHitTestVisible = false,
+            ShowInTaskbar = false,
+            ShowActivated = false,
+            SystemDecorations = SystemDecorations.None,
+            TransparencyLevelHint = [WindowTransparencyLevel.Transparent],
+            Background = null,
+            Content = new Border
+            {
+                BorderThickness = new Thickness(1),
+                BorderBrush = Brushes.DodgerBlue,
+                Opacity = 0.5
+            }
+        };
+        EnableClickThrough(treeViewFocusMask);
+
+        var keyboardFocusMask = new Window
+        {
+            Topmost = true,
+            IsHitTestVisible = false,
+            ShowInTaskbar = false,
+            ShowActivated = false,
+            SystemDecorations = SystemDecorations.None,
+            TransparencyLevelHint = [WindowTransparencyLevel.Transparent],
+            Background = null,
+            Content = new Border
+            {
+                BorderThickness = new Thickness(1),
+                BorderBrush = Brushes.Crimson,
+                Opacity = 0.5
+            }
+        };
+        EnableClickThrough(keyboardFocusMask);
+
+        visualElementContext.KeyboardFocusedElementChanged += element =>
+        {
+            Dispatcher.UIThread.Invoke(() => SetMask(keyboardFocusMask, element));
+        };
     }
 
     private void HandleTreeViewPointerMoved(object? sender, PointerEventArgs e)
@@ -41,63 +63,53 @@ public partial class VisualTreeDebuggerWindow : ReactiveSukiWindow<VisualTreeDeb
             element = element.Parent;
             if (element is TreeViewItem { DataContext: IVisualElement visualElement })
             {
-                var boundingRectangle = visualElement.BoundingRectangle;
-                SetWindowPos(
-                    visualElementMask,
-                    IntPtr.Zero,
-                    boundingRectangle.X,
-                    boundingRectangle.Y,
-                    boundingRectangle.Width,
-                    boundingRectangle.Height,
-                    SWP_NOZORDER
-                );
-                break;
+                SetMask(treeViewFocusMask, visualElement);
+                return;
             }
+        }
+
+        SetMask(treeViewFocusMask, null);
+    }
+
+    private static void SetMask(Window mask, IVisualElement? element)
+    {
+        if (element == null)
+        {
+            mask.Hide();
+        }
+        else
+        {
+            mask.Show();
+            var boundingRectangle = element.BoundingRectangle;
+            mask.Position = new PixelPoint(boundingRectangle.X, boundingRectangle.Y);
+            mask.Width = boundingRectangle.Width / mask.DesktopScaling;
+            mask.Height = boundingRectangle.Height / mask.DesktopScaling;
         }
     }
 
-    [DllImport("user32.dll")]
-    private static extern IntPtr CreateWindowEx(
-        uint dwExStyle,
-        string lpClassName,
-        string? lpWindowName,
-        uint dwStyle,
-        int x,
-        int y,
-        int nWidth,
-        int nHeight,
-        IntPtr hWndParent,
-        IntPtr hMenu,
-        IntPtr hInstance,
-        IntPtr lpParam);
+    private const int GWL_EXSTYLE   = -20;
+    private const int WS_EX_LAYERED = 0x80000;
+    private const int WS_EX_TRANSPARENT = 0x20;
+    private const uint LWA_ALPHA    = 0x2;
 
-    [DllImport("user32.dll")]
-    private static extern bool SetLayeredWindowAttributes(
-        IntPtr hWnd,
-        uint crKey,
-        byte bAlpha,
-        uint dwFlags);
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern int GetWindowLong(IntPtr hWnd, int index);
 
-    [DllImport("user32.dll")]
-    private static extern bool SetWindowPos(
-        IntPtr hWnd,
-        IntPtr hWndInsertAfter,
-        int x,
-        int y,
-        int cx,
-        int cy,
-        uint uFlags);
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern int SetWindowLong(IntPtr hWnd, int index, int newStyle);
 
-    [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
-    private static extern IntPtr GetModuleHandle(string? lpModuleName);
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern bool SetLayeredWindowAttributes(IntPtr hWnd, uint crKey, byte bAlpha, uint flags);
 
-    // 窗口样式
-    private const uint WS_EX_TRANSPARENT = 0x00000020;
-    private const uint WS_EX_LAYERED = 0x00080000;
-    private const uint WS_EX_TOPMOST = 0x00000008;
-    private const uint WS_POPUP = 0x80000000;
-    private const uint WS_VISIBLE = 0x10000000;
-    private const int LWA_ALPHA = 0x00000002;
-    private const int LWA_COLORKEY = 0x00000001;
-    private const int SWP_NOZORDER = 0x0004;
+    public static void EnableClickThrough(Window window)
+    {
+        window.Loaded += delegate
+        {
+            if (window.TryGetPlatformHandle() is not { } handle) return;
+            var hWnd = handle.Handle;
+            var style = GetWindowLong(hWnd, GWL_EXSTYLE);
+            SetWindowLong(hWnd, GWL_EXSTYLE, style | WS_EX_LAYERED | WS_EX_TRANSPARENT);
+            SetLayeredWindowAttributes(hWnd, 0, 255, LWA_ALPHA);
+        };
+    }
 }
