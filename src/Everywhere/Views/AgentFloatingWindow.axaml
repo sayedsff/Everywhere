@@ -1,17 +1,16 @@
 ﻿<v:ReactiveWindow
     x:Class="Everywhere.Views.AgentFloatingWindow" xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:suki="https://github.com/kikipoulet/SukiUI"
-    xmlns:system="clr-namespace:System;assembly=System.Runtime" xmlns:v="clr-namespace:Everywhere.Views"
-    xmlns:vm="clr-namespace:Everywhere.ViewModels"
-    xmlns:vc="clr-namespace:Everywhere.ValueConverters"
-    x:DataType="vm:AgentFloatingWindowViewModel"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:color="clr-namespace:SukiUI.ColorTheme;assembly=SukiUI"
+    xmlns:suki="https://github.com/kikipoulet/SukiUI" xmlns:system="clr-namespace:System;assembly=System.Runtime"
+    xmlns:v="clr-namespace:Everywhere.Views" xmlns:vc="clr-namespace:Everywhere.ValueConverters"
+    xmlns:vm="clr-namespace:Everywhere.ViewModels" x:DataType="vm:AgentFloatingWindowViewModel"
     x:TypeArguments="vm:AgentFloatingWindowViewModel" Background="Transparent"
-    CanResize="False" SystemDecorations="None"
+    CanResize="False"
     IsOpened="{Binding TargetElement, Converter={x:Static ObjectConverters.IsNotNull}}"
     ShowInTaskbar="False" SizeToContent="WidthAndHeight"
+    SystemDecorations="None"
     TargetBoundingRect="{Binding TargetBoundingRect}"
-    Topmost="True"
-    WindowStartupLocation="Manual">
+    Topmost="True" WindowStartupLocation="Manual">
 
     <Grid x:Name="RootGrid" RowDefinitions="*,Auto">
         <Grid.Resources>
@@ -42,9 +41,8 @@
             <Border.Transitions>
                 <Transitions>
                     <CornerRadiusTransition
-                        Easing="SineEaseInOut"
-                        Duration="0:0:0.2"
-                        Property="CornerRadius"/>
+                        Easing="SineEaseInOut" Property="CornerRadius"
+                        Duration="0:0:0.2"/>
                 </Transitions>
             </Border.Transitions>
         </Border>
@@ -54,8 +52,9 @@
             Background="Transparent" Orientation="Horizontal"
             PointerPressed="HandleTitleBarPointerPressed">
             <ToggleButton
-                Padding="0" BorderThickness="0"
-                Focusable="False"
+                Padding="0"
+                Background="{x:Null}"
+                BorderThickness="0" Focusable="False"
                 IsChecked="{Binding IsExpanded, Mode=TwoWay}">
                 <ToggleButton.Effect>
                     <DropShadowEffect BlurRadius="9" Opacity="0.3"/>
@@ -99,7 +98,7 @@
                         <ControlTemplate TargetType="MenuItem">
                             <Border Background="Transparent" Focusable="False">
                                 <Border
-                                    Margin="8,0"
+                                    Margin="4,0"
                                     Background="{TemplateBinding Background}"
                                     BorderBrush="{TemplateBinding BorderBrush}"
                                     ClipToBounds="True" CornerRadius="4">
@@ -130,8 +129,7 @@
                                             Content="{TemplateBinding Header}">
                                             <ContentPresenter.DataTemplates>
                                                 <DataTemplate DataType="system:String">
-                                                    <TextBlock FontWeight="{DynamicResource DefaultDemiBold}"
-                                                               Text="{Binding}"/>
+                                                    <TextBlock FontWeight="{DynamicResource DefaultDemiBold}" Text="{Binding}"/>
                                                 </DataTemplate>
                                             </ContentPresenter.DataTemplates>
                                         </ContentPresenter>
@@ -150,8 +148,7 @@
                                                 <!--  Opacity="0.4"/>  -->
 
                                                 <ScrollViewer Margin="8" ClipToBounds="True">
-                                                    <ItemsControl Focusable="False"
-                                                                  ItemsSource="{Binding $parent[MenuItem].Items}"/>
+                                                    <ItemsControl Focusable="False" ItemsSource="{Binding $parent[MenuItem].Items}"/>
                                                 </ScrollViewer>
                                             </Panel>
                                         </Popup>
@@ -182,19 +179,31 @@
                     MinHeight="200" MaxHeight="400"
                     HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                     <TextBlock
-                        Foreground="{DynamicResource SukiText}" Inlines="{Binding GeneratedInlineCollection}"
+                        Foreground="{DynamicResource SukiText}"
+                        Inlines="{Binding GeneratedInlineCollection}"
                         TextWrapping="WrapWithOverflow"/>
                 </ScrollViewer>
 
-                <Button
-                    Command="{Binding AcceptCommand}"
-                    Content="Accept" Focusable="False"/>
-                <Button
-                    Command="{Binding RetryCommand}"
-                    Content="Retry" Focusable="False"/>
-                <Button
-                    Command="{Binding CancelCommand}"
-                    Content="Cancel" Focusable="False"/>
+                <v:UniformStackPanel Orientation="Horizontal" Spacing="4">
+                    <Button
+                        Classes="Rounded"
+                        BorderBrush="{x:Static color:NotificationColor.ErrorIconForeground}"
+                        Command="{Binding CancelCommand}"
+                        Content="Cancel" Focusable="False"
+                        Foreground="{x:Static color:NotificationColor.ErrorIconForeground}"/>
+                    <Button
+                        Classes="Rounded"
+                        BorderBrush="{DynamicResource SukiLowText}"
+                        Command="{Binding RetryCommand}"
+                        Content="Retry" Focusable="False"
+                        Foreground="{DynamicResource SukiText}"
+                        IsVisible="{Binding !IsBusy}"/>
+                    <Button
+                        Classes="Flat Rounded"
+                        Command="{Binding AcceptCommand}"
+                        Content="Accept" Focusable="False"
+                        IsVisible="{Binding !IsBusy}"/>
+                </v:UniformStackPanel>
             </StackPanel>
         </Panel>
     </Grid>
