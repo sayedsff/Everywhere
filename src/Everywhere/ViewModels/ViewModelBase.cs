@@ -89,6 +89,13 @@ public abstract class ReactiveViewModelBase : ObservableValidator
     }
 }
 
+[Flags]
+public enum ExecutionFlags
+{
+    None = 0,
+    EnqueueIfBusy = 1,
+}
+
 public abstract partial class BusyViewModelBase : ReactiveViewModelBase
 {
     [ObservableProperty]
@@ -102,14 +109,14 @@ public abstract partial class BusyViewModelBase : ReactiveViewModelBase
     protected async Task ExecuteBusyTaskAsync(
         Func<Task> task,
         IExceptionHandler? exceptionHandler = null,
-        bool enqueueIfBusy = false,
+        ExecutionFlags flags = ExecutionFlags.None,
         CancellationToken cancellationToken = default)
     {
         await executionLock.WaitAsync(cancellationToken);
         try
         {
             cancellationToken.ThrowIfCancellationRequested();
-            if (!enqueueIfBusy && IsBusy) return;
+            if (!flags.HasFlag(ExecutionFlags.EnqueueIfBusy) && IsBusy) return;
 
             Task taskToWait;
             if (currentTask is { IsCompleted: false })
@@ -151,4 +158,15 @@ public abstract partial class BusyViewModelBase : ReactiveViewModelBase
             executionLock.Release();
         }
     }
+
+    protected Task ExecuteBusyTaskAsync(
+        Action action,
+        IExceptionHandler? exceptionHandler = null,
+        ExecutionFlags flags = ExecutionFlags.None,
+        CancellationToken cancellationToken = default) =>
+        ExecuteBusyTaskAsync(
+            () => Task.Run(action, cancellationToken),
+            exceptionHandler,
+            flags,
+            cancellationToken);
 }

@@ -102,8 +102,20 @@ public partial class AgentFloatingWindowViewModel : BusyViewModelBase
         ];
     }
 
-    public Task SetTargetElementAsync(IVisualElement? targetElement, CancellationToken cancellationToken) => ExecuteBusyTaskAsync(
-        () => Task.Run(
+    private CancellationTokenSource? targetElementChangedTokenSource;
+
+    public async Task SetTargetElementAsync(IVisualElement? targetElement, CancellationToken cancellationToken)
+    {
+        // debouncing
+        if (targetElementChangedTokenSource is not null) await targetElementChangedTokenSource.CancelAsync();
+        targetElementChangedTokenSource = new CancellationTokenSource();
+        try
+        {
+            await Task.Delay(100, targetElementChangedTokenSource.Token);
+        }
+        catch (OperationCanceledException) { }
+
+        await ExecuteBusyTaskAsync(
             () =>
             {
                 if (Equals(TargetElement, targetElement)) return;
@@ -130,33 +142,33 @@ public partial class AgentFloatingWindowViewModel : BusyViewModelBase
                 TargetElement = targetElement;
                 Actions = textEditActions;
             },
-            cancellationToken),
-        enqueueIfBusy: true,
-        cancellationToken: cancellationToken);
+            flags: ExecutionFlags.EnqueueIfBusy,
+            cancellationToken: cancellationToken);
+    }
 
     [RelayCommand]
-    private Task GenerateAndAppendAsync(string mission) => MakeGenerateTask(() => Task.Run(async () =>
+    private Task GenerateAndAppendAsync(string mission) => MakeGenerateTask(async () =>
     {
         if (TargetElement is not { } element) return;
         appendText = true;
         await GenerateAsync(element, mission);
-    }));
+    });
 
     [RelayCommand]
-    private Task GenerateAndReplaceAsync(string mission) => MakeGenerateTask(() => Task.Run(async () =>
+    private Task GenerateAndReplaceAsync(string mission) => MakeGenerateTask(async () =>
     {
         if (TargetElement is not { } element) return;
         appendText = false;
         await GenerateAsync(element, mission);
-    }));
+    });
 
     [RelayCommand]
-    private Task AcceptAsync() => ExecuteBusyTaskAsync(() => Task.Run(() =>
+    private Task AcceptAsync() => ExecuteBusyTaskAsync(() =>
     {
         if (TargetElement is not { } element) return;
         element.SetText(generatedTextBuilder.ToString(), appendText);
         Reset();
-    }));
+    });
 
     [RelayCommand]
     private Task RetryAsync() => generateTask?.Invoke() ?? Task.CompletedTask;
@@ -170,8 +182,8 @@ public partial class AgentFloatingWindowViewModel : BusyViewModelBase
 
     private Task MakeGenerateTask(Func<Task> task)
     {
-        generateTask = task;
-        return ExecuteBusyTaskAsync(task);
+        generateTask = () => Task.Run(task);
+        return ExecuteBusyTaskAsync(generateTask);
     }
 
     private void Reset()
