@@ -1,11 +1,11 @@
 <Application
     x:Class="Everywhere.App" xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:suki="https://github.com/kikipoulet/SukiUI"
-    xmlns:vc="clr-namespace:Everywhere.ValueConverters">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:suki="https://github.com/kikipoulet/SukiUI">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <MergeResourceInclude Source="avares://Everywhere/Assets/Resources.axaml"/>
+                <ResourceInclude Source="avares://Everywhere/Assets/Resources.axaml"/>
+                <ResourceInclude Source="avares://Everywhere/I18N/Key.axaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
