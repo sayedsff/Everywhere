@@ -14,10 +14,15 @@ public static class ServiceLocator
         serviceProvider = serviceCollection.BuildServiceProvider();
     }
 
-    public static T Resolve<T>(object? key = null) where T : class
+    public static object Resolve(Type type, object? key = null)
     {
         if (serviceProvider == null) throw new InvalidOperationException($"{nameof(ServiceLocator)} is not built.");
-        if (key == null) return serviceProvider.GetRequiredService<T>();
-        return (T)serviceProvider.GetRequiredKeyedService(typeof(T), key);
+        if (key == null) return serviceProvider.GetRequiredService(type);
+        return serviceProvider.GetRequiredKeyedService(type, key);
+    }
+
+    public static T Resolve<T>(object? key = null) where T : class
+    {
+        return (T)Resolve(typeof(T), key);
     }
 }

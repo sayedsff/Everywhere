@@ -1,6 +1,7 @@
 <Application
     x:Class="Everywhere.App" xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:suki="https://github.com/kikipoulet/SukiUI">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:suki="https://github.com/kikipoulet/SukiUI"
+    xmlns:vc="clr-namespace:Everywhere.ValueConverters">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

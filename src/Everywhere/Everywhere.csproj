@@ -18,8 +18,10 @@
         </PackageReference>
         <PackageReference Include="IconPacks.Avalonia.Material"/>
         <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="JetBrains.Profiler.Api"/>
+        <PackageReference Include="Microsoft.Extensions.Options" />
         <PackageReference Include="Microsoft.SemanticKernel"/>
         <PackageReference Include="Microsoft.SemanticKernel.Connectors.OpenAI"/>
+        <PackageReference Include="ObservableCollections" />
     </ItemGroup>
 
     <ItemGroup>
@@ -31,4 +33,8 @@
             <Link>Assets\Everywhere.png</Link>
         </AvaloniaResource>
     </ItemGroup>
+
+    <Target Name="I18N" BeforeTargets="PreBuildEvent">
+      <Exec Command="dotnet run --project $(SolutionDir)src/Everywhere.I18N.Generator/Everywhere.I18N.Generator.csproj -- $(SolutionDir)src/Everywhere/I18N/i18n.tsv $(SolutionDir)src/Everywhere/I18N" />
+    </Target>
 </Project>

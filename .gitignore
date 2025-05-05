@@ -454,3 +454,6 @@ $RECYCLE.BIN/
 !.vscode/extensions.json
 *.pb.h
 *.pb.cc
+
+/src/Everywhere/I18N/*.axaml
+/src/Everywhere/I18N/*.cs

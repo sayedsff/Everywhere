@@ -3,6 +3,7 @@ using Everywhere.Extensions;
 using Everywhere.Interfaces;
 using Everywhere.ViewModels;
 using Everywhere.Views;
+using Everywhere.Views.Pages;
 using Everywhere.Windows.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel;
@@ -28,6 +29,12 @@ public static class Program
                 .AddSingleton<VisualTreeDebuggerWindow>()
                 .AddSingleton<AgentFloatingWindowViewModel>()
                 .AddSingleton<AgentFloatingWindow>()
+
+                .AddSingleton<SettingsPageViewModel>()
+                .AddSingleton<IMainViewPage, SettingsPage>()
+
+                .AddSingleton<MainViewModel>()
+                .AddSingleton<MainView>()
 
                 .AddSingleton<IVisualElementContext, Win32VisualElementContext>()
                 .AddSingleton<IUserInputTrigger, Win32UserInputTrigger>()

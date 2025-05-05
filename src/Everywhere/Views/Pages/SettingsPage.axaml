@@ -1,0 +1,55 @@
+﻿<UserControl
+    x:Class="Everywhere.Views.Pages.SettingsPage" xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:vm="clr-namespace:Everywhere.ViewModels"
+    x:DataType="vm:SettingsPageViewModel">
+    <ItemsControl
+        MinWidth="640" HorizontalAlignment="Center"
+        ItemsSource="{Binding Items}">
+        <ItemsControl.Styles>
+            <Style Selector="Border.ItemContainer:pointerover">
+                <Setter Property="Background">
+                    <Setter.Value>
+                        <SolidColorBrush Opacity="0.2" Color="{DynamicResource SukiGlassCardBackground}"/>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ItemsControl.Styles>
+
+        <ItemsControl.ItemTemplate>
+            <DataTemplate DataType="vm:SettingsPageViewModel+SettingsItemBase">
+                <Border Classes="ItemContainer" CornerRadius="4">
+                    <Border.Transitions>
+                        <Transitions>
+                            <BrushTransition
+                                Easing="SineEaseInOut" Property="Background"
+                                Duration="0:0:0.2"/>
+                        </Transitions>
+                    </Border.Transitions>
+
+                    <StackPanel Margin="8">
+                        <TextBlock FontSize="16" Text="{Binding HeaderKey^}"/>
+                        <TextBlock
+                            Margin="0,8"
+                            Foreground="{DynamicResource SukiLowText}"
+                            Text="{Binding DescriptionKey^}"/>
+                        <ContentPresenter Content="{Binding}">
+                            <ContentPresenter.DataTemplates>
+                                <DataTemplate>
+                                    <DataTemplate.DataType>
+                                        <x:Type TypeName="vm:SettingsPageViewModel+SettingsSelectionItem"/>
+                                    </DataTemplate.DataType>
+
+                                    <ComboBox
+                                        MinWidth="320" MinHeight="32"
+                                        HorizontalAlignment="Left"
+                                        ItemsSource="{Binding Items}"
+                                        SelectedItem="{Binding Value, Mode=TwoWay}"/>
+                                </DataTemplate>
+                            </ContentPresenter.DataTemplates>
+                        </ContentPresenter>
+                    </StackPanel>
+                </Border>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+    </ItemsControl>
+</UserControl>
