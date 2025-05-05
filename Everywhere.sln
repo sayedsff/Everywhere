@@ -9,8 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Everywhere.Windows", "src\E
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3DA99C4E-89E3-4049-9C22-0A7EC60D83D8}"
 	ProjectSection(SolutionItems) = preProject
-		Directory.Packages.props = src\Directory.Packages.props
-		src\Directory.Build.props = src\Directory.Build.props
+		Directory.Packages.props = Directory.Packages.props
+		src\Directory.Build.props = Directory.Build.props
 		src\TextService.proto = src\TextService.proto
 		.gitignore = .gitignore
 	EndProjectSection
@@ -22,6 +22,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Everywhere.Windows.TextService", "src\Everywhere.Windows.TextService\Everywhere.Windows.TextService.vcxproj", "{D5F1DA2F-CE8F-4F35-A2C2-6DC5378211DF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Everywhere.I18N.Generator", "src\Everywhere.I18N.Generator\Everywhere.I18N.Generator.csproj", "{A68C1BEB-0FC2-4A47-BFEB-E96BB14A9913}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WritableJsonConfiguration", "3rd\WritableJsonConfiguration\src\WritableJsonConfiguration\WritableJsonConfiguration.csproj", "{85AE2A7B-E780-4741-9BE5-FB22F37D7E21}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -49,6 +51,10 @@ Global
 		{A68C1BEB-0FC2-4A47-BFEB-E96BB14A9913}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A68C1BEB-0FC2-4A47-BFEB-E96BB14A9913}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A68C1BEB-0FC2-4A47-BFEB-E96BB14A9913}.Release|Any CPU.Build.0 = Release|Any CPU
+		{85AE2A7B-E780-4741-9BE5-FB22F37D7E21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{85AE2A7B-E780-4741-9BE5-FB22F37D7E21}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{85AE2A7B-E780-4741-9BE5-FB22F37D7E21}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{85AE2A7B-E780-4741-9BE5-FB22F37D7E21}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -58,5 +64,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{2DC25E9E-46B8-4655-811C-FDF41E19F218} = {53D93485-1520-4753-81CE-DA1CFF334372}
+		{85AE2A7B-E780-4741-9BE5-FB22F37D7E21} = {53D93485-1520-4753-81CE-DA1CFF334372}
 	EndGlobalSection
 EndGlobal

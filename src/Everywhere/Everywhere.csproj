@@ -18,7 +18,7 @@
         </PackageReference>
         <PackageReference Include="IconPacks.Avalonia.Material"/>
         <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="JetBrains.Profiler.Api"/>
-        <PackageReference Include="Microsoft.Extensions.Options" />
+        <PackageReference Include="Microsoft.Extensions.Configuration" />
         <PackageReference Include="Microsoft.SemanticKernel"/>
         <PackageReference Include="Microsoft.SemanticKernel.Connectors.OpenAI"/>
         <PackageReference Include="ObservableCollections" />
@@ -26,6 +26,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\3rd\SukiUI\SukiUI\SukiUI.csproj"/>
+        <ProjectReference Include="..\..\3rd\WritableJsonConfiguration\src\WritableJsonConfiguration\WritableJsonConfiguration.csproj" />
     </ItemGroup>
 
     <ItemGroup>

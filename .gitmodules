@@ -1,3 +1,6 @@
 [submodule "3rd/SukiUI"]
 	path = 3rd/SukiUI
 	url = https://github.com/NodisAI/SukiUI
+[submodule "3rd/WritableJsonConfiguration"]
+	path = 3rd/WritableJsonConfiguration
+	url = https://github.com/DearVa/WritableJsonConfiguration

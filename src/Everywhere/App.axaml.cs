@@ -10,6 +10,15 @@ public class App : Application
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
+
+        // try
+        // {
+        //     await Task.WhenAll(ServiceLocator.Resolve<IEnumerable<IAsyncInitialize>>().Select(i => i.InitializeAsync()));
+        // }
+        // catch (Exception e)
+        // {
+        //     Console.WriteLine(e);
+        // }
     }
 
     public override void OnFrameworkInitializationCompleted()
@@ -26,8 +35,6 @@ public class App : Application
                 break;
             }
         }
-
-        base.OnFrameworkInitializationCompleted();
     }
 
     private static void DisableAvaloniaDataAnnotationValidation()

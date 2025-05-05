@@ -16,7 +16,7 @@
         </ItemsControl.Styles>
 
         <ItemsControl.ItemTemplate>
-            <DataTemplate DataType="vm:SettingsPageViewModel+SettingsItemBase">
+            <DataTemplate DataType="vm:SettingsPageViewModel+SettingsItem">
                 <Border Classes="ItemContainer" CornerRadius="4">
                     <Border.Transitions>
                         <Transitions>
@@ -34,17 +34,37 @@
                             Text="{Binding DescriptionKey^}"/>
                         <ContentPresenter Content="{Binding}">
                             <ContentPresenter.DataTemplates>
-                                <DataTemplate>
-                                    <DataTemplate.DataType>
-                                        <x:Type TypeName="vm:SettingsPageViewModel+SettingsSelectionItem"/>
-                                    </DataTemplate.DataType>
-
-                                    <ComboBox
-                                        MinWidth="320" MinHeight="32"
-                                        HorizontalAlignment="Left"
-                                        ItemsSource="{Binding Items}"
-                                        SelectedItem="{Binding Value, Mode=TwoWay}"/>
-                                </DataTemplate>
+                                <vm:SettingsItemDataTemplate>
+                                    <vm:SettingsItemDataTemplate.BooleanSettingsItemTemplate>
+                                        <DataTemplate DataType="vm:SettingsPageViewModel+SettingsItem">
+                                            <ToggleSwitch IsChecked="{Binding Value, Mode=TwoWay}"/>
+                                        </DataTemplate>
+                                    </vm:SettingsItemDataTemplate.BooleanSettingsItemTemplate>
+                                    <vm:SettingsItemDataTemplate.StringSettingsItemTemplate>
+                                        <DataTemplate DataType="vm:SettingsPageViewModel+SettingsItem">
+                                            <TextBox Text="{Binding Value, Mode=TwoWay}"/>
+                                        </DataTemplate>
+                                    </vm:SettingsItemDataTemplate.StringSettingsItemTemplate>
+                                    <vm:SettingsItemDataTemplate.FloatSettingsItemTemplate>
+                                        <DataTemplate DataType="vm:SettingsPageViewModel+SettingsItem">
+                                            <NumericUpDown Text="{Binding Value, Mode=TwoWay}"/>
+                                        </DataTemplate>
+                                    </vm:SettingsItemDataTemplate.FloatSettingsItemTemplate>
+                                    <vm:SettingsItemDataTemplate.IntegerSettingsItemTemplate>
+                                        <DataTemplate DataType="vm:SettingsPageViewModel+SettingsItem">
+                                            <NumericUpDown Value="{Binding Value, Mode=TwoWay}"/>
+                                        </DataTemplate>
+                                    </vm:SettingsItemDataTemplate.IntegerSettingsItemTemplate>
+                                    <vm:SettingsItemDataTemplate.SelectionSettingsItemTemplate>
+                                        <DataTemplate DataType="vm:SettingsPageViewModel+SelectionSettingsItem">
+                                            <ComboBox
+                                                MinWidth="320" MinHeight="32"
+                                                HorizontalAlignment="Left"
+                                                ItemsSource="{Binding Items}"
+                                                SelectedItem="{Binding Value, Mode=TwoWay}"/>
+                                        </DataTemplate>
+                                    </vm:SettingsItemDataTemplate.SelectionSettingsItemTemplate>
+                                </vm:SettingsItemDataTemplate>
                             </ContentPresenter.DataTemplates>
                         </ContentPresenter>
                     </StackPanel>
