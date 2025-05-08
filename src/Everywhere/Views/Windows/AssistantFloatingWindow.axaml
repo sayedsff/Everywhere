@@ -1,0 +1,140 @@
+﻿<v:ReactiveWindow
+    x:Class="Everywhere.Views.AssistantFloatingWindow" xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:suki="https://github.com/kikipoulet/SukiUI"
+    xmlns:system="clr-namespace:System;assembly=System.Runtime" xmlns:v="clr-namespace:Everywhere.Views"
+    xmlns:vc="clr-namespace:Everywhere.ValueConverters" xmlns:vm="clr-namespace:Everywhere.ViewModels"
+    x:DataType="vm:AssistantFloatingWindowViewModel" x:TypeArguments="vm:AssistantFloatingWindowViewModel"
+    Background="Transparent" CanResize="False"
+    IsOpened="{Binding TargetElement, Converter={x:Static ObjectConverters.IsNotNull}}"
+    ShowActivated="False" ShowInTaskbar="False"
+    SizeToContent="WidthAndHeight" SystemDecorations="None"
+    TargetBoundingRect="{Binding TargetBoundingRect}"
+    Topmost="True" WindowStartupLocation="Manual">
+
+    <Grid x:Name="RootGrid" RowDefinitions="*,Auto">
+        <Grid.Resources>
+            <vc:PlacementToCornerRadiusConverter x:Key="PlacementToCornerRadiusConverter"/>
+        </Grid.Resources>
+
+        <Grid.Styles>
+            <Style Selector="Border.IsExpanded">
+                <Setter Property="Background" Value="{DynamicResource SukiGlassCardBackground}"/>
+            </Style>
+        </Grid.Styles>
+
+        <Border
+            Grid.Row="0" Grid.RowSpan="2"
+            Background="{DynamicResource AssistantBackgroundBrush}"
+            Classes.IsExpanded="{Binding IsExpanded}">
+            <Border.CornerRadius>
+                <MultiBinding Converter="{StaticResource PlacementToCornerRadiusConverter}">
+                    <Binding>
+                        <Binding.Source>
+                            <system:Double>4</system:Double>
+                        </Binding.Source>
+                    </Binding>
+                    <Binding>
+                        <Binding.Source>
+                            <system:Double>8</system:Double>
+                        </Binding.Source>
+                    </Binding>
+                    <Binding Path="$self.Bounds.Width"/>
+                    <Binding Path="$parent[v:AssistantFloatingWindow].Placement"/>
+                    <Binding Path="IsExpanded"/>
+                </MultiBinding>
+            </Border.CornerRadius>
+
+            <Border.Transitions>
+                <Transitions>
+                    <CornerRadiusTransition
+                        Easing="SineEaseInOut" Property="CornerRadius"
+                        Duration="0:0:0.2"/>
+                    <BrushTransition
+                        Easing="SineEaseInOut" Property="Background"
+                        Duration="0:0:0.2"/>
+                </Transitions>
+            </Border.Transitions>
+        </Border>
+
+        <StackPanel
+            Grid.Row="0" Margin="8"
+            Background="Transparent" Orientation="Horizontal"
+            PointerPressed="HandleTitleBarPointerPressed">
+            <ToggleButton
+                Padding="0"
+                Background="{x:Null}"
+                BorderThickness="0" Focusable="False"
+                IsChecked="{Binding IsExpanded, Mode=TwoWay}">
+                <ToggleButton.Effect>
+                    <DropShadowEffect BlurRadius="9" Opacity="0.3"/>
+                </ToggleButton.Effect>
+
+                <Viewbox Width="36" Height="36">
+                    <ContentPresenter Content="{StaticResource AssistantAvatar}"/>
+                </Viewbox>
+            </ToggleButton>
+
+            <TextBlock
+                Margin="8,0,0,0" VerticalAlignment="Center"
+                FontSize="16" FontWeight="Bold"
+                Foreground="{DynamicResource SukiText}"
+                IsHitTestVisible="False"
+                IsVisible="{Binding IsExpanded}"
+                Text="{Binding Title}"/>
+        </StackPanel>
+
+        <Border
+            Grid.Row="0" Height="1"
+            Margin="0,-4,0,4" VerticalAlignment="Bottom"
+            Background="{DynamicResource SukiBorderBrush}"
+            IsVisible="{Binding IsExpanded}"/>
+
+        <Panel Grid.Row="1" IsVisible="{Binding IsExpanded}">
+            <Panel.Styles>
+                <Style Selector="suki|Loading">
+                    <Setter Property="Foreground" Value="{DynamicResource SukiLowText}"/>
+                </Style>
+            </Panel.Styles>
+
+            <suki:BusyArea
+                Width="400" Margin="8"
+                ClipToBounds="False"
+                IsBusy="{Binding IsBusy}"
+                IsVisible="{Binding !IsGenerating}">
+                <StackPanel Orientation="Vertical" Spacing="4">
+                    <ScrollViewer
+                        MinHeight="200" MaxHeight="400"
+                        HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                        <Panel>
+                            <ItemsControl ItemsSource="{Binding Actions}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel ItemSpacing="4" LineSpacing="4"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="v:DynamicKeyMenuItem">
+                                        <Button Command="{Binding Command}" CommandParameter="{Binding CommandParameter}">
+                                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                                <ContentPresenter Content="{Binding Icon}"/>
+                                                <ContentPresenter Content="{Binding HeaderKey^}"/>
+                                            </StackPanel>
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <TextBlock
+                                Foreground="{DynamicResource SukiText}"
+                                Inlines="{Binding GeneratedInlineCollection}"
+                                TextWrapping="WrapWithOverflow"/>
+                        </Panel>
+                    </ScrollViewer>
+
+                    <v:AssistantInputBox IsSendButtonEnabled="{Binding !IsBusy}"/>
+                </StackPanel>
+            </suki:BusyArea>
+        </Panel>
+    </Grid>
+</v:ReactiveWindow>

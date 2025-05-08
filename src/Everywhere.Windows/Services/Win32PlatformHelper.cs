@@ -3,7 +3,9 @@ using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.Accessibility;
 using Windows.Win32.UI.WindowsAndMessaging;
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Everywhere.Interfaces;
 
 namespace Everywhere.Windows.Services;
@@ -17,18 +19,21 @@ public class Win32PlatformHelper : IPlatformHelper
 
     private enum WINDOW_MESSAGE
     {
+        MA_NOACTIVATE = 0x0003,
         WM_ACTIVATE = 0x0006,
-        WM_ACTIVATEAPP = 0x001C,
         WM_SETFOCUS = 0x0007,
         WM_KILLFOCUS = 0x0008,
-        WM_NCACTIVATE = 0x0086
+        WM_ACTIVATEAPP = 0x001C,
+        WM_MOUSEACTIVATE = 0x0021,
+        WM_NCACTIVATE = 0x0086,
     }
     // ReSharper restore InconsistentNaming
     // ReSharper restore IdentifierTypo
 
-    public void SetWindowNoFocus(Window window)
+    public unsafe void SetWindowNoFocus(Window window)
     {
         Win32Properties.AddWindowStylesCallback(window, WindowStylesCallback);
+
         static (uint style, uint exStyle) WindowStylesCallback(uint style, uint exStyle)
         {
             return (style, exStyle |
@@ -38,22 +43,53 @@ public class Win32PlatformHelper : IPlatformHelper
         }
 
         Win32Properties.AddWndProcHookCallback(window, WndProcHookCallback);
+
         IntPtr WndProcHookCallback(IntPtr hWnd, uint msg, IntPtr wparam, IntPtr lparam, ref bool handled)
         {
             // handle and block all activate messages
             switch (msg)
             {
+                case (uint)WINDOW_MESSAGE.WM_MOUSEACTIVATE:
                 case (uint)WINDOW_MESSAGE.WM_ACTIVATE:
-                case (uint)WINDOW_MESSAGE.WM_ACTIVATEAPP:
                 case (uint)WINDOW_MESSAGE.WM_SETFOCUS:
                 case (uint)WINDOW_MESSAGE.WM_KILLFOCUS:
+                case (uint)WINDOW_MESSAGE.WM_ACTIVATEAPP:
                 case (uint)WINDOW_MESSAGE.WM_NCACTIVATE:
                     handled = true;
-                    return IntPtr.Zero;
+                    return (IntPtr)WINDOW_MESSAGE.MA_NOACTIVATE;
                 default:
                     return IntPtr.Zero;
             }
         }
+
+        // TODO: Following is broken
+        uint tid = 0, targetTid = 0;
+
+        window.GotFocus += (_, e) =>
+        {
+            if (e.Source is not TextBox) return;
+            tid = PInvoke.GetCurrentThreadId();
+            var targetHWnd = PInvoke.GetForegroundWindow();
+            targetTid = PInvoke.GetWindowThreadProcessId(targetHWnd, null);
+            PInvoke.AttachThreadInput(targetTid, tid, true);
+        };
+
+        window.LostFocus += (_, e) =>
+        {
+            if (e.Source is not TextBox) return;
+            PInvoke.AttachThreadInput(targetTid, tid, false);
+            tid = targetTid = 0;
+        };
+
+        window.PropertyChanged += (_, e) =>
+        {
+            if (e.Property != Visual.IsVisibleProperty || e.NewValue is not false) return;
+#pragma warning disable CS0618 // 类型或成员已过时
+            window.FocusManager?.ClearFocus();  // why, avalonia, why!!!!!!!!!!!!!!!!!!
+#pragma warning restore CS0618 // 类型或成员已过时
+            PInvoke.AttachThreadInput(targetTid, tid, false);
+            tid = targetTid = 0;
+        };
     }
 
     public void SetWindowAutoHide(Window window)
@@ -110,4 +146,7 @@ public class Win32PlatformHelper : IPlatformHelper
             }
         }
     }
+
+    [DllImport("kernel32.dll")]
+    private static extern int GetLastError();
 }

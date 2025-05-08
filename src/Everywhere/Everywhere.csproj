@@ -35,6 +35,13 @@
         </AvaloniaResource>
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Update="Views\Controls\AssistantInputBox.axaml.cs">
+        <DependentUpon>AssistantInputBox.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+    </ItemGroup>
+
     <Target Name="I18N" BeforeTargets="PreBuildEvent">
       <Exec Command="dotnet run --project $(SolutionDir)src/Everywhere.I18N.Generator/Everywhere.I18N.Generator.csproj -- $(SolutionDir)src/Everywhere/I18N/i18n.tsv $(SolutionDir)src/Everywhere/I18N" />
     </Target>

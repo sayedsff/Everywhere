@@ -4,18 +4,18 @@ using System.Diagnostics;
 using System.Security;
 using System.Text;
 using System.Text.RegularExpressions;
-using Avalonia.Controls;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Everywhere.Collections;
 using Everywhere.Enums;
 using Everywhere.Models;
+using Everywhere.Views;
 using Microsoft.SemanticKernel.ChatCompletion;
 
 namespace Everywhere.ViewModels;
 
-public partial class AgentFloatingWindowViewModel : BusyViewModelBase
+public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
 {
     [ObservableProperty]
     public partial IVisualElement? TargetElement { get; private set; }
@@ -27,7 +27,7 @@ public partial class AgentFloatingWindowViewModel : BusyViewModelBase
     public partial string? Title { get; private set; }
 
     [ObservableProperty]
-    public partial List<MenuItem> Actions { get; private set; } = [];
+    public partial List<DynamicKeyMenuItem> Actions { get; private set; } = [];
 
     [ObservableProperty]
     public partial bool IsExpanded { get; set; }
@@ -38,20 +38,20 @@ public partial class AgentFloatingWindowViewModel : BusyViewModelBase
     public BusyInlineCollection GeneratedInlineCollection { get; } = new();
 
     private readonly IChatCompletionService chatCompletionService;
-    private readonly List<MenuItem> textEditActions;
+    private readonly List<DynamicKeyMenuItem> textEditActions;
     private readonly StringBuilder generatedTextBuilder = new();
 
     private CancellationTokenSource? cancellationTokenSource;
     private Func<Task>? generateTask;
     private bool appendText;
 
-    public AgentFloatingWindowViewModel(IChatCompletionService chatCompletionService)
+    public AssistantFloatingWindowViewModel(IChatCompletionService chatCompletionService)
     {
         this.chatCompletionService = chatCompletionService;
 
         textEditActions =
         [
-            new MenuItem
+            new DynamicKeyMenuItem
             {
                 Header = "Generate",
                 Command = GenerateAndReplaceCommand,
@@ -60,7 +60,7 @@ public partial class AgentFloatingWindowViewModel : BusyViewModelBase
                     "You should try to imitate the user's writing style and tone in the context. " +
                     "Then generate a response to that can fit in the content of XML node with id=\"{ElementId}\". "
             },
-            new MenuItem
+            new DynamicKeyMenuItem
             {
                 Header = "Continue Writing",
                 Command = GenerateAndAppendCommand,
@@ -68,50 +68,51 @@ public partial class AgentFloatingWindowViewModel : BusyViewModelBase
                     "The user has already written a beginning as the content of XML node with id=\"{ElementId}\". " +
                     "You should try to imitate the user's writing style and tone, and continue writing in the user's perspective"
             },
-            new MenuItem
-            {
-                Header = "Change Tone to",
-                Items =
-                {
-                    new MenuItem
-                    {
-                        Header = "Formal",
-                        Command = GenerateAndReplaceCommand,
-                        CommandParameter = "Change the tone of content of XML node with id=\"{ElementId}\" to **Formal**"
-                    },
-                    new MenuItem
-                    {
-                        Header = "Casual",
-                        Command = GenerateAndReplaceCommand,
-                        CommandParameter = "Change the tone of content of XML node with id=\"{ElementId}\" to **Casual**"
-                    },
-                    new MenuItem
-                    {
-                        Header = "Creative",
-                        Command = GenerateAndReplaceCommand,
-                        CommandParameter = "Change the tone of content of XML node with id=\"{ElementId}\" to **Creative**"
-                    },
-                    new MenuItem
-                    {
-                        Header = "Professional",
-                        Command = GenerateAndReplaceCommand,
-                        CommandParameter = "Change the tone of content of XML node with id=\"{ElementId}\" to **Professional**"
-                    }
-                }
-            }
+            // new DynamicKeyMenuItem
+            // {
+            //     Header = "Change Tone to",
+            //     Items =
+            //     {
+            //         new DynamicKeyMenuItem
+            //         {
+            //             Header = "Formal",
+            //             Command = GenerateAndReplaceCommand,
+            //             CommandParameter = "Change the tone of content of XML node with id=\"{ElementId}\" to **Formal**"
+            //         },
+            //         new DynamicKeyMenuItem
+            //         {
+            //             Header = "Casual",
+            //             Command = GenerateAndReplaceCommand,
+            //             CommandParameter = "Change the tone of content of XML node with id=\"{ElementId}\" to **Casual**"
+            //         },
+            //         new DynamicKeyMenuItem
+            //         {
+            //             Header = "Creative",
+            //             Command = GenerateAndReplaceCommand,
+            //             CommandParameter = "Change the tone of content of XML node with id=\"{ElementId}\" to **Creative**"
+            //         },
+            //         new DynamicKeyMenuItem
+            //         {
+            //             Header = "Professional",
+            //             Command = GenerateAndReplaceCommand,
+            //             CommandParameter = "Change the tone of content of XML node with id=\"{ElementId}\" to **Professional**"
+            //         }
+            //     }
+            // }
         ];
     }
 
     private CancellationTokenSource? targetElementChangedTokenSource;
 
-    public async Task SetTargetElementAsync(IVisualElement? targetElement, CancellationToken cancellationToken)
+    public async Task SetTargetElementAsync(IVisualElement? targetElement)
     {
         // debouncing
         if (targetElementChangedTokenSource is not null) await targetElementChangedTokenSource.CancelAsync();
         targetElementChangedTokenSource = new CancellationTokenSource();
+        var token = targetElementChangedTokenSource.Token;
         try
         {
-            await Task.Delay(100, targetElementChangedTokenSource.Token);
+            await Task.Delay(100, token);
         }
         catch (OperationCanceledException) { }
 
@@ -143,7 +144,7 @@ public partial class AgentFloatingWindowViewModel : BusyViewModelBase
                 Actions = textEditActions;
             },
             flags: ExecutionFlags.EnqueueIfBusy,
-            cancellationToken: cancellationToken);
+            cancellationToken: token);
     }
 
     [RelayCommand]

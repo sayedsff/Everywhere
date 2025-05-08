@@ -11,14 +11,7 @@ public class App : Application
     {
         AvaloniaXamlLoader.Load(this);
 
-        // try
-        // {
-        //     await Task.WhenAll(ServiceLocator.Resolve<IEnumerable<IAsyncInitialize>>().Select(i => i.InitializeAsync()));
-        // }
-        // catch (Exception e)
-        // {
-        //     Console.WriteLine(e);
-        // }
+        Task.WhenAll(ServiceLocator.Resolve<IEnumerable<IAsyncInitializer>>().Select(i => i.InitializeAsync()));
     }
 
     public override void OnFrameworkInitializationCompleted()

@@ -7,4 +7,16 @@
         <WarningsAsErrors>nullable</WarningsAsErrors>
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     </PropertyGroup>
+
+    <PropertyGroup Condition="$([System.String]::Copy($(RuntimeIdentifier)).StartsWith('win'))">
+        <DefineConstants>$(DefineConstants);IsWindows</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="$([System.String]::Copy($(RuntimeIdentifier)).StartsWith('linux'))">
+        <DefineConstants>$(DefineConstants);IsLinux</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="$([System.String]::Copy($(RuntimeIdentifier)).StartsWith('osx'))">
+        <DefineConstants>$(DefineConstants);IsOSX</DefineConstants>
+    </PropertyGroup>
 </Project>

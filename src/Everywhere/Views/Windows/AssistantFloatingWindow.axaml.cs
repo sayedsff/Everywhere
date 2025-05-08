@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia.Animation.Easings;
+using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Rendering.Composition;
@@ -6,10 +7,10 @@ using SukiUI.Helpers;
 
 namespace Everywhere.Views;
 
-public partial class AgentFloatingWindow : ReactiveWindow<AgentFloatingWindowViewModel>
+public partial class AssistantFloatingWindow : ReactiveWindow<AssistantFloatingWindowViewModel>
 {
     public static readonly StyledProperty<bool> IsOpenedProperty =
-        AvaloniaProperty.Register<AgentFloatingWindow, bool>(nameof(IsOpened));
+        AvaloniaProperty.Register<AssistantFloatingWindow, bool>(nameof(IsOpened));
 
     public bool IsOpened
     {
@@ -18,7 +19,7 @@ public partial class AgentFloatingWindow : ReactiveWindow<AgentFloatingWindowVie
     }
 
     public static readonly StyledProperty<PixelRect> TargetBoundingRectProperty =
-        AvaloniaProperty.Register<AgentFloatingWindow, PixelRect>(nameof(TargetBoundingRect));
+        AvaloniaProperty.Register<AssistantFloatingWindow, PixelRect>(nameof(TargetBoundingRect));
 
     public PixelRect TargetBoundingRect
     {
@@ -27,7 +28,7 @@ public partial class AgentFloatingWindow : ReactiveWindow<AgentFloatingWindowVie
     }
 
     public static readonly StyledProperty<PlacementMode> PlacementProperty =
-        AvaloniaProperty.Register<AgentFloatingWindow, PlacementMode>(nameof(Placement));
+        AvaloniaProperty.Register<AssistantFloatingWindow, PlacementMode>(nameof(Placement));
 
     public PlacementMode Placement
     {
@@ -35,7 +36,9 @@ public partial class AgentFloatingWindow : ReactiveWindow<AgentFloatingWindowVie
         set => SetValue(PlacementProperty, value);
     }
 
-    public AgentFloatingWindow(IPlatformHelper platformHelper)
+    private static readonly Easing Easing = new BounceEaseInOut();
+
+    public AssistantFloatingWindow(IPlatformHelper platformHelper)
     {
         InitializeComponent();
         platformHelper.SetWindowNoFocus(this);
@@ -44,7 +47,7 @@ public partial class AgentFloatingWindow : ReactiveWindow<AgentFloatingWindowVie
     protected override void OnLoaded(RoutedEventArgs e)
     {
         base.OnLoaded(e);
-        ElementComposition.GetElementVisual(this).MakeSizeAnimated();
+        ElementComposition.GetElementVisual(this).MakeSizeAnimated(easing: Easing);
     }
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)

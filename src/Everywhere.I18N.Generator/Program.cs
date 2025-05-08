@@ -42,8 +42,9 @@ for (var col = 0; col < reader.Header.ColNames.Count; col++)
     if (col > 0) await writer.WriteLineAsync($"\n    x:Class=\"Everywhere.I18N.{escapedLocaleName}\">");
     else await writer.WriteLineAsync(">");
 
-    await foreach (var row in await new Sep('\t').Reader().FromFileAsync(tsvPath))
+    await foreach (var row in await new Sep('\t').Reader(o => o with { DisableColCountCheck = true }).FromFileAsync(tsvPath))
     {
+        if (col >= row.ColCount) continue;
         var key = row[0].ToString();
         var value = row[col].ToString();
         writer.Write("    <x:String x:Key=\"");
@@ -87,13 +88,13 @@ await localeManagerWriter.WriteLineAsync(
                 {
                     app.Resources.MergedDictionaries.Remove(oldLocale);
                 }
+                
+                field = value;
                 if (!Locales.TryGetValue(value, out var newLocale))
                 {
                     newLocale = Locales.Values.First();
                 }
                 app.Resources.MergedDictionaries.Add(newLocale);
-        
-                field = value;
             }
         }
     }

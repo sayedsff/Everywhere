@@ -5,7 +5,8 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceInclude Source="avares://Everywhere/Assets/Resources.axaml"/>
-                <ResourceInclude Source="avares://Everywhere/I18N/Key.axaml"/>
+                <!-- <ResourceInclude Source="avares://Everywhere/I18N/Key.axaml"/> -->
+                <ResourceInclude Source="avares://Everywhere/I18N/zh-CN.axaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
@@ -13,6 +14,8 @@
     <Application.Styles>
         <suki:SukiTheme ThemeColor="Blue"/>
         <StyleInclude Source="avares://IconPacks.Avalonia.Material/Material.axaml"/>
+
         <StyleInclude Source="avares://Everywhere/Assets/Styles.axaml"/>
+        <StyleInclude Source="avares://Everywhere/Views/Controls/AssistantInputBox.axaml"/>
     </Application.Styles>
 </Application>

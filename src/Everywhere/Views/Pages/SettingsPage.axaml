@@ -1,75 +1,112 @@
 ﻿<UserControl
     x:Class="Everywhere.Views.Pages.SettingsPage" xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:vm="clr-namespace:Everywhere.ViewModels"
-    x:DataType="vm:SettingsPageViewModel">
-    <ItemsControl
-        MinWidth="640" HorizontalAlignment="Center"
-        ItemsSource="{Binding Items}">
-        <ItemsControl.Styles>
-            <Style Selector="Border.ItemContainer:pointerover">
-                <Setter Property="Background">
-                    <Setter.Value>
-                        <SolidColorBrush Opacity="0.2" Color="{DynamicResource SukiGlassCardBackground}"/>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-        </ItemsControl.Styles>
-
-        <ItemsControl.ItemTemplate>
-            <DataTemplate DataType="vm:SettingsPageViewModel+SettingsItem">
-                <Border Classes="ItemContainer" CornerRadius="4">
-                    <Border.Transitions>
-                        <Transitions>
-                            <BrushTransition
-                                Easing="SineEaseInOut" Property="Background"
-                                Duration="0:0:0.2"/>
-                        </Transitions>
-                    </Border.Transitions>
-
-                    <StackPanel Margin="8">
-                        <TextBlock FontSize="16" Text="{Binding HeaderKey^}"/>
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:m="clr-namespace:Everywhere.Models"
+    xmlns:vm="clr-namespace:Everywhere.ViewModels" x:DataType="vm:SettingsPageViewModel">
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <ItemsControl
+            Width="640" HorizontalAlignment="Center"
+            ItemsSource="{Binding Groups}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="m:SettingsItemGroup">
+                    <StackPanel Margin="0,16">
                         <TextBlock
-                            Margin="0,8"
-                            Foreground="{DynamicResource SukiLowText}"
-                            Text="{Binding DescriptionKey^}"/>
-                        <ContentPresenter Content="{Binding}">
-                            <ContentPresenter.DataTemplates>
-                                <vm:SettingsItemDataTemplate>
-                                    <vm:SettingsItemDataTemplate.BooleanSettingsItemTemplate>
-                                        <DataTemplate DataType="vm:SettingsPageViewModel+SettingsItem">
-                                            <ToggleSwitch IsChecked="{Binding Value, Mode=TwoWay}"/>
-                                        </DataTemplate>
-                                    </vm:SettingsItemDataTemplate.BooleanSettingsItemTemplate>
-                                    <vm:SettingsItemDataTemplate.StringSettingsItemTemplate>
-                                        <DataTemplate DataType="vm:SettingsPageViewModel+SettingsItem">
-                                            <TextBox Text="{Binding Value, Mode=TwoWay}"/>
-                                        </DataTemplate>
-                                    </vm:SettingsItemDataTemplate.StringSettingsItemTemplate>
-                                    <vm:SettingsItemDataTemplate.FloatSettingsItemTemplate>
-                                        <DataTemplate DataType="vm:SettingsPageViewModel+SettingsItem">
-                                            <NumericUpDown Text="{Binding Value, Mode=TwoWay}"/>
-                                        </DataTemplate>
-                                    </vm:SettingsItemDataTemplate.FloatSettingsItemTemplate>
-                                    <vm:SettingsItemDataTemplate.IntegerSettingsItemTemplate>
-                                        <DataTemplate DataType="vm:SettingsPageViewModel+SettingsItem">
-                                            <NumericUpDown Value="{Binding Value, Mode=TwoWay}"/>
-                                        </DataTemplate>
-                                    </vm:SettingsItemDataTemplate.IntegerSettingsItemTemplate>
-                                    <vm:SettingsItemDataTemplate.SelectionSettingsItemTemplate>
-                                        <DataTemplate DataType="vm:SettingsPageViewModel+SelectionSettingsItem">
-                                            <ComboBox
-                                                MinWidth="320" MinHeight="32"
-                                                HorizontalAlignment="Left"
-                                                ItemsSource="{Binding Items}"
-                                                SelectedItem="{Binding Value, Mode=TwoWay}"/>
-                                        </DataTemplate>
-                                    </vm:SettingsItemDataTemplate.SelectionSettingsItemTemplate>
-                                </vm:SettingsItemDataTemplate>
-                            </ContentPresenter.DataTemplates>
-                        </ContentPresenter>
+                            FontSize="24" FontWeight="Bold"
+                            Text="{Binding HeaderKey^}"
+                            TextWrapping="WrapWithOverflow"/>
+
+                        <Border
+                            Height="1" Margin="0,8"
+                            Background="{DynamicResource SukiControlBorderBrush}"
+                            BorderThickness="0"/>
+
+                        <ItemsControl HorizontalAlignment="Stretch" ItemsSource="{Binding Items}">
+                            <ItemsControl.Styles>
+                                <Style Selector="Border.ItemContainer:pointerover">
+                                    <Setter Property="Background">
+                                        <Setter.Value>
+                                            <SolidColorBrush Opacity="0.2" Color="{DynamicResource SukiGlassCardBackground}"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ItemsControl.Styles>
+
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="m:SettingsItemBase">
+                                    <Border Classes="ItemContainer" CornerRadius="4">
+                                        <StackPanel Margin="8">
+                                            <TextBlock
+                                                FontSize="16"
+                                                Text="{Binding HeaderKey^}"
+                                                TextWrapping="WrapWithOverflow"/>
+                                            <TextBlock
+                                                Margin="0,8"
+                                                Foreground="{DynamicResource SukiLowText}"
+                                                Text="{Binding DescriptionKey^}"
+                                                TextWrapping="WrapWithOverflow"/>
+                                            <ContentPresenter Content="{Binding}">
+                                                <ContentPresenter.DataTemplates>
+                                                    <DataTemplate DataType="m:SettingsBooleanItem">
+                                                        <ToggleSwitch IsChecked="{Binding Value, Mode=TwoWay}" IsThreeState="{Binding CanBeNull}"/>
+                                                    </DataTemplate>
+
+                                                    <DataTemplate DataType="m:SettingsStringItem">
+                                                        <TextBox
+                                                            MinWidth="320" MinHeight="32"
+                                                            HorizontalAlignment="Left"
+                                                            AcceptsReturn="{Binding IsMultiline}"
+                                                            MaxLength="{Binding MaxLength}"
+                                                            PasswordChar="{Binding PasswordChar}"
+                                                            Text="{Binding Value, Mode=TwoWay}"
+                                                            Watermark="{Binding Watermark}"/>
+                                                    </DataTemplate>
+
+                                                    <DataTemplate DataType="m:SettingsIntegerItem">
+                                                        <StackPanel
+                                                            HorizontalAlignment="Left" Orientation="Horizontal"
+                                                            Spacing="8">
+                                                            <Slider
+                                                                Width="320"
+                                                                Maximum="{Binding MaxValue}"
+                                                                Minimum="{Binding MinValue}"
+                                                                Value="{Binding Value, Mode=TwoWay}"/>
+                                                            <TextBox MinHeight="32" Text="{Binding Value, Mode=TwoWay}"/>
+                                                        </StackPanel>
+                                                    </DataTemplate>
+
+                                                    <DataTemplate DataType="m:SettingsDoubleItem">
+                                                        <StackPanel
+                                                            HorizontalAlignment="Left" Orientation="Horizontal"
+                                                            Spacing="8">
+                                                            <Slider
+                                                                Width="320"
+                                                                LargeChange="{Binding Step}"
+                                                                Maximum="{Binding MaxValue}"
+                                                                Minimum="{Binding MinValue}"
+                                                                SmallChange="{Binding Step}"
+                                                                TickFrequency="{Binding Step}"
+                                                                Value="{Binding Value, Mode=TwoWay}"/>
+                                                            <TextBox MinHeight="32" Text="{Binding Value, Mode=TwoWay}"/>
+                                                        </StackPanel>
+                                                    </DataTemplate>
+
+                                                    <DataTemplate DataType="m:SettingsSelectionItem">
+                                                        <ComboBox
+                                                            MinWidth="320" MinHeight="32"
+                                                            HorizontalAlignment="Left"
+                                                            DisplayMemberBinding="{Binding Self^}"
+                                                            ItemsSource="{Binding ItemsSource}"
+                                                            SelectedItem="{Binding SelectedItem, Mode=TwoWay}"/>
+                                                    </DataTemplate>
+                                                </ContentPresenter.DataTemplates>
+                                            </ContentPresenter>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </StackPanel>
-                </Border>
-            </DataTemplate>
-        </ItemsControl.ItemTemplate>
-    </ItemsControl>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </ScrollViewer>
 </UserControl>

@@ -11,6 +11,7 @@ using Everywhere.Interfaces;
 using FlaUI.Core;
 using FlaUI.Core.AutomationElements;
 using FlaUI.Core.Definitions;
+using FlaUI.Core.Patterns.Infrastructure;
 using FlaUI.Core.Tools;
 using FlaUI.UIA3;
 using Google.Protobuf;
@@ -178,9 +179,8 @@ public class Win32VisualElementContext : IVisualElementContext
                     if (element.Properties.IsOffscreen.ValueOrDefault) states |= VisualElementStates.Offscreen;
                     if (!element.Properties.IsEnabled.ValueOrDefault) states |= VisualElementStates.Disabled;
                     if (element.Properties.HasKeyboardFocus.ValueOrDefault) states |= VisualElementStates.Focused;
-                    if (element.Patterns.SelectionItem.PatternOrDefault is { IsSelected.ValueOrDefault: true })
-                        states |= VisualElementStates.Selected;
-                    if (element.Patterns.Value.PatternOrDefault is { IsReadOnly.ValueOrDefault: true }) states |= VisualElementStates.ReadOnly;
+                    if (element.Patterns.SelectionItem.TryGetPattern() is { IsSelected.ValueOrDefault: true }) states |= VisualElementStates.Selected;
+                    if (element.Patterns.Value.TryGetPattern() is { IsReadOnly.ValueOrDefault: true }) states |= VisualElementStates.ReadOnly;
                     if (element.Properties.IsPassword.ValueOrDefault) states |= VisualElementStates.Password;
                     return states;
                 }
@@ -198,7 +198,7 @@ public class Win32VisualElementContext : IVisualElementContext
                 try
                 {
                     if (element.Properties.Name.TryGetValue(out var name)) return name;
-                    if (element.Patterns.LegacyIAccessible.PatternOrDefault is { } accessiblePattern) return accessiblePattern.Name;
+                    if (element.Patterns.LegacyIAccessible.TryGetPattern() is { } accessiblePattern) return accessiblePattern.Name;
                     return null;
                 }
                 catch
@@ -246,9 +246,9 @@ public class Win32VisualElementContext : IVisualElementContext
         {
             try
             {
-                if (element.Patterns.Value.PatternOrDefault is { } valuePattern) return valuePattern.Value;
-                if (element.Patterns.Text.PatternOrDefault is { } textPattern) return textPattern.DocumentRange.GetText(maxLength);
-                if (element.Patterns.LegacyIAccessible.PatternOrDefault is { } accessiblePattern) return accessiblePattern.Value;
+                if (element.Patterns.Value.TryGetPattern() is { } valuePattern) return valuePattern.Value;
+                if (element.Patterns.Text.TryGetPattern() is { } textPattern) return textPattern.DocumentRange.GetText(maxLength);
+                if (element.Patterns.LegacyIAccessible.TryGetPattern() is { } accessiblePattern) return accessiblePattern.Value;
                 return null;
             }
             catch
@@ -286,7 +286,7 @@ public class Win32VisualElementContext : IVisualElementContext
 
             bool TrySetValueWithValuePattern()
             {
-                if (element.Patterns.Value.PatternOrDefault is not { } valuePattern) return false;
+                if (element.Patterns.Value.TryGetPattern() is not { } valuePattern) return false;
 
                 try
                 {
@@ -617,6 +617,27 @@ public class Win32VisualElementContext : IVisualElementContext
         public void Dispose()
         {
             cancellationTokenSource.Cancel();
+        }
+    }
+}
+
+public static class AutomationExtension
+{
+    /// <summary>
+    /// Sometimes pattern.TryGetPattern() will throw an exception!?
+    /// </summary>
+    /// <param name="pattern"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static T? TryGetPattern<T>(this IAutomationPattern<T> pattern) where T : class, IPattern
+    {
+        try
+        {
+            return pattern.PatternOrDefault;
+        }
+        catch
+        {
+            return null;
         }
     }
 }

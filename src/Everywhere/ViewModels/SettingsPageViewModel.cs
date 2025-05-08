@@ -1,103 +1,130 @@
 ﻿using System.Reflection;
-using Avalonia.Controls;
-using Avalonia.Controls.Templates;
-using CommunityToolkit.Mvvm.ComponentModel;
 using Everywhere.Attributes;
 using Everywhere.Avalonia;
 using Everywhere.Models;
 
 namespace Everywhere.ViewModels;
 
-public class SettingsItemDataTemplate : IDataTemplate
-{
-    public required IDataTemplate BooleanSettingsItemTemplate { get; init; }
-    public required IDataTemplate StringSettingsItemTemplate { get; init; }
-    public required IDataTemplate FloatSettingsItemTemplate { get; init; }
-    public required IDataTemplate IntegerSettingsItemTemplate { get; init; }
-    public required IDataTemplate SelectionSettingsItemTemplate { get; init; }
-
-    public bool Match(object? data) => data is SettingsPageViewModel.SettingsItem;
-
-    public Control? Build(object? param)
-    {
-        if (param is not SettingsPageViewModel.SettingsItem item) throw new InvalidOperationException($"Invalid parameter type {param?.GetType()}");
-        if (param is SettingsPageViewModel.SelectionSettingsItem) return SelectionSettingsItemTemplate.Build(param);
-        if (item.ValueType == typeof(bool)) return BooleanSettingsItemTemplate.Build(param);
-        if (item.ValueType == typeof(string)) return StringSettingsItemTemplate.Build(param);
-        if (item.ValueType == typeof(float)) return FloatSettingsItemTemplate.Build(param);
-        if (item.ValueType == typeof(int)) return IntegerSettingsItemTemplate.Build(param);
-        throw new InvalidOperationException($"Unsupported type {item.ValueType}");
-    }
-}
-
 public class SettingsPageViewModel : ReactiveViewModelBase
 {
-    public class SettingsItem(string name, Type valueType, Func<object?> getter, Action<object?> setter) : ObservableObject
-    {
-        public DynamicResourceKey HeaderKey => $"Settings_{name}_Header";
-
-        public DynamicResourceKey DescriptionKey => $"Settings_{name}_Description";
-
-        public Type ValueType { get; } = valueType;
-
-        public object? Value
-        {
-            get => getter();
-            set => setter(value);
-        }
-
-        public void NotifyValueChanged()
-        {
-            OnPropertyChanged(nameof(Value));
-        }
-    }
-
-    public class SelectionSettingsItem(
-        string name,
-        Type valueType,
-        Func<object?> getter,
-        Action<object?> setter,
-        Func<IEnumerable<string>> itemsGetter
-    ) : SettingsItem(name, valueType, getter, setter)
-    {
-        public IEnumerable<string> Items => itemsGetter();
-    }
-
-    public IReadOnlyList<SettingsItem> Items { get; }
+    public IReadOnlyList<SettingsItemGroup> Groups { get; }
 
     public SettingsPageViewModel(Settings settings)
     {
-        Items = typeof(Settings)
+        Groups = typeof(Settings)
             .GetProperties(BindingFlags.Instance | BindingFlags.Public)
-            .Where(p => p is { CanRead: true, CanWrite: true })
-            .Select(p =>
-            {
-                if (p.GetCustomAttribute<SelectionSettingsItemAttribute>() is { PropertyName: { } propertyName })
+            .Where(p => p.PropertyType.IsAssignableTo(typeof(SettingsBase)))
+            .Select(
+                p =>
                 {
-                    var itemsSourceProperty = typeof(Settings).GetProperty(propertyName);
-                    if (itemsSourceProperty is null)
-                    {
-                        throw new InvalidOperationException($"Property {propertyName} not found");
-                    }
-                    if (!itemsSourceProperty.PropertyType.IsAssignableTo(typeof(IEnumerable<string>)))
-                    {
-                        throw new InvalidOperationException($"Property {propertyName} must be IEnumerable<string>");
-                    }
-
-                    return new SelectionSettingsItem(
+                    var group = p.GetValue(settings);
+                    return new SettingsItemGroup(
                         p.Name,
-                        p.PropertyType,
-                        () => p.GetValue(settings),
-                        v => p.SetValue(settings, v),
-                        () => (IEnumerable<string>)itemsSourceProperty.GetValue(settings)!);
-                }
+                        p.PropertyType
+                            .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                            .Where(pp => pp is { CanRead: true, CanWrite: true })
+                            .Select<PropertyInfo, SettingsItemBase>(
+                                pp =>
+                                {
+                                    if (pp.GetCustomAttribute<SettingsSelectionItemAttribute>() is { } selectionAttribute)
+                                    {
+                                        var itemsSourceProperty = p.PropertyType
+                                            .GetProperty(
+                                                selectionAttribute.PropertyName,
+                                                BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public)
+                                            .NotNull($"{selectionAttribute.PropertyName} Property for ItemsSource is not found");
+                                        if (!itemsSourceProperty.PropertyType.IsGenericType ||
+                                            !itemsSourceProperty.PropertyType.GetGenericTypeDefinition().IsAssignableTo(typeof(IEnumerable<>)) ||
+                                            itemsSourceProperty.PropertyType.GenericTypeArguments.Length != 1 ||
+                                            itemsSourceProperty.PropertyType.GenericTypeArguments[0] != pp.PropertyType)
+                                        {
+                                            throw new NotSupportedException(
+                                                $"{selectionAttribute.PropertyName} Property for ItemsSource has an invalid type");
+                                        }
+                                        if (itemsSourceProperty.GetMethod is not { } itemsSourceGetter)
+                                        {
+                                            throw new NotSupportedException(
+                                                $"{selectionAttribute.PropertyName} Property for ItemsSource is not readable");
+                                        }
+                                        return new SettingsSelectionItem(
+                                            $"{p.Name}_{pp.Name}",
+                                            () => pp.GetValue(group),
+                                            v => pp.SetValue(group, v),
+                                            () =>
+                                            {
+                                                var itemsSource = itemsSourceGetter.IsStatic ?
+                                                    itemsSourceProperty.GetValue(null) :
+                                                    itemsSourceProperty.GetValue(group);
+                                                return itemsSource.NotNull<IEnumerable>().Cast<object?>().Select(
+                                                    x => new DynamicResourceKeyWrapper<object?>($"SettingsSelectionItem_{p.Name}_{pp.Name}_{x}", x));
+                                            });
+                                    }
 
-                return new SettingsItem(
-                    p.Name,
-                    p.PropertyType,
-                    () => p.GetValue(settings),
-                    v => p.SetValue(settings, v));
-            })
-            .ToReadOnlyList();
+                                    if (pp.PropertyType == typeof(bool))
+                                    {
+                                        return new SettingsBooleanItem(
+                                            $"{p.Name}_{pp.Name}",
+                                            () => pp.GetValue(group).To<bool>(),
+                                            v => pp.SetValue(group, v),
+                                            false);
+                                    }
+
+                                    if (pp.PropertyType == typeof(bool?))
+                                    {
+                                        return new SettingsBooleanItem(
+                                            $"{p.Name}_{pp.Name}",
+                                            () => pp.GetValue(group).To<bool?>(),
+                                            v => pp.SetValue(group, v),
+                                            true);
+                                    }
+
+                                    if (pp.PropertyType == typeof(string))
+                                    {
+                                        var attribute = pp.GetCustomAttribute<SettingsStringItemAttribute>();
+                                        return new SettingsStringItem(
+                                            $"{p.Name}_{pp.Name}",
+                                            () => pp.GetValue(group).NotNull<string>(),
+                                            v => pp.SetValue(group, v),
+                                            attribute?.Watermark,
+                                            attribute?.MaxLength ?? int.MaxValue,
+                                            attribute?.IsMultiline ?? false,
+                                            attribute?.IsPassword ?? false);
+                                    }
+
+                                    if (pp.PropertyType == typeof(int))
+                                    {
+                                        var attribute = pp.GetCustomAttribute<SettingsIntegerItemAttribute>();
+                                        return new SettingsIntegerItem(
+                                            $"{p.Name}_{pp.Name}",
+                                            () => pp.GetValue(group).To<int>(),
+                                            v => pp.SetValue(group, v),
+                                            attribute?.Min ?? int.MinValue,
+                                            attribute?.Max ?? int.MaxValue);
+                                    }
+
+                                    if (pp.PropertyType == typeof(double))
+                                    {
+                                        var attribute = pp.GetCustomAttribute<SettingsDoubleItemAttribute>();
+                                        return new SettingsDoubleItem(
+                                            $"{p.Name}_{pp.Name}",
+                                            () => pp.GetValue(group).To<double>(),
+                                            v => pp.SetValue(group, v),
+                                            attribute?.Min ?? double.NegativeInfinity,
+                                            attribute?.Max ?? double.PositiveInfinity,
+                                            attribute?.Step ?? 0.1d);
+                                    }
+
+                                    if (pp.PropertyType == typeof(Hotkey))
+                                    {
+                                        return new SettingsHotkeyItem(
+                                            $"{p.Name}_{pp.Name}",
+                                            () => pp.GetValue(group).To<Hotkey>(),
+                                            v => pp.SetValue(group, v));
+                                    }
+
+                                    throw new NotSupportedException();
+                                })
+                            .ToReadOnlyList());
+                }).ToReadOnlyList();
     }
 }

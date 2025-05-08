@@ -1,6 +1,6 @@
 ﻿namespace Everywhere.Interfaces;
 
-public interface IAsyncInitialize
+public interface IAsyncInitializer
 {
     Task InitializeAsync();
 }
