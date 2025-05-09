@@ -1,5 +1,7 @@
 <a id="readme-top"></a>
 
+<a href="https://github.com/DearVa/Everywhere">Go to English Version »</a>
+
 [![贡献者][contributors-shield]][contributors-url]
 [![Fork 数][forks-shield]][forks-url]
 [![Star 数][stars-shield]][stars-url]

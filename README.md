@@ -1,5 +1,7 @@
 <a id="readme-top"></a>
 
+<a href="https://github.com/DearVa/Everywhere/blob/main/README-zh-cn.md">前往中文版本 »</a>
+
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
