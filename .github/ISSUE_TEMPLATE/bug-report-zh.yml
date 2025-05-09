@@ -1,0 +1,57 @@
+name: 错误报告
+description: 提交错误报告以帮助改进
+title: "[Bug] "
+labels:
+  - bug
+body:
+  - type: checkboxes
+    attributes:
+      label: 请确认以下事项
+      options:
+        - label: 我已经查找过相关的 Issue
+          required: false
+  - type: textarea
+    id: description
+    attributes:
+      label: 问题描述
+      description: 请详细描述遇到的问题。如有必要，请添加截图以帮助说明问题。
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: 应用版本
+      description: 输入你正在使用的版本
+      placeholder: 例如 1.0.0-alpha.1
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: 使用环境
+      description: 出现问题的平台或系统环境
+      placeholder: 例如 Windows 11 22631
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 预期行为
+      description: 简洁明了地描述你期望发生的结果。
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: 重现步骤
+      description: 请详细描述如何重现该问题
+      placeholder: 如果无法重现，请填写“无法重现”
+    validations:
+      required: true
+  - type: textarea
+    id: additional
+    attributes:
+      label: 补充信息
+      description: 添加关于此问题的其他相关上下文信息
+    validations:
+      required: false

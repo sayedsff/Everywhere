@@ -6,34 +6,35 @@ Settings_Common_Language_Description	更改软件的显示语言。	Change the d
 SettingsSelectionItem_Common_Language_zh-CN	中文（简体）	中文（简体）
 SettingsSelectionItem_Common_Language_en-US	English (United States)	English (United States)
 SettingsGroup_Behavior_Header	行为设置	Behavior Settings
-Settings_Behavior_IsInputAssistantEnabled_Header	开启输入助手
-Settings_Behavior_IsInputAssistantEnabled_Description	当你在任何软件中输入时，输入助手可以根据上下文为你提供帮助。
-Settings_Behavior_ShowInputAssistantFloatingWindow_Header	显示输入助手悬浮框
-Settings_Behavior_ShowInputAssistantFloatingWindow_Description	如果开启，当你在任何软件中输入时，会在旁边显示悬浮框用于快速访问。如果关闭，你仍可以使用快捷键呼出。
-Settings_Behavior_InputAssistantHotkey_Header	输入助手快捷键
-Settings_Behavior_InputAssistantHotkey_Description	当你在任何软件中输入时，按下快捷键呼出输入助手。
-SettingsGroup_Model_Header	模型设置
-Settings_Model_ModelName_Header	模型名称
-Settings_Model_ModelName_Description	要使用的模型名称。
-Settings_Model_Endpoint_Header	API接口地址
+Settings_Behavior_IsInputAssistantEnabled_Header	开启输入助手	Enable input assistant
+Settings_Behavior_IsInputAssistantEnabled_Description	当你在任何软件中输入时，输入助手可以根据上下文为你提供帮助。	When you’re typing in any application, the input assistant can offer context-based suggestions.
+Settings_Behavior_ShowInputAssistantFloatingWindow_Header	显示输入助手悬浮框	Show input assistant flyout
+Settings_Behavior_ShowInputAssistantFloatingWindow_Description	如果开启，当你在任何软件中输入时，会在旁边显示悬浮框用于快速访问。如果关闭，你仍可以使用快捷键呼出。	If enabled, a flyout appears beside your cursor for quick access when typing; if disabled, you can still invoke it via hotkey.
+Settings_Behavior_InputAssistantHotkey_Header	输入助手快捷键	Input assistant hotkey
+Settings_Behavior_InputAssistantHotkey_Description	当你在任何软件中输入时，按下快捷键呼出输入助手。	The hotkey to invoke the input assistant while typing in any application.
+SettingsGroup_Model_Header	模型设置	Model Settings
+Settings_Model_ModelName_Header	模型名称	Model Name
+Settings_Model_ModelName_Description	要使用的模型名称。	The name of the model to use.
+Settings_Model_Endpoint_Header	API接口地址	API Endpoint
 Settings_Model_Endpoint_Description	"正确输入例子：https://openai.com/api/v1
-错误输入例子：https://openai.com/api/v1/chat/completions"
-Settings_Model_ApiKey_Header	API Key
-Settings_Model_ApiKey_Description	API访问秘钥，如果是ollama或者LM Studio这类本地模型不需要验证的，请留空。
-Settings_Model_Temperature_Header	创意活跃度（Temperature）
-Settings_Model_Temperature_Description	数值越大，回答越有创意和想象力；数值越小，回答越严谨。注意，对于某些模型，数值超过1.0可能会导致输出乱码。
-Settings_Model_TopP_Header	思维开放度（Top p）
-Settings_Model_TopP_Description	考虑多少种可能性，值越大，接受更多可能的回答；值越小，倾向选择最可能的回答。不推荐和创意活跃度一起更改。
-Settings_Model_IsImageEnabled_Header	开启多模态图像功能
-Settings_Model_IsImageEnabled_Description	如果大模型（如gpt-4o等）支持图片上传（视觉输入），开启后此功能后，AI助手会在合适的时机将图像一并输入，有利于大模型更好地理解上下文。如果模型不支持，开启后可能会导致调用失败。
-Settings_Model_IsToolUseEnabled_Header	开启工具调用功能
-Settings_Model_IsToolUseEnabled_Description	如果大模型（如DeepSeek-V3、gpt-4o等）支持工具调用，开启后此功能后，AI助手会在合适的时机调用工具，从而开启更强大的能力。如果模型不支持，开启后可能会导致调用失败。
-AssistantInputBox_Watermark	询问Everywhere助手
-AssistantInputBox_AddButton_ToolTip	添加附加内容到对话
-AssistantInputBox_ImageButton_ToolTip	允许访问屏幕上的图像
-AssistantInputBox_ImageButton_Text	图像
-AssistantInputBox_WebSearchButton_ToolTip	在网络上搜索
-AssistantInputBox_WebSearchButton_Text	搜索
-AssistantInputBox_ToolCallButton_ToolTip	使用工具强化助手能力
-AssistantInputBox_ToolCallButton_Text	工具
+错误输入例子：https://openai.com/api/v1/chat/completions"	"Correct input example: https://openai.com/api/v1
+Incorrect input example: https://openai.com/api/v1/chat/completions"
+Settings_Model_ApiKey_Header	API Key	API Key
+Settings_Model_ApiKey_Description	API访问秘钥，如果是ollama或者LM Studio这类本地模型不需要验证的，请留空。	API access key. Leave blank for local models (e.g., Ollama or LM Studio) that don’t require authentication.
+Settings_Model_Temperature_Header	创意活跃度（Temperature）	Creativity (Temperature)
+Settings_Model_Temperature_Description	数值越大，回答越有创意和想象力；数值越小，回答越严谨。注意，对于某些模型，数值超过1.0可能会导致输出乱码。	The higher the value, the more creative and imaginative the responses; the lower the value, the more precise. Note: values above 1.0 can cause output issues in some models.
+Settings_Model_TopP_Header	思维开放度（Top p）	Thought openness (Top p)
+Settings_Model_TopP_Description	考虑多少种可能性，值越大，接受更多可能的回答；值越小，倾向选择最可能的回答。不推荐和创意活跃度一起更改。	Determines how many possibilities to consider: higher accepts more varied responses; lower favors the most likely. Not recommended to change alongside Temperature.
+Settings_Model_IsImageEnabled_Header	开启多模态图像功能	Enable multimodal image support
+Settings_Model_IsImageEnabled_Description	如果大模型（如gpt-4o等）支持图片上传（视觉输入），开启后此功能后，AI助手会在合适的时机将图像一并输入，有利于大模型更好地理解上下文。如果模型不支持，开启后可能会导致调用失败。	If your model (e.g., GPT-4o) supports image input, enabling this lets the assistant include images at appropriate times for richer context; if unsupported, calls may fail.
+Settings_Model_IsToolUseEnabled_Header	开启工具调用功能	Enable tool calling
+Settings_Model_IsToolUseEnabled_Description	如果大模型（如DeepSeek-V3、gpt-4o等）支持工具调用，开启后此功能后，AI助手会在合适的时机调用工具，从而开启更强大的能力。如果模型不支持，开启后可能会导致调用失败。	If your model (e.g., DeepSeek-V3, GPT-4o) supports tool calls, enabling this lets the assistant invoke tools when appropriate for enhanced capabilities; if unsupported, calls may fail.
+AssistantInputBox_Watermark	询问Everywhere助手	Ask the Everywhere assistant
+AssistantInputBox_AddButton_ToolTip	添加附加内容到对话	Add extra content to the conversation
+AssistantInputBox_ImageButton_ToolTip	允许访问屏幕上的图像	Allow access to aware your screen
+AssistantInputBox_ImageButton_Text	图像	Image
+AssistantInputBox_WebSearchButton_ToolTip	在网络上搜索	Search the web
+AssistantInputBox_WebSearchButton_Text	搜索	Search
+AssistantInputBox_ToolCallButton_ToolTip	使用工具强化助手能力	Use tools to enhance assistant capabilities
+AssistantInputBox_ToolCallButton_Text	工具	Tools
 AssistantInputBox_SendButton_ToolTip	发送
