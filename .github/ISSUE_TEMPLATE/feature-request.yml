@@ -1,0 +1,27 @@
+name: Feature Request
+description: Submit a new feature request
+title: "[Feat] "
+labels:
+  - enhancement
+body:
+  - type: checkboxes
+    attributes:
+      label: Use the search function to see if this feature has already been suggested.
+      options:
+        - label: I have searched for duplicate issues.
+          required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description of new feature
+      description: Please describe the new features in detail
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: App Version
+      description: Enter the version you are using
+      placeholder: E.g. 1.0.0-alpha.1
+    validations:
+      required: true
