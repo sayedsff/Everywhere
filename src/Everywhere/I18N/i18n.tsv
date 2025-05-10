@@ -27,8 +27,8 @@ Settings_Model_TopP_Header	思维开放度（Top p）	Thought openness (Top p)
 Settings_Model_TopP_Description	考虑多少种可能性，值越大，接受更多可能的回答；值越小，倾向选择最可能的回答。不推荐和创意活跃度一起更改。	Determines how many possibilities to consider: higher accepts more varied responses; lower favors the most likely. Not recommended to change alongside Temperature.
 Settings_Model_IsImageEnabled_Header	开启多模态图像功能	Enable multimodal image support
 Settings_Model_IsImageEnabled_Description	如果大模型（如gpt-4o等）支持图片上传（视觉输入），开启后此功能后，AI助手会在合适的时机将图像一并输入，有利于大模型更好地理解上下文。如果模型不支持，开启后可能会导致调用失败。	If your model (e.g., GPT-4o) supports image input, enabling this lets the assistant include images at appropriate times for richer context; if unsupported, calls may fail.
-Settings_Model_IsToolUseEnabled_Header	开启工具调用功能	Enable tool calling
-Settings_Model_IsToolUseEnabled_Description	如果大模型（如DeepSeek-V3、gpt-4o等）支持工具调用，开启后此功能后，AI助手会在合适的时机调用工具，从而开启更强大的能力。如果模型不支持，开启后可能会导致调用失败。	If your model (e.g., DeepSeek-V3, GPT-4o) supports tool calls, enabling this lets the assistant invoke tools when appropriate for enhanced capabilities; if unsupported, calls may fail.
+Settings_Model_IsToolCallEnabled_Header	开启工具调用功能	Enable tool calling
+Settings_Model_IsToolCallEnabled_Description	如果大模型（如DeepSeek-V3、gpt-4o等）支持工具调用，开启后此功能后，AI助手会在合适的时机调用工具，从而开启更强大的能力。如果模型不支持，开启后可能会导致调用失败。	If your model (e.g., DeepSeek-V3, GPT-4o) supports tool calls, enabling this lets the assistant invoke tools when appropriate for enhanced capabilities; if unsupported, calls may fail.
 AssistantInputBox_Watermark	询问Everywhere助手	Ask the Everywhere assistant
 AssistantInputBox_AddButton_ToolTip	添加附加内容到对话	Add extra content to the conversation
 AssistantInputBox_ImageButton_ToolTip	允许访问屏幕上的图像	Allow access to aware your screen
@@ -38,3 +38,5 @@ AssistantInputBox_WebSearchButton_Text	搜索	Search
 AssistantInputBox_ToolCallButton_ToolTip	使用工具强化助手能力	Use tools to enhance assistant capabilities
 AssistantInputBox_ToolCallButton_Text	工具	Tools
 AssistantInputBox_SendButton_ToolTip	发送
+AssistantCommand_Translate_Description	翻译为目标语言
+AssistantCommand_Rewrite_Description	按要求重写
