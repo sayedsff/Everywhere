@@ -10,16 +10,11 @@
 
 <br />
 <div align="center">
-  <a href="https://github.com/DearVa/Everywhere">
-    <img src="https://raw.githubusercontent.com/DearVa/Everywhere/refs/heads/main/img/Everywhere.svg" alt="Logo" width="100" height="120">
-  </a>
-
-<h3 align="center">Everywhere</h3>
+  <img src="https://raw.githubusercontent.com/DearVa/Everywhere/refs/heads/main/img/banner.png" alt="Banner"/>
 
   <p align="center">
-    Seamless AI assistance that brings your favorite LLM to every app, every time—everywhere.
     <br />
-    <i>⚠️ Work In Progress ⚠️</i>
+    <h2>🚧 NOTICE: This project is under active development and is not yet ready for use 🚧</h2>
     <br/>
     <a href="https://github.com/DearVa/Everywhere"><strong>(WIP) Explore the docs »</strong></a>
     <br />
@@ -62,6 +57,15 @@
 ### Installation
 
 > **Note**: Pre‑built installers are not yet available; build from source for now.
+
+## ✈️ Roadmap
+
+- [ ] Edit assistant (WIP)
+- [ ] Screen-based assistant
+- [ ] Web searching & thinking
+- [ ] MCP Tools
+- [ ] Voice input
+- [ ] RAG & Knowledge base
 
 ## 🤝 Contributing
 
