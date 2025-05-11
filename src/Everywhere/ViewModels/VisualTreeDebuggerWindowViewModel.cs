@@ -1,6 +1,5 @@
 ﻿using System.Collections.ObjectModel;
 using System.Diagnostics;
-using Everywhere.Models;
 
 namespace Everywhere.ViewModels;
 
@@ -17,18 +16,18 @@ public partial class VisualTreeDebuggerWindowViewModel : ReactiveViewModelBase
             Debug.WriteLine(element?.ToString());
         };
 
-        userInputTrigger.PointerHotkeyActivated += _ =>
+        userInputTrigger.KeyboardHotkeyActivated += () =>
         {
             RootElements.Clear();
             var element = visualElementContext.PointerOverElement;
-            if (element != null)
-                RootElements.Add(new OptimizedVisualElement(
-                    element
-                        .GetAncestors()
-                        .CurrentAndNext()
-                        .Where(p => p.current.ProcessId != p.next.ProcessId)
-                        .Select(p => p.current)
-                        .First()));
+            if (element == null) return;
+            element = element
+                .GetAncestors()
+                .CurrentAndNext()
+                .Where(p => p.current.ProcessId != p.next.ProcessId)
+                .Select(p => p.current)
+                .First();
+            RootElements.Add(element);
         };
     }
 }

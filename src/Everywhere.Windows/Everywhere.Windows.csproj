@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
-        <TargetFramework>net9.0-windows</TargetFramework>
+        <TargetFramework>net9.0-windows10.0.19041.0</TargetFramework>
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
         <ApplicationIcon>..\..\img\Everywhere.ico</ApplicationIcon>
     </PropertyGroup>
@@ -12,6 +12,7 @@
 
     <ItemGroup>
         <PackageReference Include="Avalonia.Desktop"/>
+        <PackageReference Include="HotAvalonia" PrivateAssets="All"/>
         <PackageReference Include="Google.Protobuf"/>
         <PackageReference Include="Grpc.Core.Api"/>
         <PackageReference Include="Grpc.Tools">
@@ -20,6 +21,7 @@
         </PackageReference>
         <PackageReference Include="Microsoft.Windows.CsWin32"/>
         <PackageReference Include="FlaUI.UIA3"/>
+        <PackageReference Include="Vortice.Direct3D11" />
     </ItemGroup>
 
     <ItemGroup>

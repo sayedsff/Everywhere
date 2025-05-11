@@ -1,4 +1,5 @@
-﻿using Everywhere.Enums;
+﻿using System.Drawing;
+using Everywhere.Enums;
 
 namespace Everywhere.Interfaces;
 
@@ -37,6 +38,8 @@ public interface IVisualElement
     string? GetText(int maxLength = -1);
 
     void SetText(string text, bool append);
+
+    Task<Bitmap> CaptureAsync();
 
     event Action<IVisualElement> TextChanged;
 

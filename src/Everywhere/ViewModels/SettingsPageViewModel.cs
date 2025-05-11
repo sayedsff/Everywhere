@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using Everywhere.Attributes;
-using Everywhere.Avalonia;
 using Everywhere.Models;
 
 namespace Everywhere.ViewModels;

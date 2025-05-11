@@ -27,6 +27,7 @@ MapVirtualKey
 BlockInput
 GetWindowThreadProcessId
 
+DwmGetWindowAttribute
 DwmSetWindowAttribute
 SetWindowCompositionAttribute
 GetWindowLong
@@ -54,3 +55,20 @@ TranslateMessage
 DispatchMessage
 SetTimer
 KillTimer
+
+SetFocus
+ImmGetContext
+ImmAssociateContext
+ImmReleaseContext
+GetWindowRect
+
+DwmRegisterThumbnail
+DwmQueryThumbnailSourceSize
+DwmUpdateThumbnailProperties
+GetDC
+DwmUnregisterThumbnail
+BitBlt
+ReleaseDC
+ShowWindow
+SetLayeredWindowAttributes
+PrintWindow

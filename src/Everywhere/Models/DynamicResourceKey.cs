@@ -1,6 +1,8 @@
-﻿using Avalonia.Controls;
+﻿using System.Diagnostics.CodeAnalysis;
+using Avalonia.Controls;
+using Avalonia.Controls.Documents;
 
-namespace Everywhere.Avalonia;
+namespace Everywhere.Models;
 
 public class DynamicResourceKey(object key) : IObservable<object?>
 {
@@ -12,7 +14,8 @@ public class DynamicResourceKey(object key) : IObservable<object?>
     public IDisposable Subscribe(IObserver<object?> observer) =>
         Application.Current!.Resources.GetResourceObservable(key).Subscribe(observer);
 
-    public static implicit operator DynamicResourceKey(string key) => new(key);
+    [return: NotNullIfNotNull(nameof(key))]
+    public static implicit operator DynamicResourceKey?(string? key) => key == null ? null : new DynamicResourceKey(key);
 }
 
 public class DynamicResourceKeyWrapper<T>(object key, T value) : DynamicResourceKey(key)
@@ -25,4 +28,9 @@ public class DynamicResourceKeyWrapper<T>(object key, T value) : DynamicResource
     }
 
     public override int GetHashCode() => Value?.GetHashCode() ?? 0;
+}
+
+public class DynamicResourceKeyRun(object key) : Run(key.ToString())
+{
+    public IObservable<object?> Key => Application.Current!.Resources.GetResourceObservable(key);
 }

@@ -41,7 +41,7 @@ public partial class AssistantFloatingWindow : ReactiveWindow<AssistantFloatingW
     public AssistantFloatingWindow(IPlatformHelper platformHelper)
     {
         InitializeComponent();
-        platformHelper.SetWindowNoFocus(this);
+        // platformHelper.SetWindowNoFocus(this);
     }
 
     protected override void OnLoaded(RoutedEventArgs e)

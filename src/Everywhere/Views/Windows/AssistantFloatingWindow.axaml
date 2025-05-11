@@ -1,29 +1,52 @@
 ﻿<v:ReactiveWindow
-    x:Class="Everywhere.Views.AssistantFloatingWindow" xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:suki="https://github.com/kikipoulet/SukiUI"
-    xmlns:system="clr-namespace:System;assembly=System.Runtime" xmlns:v="clr-namespace:Everywhere.Views"
-    xmlns:vc="clr-namespace:Everywhere.ValueConverters" xmlns:vm="clr-namespace:Everywhere.ViewModels"
-    x:DataType="vm:AssistantFloatingWindowViewModel" x:TypeArguments="vm:AssistantFloatingWindowViewModel"
-    Background="Transparent" CanResize="False"
+    x:Class="Everywhere.Views.AssistantFloatingWindow"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ip="https://github.com/MahApps/IconPacks.Avalonia"
+    xmlns:m="clr-namespace:Everywhere.Models"
+    xmlns:suki="https://github.com/kikipoulet/SukiUI"
+    xmlns:system="clr-namespace:System;assembly=System.Runtime"
+    xmlns:v="clr-namespace:Everywhere.Views"
+    xmlns:vc="clr-namespace:Everywhere.ValueConverters"
+    xmlns:vm="clr-namespace:Everywhere.ViewModels"
+    x:DataType="vm:AssistantFloatingWindowViewModel"
+    x:TypeArguments="vm:AssistantFloatingWindowViewModel" Background="Transparent"
+    CanResize="False"
     IsOpened="{Binding TargetElement, Converter={x:Static ObjectConverters.IsNotNull}}"
-    ShowActivated="False" ShowInTaskbar="False"
-    SizeToContent="WidthAndHeight" SystemDecorations="None"
+    ShowInTaskbar="False" SizeToContent="WidthAndHeight"
+    SystemDecorations="None"
     TargetBoundingRect="{Binding TargetBoundingRect}"
     Topmost="True" WindowStartupLocation="Manual">
 
-    <Grid x:Name="RootGrid" RowDefinitions="*,Auto">
+    <Grid
+        x:Name="RootGrid" ColumnDefinitions="*,Auto"
+        RowDefinitions="*,Auto">
         <Grid.Resources>
             <vc:PlacementToCornerRadiusConverter x:Key="PlacementToCornerRadiusConverter"/>
         </Grid.Resources>
 
         <Grid.Styles>
-            <Style Selector="Border.IsExpanded">
-                <Setter Property="Background" Value="{DynamicResource SukiGlassCardBackground}"/>
+            <Style Selector="Border.IsExpanded#BackgroundBorder">
+                <Setter Property="Opacity" Value="0"/>
+            </Style>
+
+            <Style Selector="Button#FloatingCloseButton">
+                <Setter Property="Opacity" Value="0"/>
+            </Style>
+
+            <Style Selector=":pointerover Button#FloatingCloseButton">
+                <Setter Property="Opacity" Value="1"/>
             </Style>
         </Grid.Styles>
 
-        <Border
+        <suki:SukiBackground
             Grid.Row="0" Grid.RowSpan="2"
+            Grid.Column="0"
+            CornerRadius="{Binding CornerRadius, ElementName=BackgroundBorder, Mode=OneWay}"/>
+
+        <Border
+            x:Name="BackgroundBorder" Grid.Row="0"
+            Grid.RowSpan="2" Grid.Column="0"
             Background="{DynamicResource AssistantBackgroundBrush}"
             Classes.IsExpanded="{Binding IsExpanded}">
             <Border.CornerRadius>
@@ -35,7 +58,7 @@
                     </Binding>
                     <Binding>
                         <Binding.Source>
-                            <system:Double>8</system:Double>
+                            <CornerRadius>8,26</CornerRadius>
                         </Binding.Source>
                     </Binding>
                     <Binding Path="$self.Bounds.Width"/>
@@ -49,30 +72,46 @@
                     <CornerRadiusTransition
                         Easing="SineEaseInOut" Property="CornerRadius"
                         Duration="0:0:0.2"/>
-                    <BrushTransition
-                        Easing="SineEaseInOut" Property="Background"
+                    <DoubleTransition
+                        Easing="SineEaseInOut" Property="Opacity"
                         Duration="0:0:0.2"/>
                 </Transitions>
             </Border.Transitions>
         </Border>
 
-        <StackPanel
-            Grid.Row="0" Margin="8"
-            Background="Transparent" Orientation="Horizontal"
-            PointerPressed="HandleTitleBarPointerPressed">
+        <DockPanel
+            Grid.Row="0" Grid.Column="0"
+            Margin="8" Background="Transparent"
+            LastChildFill="True" PointerPressed="HandleTitleBarPointerPressed">
             <ToggleButton
-                Padding="0"
+                DockPanel.Dock="Left" Padding="0"
                 Background="{x:Null}"
                 BorderThickness="0" Focusable="False"
                 IsChecked="{Binding IsExpanded, Mode=TwoWay}">
                 <ToggleButton.Effect>
-                    <DropShadowEffect BlurRadius="9" Opacity="0.3"/>
+                    <DropShadowEffect
+                        BlurRadius="9" Opacity="0.3"/>
                 </ToggleButton.Effect>
 
-                <Viewbox Width="36" Height="36">
+                <Viewbox
+                    Width="36" Height="36">
                     <ContentPresenter Content="{StaticResource AssistantAvatar}"/>
                 </Viewbox>
             </ToggleButton>
+
+            <Button
+                Classes="Basic WindowControlsButton Close" DockPanel.Dock="Right"
+                Width="24" Height="24"
+                Margin="0,0,0,4" VerticalAlignment="Center"
+                Command="{Binding SetTargetElementCommand}"
+                CommandParameter="{x:Null}"
+                CornerRadius="4"
+                IsVisible="{Binding IsExpanded}">
+                <PathIcon
+                    Width="12" Height="12"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    Data="{x:Static suki:Icons.WindowClose}"/>
+            </Button>
 
             <TextBlock
                 Margin="8,0,0,0" VerticalAlignment="Center"
@@ -81,60 +120,164 @@
                 IsHitTestVisible="False"
                 IsVisible="{Binding IsExpanded}"
                 Text="{Binding Title}"/>
-        </StackPanel>
+        </DockPanel>
+
+        <Button
+            x:Name="FloatingCloseButton" Classes="Basic WindowControlsButton Close"
+            Grid.Row="0" Grid.Column="1"
+            Width="16" Height="16"
+            VerticalAlignment="Top"
+            Command="{Binding SetTargetElementCommand}"
+            CommandParameter="{x:Null}"
+            CornerRadius="8"
+            IsVisible="{Binding !IsExpanded}">
+            <PathIcon
+                Width="9" Height="9"
+                HorizontalAlignment="Center" VerticalAlignment="Center"
+                Data="{x:Static suki:Icons.WindowClose}"/>
+        </Button>
 
         <Border
-            Grid.Row="0" Height="1"
-            Margin="0,-4,0,4" VerticalAlignment="Bottom"
+            Grid.Row="0" Grid.Column="0"
+            Height="1" Margin="0,-4,0,4"
+            VerticalAlignment="Bottom"
             Background="{DynamicResource SukiBorderBrush}"
             IsVisible="{Binding IsExpanded}"/>
 
-        <Panel Grid.Row="1" IsVisible="{Binding IsExpanded}">
+        <Panel
+            Grid.Row="1" Grid.Column="0"
+            IsVisible="{Binding IsExpanded}">
             <Panel.Styles>
                 <Style Selector="suki|Loading">
                     <Setter Property="Foreground" Value="{DynamicResource SukiLowText}"/>
                 </Style>
             </Panel.Styles>
 
-            <suki:BusyArea
+            <StackPanel
                 Width="400" Margin="8"
-                ClipToBounds="False"
-                IsBusy="{Binding IsBusy}"
-                IsVisible="{Binding !IsGenerating}">
-                <StackPanel Orientation="Vertical" Spacing="4">
-                    <ScrollViewer
-                        MinHeight="200" MaxHeight="400"
-                        HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-                        <Panel>
-                            <ItemsControl ItemsSource="{Binding Actions}">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <WrapPanel ItemSpacing="4" LineSpacing="4"/>
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
+                Orientation="Vertical" Spacing="4">
+                <ScrollViewer
+                    MinHeight="200" MaxHeight="400"
+                    HorizontalContentAlignment="Stretch" HorizontalScrollBarVisibility="Disabled"
+                    VerticalScrollBarVisibility="Auto">
+                    <Panel>
+                        <ItemsControl
+                            IsVisible="{Binding !ChatMessages.Count}"
+                            ItemsSource="{Binding Actions}">
+                            <ItemsControl.Styles>
+                                <Style Selector="v|DynamicKeyMenuItem">
+                                    <Setter Property="Template">
+                                        <ControlTemplate TargetType="v:DynamicKeyMenuItem">
+                                            <Button
+                                                Height="36"
+                                                Command="{TemplateBinding Command}"
+                                                CommandParameter="{TemplateBinding CommandParameter}"
+                                                CornerRadius="18">
+                                                <StackPanel
+                                                    Orientation="Horizontal" Spacing="4">
+                                                    <ContentPresenter Content="{TemplateBinding Icon}"/>
+                                                    <ContentPresenter Content="{Binding HeaderKey^, RelativeSource={RelativeSource TemplatedParent}}"/>
+                                                </StackPanel>
+                                            </Button>
+                                        </ControlTemplate>
+                                    </Setter>
+                                </Style>
+                            </ItemsControl.Styles>
 
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate DataType="v:DynamicKeyMenuItem">
-                                        <Button Command="{Binding Command}" CommandParameter="{Binding CommandParameter}">
-                                            <StackPanel Orientation="Horizontal" Spacing="4">
-                                                <ContentPresenter Content="{Binding Icon}"/>
-                                                <ContentPresenter Content="{Binding HeaderKey^}"/>
-                                            </StackPanel>
-                                        </Button>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel
+                                        ItemSpacing="4" LineSpacing="4"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
 
-                            <TextBlock
-                                Foreground="{DynamicResource SukiText}"
-                                Inlines="{Binding GeneratedInlineCollection}"
-                                TextWrapping="WrapWithOverflow"/>
-                        </Panel>
-                    </ScrollViewer>
+                        <ItemsControl
+                            IsVisible="{Binding !!ChatMessages.Count}"
+                            ItemsSource="{Binding ChatMessages}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel
+                                        Orientation="Vertical" Spacing="6"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
 
-                    <v:AssistantInputBox IsSendButtonEnabled="{Binding !IsBusy}"/>
-                </StackPanel>
-            </suki:BusyArea>
+                            <ItemsControl.Styles>
+                                <Style Selector="StackPanel.Chat:not(.User)">
+                                    <Setter Property="HorizontalAlignment" Value="Left"/>
+                                </Style>
+
+                                <Style Selector="StackPanel.Chat.User">
+                                    <Setter Property="HorizontalAlignment" Value="Right"/>
+                                </Style>
+
+                                <Style Selector="StackPanel.Chat:not(.Assistant) StackPanel#ChatMessageOperationPanel">
+                                    <Setter Property="IsVisible" Value="False"/>
+                                </Style>
+
+                                <Style Selector="StackPanel.Chat.Assistant:not(:pointerover) StackPanel#ChatMessageOperationPanel">
+                                    <Setter Property="Opacity" Value="0"/>
+                                </Style>
+
+                                <Style Selector="Button ip|PackIconMaterial">
+                                    <Setter Property="Foreground" Value="{DynamicResource SukiText}"/>
+                                    <Setter Property="Width" Value="14"/>
+                                    <Setter Property="Height" Value="14"/>
+                                </Style>
+                            </ItemsControl.Styles>
+
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="m:ChatMessage">
+                                    <StackPanel
+                                        Classes="Chat" Background="Transparent"
+                                        Classes.Assistant="{Binding Role.Value, Converter={x:Static ObjectConverters.Equal}, ConverterParameter=assistant, Mode=OneTime}"
+                                        Classes.User="{Binding Role.Value, Converter={x:Static ObjectConverters.Equal}, ConverterParameter=user, Mode=OneTime}"
+                                        Orientation="Vertical" Spacing="4">
+                                        <suki:GlassCard MaxWidth="{Binding $parent[ItemsControl].Bounds.Width}">
+                                            <TextBlock
+                                                Foreground="{DynamicResource SukiText}"
+                                                Inlines="{Binding InlineCollection}"
+                                                TextWrapping="WrapWithOverflow"/>
+                                        </suki:GlassCard>
+
+                                        <StackPanel
+                                            x:Name="ChatMessageOperationPanel" HorizontalAlignment="Right"
+                                            Orientation="Horizontal">
+                                            <Button
+                                                Classes="Basic" Padding="2"
+                                                Command="{Binding $parent[v:AssistantFloatingWindow].ViewModel.RetryCommand}"
+                                                CommandParameter="{Binding}">
+                                                <ip:PackIconMaterial Kind="Refresh"/>
+                                            </Button>
+                                            <Button
+                                                Classes="Basic" Padding="2"
+                                                Command="{Binding $parent[v:AssistantFloatingWindow].ViewModel.CopyCommand}"
+                                                CommandParameter="{Binding}">
+                                                <ip:PackIconMaterial Kind="ContentCopy"/>
+                                            </Button>
+                                            <!--  <Button  -->
+                                            <!--  Classes="Success" Padding="2"  -->
+                                            <!--  BorderThickness="0"  -->
+                                            <!--  Command="{Binding $parent[v:AssistantFloatingWindow].ViewModel.AcceptCommand}"  -->
+                                            <!--  CommandParameter="{Binding}">  -->
+                                            <!--     <ip:PackIconMaterial Kind="Check"/> -->
+                                            <!-- </Button> -->
+                                        </StackPanel>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Panel>
+                </ScrollViewer>
+
+                <v:AssistantInputBox
+                    AssistantCommandItemsSource="{Binding AssistantCommands}"
+                    Command="{Binding ProcessChatMessageSentCommand}"
+                    IsImageSupported="{Binding Settings.Model.IsImageEnabled}"
+                    IsSendButtonEnabled="{Binding !IsBusy}"
+                    IsToolCallSupported="{Binding Settings.Model.IsToolCallEnabled}"
+                    IsWebSearchSupported="{Binding Settings.Model.IsToolCallEnabled}"/>
+            </StackPanel>
         </Panel>
     </Grid>
 </v:ReactiveWindow>

@@ -1,0 +1,11 @@
+﻿<Styles
+    xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:v="using:Everywhere.Views">
+    <Design.PreviewWith>
+        <v:DynamicKeyMenuItem/>
+    </Design.PreviewWith>
+
+    <Style Selector="v|DynamicKeyMenuItem /template/ ContentPresenter#PART_HeaderPresenter">
+        <Setter Property="Content" Value="{Binding HeaderKey^, RelativeSource={RelativeSource TemplatedParent}}"/>
+    </Style>
+</Styles>

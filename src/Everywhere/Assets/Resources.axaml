@@ -1,4 +1,6 @@
-﻿<ResourceDictionary xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+﻿<ResourceDictionary
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <LinearGradientBrush x:Key="AssistantBackgroundBrush" SpreadMethod="Pad" StartPoint="0%,0%" EndPoint="100%,100%">
         <GradientStop Offset="0" Color="#FFAC45F1"/>
         <GradientStop Offset="0.1" Color="#FFA64BF1"/>
@@ -6,6 +8,11 @@
         <GradientStop Offset="0.6" Color="#FF7A7EF4"/>
         <GradientStop Offset="0.8" Color="#FF55A9F6"/>
         <GradientStop Offset="1" Color="#FF3DC6F8"/>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="AssistantLowBackgroundBrush" SpreadMethod="Pad" StartPoint="0%,0%" EndPoint="100%,100%">
+        <GradientStop Offset="0" Color="#FF8134b5"/>
+        <GradientStop Offset="1" Color="#FF2f99bf"/>
     </LinearGradientBrush>
 
     <Panel x:Key="AssistantAvatar">
@@ -91,7 +98,9 @@
             <Image.Source>
                 <DrawingImage>
                     <DrawingImage.Drawing>
-                        <GeometryDrawing Brush="#FF000000" Geometry="F1 M612,440C612,471 624,496 651,496 678,496 689,471 689,440 689,409 677,384 651,384 625,384 612,409 612,440z M430,440C430,471 418,496 391,496 364,496 353,471 353,440 353,409 365,384 391,384 417,384 430,409 430,440z"/>
+                        <GeometryDrawing
+                            Brush="#FF000000"
+                            Geometry="F1 M612,440C612,471 624,496 651,496 678,496 689,471 689,440 689,409 677,384 651,384 625,384 612,409 612,440z M430,440C430,471 418,496 391,496 364,496 353,471 353,440 353,409 365,384 391,384 417,384 430,409 430,440z"/>
                     </DrawingImage.Drawing>
                 </DrawingImage>
             </Image.Source>

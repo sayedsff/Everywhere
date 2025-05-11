@@ -1,5 +1,4 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Everywhere.Avalonia;
 
 namespace Everywhere.Models;
 

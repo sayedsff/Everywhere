@@ -8,8 +8,11 @@ public class PlacementToCornerRadiusConverter : IMultiValueConverter
 {
     public object Convert(IList<object?> values, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (values is not [double small, double medium, double large, PlacementMode mode, bool isExpanded]) throw new ArgumentOutOfRangeException(nameof(values));
-        if (isExpanded) return new CornerRadius(medium);
+        if (values is not [double small, CornerRadius medium, double large, PlacementMode mode, bool isExpanded])
+            throw new ArgumentOutOfRangeException(nameof(values));
+
+        if (isExpanded) return medium;
+
         return mode switch
         {
             PlacementMode.TopEdgeAlignedLeft => new CornerRadius(large, large, large, small),

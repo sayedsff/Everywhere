@@ -1,8 +1,12 @@
 ﻿<UserControl
-    x:Class="Everywhere.Views.Pages.SettingsPage" xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:m="clr-namespace:Everywhere.Models"
-    xmlns:vm="clr-namespace:Everywhere.ViewModels" x:DataType="vm:SettingsPageViewModel">
-    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+    x:Class="Everywhere.Views.Pages.SettingsPage"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:m="clr-namespace:Everywhere.Models"
+    xmlns:vm="clr-namespace:Everywhere.ViewModels"
+    x:DataType="vm:SettingsPageViewModel">
+    <ScrollViewer
+        HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
         <ItemsControl
             Width="640" HorizontalAlignment="Center"
             ItemsSource="{Binding Groups}">
@@ -19,12 +23,16 @@
                             Background="{DynamicResource SukiControlBorderBrush}"
                             BorderThickness="0"/>
 
-                        <ItemsControl HorizontalAlignment="Stretch" ItemsSource="{Binding Items}">
+                        <ItemsControl
+                            HorizontalAlignment="Stretch"
+                            ItemsSource="{Binding Items}">
                             <ItemsControl.Styles>
                                 <Style Selector="Border.ItemContainer:pointerover">
                                     <Setter Property="Background">
                                         <Setter.Value>
-                                            <SolidColorBrush Opacity="0.2" Color="{DynamicResource SukiGlassCardBackground}"/>
+                                            <SolidColorBrush
+                                                Opacity="0.2"
+                                                Color="{DynamicResource SukiGlassCardBackground}"/>
                                         </Setter.Value>
                                     </Setter>
                                 </Style>
@@ -32,7 +40,8 @@
 
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate DataType="m:SettingsItemBase">
-                                    <Border Classes="ItemContainer" CornerRadius="4">
+                                    <Border
+                                        Classes="ItemContainer" CornerRadius="4">
                                         <StackPanel Margin="8">
                                             <TextBlock
                                                 FontSize="16"
@@ -46,7 +55,9 @@
                                             <ContentPresenter Content="{Binding}">
                                                 <ContentPresenter.DataTemplates>
                                                     <DataTemplate DataType="m:SettingsBooleanItem">
-                                                        <ToggleSwitch IsChecked="{Binding Value, Mode=TwoWay}" IsThreeState="{Binding CanBeNull}"/>
+                                                        <ToggleSwitch
+                                                            IsChecked="{Binding Value, Mode=TwoWay}"
+                                                            IsThreeState="{Binding CanBeNull}"/>
                                                     </DataTemplate>
 
                                                     <DataTemplate DataType="m:SettingsStringItem">
@@ -69,7 +80,9 @@
                                                                 Maximum="{Binding MaxValue}"
                                                                 Minimum="{Binding MinValue}"
                                                                 Value="{Binding Value, Mode=TwoWay}"/>
-                                                            <TextBox MinHeight="32" Text="{Binding Value, Mode=TwoWay}"/>
+                                                            <TextBox
+                                                                MinHeight="32"
+                                                                Text="{Binding Value, Mode=TwoWay}"/>
                                                         </StackPanel>
                                                     </DataTemplate>
 
@@ -85,7 +98,9 @@
                                                                 SmallChange="{Binding Step}"
                                                                 TickFrequency="{Binding Step}"
                                                                 Value="{Binding Value, Mode=TwoWay}"/>
-                                                            <TextBox MinHeight="32" Text="{Binding Value, Mode=TwoWay}"/>
+                                                            <TextBox
+                                                                MinHeight="32"
+                                                                Text="{Binding Value, Mode=TwoWay}"/>
                                                         </StackPanel>
                                                     </DataTemplate>
 

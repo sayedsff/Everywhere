@@ -86,5 +86,5 @@ public partial class ModelSettings() : SettingsBase("Model")
     public partial bool IsImageEnabled { get; set; } = true;
 
     [ObservableProperty]
-    public partial bool IsToolUseEnabled { get; set; } = true;
+    public partial bool IsToolCallEnabled { get; set; } = true;
 }

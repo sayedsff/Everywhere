@@ -1,4 +1,5 @@
-﻿using Everywhere.Enums;
+﻿using System.Drawing;
+using Everywhere.Enums;
 
 namespace Everywhere.Models;
 
@@ -23,6 +24,8 @@ public class OptimizedVisualElement(IVisualElement original) : IVisualElement
     public string? GetText(int maxLength = -1) => original.GetText(maxLength);
 
     public void SetText(string text, bool append) => original.SetText(text, append);
+
+    public Task<Bitmap> CaptureAsync() => original.CaptureAsync();
 
     public event Action<IVisualElement>? TextChanged
     {

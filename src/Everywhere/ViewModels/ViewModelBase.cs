@@ -107,7 +107,7 @@ public abstract partial class BusyViewModelBase : ReactiveViewModelBase
     private readonly SemaphoreSlim executionLock = new(1, 1);
 
     protected async Task ExecuteBusyTaskAsync(
-        Func<Task> task,
+        Func<CancellationToken, Task> task,
         IExceptionHandler? exceptionHandler = null,
         ExecutionFlags flags = ExecutionFlags.None,
         CancellationToken cancellationToken = default)
@@ -125,14 +125,14 @@ public abstract partial class BusyViewModelBase : ReactiveViewModelBase
                 currentTask = currentTask.ContinueWith(
                     async _ =>
                     {
-                        try { await task(); }
+                        try { await task(cancellationToken); }
                         catch when (cancellationToken.IsCancellationRequested) { }
                     },
                     TaskContinuationOptions.RunContinuationsAsynchronously);
             }
             else
             {
-                taskToWait = currentTask = task();
+                taskToWait = currentTask = task(cancellationToken);
             }
 
             try
@@ -160,12 +160,12 @@ public abstract partial class BusyViewModelBase : ReactiveViewModelBase
     }
 
     protected Task ExecuteBusyTaskAsync(
-        Action action,
+        Action<CancellationToken> action,
         IExceptionHandler? exceptionHandler = null,
         ExecutionFlags flags = ExecutionFlags.None,
         CancellationToken cancellationToken = default) =>
         ExecuteBusyTaskAsync(
-            () => Task.Run(action, cancellationToken),
+            token => Task.Run(() => action(token), token),
             exceptionHandler,
             flags,
             cancellationToken);

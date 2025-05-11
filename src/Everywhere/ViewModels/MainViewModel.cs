@@ -7,11 +7,11 @@ using SukiUI.Controls;
 
 namespace Everywhere.ViewModels;
 
-public partial class MainViewModel(IServiceProvider serviceProvider) : ReactiveViewModelBase
+public class MainViewModel(IServiceProvider serviceProvider) : ReactiveViewModelBase
 {
     [field: AllowNull, MaybeNull]
     public NotifyCollectionChangedSynchronizedViewList<SukiSideMenuItem> Pages =>
-        field ??= pages.ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
+        field ??= pages.ToNotifyCollectionChangedSlim(SynchronizationContextCollectionEventDispatcher.Current);
 
     private readonly ObservableList<SukiSideMenuItem> pages = [];
 

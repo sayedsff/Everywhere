@@ -13,14 +13,17 @@ public class BusyInlineCollection : InlineCollection
 
     private readonly Loading loading;
 
-    public BusyInlineCollection()
+    public BusyInlineCollection(bool isBusy = false)
     {
-        Add(loading = new Loading
-        {
-            Width = 16,
-            Height = 16,
-            IsHitTestVisible = false
-        });
+        Add(
+            loading = new Loading
+            {
+                Width = 16,
+                Height = 16,
+                Margin = new Thickness(8, 0, 0, 0),
+                IsHitTestVisible = false,
+                IsVisible = isBusy
+            });
     }
 
     public override void Add(Inline inline)
