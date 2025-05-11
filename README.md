@@ -37,7 +37,7 @@
 - **Screen Awareness** – Capture and analyze the current window or selected region to offer context‑specific suggestions and summaries.
 - **MCP Integration** – Leverage the Model Context Protocol to wire up custom tools and data sources for deeper automation.
 - **Multimodal Understanding** – Process text, images, and screenshots for code explanations, UI analysis, or visual Q&A.
-- **Privacy First** – Choose between cloud LLMs (ChatGPT, DeepSeek, etc.) and fully local models (Ollama, LM Studio) to keep sensitive data on‑device.
+- **LLMs under control** – Choose between cloud LLMs (ChatGPT, DeepSeek, etc.) and fully local models (Ollama, LM Studio).
 
 ### 🛠 Built With
 
@@ -49,7 +49,7 @@
 
 | Platform | Minimum Version |
 |----------|-----------------|
-| Windows  | 10 / 11         |
+| Windows  | 10.0.19041.0    |
 | macOS    | *Planned*       |
 
 ## 🚀 Getting Started
@@ -79,7 +79,7 @@ We welcome issues, feature ideas, and PRs! See [CONTRIBUTING.md](CONTRIBUTING.md
 
 ## License
 
-Distributed under the MIT License. See [LICENSE](LICENSE) for more information.
+Distributed under the Apache 2.0 License. See [LICENSE](LICENSE) for more information.
 
 ## Acknowledgments
 
