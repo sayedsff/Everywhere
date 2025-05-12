@@ -237,15 +237,17 @@
                                             x:Name="ChatMessageOperationPanel" HorizontalAlignment="Right"
                                             Orientation="Horizontal">
                                             <Button
-                                                Classes="Basic" Padding="2"
+                                                Classes="Basic" Padding="4"
                                                 Command="{Binding $parent[v:AssistantFloatingWindow].ViewModel.RetryCommand}"
-                                                CommandParameter="{Binding}">
+                                                CommandParameter="{Binding}"
+                                                ToolTip.Tip="{DynamicResource AssistantFloatingWindow_ChatMessage_Assistant_Regenerate}">
                                                 <ip:PackIconMaterial Kind="Refresh"/>
                                             </Button>
                                             <Button
-                                                Classes="Basic" Padding="2"
+                                                Classes="Basic" Padding="4"
                                                 Command="{Binding $parent[v:AssistantFloatingWindow].ViewModel.CopyCommand}"
-                                                CommandParameter="{Binding}">
+                                                CommandParameter="{Binding}"
+                                                ToolTip.Tip="{DynamicResource AssistantFloatingWindow_ChatMessage_Assistant_Copy}">
                                                 <ip:PackIconMaterial Kind="ContentCopy"/>
                                             </Button>
                                         </StackPanel>
@@ -266,25 +268,25 @@
                                 </DataTemplate>
 
                                 <DataTemplate DataType="m:ActionChatMessage">
-                                    <Expander
-                                        Classes="ChatMessage Action" HorizontalAlignment="Left"
-                                        Background="{DynamicResource SukiGlassCardBackground}"
-                                        BorderBrush="{DynamicResource GlassBorderBrush}"
-                                        BorderThickness="1.5" ExpandDirection="Down">
-                                        <Expander.Header>
-                                            <StackPanel
-                                                Orientation="Horizontal" Spacing="4">
-                                                <ip:PackIconMaterial Kind="{Binding Icon}"/>
-                                                <SelectableTextBlock Text="{Binding HeaderKey^, FallbackValue={x:Null}}"/>
-                                                <suki:Loading
-                                                    Width="16" Height="16"
-                                                    IsHitTestVisible="False"
-                                                    IsVisible="{Binding IsBusy}"/>
-                                            </StackPanel>
-                                        </Expander.Header>
+                                    <suki:GlassCard
+                                        Classes="ChatMessage Action" HorizontalAlignment="Left">
+                                        <Expander
+                                            Background="Transparent" BorderThickness="0">
+                                            <Expander.Header>
+                                                <StackPanel
+                                                    Orientation="Horizontal" Spacing="4">
+                                                    <ip:PackIconMaterial Kind="{Binding Icon}"/>
+                                                    <SelectableTextBlock Text="{Binding HeaderKey^, FallbackValue={x:Null}}"/>
+                                                    <suki:Loading
+                                                        Width="16" Height="16"
+                                                        IsHitTestVisible="False"
+                                                        IsVisible="{Binding IsBusy}"/>
+                                                </StackPanel>
+                                            </Expander.Header>
 
-                                        <SelectableTextBlock Inlines="{Binding InlineCollection}"/>
-                                    </Expander>
+                                            <SelectableTextBlock Inlines="{Binding InlineCollection}"/>
+                                        </Expander>
+                                    </suki:GlassCard>
                                 </DataTemplate>
                             </ItemsControl.DataTemplates>
                         </ItemsControl>
@@ -297,7 +299,7 @@
                     IsImageSupported="{Binding Settings.Model.IsImageEnabled}"
                     IsSendButtonEnabled="{Binding !IsBusy}"
                     IsToolCallSupported="{Binding Settings.Model.IsToolCallEnabled}"
-                    IsWebSearchSupported="{Binding Settings.Model.IsToolCallEnabled}"/>
+                    IsWebSearchSupported="{Binding Settings.Model.IsWebSearchEnabled}"/>
             </StackPanel>
         </Panel>
     </Grid>
