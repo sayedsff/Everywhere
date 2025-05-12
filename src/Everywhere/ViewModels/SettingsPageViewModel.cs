@@ -97,59 +97,61 @@ public class SettingsPageViewModel : ReactiveViewModelBase
                                                     x => new DynamicResourceKeyWrapper<object?>($"SettingsSelectionItem_{p.Name}_{pp.Name}_{x}", x));
                                             });
                                     }
-
-                                    if (pp.PropertyType == typeof(bool))
+                                    else
                                     {
-                                        result = new SettingsBooleanItem(
-                                            name,
-                                            new SettingsValueProxy<bool?>(group, pp),
-                                            false);
-                                    }
+                                        if (pp.PropertyType == typeof(bool))
+                                        {
+                                            result = new SettingsBooleanItem(
+                                                name,
+                                                new SettingsValueProxy<bool?>(group, pp),
+                                                false);
+                                        }
 
-                                    if (pp.PropertyType == typeof(bool?))
-                                    {
-                                        result = new SettingsBooleanItem(
-                                            name,
-                                            new SettingsValueProxy<bool?>(group, pp),
-                                            true);
-                                    }
+                                        if (pp.PropertyType == typeof(bool?))
+                                        {
+                                            result = new SettingsBooleanItem(
+                                                name,
+                                                new SettingsValueProxy<bool?>(group, pp),
+                                                true);
+                                        }
 
-                                    if (pp.PropertyType == typeof(string))
-                                    {
-                                        var attribute = pp.GetCustomAttribute<SettingsStringItemAttribute>();
-                                        result = new SettingsStringItem(
-                                            name,
-                                            new SettingsValueProxy<string>(group, pp),
-                                            attribute?.Watermark,
-                                            attribute?.MaxLength ?? int.MaxValue,
-                                            attribute?.IsMultiline ?? false,
-                                            attribute?.IsPassword ?? false);
-                                    }
+                                        if (pp.PropertyType == typeof(string))
+                                        {
+                                            var attribute = pp.GetCustomAttribute<SettingsStringItemAttribute>();
+                                            result = new SettingsStringItem(
+                                                name,
+                                                new SettingsValueProxy<string>(group, pp),
+                                                attribute?.Watermark,
+                                                attribute?.MaxLength ?? int.MaxValue,
+                                                attribute?.IsMultiline ?? false,
+                                                attribute?.IsPassword ?? false);
+                                        }
 
-                                    if (pp.PropertyType == typeof(int))
-                                    {
-                                        var attribute = pp.GetCustomAttribute<SettingsIntegerItemAttribute>();
-                                        result = new SettingsIntegerItem(
-                                            name,
-                                            new SettingsValueProxy<int>(group, pp),
-                                            attribute?.Min ?? int.MinValue,
-                                            attribute?.Max ?? int.MaxValue);
-                                    }
+                                        if (pp.PropertyType == typeof(int))
+                                        {
+                                            var attribute = pp.GetCustomAttribute<SettingsIntegerItemAttribute>();
+                                            result = new SettingsIntegerItem(
+                                                name,
+                                                new SettingsValueProxy<int>(group, pp),
+                                                attribute?.Min ?? int.MinValue,
+                                                attribute?.Max ?? int.MaxValue);
+                                        }
 
-                                    if (pp.PropertyType == typeof(double))
-                                    {
-                                        var attribute = pp.GetCustomAttribute<SettingsDoubleItemAttribute>();
-                                        result = new SettingsDoubleItem(
-                                            name,
-                                            new SettingsValueProxy<double>(group, pp),
-                                            attribute?.Min ?? double.NegativeInfinity,
-                                            attribute?.Max ?? double.PositiveInfinity,
-                                            attribute?.Step ?? 0.1d);
-                                    }
+                                        if (pp.PropertyType == typeof(double))
+                                        {
+                                            var attribute = pp.GetCustomAttribute<SettingsDoubleItemAttribute>();
+                                            result = new SettingsDoubleItem(
+                                                name,
+                                                new SettingsValueProxy<double>(group, pp),
+                                                attribute?.Min ?? double.NegativeInfinity,
+                                                attribute?.Max ?? double.PositiveInfinity,
+                                                attribute?.Step ?? 0.1d);
+                                        }
 
-                                    if (pp.PropertyType == typeof(Hotkey))
-                                    {
-                                        result = new SettingsHotkeyItem(name, new SettingsValueProxy<Hotkey>(group, pp));
+                                        if (pp.PropertyType == typeof(Hotkey))
+                                        {
+                                            result = new SettingsHotkeyItem(name, new SettingsValueProxy<Hotkey>(group, pp));
+                                        }
                                     }
 
                                     if (result == null) return null;
