@@ -27,5 +27,14 @@ public class SettingsDoubleItemAttribute : Attribute
 [AttributeUsage(AttributeTargets.Property)]
 public class SettingsSelectionItemAttribute : Attribute
 {
-    public required string PropertyName { get; set; }
+    public required string ItemsSource { get; set; }
+}
+
+[AttributeUsage(AttributeTargets.Property)]
+public class SettingsGroupAttribute(string propertyName) : Attribute
+{
+    /// <summary>
+    /// Set the propertyName, which is bool
+    /// </summary>
+    public string PropertyName { get; set; } = propertyName;
 }

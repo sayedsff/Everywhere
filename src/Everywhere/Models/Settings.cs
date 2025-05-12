@@ -32,7 +32,7 @@ public class Settings
 
 public partial class CommonSettings() : SettingsBase("Common")
 {
-    [SettingsSelectionItem(PropertyName = nameof(LanguageSource))]
+    [SettingsSelectionItem(ItemsSource = nameof(LanguageSource))]
     public string Language
     {
         get => LocaleManager.CurrentLocale;
@@ -83,8 +83,32 @@ public partial class ModelSettings() : SettingsBase("Model")
     public partial double TopP { get; set; } = 1.0;
 
     [ObservableProperty]
-    public partial bool IsImageEnabled { get; set; } = true;
+    public partial bool IsImageEnabled { get; set; }
 
     [ObservableProperty]
-    public partial bool IsToolCallEnabled { get; set; } = true;
+    [NotifyPropertyChangedFor(nameof(IsWebSearchEnabled))]
+    public partial bool IsToolCallEnabled { get; set; }
+
+    [SettingsGroup(nameof(IsToolCallEnabled))]
+    public bool IsWebSearchEnabled
+    {
+        get => IsToolCallEnabled && field;
+        set => SetProperty(ref field, value);
+    }
+
+    [ObservableProperty]
+    [SettingsGroup(nameof(IsWebSearchEnabled))]
+    [SettingsSelectionItem(ItemsSource = nameof(WebSearchProviders))]
+    public partial string WebSearchProvider { get; set; } = "bing";
+
+    [JsonIgnore]
+    public static IEnumerable<string> WebSearchProviders => ["bing", "brave", "bocha"]; // TODO: google
+
+    [ObservableProperty]
+    [SettingsGroup(nameof(IsWebSearchEnabled))]
+    public partial string WebSearchApiKey { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    [SettingsGroup(nameof(IsWebSearchEnabled))]
+    public partial string WebSearchEndpoint { get; set; } = string.Empty;
 }

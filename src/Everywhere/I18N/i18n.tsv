@@ -15,20 +15,32 @@ Settings_Behavior_InputAssistantHotkey_Description	当你在任何软件中输�
 SettingsGroup_Model_Header	模型设置	Model Settings
 Settings_Model_ModelName_Header	模型名称	Model Name
 Settings_Model_ModelName_Description	要使用的模型名称。	The name of the model to use.
-Settings_Model_Endpoint_Header	API接口地址	API Endpoint
+Settings_Model_Endpoint_Header	模型API接口地址	Model API Endpoint
 Settings_Model_Endpoint_Description	"正确输入例子：https://openai.com/api/v1
 错误输入例子：https://openai.com/api/v1/chat/completions"	"Correct input example: https://openai.com/api/v1
 Incorrect input example: https://openai.com/api/v1/chat/completions"
-Settings_Model_ApiKey_Header	API Key	API Key
-Settings_Model_ApiKey_Description	API访问秘钥，如果是ollama或者LM Studio这类本地模型不需要验证的，请留空。	API access key. Leave blank for local models (e.g., Ollama or LM Studio) that don’t require authentication.
+Settings_Model_ApiKey_Header	模型API Key	Model API Key
+Settings_Model_ApiKey_Description	模型API访问秘钥，你可以在对应模型提供方的API网站获取。如果是ollama或者LM Studio这类本地模型不需要验证的，请留空。	Model API access key. You can get it from model provider's API website. Leave blank for local models (e.g., Ollama or LM Studio) that don’t require authentication.
 Settings_Model_Temperature_Header	创意活跃度（Temperature）	Creativity (Temperature)
 Settings_Model_Temperature_Description	数值越大，回答越有创意和想象力；数值越小，回答越严谨。注意，对于某些模型，数值超过1.0可能会导致输出乱码。	The higher the value, the more creative and imaginative the responses; the lower the value, the more precise. Note: values above 1.0 can cause output issues in some models.
 Settings_Model_TopP_Header	思维开放度（Top p）	Thought openness (Top p)
 Settings_Model_TopP_Description	考虑多少种可能性，值越大，接受更多可能的回答；值越小，倾向选择最可能的回答。不推荐和创意活跃度一起更改。	Determines how many possibilities to consider: higher accepts more varied responses; lower favors the most likely. Not recommended to change alongside Temperature.
-Settings_Model_IsImageEnabled_Header	开启多模态图像功能	Enable multimodal image support
-Settings_Model_IsImageEnabled_Description	如果大模型（如gpt-4o等）支持图片上传（视觉输入），开启后此功能后，AI助手会在合适的时机将图像一并输入，有利于大模型更好地理解上下文。如果模型不支持，开启后可能会导致调用失败。	If your model (e.g., GPT-4o) supports image input, enabling this lets the assistant include images at appropriate times for richer context; if unsupported, calls may fail.
-Settings_Model_IsToolCallEnabled_Header	开启工具调用功能	Enable tool calling
+Settings_Model_IsImageEnabled_Header	开启图像多模态	Enable multimodal image support
+Settings_Model_IsImageEnabled_Description	如果大模型（如gpt-4o等）支持图像上传（视觉输入），开启后此功能后，AI助手会在合适的时机将图像一并输入，有利于大模型更好地理解上下文。如果模型不支持，开启后可能会导致调用失败。	If your model (e.g., GPT-4o) supports image input, enabling this lets the assistant include images at appropriate times for richer context; if unsupported, calls may fail.
+Settings_Model_IsToolCallEnabled_Header	开启工具调用	Enable tool calling
 Settings_Model_IsToolCallEnabled_Description	如果大模型（如DeepSeek-V3、gpt-4o等）支持工具调用，开启后此功能后，AI助手会在合适的时机调用工具，从而开启更强大的能力。如果模型不支持，开启后可能会导致调用失败。	If your model (e.g., DeepSeek-V3, GPT-4o) supports tool calls, enabling this lets the assistant invoke tools when appropriate for enhanced capabilities; if unsupported, calls may fail.
+Settings_Model_IsWebSearchEnabled_Header	开启网络搜索
+Settings_Model_IsWebSearchEnabled_Description	在开启工具调用的情况下，开启此功能可允许模型搜索网络结果之后再回答。
+Settings_Model_WebSearchProvider_Header	网络搜索服务提供方
+Settings_Model_WebSearchProvider_Description
+SettingsSelectionItem_Model_WebSearchProvider_bing	必应
+SettingsSelectionItem_Model_WebSearchProvider_google	谷歌
+SettingsSelectionItem_Model_WebSearchProvider_brave	brave
+SettingsSelectionItem_Model_WebSearchProvider_bocha	博查
+Settings_Model_WebSearchApiKey_Header	网络搜索服务API Key
+Settings_Model_WebSearchApiKey_Description	网络搜索服务API访问秘钥，你可以在对应网络搜索服务提供方的API网站获取。
+Settings_Model_WebSearchEndpoint_Header	网络搜索服务API接口地址
+Settings_Model_WebSearchEndpoint_Description	（选填）如果使用官方的API接口，请留空使用默认值。
 AssistantInputBox_Watermark	询问Everywhere助手	Ask the Everywhere assistant
 AssistantInputBox_AddButton_ToolTip	添加附加内容到对话	Add extra content to the conversation
 AssistantInputBox_ImageButton_ToolTip	允许访问屏幕上的图像	Allow access to aware your screen

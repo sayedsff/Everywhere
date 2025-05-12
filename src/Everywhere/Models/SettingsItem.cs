@@ -11,47 +11,38 @@ public class SettingsItemGroup(string name, IReadOnlyList<SettingsItemBase> item
 public abstract class SettingsItemBase(string name) : ObservableObject
 {
     public DynamicResourceKey HeaderKey => $"Settings_{name}_Header";
-
     public DynamicResourceKey DescriptionKey => $"Settings_{name}_Description";
+    public IValueProxy<bool>? IsEnabledProxy { get; set; }
+    public List<SettingsItemBase> Items { get; } = [];
 }
 
-public abstract class SettingsItemBase<T>(string name, Func<T> getter, Action<T> setter) : SettingsItemBase(name)
+public interface IValueProxy<T>
 {
-    public T Value
-    {
-        get => getter();
-        set
-        {
-            setter(value);
-            OnPropertyChanged();
-        }
-    }
+    public T Value { get; set; }
+}
 
-    public void NotifyValueChanged()
-    {
-        OnPropertyChanged(nameof(Value));
-    }
+public abstract class SettingsItemBase<T>(string name, IValueProxy<T> valueProxy) : SettingsItemBase(name)
+{
+    public IValueProxy<T> ValueProxy => valueProxy;
 }
 
 public class SettingsBooleanItem(
     string name,
-    Func<bool?> getter,
-    Action<bool?> setter,
+    IValueProxy<bool?> valueProxy,
     bool canBeNull
-) : SettingsItemBase<bool?>(name, getter, setter)
+) : SettingsItemBase<bool?>(name, valueProxy)
 {
     public bool CanBeNull => canBeNull;
 }
 
 public class SettingsStringItem(
     string name,
-    Func<string> getter,
-    Action<string> setter,
+    IValueProxy<string> valueProxy,
     string? watermark,
     int maxLength,
     bool isMultiline,
     bool isPassword
-) : SettingsItemBase<string>(name, getter, setter)
+) : SettingsItemBase<string>(name, valueProxy)
 {
     public string? Watermark => watermark;
 
@@ -64,11 +55,10 @@ public class SettingsStringItem(
 
 public class SettingsIntegerItem(
     string name,
-    Func<int> getter,
-    Action<int> setter,
+    IValueProxy<int> valueProxy,
     int minValue,
     int maxValue
-) : SettingsItemBase<int>(name, getter, setter)
+) : SettingsItemBase<int>(name, valueProxy)
 {
     public int MinValue => minValue;
 
@@ -77,12 +67,11 @@ public class SettingsIntegerItem(
 
 public class SettingsDoubleItem(
     string name,
-    Func<double> getter,
-    Action<double> setter,
+    IValueProxy<double> valueProxy,
     double minValue,
     double maxValue,
     double step
-) : SettingsItemBase<double>(name, getter, setter)
+) : SettingsItemBase<double>(name, valueProxy)
 {
     public double MinValue => minValue;
 
@@ -93,10 +82,9 @@ public class SettingsDoubleItem(
 
 public class SettingsSelectionItem(
     string name,
-    Func<object?> getter,
-    Action<object?> setter,
+    IValueProxy<object?> valueProxy,
     Func<IEnumerable<DynamicResourceKeyWrapper<object?>>> itemsSource
-) : SettingsItemBase<object?>(name, getter, setter)
+) : SettingsItemBase<object?>(name, valueProxy)
 {
     public IEnumerable<DynamicResourceKeyWrapper<object?>> ItemsSource => itemsSource();
 
@@ -105,15 +93,12 @@ public class SettingsSelectionItem(
     /// </summary>
     public DynamicResourceKeyWrapper<object?> SelectedItem
     {
-        get => ItemsSource.First(i => Equals(i.Value, Value));
-        set => Value = value.Value;
+        get => ItemsSource.First(i => Equals(i.Value, ValueProxy.Value));
+        set => ValueProxy.Value = value.Value;
     }
 }
 
 public class SettingsHotkeyItem(
     string name,
-    Func<Hotkey> getter,
-    Action<Hotkey> setter
-) : SettingsItemBase<Hotkey>(name, getter, setter)
-{
-}
+    IValueProxy<Hotkey> valueProxy
+) : SettingsItemBase<Hotkey>(name, valueProxy);

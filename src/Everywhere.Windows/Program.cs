@@ -60,10 +60,6 @@ public static class Program
                 .AddSingleton<IVisualElementContext, Win32VisualElementContext>()
                 .AddSingleton<IUserInputTrigger, Win32UserInputTrigger>()
                 .AddSingleton<IPlatformHelper, Win32PlatformHelper>()
-                .AddOpenAIChatCompletion(
-                    modelId: "gpt-4o",
-                    apiKey: Environment.GetEnvironmentVariable("NODIS_API_KEY", EnvironmentVariableTarget.User).NotNull("NODIS_API_KEY is not set")
-                )
 
                 #endregion
 

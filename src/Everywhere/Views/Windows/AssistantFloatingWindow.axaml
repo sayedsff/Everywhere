@@ -203,41 +203,34 @@
                             </ItemsControl.ItemsPanel>
 
                             <ItemsControl.Styles>
-                                <Style Selector="StackPanel.Chat:not(.User)">
-                                    <Setter Property="HorizontalAlignment" Value="Left"/>
+                                <Style Selector=":is(Control).ChatMessage">
+                                    <Setter Property="MaxWidth" Value="{Binding $parent[ItemsControl].Bounds.Width}"/>
                                 </Style>
 
-                                <Style Selector="StackPanel.Chat.User">
-                                    <Setter Property="HorizontalAlignment" Value="Right"/>
-                                </Style>
-
-                                <Style Selector="StackPanel.Chat:not(.Assistant) StackPanel#ChatMessageOperationPanel">
-                                    <Setter Property="IsVisible" Value="False"/>
-                                </Style>
-
-                                <Style Selector="StackPanel.Chat.Assistant:not(:pointerover) StackPanel#ChatMessageOperationPanel">
+                                <Style Selector="StackPanel.ChatMessage.Assistant:not(:pointerover) StackPanel#ChatMessageOperationPanel">
                                     <Setter Property="Opacity" Value="0"/>
                                 </Style>
 
                                 <Style Selector="Button ip|PackIconMaterial">
                                     <Setter Property="Foreground" Value="{DynamicResource SukiText}"/>
-                                    <Setter Property="Width" Value="14"/>
-                                    <Setter Property="Height" Value="14"/>
+                                    <Setter Property="Width" Value="16"/>
+                                    <Setter Property="Height" Value="16"/>
+                                </Style>
+
+                                <Style Selector="SelectableTextBlock">
+                                    <Setter Property="Foreground" Value="{DynamicResource SukiText}"/>
+                                    <Setter Property="TextWrapping" Value="WrapWithOverflow"/>
                                 </Style>
                             </ItemsControl.Styles>
 
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate DataType="m:ChatMessage">
+                            <ItemsControl.DataTemplates>
+                                <DataTemplate DataType="m:AssistantChatMessage">
                                     <StackPanel
-                                        Classes="Chat" Background="Transparent"
-                                        Classes.Assistant="{Binding Role.Value, Converter={x:Static ObjectConverters.Equal}, ConverterParameter=assistant, Mode=OneTime}"
-                                        Classes.User="{Binding Role.Value, Converter={x:Static ObjectConverters.Equal}, ConverterParameter=user, Mode=OneTime}"
-                                        Orientation="Vertical" Spacing="4">
-                                        <suki:GlassCard MaxWidth="{Binding $parent[ItemsControl].Bounds.Width}">
-                                            <TextBlock
-                                                Foreground="{DynamicResource SukiText}"
-                                                Inlines="{Binding InlineCollection}"
-                                                TextWrapping="WrapWithOverflow"/>
+                                        Classes="ChatMessage Assistant" HorizontalAlignment="Left"
+                                        Background="Transparent" Orientation="Vertical"
+                                        Spacing="4">
+                                        <suki:GlassCard>
+                                            <SelectableTextBlock Inlines="{Binding InlineCollection}"/>
                                         </suki:GlassCard>
 
                                         <StackPanel
@@ -255,17 +248,45 @@
                                                 CommandParameter="{Binding}">
                                                 <ip:PackIconMaterial Kind="ContentCopy"/>
                                             </Button>
-                                            <!--  <Button  -->
-                                            <!--  Classes="Success" Padding="2"  -->
-                                            <!--  BorderThickness="0"  -->
-                                            <!--  Command="{Binding $parent[v:AssistantFloatingWindow].ViewModel.AcceptCommand}"  -->
-                                            <!--  CommandParameter="{Binding}">  -->
-                                            <!--     <ip:PackIconMaterial Kind="Check"/> -->
-                                            <!-- </Button> -->
                                         </StackPanel>
                                     </StackPanel>
                                 </DataTemplate>
-                            </ItemsControl.ItemTemplate>
+
+                                <DataTemplate DataType="m:UserChatMessage">
+                                    <StackPanel
+                                        Classes="ChatMessage User" HorizontalAlignment="Right"
+                                        Background="Transparent" Orientation="Vertical"
+                                        Spacing="4">
+                                        <suki:GlassCard>
+                                            <SelectableTextBlock Inlines="{Binding InlineCollection}"/>
+                                        </suki:GlassCard>
+
+                                        <!--  TODO: Edit operations  -->
+                                    </StackPanel>
+                                </DataTemplate>
+
+                                <DataTemplate DataType="m:ActionChatMessage">
+                                    <Expander
+                                        Classes="ChatMessage Action" HorizontalAlignment="Left"
+                                        Background="{DynamicResource SukiGlassCardBackground}"
+                                        BorderBrush="{DynamicResource GlassBorderBrush}"
+                                        BorderThickness="1.5" ExpandDirection="Down">
+                                        <Expander.Header>
+                                            <StackPanel
+                                                Orientation="Horizontal" Spacing="4">
+                                                <ip:PackIconMaterial Kind="{Binding Icon}"/>
+                                                <SelectableTextBlock Text="{Binding HeaderKey^, FallbackValue={x:Null}}"/>
+                                                <suki:Loading
+                                                    Width="16" Height="16"
+                                                    IsHitTestVisible="False"
+                                                    IsVisible="{Binding IsBusy}"/>
+                                            </StackPanel>
+                                        </Expander.Header>
+
+                                        <SelectableTextBlock Inlines="{Binding InlineCollection}"/>
+                                    </Expander>
+                                </DataTemplate>
+                            </ItemsControl.DataTemplates>
                         </ItemsControl>
                     </Panel>
                 </ScrollViewer>

@@ -20,7 +20,7 @@ public class BusyInlineCollection : InlineCollection
             {
                 Width = 16,
                 Height = 16,
-                Margin = new Thickness(8, 0, 0, 0),
+                Margin = new Thickness(4, 0, 0, 0),
                 IsHitTestVisible = false,
                 IsVisible = isBusy
             });

@@ -25,6 +25,7 @@ public class App : Application
                 {
                     Content = ServiceLocator.Resolve<MainView>()
                 };
+                // desktop.MainWindow = ServiceLocator.Resolve<VisualTreeDebuggerWindow>();
                 break;
             }
         }

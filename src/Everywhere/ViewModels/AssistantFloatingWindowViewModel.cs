@@ -14,9 +14,13 @@ using Everywhere.Enums;
 using Everywhere.Models;
 using Everywhere.Views;
 using IconPacks.Avalonia.Material;
-using Microsoft.Extensions.AI;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
+using Microsoft.SemanticKernel.Connectors.OpenAI;
+using Microsoft.SemanticKernel.Plugins.Web;
+using Microsoft.SemanticKernel.Plugins.Web.Bing;
+using Microsoft.SemanticKernel.Plugins.Web.Brave;
+using Microsoft.SemanticKernel.Plugins.Web.Google;
 using ObservableCollections;
 using ChatMessage = Everywhere.Models.ChatMessage;
 
@@ -46,20 +50,18 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
 
     [field: AllowNull, MaybeNull]
     public NotifyCollectionChangedSynchronizedViewList<ChatMessage> ChatMessages =>
-        field ??= chatMessages.CreateView(x => x).With(v => v.AttachFilter(m => m.Role != ChatRole.System))
+        field ??= chatMessages.CreateView(x => x).With(v => v.AttachFilter(m => m.Role != AuthorRole.System))
             .ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 
-    private readonly IChatCompletionService chatCompletionService;
     private readonly List<DynamicKeyMenuItem> textEditActions;
     private readonly List<AssistantCommand> textEditCommands;
     private readonly ObservableList<ChatMessage> chatMessages = [];
 
     private CancellationTokenSource? cancellationTokenSource;
 
-    public AssistantFloatingWindowViewModel(Settings settings, IChatCompletionService chatCompletionService)
+    public AssistantFloatingWindowViewModel(Settings settings)
     {
         Settings = settings;
-        this.chatCompletionService = chatCompletionService;
 
         textEditActions =
         [
@@ -177,7 +179,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
             cancellationToken: cancellationToken);
     }
 
-    private static readonly ChatRole ActionRole = new("Action");
+    private static readonly AuthorRole ActionRole = new("Action");
 
     [RelayCommand]
     private Task ProcessChatMessageSentAsync(string message) => ExecuteBusyTaskAsync(
@@ -202,7 +204,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
                         commandArgument = command.DefaultValueFactory?.Invoke() ?? string.Empty;
                     }
                     var userPrompt = string.Format(command.UserPrompt, commandArgument);
-                    userMessage = new ChatMessage(ChatRole.User, userPrompt)
+                    userMessage = new UserChatMessage(userPrompt)
                     {
                         InlineCollection =
                         {
@@ -215,14 +217,14 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
 
             systemPrompt ??= Prompts.GetDefaultSystemPromptWithMission(
                 "Focused XML node id=\"{ElementId}\". Based on context, answer the user's question");
-            userMessage ??= new ChatMessage(ChatRole.User, message) { InlineCollection = { message } };
+            userMessage ??= new UserChatMessage(message) { InlineCollection = { message } };
             chatMessages.Add(userMessage);
 
             if (chatMessages.Count == 1)
             {
                 if (TargetElement is not { } targetElement) return;
 
-                var analysisMessage = new ChatMessage(ActionRole)
+                var analysisMessage = new ActionChatMessage(ActionRole)
                 {
                     InlineCollection = { "Analyzing context" }
                 };
@@ -231,20 +233,11 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
                 analysisMessage.InlineCollection.IsBusy = true;
                 var builtSystemPrompt = await Task.Run(() => BuildSystemPrompt(targetElement, systemPrompt, cancellationToken), cancellationToken);
                 chatMessages.Remove(analysisMessage);
-                chatMessages.Insert(0, new ChatMessage(ChatRole.System, builtSystemPrompt) { InlineCollection = { builtSystemPrompt } });
+                chatMessages.Insert(0, new SystemChatMessage(builtSystemPrompt));
             }
 
             await GenerateAsync(cancellationToken);
         });
-
-    // [RelayCommand]
-    // private Task AcceptAsync() => ExecuteBusyTaskAsync(
-    //     () =>
-    //     {
-    //         if (TargetElement is not { } element) return;
-    //         element.SetText(generatedTextBuilder.ToString(), appendText);
-    //         Reset();
-    //     });
 
     [RelayCommand]
     private Task RetryAsync(ChatMessage chatMessage) => ExecuteBusyTaskAsync(
@@ -370,30 +363,109 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
 
     private async Task GenerateAsync(CancellationToken cancellationToken)
     {
+        // todo: maybe I need to move this builder to a better place (using DI)
+        var modelSettings = Settings.Model;
+        var builder = Kernel.CreateBuilder();
+        builder.AddOpenAIChatCompletion(
+            modelId: modelSettings.ModelName,
+            endpoint: new Uri(modelSettings.Endpoint, UriKind.Absolute),
+            apiKey: modelSettings.ApiKey);
+
+        if (modelSettings is { IsWebSearchEnabled: true, WebSearchApiKey: { } webSearchApiKey } && !string.IsNullOrWhiteSpace(webSearchApiKey))
+        {
+            Uri.TryCreate(modelSettings.WebSearchEndpoint, UriKind.Absolute, out var webSearchEndPoint);
+            builder.Plugins.AddFromObject(new WebSearchEnginePlugin(modelSettings.WebSearchProvider switch
+            {
+                // TODO: "google" => new GoogleConnector(webSearchApiKey, webSearchEndPoint),
+                "brave" => new BraveConnector(webSearchApiKey, webSearchEndPoint),
+                "bocha" => new BoChaConnector(webSearchApiKey, webSearchEndPoint),
+                _ => new BingConnector(webSearchApiKey, webSearchEndPoint)
+            }), "web_search");
+        }
+
+        var kernel = builder.Build();
+
+        var openAIPromptExecutionSettings = new OpenAIPromptExecutionSettings
+        {
+            Temperature = modelSettings.Temperature,
+            TopP = modelSettings.TopP,
+            FunctionChoiceBehavior = FunctionChoiceBehavior.Auto(autoInvoke: false)
+        };
+        var chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
+
         var chatHistory = new ChatHistory(
             chatMessages
-                .Where(m => m.Role.Value is "system" or "assistant" or "user" or "tool")
-                .Select(m => new ChatMessageContent(new AuthorRole(m.Role.Value), m.ToString())));
-        var assistantMessage = new ChatMessage(ChatRole.Assistant)
-        {
-            InlineCollection =
-            {
-                IsBusy = true,
-            },
-        };
+                .Where(m => m.Role.Label is "system" or "assistant" or "user" or "tool")
+                .Select(m => new ChatMessageContent(m.Role, m.ToString())));
+        var assistantMessage = new AssistantChatMessage();
         chatMessages.Add(assistantMessage);
+
         try
         {
-            await foreach (var message in chatCompletionService.GetStreamingChatMessageContentsAsync(
-                               chatHistory,
-                               cancellationToken: cancellationToken))
+            while (true)
             {
-                if (message.Content is { Length: > 0 } content) assistantMessage.InlineCollection.Add(content);
+                AuthorRole? authorRole = null;
+                var assistantContentBuilder = new StringBuilder();
+                var functionCallContentBuilder = new FunctionCallContentBuilder();
+
+                await foreach (var streamingContent in chatCompletionService.GetStreamingChatMessageContentsAsync(
+                                   chatHistory,
+                                   openAIPromptExecutionSettings,
+                                   kernel,
+                                   cancellationToken))
+                {
+                    if (streamingContent.Content is not null)
+                    {
+                        assistantContentBuilder.Append(streamingContent.Content);
+                        assistantMessage.InlineCollection.Add(streamingContent.Content);
+                    }
+
+                    authorRole ??= streamingContent.Role;
+                    functionCallContentBuilder.Append(streamingContent);
+                }
+
+                chatHistory.AddAssistantMessage(assistantContentBuilder.ToString());
+
+                var functionCalls = functionCallContentBuilder.Build();
+                if (functionCalls.Count == 0) break;
+
+                var functionCallContent = new ChatMessageContent(authorRole ?? default, content: null);
+                chatHistory.Add(functionCallContent);
+
+                foreach (var functionCall in functionCalls)
+                {
+                    functionCallContent.Items.Add(functionCall);
+
+                    var actionChatMessage = functionCall.PluginName switch
+                    {
+                        "web_search" => new ActionChatMessage(
+                            AuthorRole.Tool,
+                            PackIconMaterialKind.Earth,
+                            "ActionChatMessage_Header_WebSearching"),
+                        _ => throw new NotImplementedException()
+                    };
+                    chatMessages.Insert(chatMessages.Count - 1, actionChatMessage);
+
+                    try
+                    {
+                        var resultContent = await functionCall.InvokeAsync(kernel, cancellationToken);
+                        chatHistory.Add(resultContent.ToChatMessage());
+                    }
+                    catch (Exception ex)
+                    {
+                        chatHistory.Add(new FunctionResultContent(functionCall, ex.Message).ToChatMessage());
+                        actionChatMessage.InlineCollection.Add($"Failed: {ex.Message}");
+                    }
+                    finally
+                    {
+                        actionChatMessage.IsBusy = false;
+                    }
+                }
             }
         }
         finally
         {
-            assistantMessage.InlineCollection.IsBusy = false;
+            assistantMessage.IsBusy = false;
         }
     }
 

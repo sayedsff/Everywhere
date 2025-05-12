@@ -18,7 +18,9 @@
         <PackageReference Include="Microsoft.Extensions.Configuration" />
         <PackageReference Include="Microsoft.SemanticKernel"/>
         <PackageReference Include="Microsoft.SemanticKernel.Connectors.OpenAI"/>
+        <PackageReference Include="Microsoft.SemanticKernel.Plugins.Web" />
         <PackageReference Include="ObservableCollections" />
+        <PackageReference Include="System.Drawing.Common" />
     </ItemGroup>
 
     <ItemGroup>
@@ -31,19 +33,10 @@
             <Link>Assets\Everywhere.png</Link>
         </AvaloniaResource>
     </ItemGroup>
-
-    <ItemGroup>
-      <Compile Update="Views\Controls\AssistantInputBox.axaml.cs">
-        <DependentUpon>AssistantInputBox.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Reference Include="System.Drawing.Common">
-        <HintPath>C:\Program Files\dotnet\shared\Microsoft.WindowsDesktop.App\9.0.4\System.Drawing.Common.dll</HintPath>
-      </Reference>
-    </ItemGroup>
+    
+    <PropertyGroup>
+        <NoWarn>$(NoWarn);SKEXP0001,SKEXP0010,SKEXP0050</NoWarn>
+    </PropertyGroup>
 
     <Target Name="I18N" BeforeTargets="PreBuildEvent">
       <Exec Command="dotnet run --project $(SolutionDir)src/Everywhere.I18N.Generator/Everywhere.I18N.Generator.csproj -- $(SolutionDir)src/Everywhere/I18N/i18n.tsv $(SolutionDir)src/Everywhere/I18N" />
