@@ -14,32 +14,38 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="Expander">
-                            <StackPanel Orientation="Vertical">
+                            <suki:GlassCard>
+                                <StackPanel>
                                 <LayoutTransformControl Name="PART_ToggleTransform">
-                                    <ToggleButton
-                                        x:Name="PART_ToggleButton" Classes="Basic"
-                                        DockPanel.Dock="Right" HorizontalAlignment="Stretch"
-                                        VerticalAlignment="Center" HorizontalContentAlignment="Stretch"
-                                        Background="{TemplateBinding Background}"
-                                        BorderBrush="{DynamicResource SukiBorderBrush}"
-                                        BorderThickness="0" CornerRadius="8"
-                                        IsChecked="{TemplateBinding IsExpanded, Mode=TwoWay}">
-                                        <Grid ColumnDefinitions="Auto,*,Auto">
+                                    <Panel>
+                                        <ToggleButton
+                                            x:Name="PART_ToggleButton" Classes="Basic"
+                                            DockPanel.Dock="Right" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
+                                            Background="{TemplateBinding Background}"
+                                            BorderBrush="{DynamicResource SukiBorderBrush}"
+                                            BorderThickness="0" CornerRadius="8"
+                                            IsEnabled="True"
+                                            IsChecked="{TemplateBinding IsExpanded, Mode=TwoWay}">
+                                        </ToggleButton>
+                                        <Grid ColumnDefinitions="*, Auto">
                                             <ContentPresenter
                                                 Grid.Column="0" HorizontalAlignment="Left"
                                                 VerticalAlignment="Center"
                                                 Content="{TemplateBinding Header}"
                                                 FontWeight="{DynamicResource DefaultDemiBold}"/>
                                             <PathIcon
-                                                x:Name="PART_Icon" Grid.Column="2"
-                                                Width="10" Height="10"
-                                                Margin="10,0,0,0"
+                                                IsHitTestVisible="False"
+                                                x:Name="PART_Icon" Grid.Column="1"
+                                                Width="20" Height="20"
+                                                Margin="20, 0"
+                                                HorizontalAlignment="Left"
                                                 Data="{x:Static suki:Icons.ChevronDown}"/>
                                         </Grid>
-                                    </ToggleButton>
+                                    </Panel>
                                 </LayoutTransformControl>
 
                                 <ContentControl
+                                    IsVisible="{Binding ElementName=PART_ToggleButton, Path=IsChecked}"
                                     x:Name="ContentExpandControlContainer" Padding="32,0">
                                     <suki:ContentExpandControl
                                         x:Name="PART_ContentExpand"
@@ -49,14 +55,24 @@
                                         ContentTemplate="{TemplateBinding ContentTemplate}"/>
                                 </ContentControl>
                             </StackPanel>
+                            </suki:GlassCard>
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>
             </Style>
 
+            <Style Selector="Expander.SettingsItemContainer:down">
+                <Style Selector="^ /template/ suki|ContentExpandControl#PART_ContentExpand">
+                    <Setter Property="Margin" Value="0, 12" />
+                </Style>
+            </Style>
+
             <Style Selector="Expander.SettingsItemContainer.NotExpandable">
                 <Style Selector="^ PathIcon#PART_Icon">
                     <Setter Property="IsVisible" Value="False"/>
+                </Style>
+                <Style Selector="^ ToggleButton#PART_ToggleButton">
+                    <Setter Property="IsHitTestVisible" Value="False"/>
                 </Style>
 
                 <Style Selector="^ ContentControl#ContentExpandControlContainer">
@@ -90,6 +106,7 @@
                                         TextWrapping="WrapWithOverflow"/>
                                     <TextBlock
                                         Margin="0,8"
+                                        FontWeight="Regular"
                                         Foreground="{DynamicResource SukiLowText}"
                                         Text="{Binding DescriptionKey^}"
                                         TextWrapping="WrapWithOverflow"/>
@@ -133,15 +150,14 @@
                                                     Spacing="8">
                                                     <Slider
                                                         Width="320"
-                                                        LargeChange="{Binding Step}"
                                                         Maximum="{Binding MaxValue}"
                                                         Minimum="{Binding MinValue}"
-                                                        SmallChange="{Binding Step}"
                                                         TickFrequency="{Binding Step}"
+                                                        IsSnapToTickEnabled="True"
                                                         Value="{Binding ValueProxy.Value, Mode=TwoWay}"/>
                                                     <TextBox
                                                         MinHeight="32"
-                                                        Text="{Binding ValueProxy.Value, Mode=TwoWay}"/>
+                                                        Text="{Binding ValueProxy.Value, Mode=TwoWay, StringFormat={}{0:F1}}"/>
                                                 </StackPanel>
                                             </DataTemplate>
 
@@ -160,7 +176,13 @@
 
                             <ItemsControl
                                 Classes="SettingsItemItemsControl" HorizontalAlignment="Stretch"
-                                ItemsSource="{Binding Items}"/>
+                                ItemsSource="{Binding Items}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Spacing="10"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
                         </Expander>
                     </DataTemplate>
                 </Setter>
@@ -168,13 +190,12 @@
         </ScrollViewer.Styles>
 
         <ItemsControl
-            Width="640" HorizontalAlignment="Center"
-            ItemsSource="{Binding Groups}">
+            Padding="64, 32" ItemsSource="{Binding Groups}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate DataType="m:SettingsItemGroup">
                     <StackPanel Margin="0,16">
                         <TextBlock
-                            FontSize="24" FontWeight="Bold"
+                            FontSize="24" FontWeight="Heavy"
                             Text="{Binding HeaderKey^}"
                             TextWrapping="WrapWithOverflow"/>
 
@@ -185,7 +206,13 @@
 
                         <ItemsControl
                             Classes="SettingsItemItemsControl" HorizontalAlignment="Stretch"
-                            ItemsSource="{Binding Items}"/>
+                            ItemsSource="{Binding Items}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Spacing="10"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl> 
                     </StackPanel>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>

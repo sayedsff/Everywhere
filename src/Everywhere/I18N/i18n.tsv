@@ -29,18 +29,18 @@ Settings_Model_IsImageEnabled_Header	开启图像多模态	Enable multimodal ima
 Settings_Model_IsImageEnabled_Description	如果大模型（如gpt-4o等）支持图像上传（视觉输入），开启后此功能后，AI助手会在合适的时机将图像一并输入，有利于大模型更好地理解上下文。如果模型不支持，开启后可能会导致调用失败。	If your model (e.g., GPT-4o) supports image input, enabling this lets the assistant include images at appropriate times for richer context; if unsupported, calls may fail.
 Settings_Model_IsToolCallEnabled_Header	开启工具调用	Enable tool calling
 Settings_Model_IsToolCallEnabled_Description	如果大模型（如DeepSeek-V3、gpt-4o等）支持工具调用，开启后此功能后，AI助手会在合适的时机调用工具，从而开启更强大的能力。如果模型不支持，开启后可能会导致调用失败。	If your model (e.g., DeepSeek-V3, GPT-4o) supports tool calls, enabling this lets the assistant invoke tools when appropriate for enhanced capabilities; if unsupported, calls may fail.
-Settings_Model_IsWebSearchEnabled_Header	开启网络搜索
-Settings_Model_IsWebSearchEnabled_Description	在开启工具调用的情况下，开启此功能可允许模型搜索网络结果之后再回答。
-Settings_Model_WebSearchProvider_Header	网络搜索服务提供方
+Settings_Model_IsWebSearchEnabled_Header	开启网络搜索	Enable Web search
+Settings_Model_IsWebSearchEnabled_Description	在开启工具调用的情况下，开启此功能可允许模型搜索网络结果之后再回答。	When tool usage is enabled, turning on this feature allows the model to search the web for results before responding.
+Settings_Model_WebSearchProvider_Header	网络搜索服务提供方	Web search service provider
 Settings_Model_WebSearchProvider_Description
-SettingsSelectionItem_Model_WebSearchProvider_bing	必应
-SettingsSelectionItem_Model_WebSearchProvider_google	谷歌
-SettingsSelectionItem_Model_WebSearchProvider_brave	brave
-SettingsSelectionItem_Model_WebSearchProvider_bocha	博查
-Settings_Model_WebSearchApiKey_Header	网络搜索服务API Key
-Settings_Model_WebSearchApiKey_Description	网络搜索服务API访问秘钥，你可以在对应网络搜索服务提供方的API网站获取。
-Settings_Model_WebSearchEndpoint_Header	网络搜索服务API接口地址
-Settings_Model_WebSearchEndpoint_Description	（选填）如果使用官方的API接口，请留空使用默认值。
+SettingsSelectionItem_Model_WebSearchProvider_bing	必应	Bing
+SettingsSelectionItem_Model_WebSearchProvider_google	谷歌	Google
+SettingsSelectionItem_Model_WebSearchProvider_brave	brave	brave
+SettingsSelectionItem_Model_WebSearchProvider_bocha	博查	Bocha
+Settings_Model_WebSearchApiKey_Header	网络搜索服务API Key	Web search service API Key
+Settings_Model_WebSearchApiKey_Description	网络搜索服务API访问秘钥，你可以在对应网络搜索服务提供方的API网站获取。	Web search service API access key, which you can obtain from the API website of the corresponding web search service provider.
+Settings_Model_WebSearchEndpoint_Header	网络搜索服务API接口地址	Web search service API endpoint address.
+Settings_Model_WebSearchEndpoint_Description	（选填）如果使用官方的API接口，请留空使用默认值。	(Optional) Leave blank to use the default value if using the official API endpoint.
 AssistantInputBox_Watermark	询问Everywhere助手	Ask the Everywhere assistant
 AssistantInputBox_AddButton_ToolTip	添加附加内容到对话	Add extra content to the conversation
 AssistantInputBox_ImageButton_ToolTip	允许访问屏幕上的图像	Allow access to aware your screen
@@ -49,9 +49,9 @@ AssistantInputBox_WebSearchButton_ToolTip	在网络上搜索	Search the web
 AssistantInputBox_WebSearchButton_Text	搜索	Search
 AssistantInputBox_ToolCallButton_ToolTip	使用工具强化助手能力	Use tools to enhance assistant capabilities
 AssistantInputBox_ToolCallButton_Text	工具	Tools
-AssistantInputBox_SendButton_ToolTip	发送
-AssistantCommand_Translate_Description	翻译为目标语言
-AssistantCommand_Rewrite_Description	按要求重写
+AssistantInputBox_SendButton_ToolTip	发送	Send
+AssistantCommand_Translate_Description	翻译为目标语言	Translate into the target language
+AssistantCommand_Rewrite_Description	按要求重写	Rewrite as required
 ActionChatMessage_Header_AnalyzingContext	分析上下文
 ActionChatMessage_Header_WebSearching	搜索网络
 AssistantFloatingWindow_ChatMessage_Assistant_Regenerate	重新回答
