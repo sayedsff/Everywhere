@@ -89,9 +89,16 @@
 
 ## 🙏 致谢
 
-* [kikipoulet/SukiUI](https://github.com/kikipoulet/SukiUI) *UI 组件*
-* [FlaUI](https://github.com/FlaUI/FlaUI) *屏幕感知支持*
 * [microsoft/CsWin32](https://github.com/microsoft/CsWin32)
+* [kikipoulet/SukiUI](https://github.com/kikipoulet/SukiUI) UI 样式和组件
+* [ahopper/Avalonia.IconPacks](https://github.com/ahopper/Avalonia.IconPacks) 图标
+* [Kira-NT/HotAvalonia](https://github.com/Kira-NT/HotAvalonia) Avalonia 热重载
+* [microsoft/CommunityToolkit.Mvvm](https://github.com/CommunityToolkit/dotnet) & [Cysharp/ObservableCollections](https://github.com/Cysharp/ObservableCollections) MVVM
+* [FlaUI](https://github.com/FlaUI/FlaUI) 屏幕感知和 UI 自动化
+* [microsoft/CsWin32](https://github.com/microsoft/CsWin32) 自动生成 Win32 API
+* [Kibnet/WritableJsonConfiguration](https://github.com/Kibnet/WritableJsonConfiguration) 设置存储
+* [microsoft/semantic-kernel](https://github.com/microsoft/semantic-kernel) 大模型、RAG 和工具调用等
+* [nietras/Sep](https://github.com/nietras/Sep) tsv 读取器，用于国际化
 
 <p align="right">(<a href="#readme-top">返回顶部</a>)</p>
 
