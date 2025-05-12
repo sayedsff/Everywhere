@@ -58,7 +58,7 @@ public partial class ActionChatMessage : ChatMessage
     public partial DynamicResourceKey? HeaderKey { get; set; }
 
     public ActionChatMessage(AuthorRole role,
-        PackIconMaterialKind icon = PackIconMaterialKind.Brain,
+        PackIconMaterialKind icon = PackIconMaterialKind.ThoughtBubble,
         DynamicResourceKey? headerKey = null,
         string? actualContent = null) : base(role, actualContent)
     {

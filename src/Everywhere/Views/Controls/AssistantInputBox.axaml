@@ -2,7 +2,6 @@
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:ip="https://github.com/MahApps/IconPacks.Avalonia"
-    xmlns:models="clr-namespace:Everywhere.Models"
     xmlns:v="clr-namespace:Everywhere.Views">
     <Design.PreviewWith>
         <v:AssistantInputBox/>
@@ -158,6 +157,7 @@
                                 Height="32" Padding="8,4"
                                 CornerRadius="32"
                                 IsChecked="{Binding IsImageEnabled, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                IsVisible="{TemplateBinding IsImageSupported}"
                                 ToolTip.Tip="{DynamicResource AssistantInputBox_ImageButton_ToolTip}">
                                 <StackPanel Orientation="Horizontal">
                                     <ip:PackIconMaterial
@@ -172,6 +172,7 @@
                                 Height="32" Padding="8,4"
                                 CornerRadius="32"
                                 IsChecked="{Binding IsWebSearchEnabled, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                IsVisible="{TemplateBinding IsWebSearchSupported}"
                                 ToolTip.Tip="{DynamicResource AssistantInputBox_WebSearchButton_ToolTip}">
                                 <StackPanel Orientation="Horizontal">
                                     <ip:PackIconMaterial Kind="Earth"/>
@@ -185,6 +186,7 @@
                                 Height="32" Padding="8,4"
                                 CornerRadius="32"
                                 IsChecked="{Binding IsToolCallEnabled, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                IsVisible="{TemplateBinding IsToolCallSupported}"
                                 ToolTip.Tip="{DynamicResource AssistantInputBox_ToolCallButton_ToolTip}">
                                 <StackPanel Orientation="Horizontal">
                                     <ip:PackIconMaterial
