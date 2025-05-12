@@ -83,9 +83,15 @@ Distributed under the Apache 2.0 License. See [LICENSE](LICENSE) for more inform
 
 ## Acknowledgments
 
-* [kikipoulet/SukiUI](https://github.com/kikipoulet/SukiUI) *UI Components*
-* [FlaUI](https://github.com/FlaUI/FlaUI) *Screen Aware*
-* [microsoft/CsWin32](https://github.com/microsoft/CsWin32)
+* [kikipoulet/SukiUI](https://github.com/kikipoulet/SukiUI) UI Styles and Components
+* [ahopper/Avalonia.IconPacks](https://github.com/ahopper/Avalonia.IconPacks) Icons
+* [Kira-NT/HotAvalonia](https://github.com/Kira-NT/HotAvalonia) Avalonia hot reload
+* [microsoft/CommunityToolkit.Mvvm](https://github.com/CommunityToolkit/dotnet) & [Cysharp/ObservableCollections](https://github.com/Cysharp/ObservableCollections) MVVM
+* [FlaUI](https://github.com/FlaUI/FlaUI) Screen Aware & UI Automation
+* [microsoft/CsWin32](https://github.com/microsoft/CsWin32) Win32 API Autogen
+* [Kibnet/WritableJsonConfiguration](https://github.com/Kibnet/WritableJsonConfiguration) Settings storage
+* [microsoft/semantic-kernel](https://github.com/microsoft/semantic-kernel) LLMs, RAG, Tool call, etc.
+* [nietras/Sep](https://github.com/nietras/Sep) tsv Reader for i18n
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
