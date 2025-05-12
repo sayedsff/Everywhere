@@ -1,10 +1,7 @@
-﻿using System.Collections.Frozen;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Security;
 using System.Text;
-using System.Text.RegularExpressions;
 using Avalonia.Controls.Documents;
 using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -12,6 +9,7 @@ using CommunityToolkit.Mvvm.Input;
 using Everywhere.Agents;
 using Everywhere.Enums;
 using Everywhere.Models;
+using Everywhere.Utils;
 using Everywhere.Views;
 using IconPacks.Avalonia.Material;
 using Microsoft.SemanticKernel;
@@ -20,7 +18,6 @@ using Microsoft.SemanticKernel.Connectors.OpenAI;
 using Microsoft.SemanticKernel.Plugins.Web;
 using Microsoft.SemanticKernel.Plugins.Web.Bing;
 using Microsoft.SemanticKernel.Plugins.Web.Brave;
-using Microsoft.SemanticKernel.Plugins.Web.Google;
 using ObservableCollections;
 using ChatMessage = Everywhere.Models.ChatMessage;
 
@@ -120,13 +117,23 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
             new AssistantCommand(
                 "/translate",
                 "AssistantCommand_Translate_Description",
-                Prompts.GetDefaultSystemPromptWithMission("Based on context, translate the content of XML node with id=\"{ElementId}\""),
+                Prompts.RenderPrompt(
+                    Prompts.DefaultSystemPromptWithMission,
+                    new Dictionary<string, Func<string>>
+                    {
+                        { "Mission", () => "Based on context, translate the content of XML node with id=\"{ElementId}\"" }
+                    }),
                 "Translate it into {0}",
                 () => Settings.Common.Language),
             new AssistantCommand(
                 "/rewrite",
                 "AssistantCommand_Rewrite_Description",
-                Prompts.GetDefaultSystemPromptWithMission("Based on context, rewrite the content of XML node with id=\"{ElementId}\""),
+                Prompts.RenderPrompt(
+                    Prompts.DefaultSystemPromptWithMission,
+                    new Dictionary<string, Func<string>>
+                    {
+                        { "Mission", () => "Based on context, rewrite the content of XML node with id=\"{ElementId}\"" }
+                    }),
                 "{0}",
                 () => "Refine it"),
         ];
@@ -215,8 +222,12 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
                 }
             }
 
-            systemPrompt ??= Prompts.GetDefaultSystemPromptWithMission(
-                "Focused XML node id=\"{ElementId}\". Based on context, answer the user's question");
+            systemPrompt ??= Prompts.RenderPrompt(
+                Prompts.DefaultSystemPromptWithMission,
+                new Dictionary<string, Func<string>>
+                {
+                    { "Mission", () => "Focused XML node id=\"{ElementId}\". Based on context, answer the user's question" }
+                });
             userMessage ??= new UserChatMessage(message) { InlineCollection = { message } };
             chatMessages.Add(userMessage);
 
@@ -224,15 +235,15 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
             {
                 if (TargetElement is not { } targetElement) return;
 
-                var analysisMessage = new ActionChatMessage(ActionRole)
-                {
-                    InlineCollection = { "Analyzing context" }
-                };
+                var analysisMessage = new ActionChatMessage(
+                    ActionRole,
+                    PackIconMaterialKind.LayersSearch,
+                    "ActionChatMessage_Header_AnalyzingContext");
                 chatMessages.Add(analysisMessage);
 
-                analysisMessage.InlineCollection.IsBusy = true;
+                analysisMessage.IsBusy = true;
                 var builtSystemPrompt = await Task.Run(() => BuildSystemPrompt(targetElement, systemPrompt, cancellationToken), cancellationToken);
-                chatMessages.Remove(analysisMessage);
+                analysisMessage.IsBusy = false;
                 chatMessages.Insert(0, new SystemChatMessage(builtSystemPrompt));
             }
 
@@ -271,94 +282,26 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
 
     private string BuildSystemPrompt(IVisualElement element, string systemPrompt, CancellationToken cancellationToken)
     {
-#if DEBUG
-        Debug.WriteLine("BuildXml started...");
-        var sw = Stopwatch.StartNew();
-#endif
-
-        var rootElement = new OptimizedVisualElement(
+        var xmlBuilder = new VisualElementXmlBuilder(new OptimizedVisualElement(
             element
                 .GetAncestors()
                 .CurrentAndNext()
                 .Where(p => p.current.ProcessId != p.next.ProcessId)
                 .Select(p => p.current)
-                .First());
+                .First()));
 
-        var visualTreeXmlBuilder = new StringBuilder();
-        var idMap = new Dictionary<IVisualElement, int>();
-        BuildXml(rootElement, 0);
-
-#if DEBUG
-        sw.Stop();
-        Debug.WriteLine($"BuildXml finished in {sw.ElapsedMilliseconds}ms");
-#endif
-
-        var values = new Dictionary<string, Func<string>>
-        {
-            { "OS", () => Environment.OSVersion.ToString() },
-            { "Time", () => DateTime.Now.ToString("F") },
-            { "VisualTree", () => visualTreeXmlBuilder.Remove(visualTreeXmlBuilder.Length - 1, 1).ToString() }, // todo: lazy build xml
-            { "SystemLanguage", () => new CultureInfo(Settings.Common.Language).DisplayName },
-            { "ElementId", () => idMap[element].ToString() },
-        }.ToFrozenDictionary();
-
-        var renderedSystemPrompt = StringTemplateRegex().Replace(
+        var renderedSystemPrompt = Prompts.RenderPrompt(
             systemPrompt,
-            m => values.TryGetValue(m.Groups[1].Value, out var getter) ? getter() : m.Value);
+            new Dictionary<string, Func<string>>
+            {
+                { "OS", () => Environment.OSVersion.ToString() },
+                { "Time", () => DateTime.Now.ToString("F") },
+                { "SystemLanguage", () => new CultureInfo(Settings.Common.Language).DisplayName },
+                { "VisualTree", () => xmlBuilder.BuildXml(cancellationToken) },
+                { "ElementId", () => xmlBuilder.GetIdMap(cancellationToken)[element].ToString() },
+            });
 
         return renderedSystemPrompt;
-
-        void BuildXml(IVisualElement currentElement, int indentLevel)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            var indent = new string(' ', indentLevel * 2);
-            visualTreeXmlBuilder.Append(indent);
-            visualTreeXmlBuilder.Append('<').Append(currentElement.Type);
-
-            var id = idMap.Count;
-            idMap.Add(currentElement, id);
-            visualTreeXmlBuilder.Append(" id=\"").Append(id).Append('"');
-
-            if (currentElement.Name is { } name && !string.IsNullOrWhiteSpace(name))
-            {
-                visualTreeXmlBuilder.Append(" name=\"").Append(SecurityElement.Escape(name)).Append('"');
-            }
-
-            var textLines = currentElement.GetText()?.Split(Environment.NewLine);
-
-            using var childrenEnumerator = currentElement.Children.GetEnumerator();
-            if (textLines is [{ } text] && !string.IsNullOrWhiteSpace(text))
-            {
-                visualTreeXmlBuilder.Append(" text=\"").Append(SecurityElement.Escape(text)).Append('"');
-            }
-
-            if (!childrenEnumerator.MoveNext())
-            {
-                // If the element has no children, we can omit the text node in a single line.
-                visualTreeXmlBuilder.AppendLine("/>");
-            }
-            else
-            {
-                visualTreeXmlBuilder.AppendLine(">");
-                if (textLines is { Length: > 1 })
-                {
-                    var textLineIndent = new string(' ', indentLevel * 2 + 2);
-                    foreach (var textLine in textLines)
-                    {
-                        if (string.IsNullOrWhiteSpace(textLine)) continue;
-                        visualTreeXmlBuilder.Append(textLineIndent).AppendLine(SecurityElement.Escape(textLine));
-                    }
-                }
-
-                do
-                {
-                    BuildXml(childrenEnumerator.Current, indentLevel + 1);
-                }
-                while (childrenEnumerator.MoveNext());
-                visualTreeXmlBuilder.Append(indent).Append("</").Append(currentElement.Type).AppendLine(">");
-            }
-        }
     }
 
     private async Task GenerateAsync(CancellationToken cancellationToken)
@@ -468,7 +411,4 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
             assistantMessage.IsBusy = false;
         }
     }
-
-    [GeneratedRegex(@"(?<!\{)\{(\w+)\}(?!\})")]
-    private static partial Regex StringTemplateRegex();
 }
