@@ -89,7 +89,6 @@
 
 ## 🙏 致谢
 
-* [microsoft/CsWin32](https://github.com/microsoft/CsWin32)
 * [kikipoulet/SukiUI](https://github.com/kikipoulet/SukiUI) UI 样式和组件
 * [ahopper/Avalonia.IconPacks](https://github.com/ahopper/Avalonia.IconPacks) 图标
 * [Kira-NT/HotAvalonia](https://github.com/Kira-NT/HotAvalonia) Avalonia 热重载
