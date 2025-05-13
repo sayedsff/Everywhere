@@ -8,226 +8,230 @@
     </Design.PreviewWith>
 
     <Style Selector="v|AssistantInputBox">
-        <Setter Property="CornerRadius" Value="20"/>
         <Setter Property="Watermark" Value="{DynamicResource AssistantInputBox_Watermark}"/>
-        <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="BorderBrush" Value="{DynamicResource SukiControlBorderBrush}"/>
-        <Setter Property="Background" Value="{DynamicResource SukiBackground}"/>
         <Setter Property="Foreground" Value="{DynamicResource SukiText}"/>
         <Setter Property="Padding" Value="6"/>
 
         <Setter Property="Template">
             <ControlTemplate>
                 <Border
-                    Padding="{TemplateBinding Padding}"
-                    Background="{TemplateBinding Background}"
                     BorderBrush="{TemplateBinding BorderBrush}"
-                    BorderThickness="{TemplateBinding BorderThickness}"
-                    CornerRadius="{TemplateBinding CornerRadius}">
-                    <Grid
-                        ColumnDefinitions="*,Auto" RowDefinitions="*,Auto,Auto"
-                        RowSpacing="4">
-                        <TextBox
-                            x:Name="PART_TextBox" Grid.Column="0"
-                            Grid.ColumnSpan="2" Margin="6,4,6,0"
-                            AcceptsReturn="True" Grid.IsSharedSizeScope="True"
-                            Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
-                            Watermark="{TemplateBinding Watermark}">
-                            <TextBox.Template>
-                                <ControlTemplate TargetType="TextBox">
-                                    <Panel Background="Transparent">
-                                        <TextBlock
-                                            FontSize="{TemplateBinding FontSize}"
-                                            IsVisible="{TemplateBinding Text, Converter={x:Static StringConverters.IsNullOrEmpty}}"
-                                            Opacity="0.5"
-                                            Text="{TemplateBinding Watermark}"
-                                            TextAlignment="{TemplateBinding TextAlignment}"
-                                            TextWrapping="{TemplateBinding TextWrapping}"/>
-                                        <v:AssistantInputTextPresenter
-                                            Name="PART_TextPresenter"
-                                            CaretBrush="{DynamicResource SukiLowText}"
-                                            CaretIndex="{TemplateBinding CaretIndex}"
-                                            PasswordChar="{TemplateBinding PasswordChar}"
-                                            RevealPassword="{TemplateBinding RevealPassword}"
-                                            SelectedAssistantCommand="{Binding $parent[v:AssistantInputBox].SelectedAssistantCommand}"
-                                            SelectionBrush="{TemplateBinding SelectionBrush}"
-                                            SelectionEnd="{TemplateBinding SelectionEnd}"
-                                            SelectionForegroundBrush="{TemplateBinding SelectionForegroundBrush}"
-                                            SelectionStart="{TemplateBinding SelectionStart}"
-                                            Text="{TemplateBinding Text, Mode=TwoWay}"
-                                            TextAlignment="{TemplateBinding TextAlignment}"
-                                            TextBlock.FontSize="{TemplateBinding FontSize}"
-                                            TextBlock.Foreground="{TemplateBinding Foreground}"
-                                            TextWrapping="{TemplateBinding TextWrapping}"/>
-                                    </Panel>
-                                </ControlTemplate>
-                            </TextBox.Template>
-                        </TextBox>
+                    BorderThickness="1.5" CornerRadius="20">
+                    <ExperimentalAcrylicBorder
+                        Padding="{TemplateBinding Padding}"
+                        CornerRadius="19.25">
+                        <ExperimentalAcrylicBorder.Material>
+                            <ExperimentalAcrylicMaterial
+                                MaterialOpacity="0.05" TintColor="White"
+                                TintOpacity="0.05"/>
+                        </ExperimentalAcrylicBorder.Material>
 
-                        <Popup
-                            Grid.Row="0" Grid.Column="0"
-                            IsOpen="{Binding IsAssistantCommandFlyoutOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
-                            Placement="TopEdgeAlignedLeft" PlacementTarget="PART_TextBox">
-                            <ListBox
-                                Background="{DynamicResource SukiCardBackground}"
-                                CornerRadius="6" Grid.IsSharedSizeScope="True"
-                                ItemsSource="{TemplateBinding AssistantCommandItemsSource}"
-                                SelectedItem="{Binding SelectedAssistantCommand, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
-                                <ListBox.Styles>
-                                    <Style Selector="ListBoxItem">
+                        <Grid
+                            ColumnDefinitions="*,Auto" RowDefinitions="*,Auto,Auto"
+                            RowSpacing="4">
+                            <TextBox
+                                x:Name="PART_TextBox" Grid.Column="0"
+                                Grid.ColumnSpan="2" Margin="6,4,6,0"
+                                AcceptsReturn="True" Grid.IsSharedSizeScope="True"
+                                Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                Watermark="{TemplateBinding Watermark}">
+                                <TextBox.Template>
+                                    <ControlTemplate TargetType="TextBox">
+                                        <Panel Background="Transparent">
+                                            <TextBlock
+                                                FontSize="{TemplateBinding FontSize}"
+                                                IsVisible="{TemplateBinding Text, Converter={x:Static StringConverters.IsNullOrEmpty}}"
+                                                Opacity="0.5"
+                                                Text="{TemplateBinding Watermark}"
+                                                TextAlignment="{TemplateBinding TextAlignment}"
+                                                TextWrapping="{TemplateBinding TextWrapping}"/>
+                                            <v:AssistantInputTextPresenter
+                                                Name="PART_TextPresenter"
+                                                CaretBrush="{DynamicResource SukiLowText}"
+                                                CaretIndex="{TemplateBinding CaretIndex}"
+                                                PasswordChar="{TemplateBinding PasswordChar}"
+                                                RevealPassword="{TemplateBinding RevealPassword}"
+                                                SelectedAssistantCommand="{Binding $parent[v:AssistantInputBox].SelectedAssistantCommand}"
+                                                SelectionBrush="{TemplateBinding SelectionBrush}"
+                                                SelectionEnd="{TemplateBinding SelectionEnd}"
+                                                SelectionForegroundBrush="{TemplateBinding SelectionForegroundBrush}"
+                                                SelectionStart="{TemplateBinding SelectionStart}"
+                                                Text="{TemplateBinding Text, Mode=TwoWay}"
+                                                TextAlignment="{TemplateBinding TextAlignment}"
+                                                TextBlock.FontSize="{TemplateBinding FontSize}"
+                                                TextBlock.Foreground="{TemplateBinding Foreground}"
+                                                TextWrapping="{TemplateBinding TextWrapping}"/>
+                                        </Panel>
+                                    </ControlTemplate>
+                                </TextBox.Template>
+                            </TextBox>
+
+                            <Popup
+                                Grid.Row="0" Grid.Column="0"
+                                IsOpen="{Binding IsAssistantCommandFlyoutOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                Placement="TopEdgeAlignedLeft" PlacementTarget="PART_TextBox">
+                                <ListBox
+                                    Background="{DynamicResource SukiCardBackground}"
+                                    CornerRadius="6" Grid.IsSharedSizeScope="True"
+                                    ItemsSource="{TemplateBinding AssistantCommandItemsSource}"
+                                    SelectedItem="{Binding SelectedAssistantCommand, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
+                                    <ListBox.Styles>
+                                        <Style Selector="ListBoxItem">
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="ListBoxItem">
+                                                        <Border
+                                                            x:Name="BorderBasicStyle" Margin="0,0,0,0"
+                                                            Padding="8,4" CornerRadius="4">
+                                                            <ContentPresenter
+                                                                x:Name="PART_ContentPresenter" Margin="0,0,0,0"
+                                                                Padding="{TemplateBinding Padding}"
+                                                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                                Background="Transparent" BorderBrush="Transparent"
+                                                                BorderThickness="{TemplateBinding BorderThickness}"
+                                                                Content="{TemplateBinding Content}"
+                                                                ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                                CornerRadius="{TemplateBinding CornerRadius}"/>
+                                                        </Border>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </ListBox.Styles>
+                                </ListBox>
+                            </Popup>
+
+                            <ItemsControl
+                                Grid.Row="1" Grid.Column="0"
+                                Grid.ColumnSpan="2"
+                                ItemsSource="{TemplateBinding ItemsSource}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+
+                                <ItemsControl.Styles>
+                                    <Style Selector="v|DynamicKeyMenuItem">
                                         <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate TargetType="ListBoxItem">
-                                                    <Border
-                                                        x:Name="BorderBasicStyle" Margin="0,0,0,0"
-                                                        Padding="8,4" CornerRadius="4">
-                                                        <ContentPresenter
-                                                            x:Name="PART_ContentPresenter" Margin="0,0,0,0"
-                                                            Padding="{TemplateBinding Padding}"
-                                                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                            Background="Transparent" BorderBrush="Transparent"
-                                                            BorderThickness="{TemplateBinding BorderThickness}"
-                                                            Content="{TemplateBinding Content}"
-                                                            ContentTemplate="{TemplateBinding ContentTemplate}"
-                                                            CornerRadius="{TemplateBinding CornerRadius}"/>
-                                                    </Border>
-                                                </ControlTemplate>
-                                            </Setter.Value>
+                                            <ControlTemplate TargetType="v:DynamicKeyMenuItem">
+                                                <Border
+                                                    Height="16" CornerRadius="8">
+                                                    <StackPanel
+                                                        Orientation="Horizontal" Spacing="4">
+                                                        <ContentPresenter Content="{TemplateBinding Icon}"/>
+                                                        <ContentPresenter Content="{Binding HeaderKey^, RelativeSource={RelativeSource TemplatedParent}}"/>
+                                                        <Button
+                                                            Padding="0" Background="Transparent"
+                                                            BorderThickness="0">
+                                                            <ip:PackIconMaterial Kind="Cross"/>
+                                                        </Button>
+                                                    </StackPanel>
+                                                </Border>
+                                            </ControlTemplate>
                                         </Setter>
                                     </Style>
-                                </ListBox.Styles>
-                            </ListBox>
-                        </Popup>
+                                </ItemsControl.Styles>
+                            </ItemsControl>
 
-                        <ItemsControl
-                            Grid.Row="1" Grid.Column="0"
-                            Grid.ColumnSpan="2"
-                            ItemsSource="{TemplateBinding ItemsSource}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <WrapPanel/>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-
-                            <ItemsControl.Styles>
-                                <Style Selector="v|DynamicKeyMenuItem">
-                                    <Setter Property="Template">
-                                        <ControlTemplate TargetType="v:DynamicKeyMenuItem">
-                                            <Border
-                                                Height="16" CornerRadius="8">
-                                                <StackPanel
-                                                    Orientation="Horizontal" Spacing="4">
-                                                    <ContentPresenter Content="{TemplateBinding Icon}"/>
-                                                    <ContentPresenter Content="{Binding HeaderKey^, RelativeSource={RelativeSource TemplatedParent}}"/>
-                                                    <Button
-                                                        Padding="0" Background="Transparent"
-                                                        BorderThickness="0">
-                                                        <ip:PackIconMaterial Kind="Cross"/>
-                                                    </Button>
-                                                </StackPanel>
-                                            </Border>
-                                        </ControlTemplate>
-                                    </Setter>
-                                </Style>
-                            </ItemsControl.Styles>
-                        </ItemsControl>
-
-                        <StackPanel
-                            Grid.Row="2" Grid.Column="0"
-                            Orientation="Horizontal" Spacing="4">
-                            <Button
-                                Width="30" Height="30"
-                                Padding="0"
-                                BorderBrush="{DynamicResource SukiControlBorderBrush}"
-                                CornerRadius="15"
-                                ToolTip.Tip="{DynamicResource AssistantInputBox_AddButton_ToolTip}">
-                                <ip:PackIconMaterial
-                                    Width="12" VerticalAlignment="Center"
-                                    Kind="Plus"/>
-
-                                <Button.Flyout>
-                                    <MenuFlyout
-                                        ItemTemplate="{x:Static v:AssistantInputBox.DynamicKeyMenuItemTemplate}"
-                                        ItemsSource="{Binding AddableAttachmentItemsSource, RelativeSource={RelativeSource TemplatedParent}}"
-                                        Placement="TopEdgeAlignedLeft"/>
-                                </Button.Flyout>
-                            </Button>
-
-                            <ToggleButton
-                                Height="30" Padding="8,4"
-                                CornerRadius="15"
-                                IsChecked="{Binding IsImageEnabled, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
-                                IsVisible="{TemplateBinding IsImageSupported}"
-                                ToolTip.Tip="{DynamicResource AssistantInputBox_ImageButton_ToolTip}">
-                                <StackPanel Orientation="Horizontal">
+                            <StackPanel
+                                Grid.Row="2" Grid.Column="0"
+                                Orientation="Horizontal" Spacing="4">
+                                <Button
+                                    Width="30" Height="30"
+                                    Padding="0"
+                                    BorderBrush="{DynamicResource SukiControlBorderBrush}"
+                                    CornerRadius="15"
+                                    ToolTip.Tip="{DynamicResource AssistantInputBox_AddButton_ToolTip}">
                                     <ip:PackIconMaterial
-                                        Width="14" VerticalAlignment="Center"
-                                        Kind="Image"/>
-                                    <TextBlock
-                                        Margin="4,0,0,0"
-                                        Text="{DynamicResource AssistantInputBox_ImageButton_Text}"/>
-                                </StackPanel>
-                            </ToggleButton>
+                                        Width="12" VerticalAlignment="Center"
+                                        Kind="Plus"/>
 
-                            <ToggleButton
-                                Height="30" Padding="8,4"
-                                CornerRadius="15"
-                                IsChecked="{Binding IsWebSearchEnabled, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
-                                IsVisible="{TemplateBinding IsWebSearchSupported}"
-                                ToolTip.Tip="{DynamicResource AssistantInputBox_WebSearchButton_ToolTip}">
-                                <StackPanel Orientation="Horizontal">
+                                    <Button.Flyout>
+                                        <MenuFlyout
+                                            ItemTemplate="{x:Static v:AssistantInputBox.DynamicKeyMenuItemTemplate}"
+                                            ItemsSource="{Binding AddableAttachmentItemsSource, RelativeSource={RelativeSource TemplatedParent}}"
+                                            Placement="TopEdgeAlignedLeft"/>
+                                    </Button.Flyout>
+                                </Button>
+
+                                <ToggleButton
+                                    Height="30" Padding="8,4"
+                                    CornerRadius="15"
+                                    IsChecked="{Binding IsImageEnabled, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                    IsVisible="{TemplateBinding IsImageSupported}"
+                                    ToolTip.Tip="{DynamicResource AssistantInputBox_ImageButton_ToolTip}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <ip:PackIconMaterial
+                                            Width="14" VerticalAlignment="Center"
+                                            Kind="Image"/>
+                                        <TextBlock
+                                            Margin="4,0,0,0"
+                                            Text="{DynamicResource AssistantInputBox_ImageButton_Text}"/>
+                                    </StackPanel>
+                                </ToggleButton>
+
+                                <ToggleButton
+                                    Height="30" Padding="8,4"
+                                    CornerRadius="15"
+                                    IsChecked="{Binding IsWebSearchEnabled, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                    IsVisible="{TemplateBinding IsWebSearchSupported}"
+                                    ToolTip.Tip="{DynamicResource AssistantInputBox_WebSearchButton_ToolTip}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <ip:PackIconMaterial
+                                            Width="14" Kind="Earth"/>
+                                        <TextBlock
+                                            Margin="4,0,0,0" VerticalAlignment="Center"
+                                            Text="{DynamicResource AssistantInputBox_WebSearchButton_Text}"/>
+                                    </StackPanel>
+                                </ToggleButton>
+
+                                <ToggleButton
+                                    Height="30" Padding="8,4"
+                                    CornerRadius="15"
+                                    IsChecked="{Binding IsToolCallEnabled, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                    IsVisible="{TemplateBinding IsToolCallSupported}"
+                                    ToolTip.Tip="{DynamicResource AssistantInputBox_ToolCallButton_ToolTip}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <ip:PackIconMaterial
+                                            Width="14" Kind="Tools"/>
+                                        <TextBlock
+                                            Margin="4,0,0,0"
+                                            Text="{DynamicResource AssistantInputBox_ToolCallButton_Text}"/>
+                                    </StackPanel>
+                                </ToggleButton>
+                            </StackPanel>
+
+                            <StackPanel
+                                Grid.Row="2" Grid.Column="1"
+                                Margin="8,0,0,0" Orientation="Horizontal"
+                                Spacing="4">
+                                <Button
+                                    x:Name="PART_SendButton" Classes="Flat"
+                                    Width="30" Height="30"
+                                    Padding="0" CornerRadius="15"
+                                    ToolTip.Tip="{DynamicResource AssistantInputBox_SendButton_ToolTip}">
+                                    <Button.IsEnabled>
+                                        <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                            <Binding
+                                                Path="IsSendButtonEnabled"
+                                                RelativeSource="{RelativeSource TemplatedParent}"/>
+                                            <Binding
+                                                Converter="{x:Static StringConverters.IsNotNullOrEmpty}"
+                                                Path="Text"
+                                                RelativeSource="{RelativeSource TemplatedParent}"/>
+                                        </MultiBinding>
+                                    </Button.IsEnabled>
+
                                     <ip:PackIconMaterial
-                                        Width="14" Kind="Earth"/>
-                                    <TextBlock
-                                        Margin="4,0,0,0" VerticalAlignment="Center"
-                                        Text="{DynamicResource AssistantInputBox_WebSearchButton_Text}"/>
-                                </StackPanel>
-                            </ToggleButton>
-
-                            <ToggleButton
-                                Height="30" Padding="8,4"
-                                CornerRadius="15"
-                                IsChecked="{Binding IsToolCallEnabled, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
-                                IsVisible="{TemplateBinding IsToolCallSupported}"
-                                ToolTip.Tip="{DynamicResource AssistantInputBox_ToolCallButton_ToolTip}">
-                                <StackPanel Orientation="Horizontal">
-                                    <ip:PackIconMaterial
-                                        Width="14" Kind="Tools"/>
-                                    <TextBlock
-                                        Margin="4,0,0,0"
-                                        Text="{DynamicResource AssistantInputBox_ToolCallButton_Text}"/>
-                                </StackPanel>
-                            </ToggleButton>
-                        </StackPanel>
-
-                        <StackPanel
-                            Grid.Row="2" Grid.Column="1"
-                            Margin="8,0,0,0" Orientation="Horizontal"
-                            Spacing="4">
-                            <Button
-                                x:Name="PART_SendButton" Classes="Flat"
-                                Width="30" Height="30"
-                                Padding="0" CornerRadius="15"
-                                ToolTip.Tip="{DynamicResource AssistantInputBox_SendButton_ToolTip}">
-                                <Button.IsEnabled>
-                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
-                                        <Binding
-                                            Path="IsSendButtonEnabled"
-                                            RelativeSource="{RelativeSource TemplatedParent}"/>
-                                        <Binding
-                                            Converter="{x:Static StringConverters.IsNotNullOrEmpty}"
-                                            Path="Text"
-                                            RelativeSource="{RelativeSource TemplatedParent}"/>
-                                    </MultiBinding>
-                                </Button.IsEnabled>
-
-                                <ip:PackIconMaterial
-                                    Width="15" Foreground="White"
-                                    Kind="ArrowUp"/>
-                            </Button>
-                        </StackPanel>
-                    </Grid>
+                                        Width="15" Foreground="White"
+                                        Kind="ArrowUp"/>
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+                    </ExperimentalAcrylicBorder>
                 </Border>
             </ControlTemplate>
         </Setter>

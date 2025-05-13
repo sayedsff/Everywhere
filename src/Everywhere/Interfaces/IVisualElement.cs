@@ -1,4 +1,4 @@
-﻿using System.Drawing;
+﻿using Avalonia.Media.Imaging;
 using Everywhere.Enums;
 
 namespace Everywhere.Interfaces;
@@ -33,7 +33,7 @@ public interface IVisualElement
     /// <param name="maxLength">allowed max length of the text, -1 means no limit.</param>
     /// <returns></returns>
     /// <remarks>
-    /// set maxLength to 0 and check if the text is empty to check if the element is empty, with minimal performance impact.
+    /// set maxLength to 0 can check if the text is null, with minimal performance impact.
     /// </remarks>
     string? GetText(int maxLength = -1);
 

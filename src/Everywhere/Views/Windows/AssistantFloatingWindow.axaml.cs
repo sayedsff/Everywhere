@@ -38,27 +38,29 @@ public partial class AssistantFloatingWindow : ReactiveWindow<AssistantFloatingW
 
     private static readonly Easing Easing = new BounceEaseInOut();
 
-    // private readonly IWindowHelper platformHelper;
+    private readonly IWindowHelper windowHelper;
 
     public AssistantFloatingWindow(IWindowHelper windowHelper)
     {
-        // this.windowHelper = windowHelper;
+        this.windowHelper = windowHelper;
 
         InitializeComponent();
         windowHelper.SetWindowNoFocus(this);
 
-        // BackgroundBorder.PropertyChanged += HandleBackgroundBorderPropertyChanged;
+        BackgroundBorder.PropertyChanged += HandleBackgroundBorderPropertyChanged;
     }
 
-    // private void HandleBackgroundBorderPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
-    // {
-    //     if (e.Property != Border.CornerRadiusProperty || e.NewValue is not CornerRadius cornerRadius) return;
-    //     platformHelper.SetWindowCornerRadius(this, cornerRadius);
-    // }
+    private void HandleBackgroundBorderPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+    {
+        if (e.Property != Border.CornerRadiusProperty || e.NewValue is not CornerRadius cornerRadius) return;
+        windowHelper.SetWindowCornerRadius(this, cornerRadius);
+    }
 
     protected override void OnLoaded(RoutedEventArgs e)
     {
         base.OnLoaded(e);
+
+        windowHelper.SetWindowCornerRadius(this, BackgroundBorder.CornerRadius);
 
         // Make the window topmost
         Topmost = false;

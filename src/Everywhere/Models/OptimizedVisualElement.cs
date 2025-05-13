@@ -1,4 +1,4 @@
-﻿using System.Drawing;
+﻿using Avalonia.Media.Imaging;
 using Everywhere.Enums;
 
 namespace Everywhere.Models;
@@ -44,6 +44,9 @@ public class OptimizedVisualElement(IVisualElement original) : IVisualElement
         foreach (var child in element.Children)
         {
             if (element.BoundingRectangle is not { Width: > 0, Height: > 0 })
+                continue;
+
+            if (element.States.HasFlag(VisualElementStates.Offscreen))
                 continue;
 
             if (IsPanelLikeElement(child) &&

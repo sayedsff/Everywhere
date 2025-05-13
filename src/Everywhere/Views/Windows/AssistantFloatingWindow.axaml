@@ -1,22 +1,17 @@
 ﻿<v:ReactiveWindow
-    x:Class="Everywhere.Views.AssistantFloatingWindow"
-    xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:ip="https://github.com/MahApps/IconPacks.Avalonia"
-    xmlns:m="clr-namespace:Everywhere.Models"
-    xmlns:suki="https://github.com/kikipoulet/SukiUI"
-    xmlns:system="clr-namespace:System;assembly=System.Runtime"
-    xmlns:v="clr-namespace:Everywhere.Views"
-    xmlns:vc="clr-namespace:Everywhere.ValueConverters"
-    xmlns:vm="clr-namespace:Everywhere.ViewModels"
-    x:DataType="vm:AssistantFloatingWindowViewModel"
-    x:TypeArguments="vm:AssistantFloatingWindowViewModel" Background="Transparent"
-    CanResize="False"
+    x:Class="Everywhere.Views.AssistantFloatingWindow" xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ip="https://github.com/MahApps/IconPacks.Avalonia"
+    xmlns:m="clr-namespace:Everywhere.Models" xmlns:suki="https://github.com/kikipoulet/SukiUI"
+    xmlns:system="clr-namespace:System;assembly=System.Runtime" xmlns:v="clr-namespace:Everywhere.Views"
+    xmlns:vc="clr-namespace:Everywhere.ValueConverters" xmlns:vm="clr-namespace:Everywhere.ViewModels"
+    x:DataType="vm:AssistantFloatingWindowViewModel" x:TypeArguments="vm:AssistantFloatingWindowViewModel"
+    Background="Transparent" CanResize="False"
     IsOpened="{Binding TargetElement, Converter={x:Static ObjectConverters.IsNotNull}}"
     ShowActivated="False" ShowInTaskbar="False"
-    SizeToContent="WidthAndHeight" SystemDecorations="None"
+    SizeToContent="WidthAndHeight" SystemDecorations="BorderOnly"
     TargetBoundingRect="{Binding TargetBoundingRect}"
-    Topmost="True" WindowStartupLocation="Manual">
+    Topmost="True" TransparencyLevelHint="AcrylicBlur"
+    WindowStartupLocation="Manual">
 
     <Grid
         x:Name="RootGrid" ColumnDefinitions="*,Auto"
@@ -26,9 +21,9 @@
         </Grid.Resources>
 
         <Grid.Styles>
-            <Style Selector="Border.IsExpanded#BackgroundBorder">
-                <Setter Property="Opacity" Value="0"/>
-            </Style>
+            <!-- <Style Selector="Border.IsExpanded#BackgroundBorder"> -->
+            <!--     <Setter Property="Opacity" Value="0"/> -->
+            <!-- </Style> -->
 
             <Style Selector="Button#FloatingCloseButton">
                 <Setter Property="Opacity" Value="0"/>
@@ -39,16 +34,12 @@
             </Style>
         </Grid.Styles>
 
-        <suki:SukiBackground
-            Grid.Row="0" Grid.RowSpan="2"
-            Grid.Column="0"
-            CornerRadius="{Binding CornerRadius, ElementName=BackgroundBorder, Mode=OneWay}"/>
-
         <Border
             x:Name="BackgroundBorder" Grid.Row="0"
             Grid.RowSpan="2" Grid.Column="0"
             Background="{DynamicResource AssistantBackgroundBrush}"
-            Classes.IsExpanded="{Binding IsExpanded}">
+            Classes.IsExpanded="{Binding IsExpanded}"
+            Opacity="0">
             <Border.CornerRadius>
                 <MultiBinding Converter="{StaticResource PlacementToCornerRadiusConverter}">
                     <Binding>
@@ -100,9 +91,9 @@
             </ToggleButton>
 
             <Button
-                Classes="Basic WindowControlsButton Close" DockPanel.Dock="Right"
-                Width="24" Height="24"
-                Margin="0,0,0,4" VerticalAlignment="Center"
+                DockPanel.Dock="Right" Width="24"
+                Height="24" Margin="0,0,0,4"
+                VerticalAlignment="Center" Classes="Basic WindowControlsButton Close"
                 Command="{Binding SetTargetElementCommand}"
                 CommandParameter="{x:Null}"
                 CornerRadius="4"
@@ -123,10 +114,10 @@
         </DockPanel>
 
         <Button
-            x:Name="FloatingCloseButton" Classes="Basic WindowControlsButton Close"
-            Grid.Row="0" Grid.Column="1"
-            Width="16" Height="16"
-            VerticalAlignment="Top"
+            x:Name="FloatingCloseButton" Grid.Row="0"
+            Grid.Column="1" Width="16"
+            Height="16" VerticalAlignment="Top"
+            Classes="Basic WindowControlsButton Close"
             Command="{Binding SetTargetElementCommand}"
             CommandParameter="{x:Null}"
             CornerRadius="8"
@@ -226,8 +217,8 @@
                             <ItemsControl.DataTemplates>
                                 <DataTemplate DataType="m:AssistantChatMessage">
                                     <StackPanel
-                                        Classes="ChatMessage Assistant" HorizontalAlignment="Left"
-                                        Background="Transparent" Orientation="Vertical"
+                                        HorizontalAlignment="Left" Background="Transparent"
+                                        Classes="ChatMessage Assistant" Orientation="Vertical"
                                         Spacing="4">
                                         <suki:GlassCard>
                                             <SelectableTextBlock Inlines="{Binding InlineCollection}"/>
@@ -237,14 +228,14 @@
                                             x:Name="ChatMessageOperationPanel" HorizontalAlignment="Right"
                                             Orientation="Horizontal">
                                             <Button
-                                                Classes="Basic" Padding="4"
+                                                Padding="4" Classes="Basic"
                                                 Command="{Binding $parent[v:AssistantFloatingWindow].ViewModel.RetryCommand}"
                                                 CommandParameter="{Binding}"
                                                 ToolTip.Tip="{DynamicResource AssistantFloatingWindow_ChatMessage_Assistant_Regenerate}">
                                                 <ip:PackIconMaterial Kind="Refresh"/>
                                             </Button>
                                             <Button
-                                                Classes="Basic" Padding="4"
+                                                Padding="4" Classes="Basic"
                                                 Command="{Binding $parent[v:AssistantFloatingWindow].ViewModel.CopyCommand}"
                                                 CommandParameter="{Binding}"
                                                 ToolTip.Tip="{DynamicResource AssistantFloatingWindow_ChatMessage_Assistant_Copy}">
@@ -256,8 +247,8 @@
 
                                 <DataTemplate DataType="m:UserChatMessage">
                                     <StackPanel
-                                        Classes="ChatMessage User" HorizontalAlignment="Right"
-                                        Background="Transparent" Orientation="Vertical"
+                                        HorizontalAlignment="Right" Background="Transparent"
+                                        Classes="ChatMessage User" Orientation="Vertical"
                                         Spacing="4">
                                         <suki:GlassCard>
                                             <SelectableTextBlock Inlines="{Binding InlineCollection}"/>
@@ -269,7 +260,7 @@
 
                                 <DataTemplate DataType="m:ActionChatMessage">
                                     <suki:GlassCard
-                                        Classes="ChatMessage Action" HorizontalAlignment="Left">
+                                        HorizontalAlignment="Left" Classes="ChatMessage Action">
                                         <Expander
                                             Background="Transparent" BorderThickness="0">
                                             <Expander.Header>

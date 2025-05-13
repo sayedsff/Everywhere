@@ -50,7 +50,6 @@ public partial class VisualTreeDebugger : UserControl
         treeViewPointerOverMask = new Window
         {
             Topmost = true,
-            IsHitTestVisible = false,
             ShowInTaskbar = false,
             ShowActivated = false,
             SystemDecorations = SystemDecorations.None,
@@ -60,14 +59,15 @@ public partial class VisualTreeDebugger : UserControl
             {
                 Background = Brushes.DodgerBlue,
                 Opacity = 0.2
-            }
+            },
         };
+        treeViewPointerOverMask.Closing += (_, e) => e.Cancel = true;
+        windowHelper.SetWindowNoFocus(treeViewPointerOverMask);
         windowHelper.SetWindowHitTestInvisible(treeViewPointerOverMask);
 
         var keyboardFocusMask = new Window
         {
             Topmost = true,
-            IsHitTestVisible = false,
             ShowInTaskbar = false,
             ShowActivated = false,
             SystemDecorations = SystemDecorations.None,
@@ -80,6 +80,8 @@ public partial class VisualTreeDebugger : UserControl
                 Opacity = 0.5
             }
         };
+        keyboardFocusMask.Closing += (_, e) => e.Cancel = true;
+        windowHelper.SetWindowNoFocus(keyboardFocusMask);
         windowHelper.SetWindowHitTestInvisible(keyboardFocusMask);
 
         visualElementContext.KeyboardFocusedElementChanged += element =>
@@ -149,6 +151,20 @@ public partial class VisualTreeDebugger : UserControl
             window.Title = nameof(VisualTreeDebugger);
         }
     }
+
+    private async void HandleCaptureButtonClicked(object? sender, RoutedEventArgs e)
+    {
+        if (VisualTreeView.SelectedItem is not IVisualElement selectedItem) return;
+        try
+        {
+            CaptureImage.Source = await selectedItem.CaptureAsync();
+        }
+        catch (Exception ex)
+        {
+            CaptureImage.Source = null;
+            Debug.WriteLine(ex);
+        }
+    }
 }
 
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
@@ -157,6 +173,8 @@ internal class DebuggerVisualElement(IVisualElement element) : ObservableObject
     public string? Name => element.Name;
 
     public VisualElementType Type => element.Type;
+
+    public VisualElementStates States => element.States;
 
     public int ProcessId => element.ProcessId;
 
