@@ -1,27 +1,73 @@
 ﻿<UserControl
-    x:Class="Everywhere.Views.VisualTreeDebugger"
-    xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:i="clr-namespace:Everywhere.Interfaces"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    x:Class="Everywhere.Views.VisualTreeDebugger" xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="clr-namespace:Everywhere.Interfaces" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:v="clr-namespace:Everywhere.Views" d:DesignHeight="450"
     d:DesignWidth="800" mc:Ignorable="d">
-    <TreeView
-        ItemsSource="{Binding $parent[v:VisualTreeDebugger].RootElements}"
-        PointerMoved="HandleTreeViewPointerMoved">
-        <TreeView.ItemTemplate>
-            <TreeDataTemplate
-                DataType="i:IVisualElement"
-                ItemsSource="{Binding Children}">
-                <TextBlock>
-                    <Run Text="{Binding Id}"/>
-                    <Run
-                        FontWeight="Bold"
-                        Text="{Binding Type, StringFormat={}[{0}]}"/>
-                    <Run Text="{Binding Name}"/>
-                </TextBlock>
-            </TreeDataTemplate>
-        </TreeView.ItemTemplate>
-    </TreeView>
+    <Grid
+        Margin="8,4,8,8" ColumnDefinitions="3*,1,1*"
+        RowDefinitions="Auto,*">
+
+        <Border
+            Grid.Row="0" Grid.Column="0"
+            Grid.ColumnSpan="3" Padding="0,4"
+            BorderBrush="{DynamicResource SukiBorderBrush}"
+            BorderThickness="0,0,0,1">
+            <StackPanel Orientation="Horizontal">
+                <CheckBox
+                    x:Name="ShowKeyboardFocusedElementCheckBox" Content="Show keyboard focused element"/>
+            </StackPanel>
+        </Border>
+
+        <TreeView
+            x:Name="VisualTreeView" Grid.Row="1"
+            Grid.Column="0" PointerMoved="HandleVisualTreeViewPointerMoved"
+            SelectionChanged="HandleVisualTreeViewSelectionChanged">
+            <TreeView.ItemTemplate>
+                <TreeDataTemplate
+                    DataType="i:IVisualElement"
+                    ItemsSource="{Binding Children}">
+                    <TextBlock>
+                        <Run Text="{Binding Id}"/>
+                        <Run
+                            FontWeight="Bold"
+                            Text="{Binding Type, StringFormat={}[{0}]}"/>
+                        <Run Text="{Binding Name}"/>
+                    </TextBlock>
+                </TreeDataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
+
+        <ItemsControl
+            x:Name="PropertyItemsControl" Grid.Row="1"
+            Grid.Column="2" Margin="4,0">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="v:VisualElementProperty">
+                    <StackPanel
+                        Margin="0,0,0,8" Orientation="Vertical"
+                        Spacing="4">
+                        <TextBlock
+                            FontSize="16"
+                            Text="{Binding Name}"
+                            TextWrapping="WrapWithOverflow"/>
+
+                        <TextBox
+                            AcceptsReturn="True"
+                            IsReadOnly="{Binding IsReadOnly}"
+                            Text="{Binding Value, Mode=TwoWay}"
+                            TextWrapping="WrapWithOverflow"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <GridSplitter
+            Grid.Row="1" Grid.Column="1"
+            Width="3" Background="Transparent"/>
+        <Border
+            Grid.Row="1" Grid.Column="1"
+            Width="1"
+            Background="{DynamicResource SukiBorderBrush}"
+            IsHitTestVisible="False"/>
+    </Grid>
 </UserControl>

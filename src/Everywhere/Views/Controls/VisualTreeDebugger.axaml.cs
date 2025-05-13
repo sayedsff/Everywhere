@@ -1,17 +1,27 @@
 ﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
+using Everywhere.Enums;
+using Everywhere.Models;
 
 namespace Everywhere.Views;
 
 public partial class VisualTreeDebugger : UserControl
 {
-    public ObservableCollection<IVisualElement> RootElements { get; } = [];
-
-    private readonly Window treeViewFocusMask;
+    private readonly ObservableCollection<IVisualElement> rootElements = [];
+    private readonly IReadOnlyList<VisualElementProperty> properties = typeof(DebuggerVisualElement)
+        .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+        .Select(p => new VisualElementProperty(p))
+        .ToReadOnlyList();
+    private readonly Window treeViewPointerOverMask;
 
     public VisualTreeDebugger(
         IUserInputTrigger userInputTrigger,
@@ -20,14 +30,12 @@ public partial class VisualTreeDebugger : UserControl
     {
         InitializeComponent();
 
-        visualElementContext.KeyboardFocusedElementChanged += element =>
-        {
-            Debug.WriteLine(element?.ToString());
-        };
+        VisualTreeView.ItemsSource = rootElements;
+        PropertyItemsControl.ItemsSource = properties;
 
         userInputTrigger.KeyboardHotkeyActivated += () =>
         {
-            RootElements.Clear();
+            rootElements.Clear();
             var element = visualElementContext.PointerOverElement;
             if (element == null) return;
             element = element
@@ -35,11 +43,11 @@ public partial class VisualTreeDebugger : UserControl
                 .CurrentAndNext()
                 .Where(p => p.current.ProcessId != p.next.ProcessId)
                 .Select(p => p.current)
-                .First();
-            RootElements.Add(element);
+                .FirstOrDefault() ?? element;
+            rootElements.Add(element);
         };
 
-        treeViewFocusMask = new Window
+        treeViewPointerOverMask = new Window
         {
             Topmost = true,
             IsHitTestVisible = false,
@@ -50,12 +58,11 @@ public partial class VisualTreeDebugger : UserControl
             Background = null,
             Content = new Border
             {
-                BorderThickness = new Thickness(1),
-                BorderBrush = Brushes.DodgerBlue,
-                Opacity = 0.5
+                Background = Brushes.DodgerBlue,
+                Opacity = 0.2
             }
         };
-        windowHelper.SetWindowHitTestInvisible(treeViewFocusMask);
+        windowHelper.SetWindowHitTestInvisible(treeViewPointerOverMask);
 
         var keyboardFocusMask = new Window
         {
@@ -77,24 +84,42 @@ public partial class VisualTreeDebugger : UserControl
 
         visualElementContext.KeyboardFocusedElementChanged += element =>
         {
-            Dispatcher.UIThread.Invoke(() => SetMask(keyboardFocusMask, element));
+            Dispatcher.UIThread.Invoke(
+                () =>
+                {
+                    if (ShowKeyboardFocusedElementCheckBox.IsChecked is true) SetMask(keyboardFocusMask, element);
+                });
+        };
+
+        ShowKeyboardFocusedElementCheckBox.IsCheckedChanged += delegate
+        {
+            if (ShowKeyboardFocusedElementCheckBox.IsChecked is not true) SetMask(keyboardFocusMask, null);
         };
     }
 
-    private void HandleTreeViewPointerMoved(object? sender, PointerEventArgs e)
+    private void HandleVisualTreeViewPointerMoved(object? sender, PointerEventArgs e)
     {
+        IVisualElement? visualElement = null;
         var element = e.Source as StyledElement;
         while (element != null)
         {
             element = element.Parent;
-            if (element is TreeViewItem { DataContext: IVisualElement visualElement })
+            if (element != null && (visualElement = element.DataContext as IVisualElement) != null)
             {
-                SetMask(treeViewFocusMask, visualElement);
-                return;
+                break;
             }
         }
 
-        SetMask(treeViewFocusMask, null);
+        SetMask(treeViewPointerOverMask, visualElement);
+    }
+
+    private void HandleVisualTreeViewSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        var debuggerElement = VisualTreeView.SelectedItem is not IVisualElement selectedItem ? null : new DebuggerVisualElement(selectedItem);
+        foreach (var property in properties)
+        {
+            property.Target = debuggerElement;
+        }
     }
 
     private static void SetMask(Window mask, IVisualElement? element)
@@ -102,14 +127,101 @@ public partial class VisualTreeDebugger : UserControl
         if (element == null)
         {
             mask.Hide();
+            mask.Topmost = false;
         }
         else
         {
             mask.Show();
+            mask.Topmost = true;
             var boundingRectangle = element.BoundingRectangle;
             mask.Position = new PixelPoint(boundingRectangle.X, boundingRectangle.Y);
             mask.Width = boundingRectangle.Width / mask.DesktopScaling;
             mask.Height = boundingRectangle.Height / mask.DesktopScaling;
+        }
+    }
+
+    protected override void OnLoaded(RoutedEventArgs e)
+    {
+        base.OnLoaded(e);
+
+        if (TopLevel.GetTopLevel(this) is Window window)
+        {
+            window.Title = nameof(VisualTreeDebugger);
+        }
+    }
+}
+
+[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+internal class DebuggerVisualElement(IVisualElement element) : ObservableObject
+{
+    public string? Name => element.Name;
+
+    public VisualElementType Type => element.Type;
+
+    public int ProcessId => element.ProcessId;
+
+    public string ProcessName
+    {
+        get
+        {
+            try
+            {
+                using var process = Process.GetProcessById(ProcessId);
+                return process.ProcessName;
+            }
+            catch
+            {
+                return "Unknown";
+            }
+        }
+    }
+
+    public PixelRect BoundingRectangle => element.BoundingRectangle;
+
+    public string? Text
+    {
+        get => element.GetText();
+        set
+        {
+            if (value == null) return;
+            element.SetText(value, false);
+            OnPropertyChanged();
+        }
+    }
+}
+
+internal class VisualElementProperty(PropertyInfo propertyInfo) : ObservableObject, IValueProxy<object?>
+{
+    public DebuggerVisualElement? Target
+    {
+        get;
+        set
+        {
+            if (field != null) field.PropertyChanged -= HandleElementPropertyChanged;
+            field = value;
+            if (field != null) field.PropertyChanged += HandleElementPropertyChanged;
+            OnPropertyChanged(nameof(Value));
+        }
+    }
+
+    private void HandleElementPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != propertyInfo.Name) return;
+        OnPropertyChanged(nameof(Value));
+    }
+
+    public string Name => propertyInfo.Name;
+
+    public bool IsReadOnly => !propertyInfo.CanWrite;
+
+    public object? Value
+    {
+        get => Target == null ? null : propertyInfo.GetValue(Target);
+        set
+        {
+            if (Target == null) return;
+            if (IsReadOnly) return;
+            propertyInfo.SetValue(Target, value);
         }
     }
 }
