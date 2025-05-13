@@ -318,7 +318,7 @@ public class AssistantInputTextPresenter : TextPresenter
     protected override Size ArrangeOverride(Size finalSize)
     {
         var finalWidth = finalSize.Width;
-        if (MathUtilities.AreClose(constraint.Width, finalWidth) == false)
+        if (!constraint.Width.IsCloseTo(finalWidth))
         {
             constraint = new Size(Math.Ceiling(finalWidth), double.PositiveInfinity);
         }
@@ -369,8 +369,8 @@ public class AssistantInputTextPresenter : TextPresenter
             ];
         }
 
-        var maxWidth = MathUtilities.IsZero(constraint.Width) ? double.PositiveInfinity : constraint.Width;
-        var maxHeight = MathUtilities.IsZero(constraint.Height) ? double.PositiveInfinity : constraint.Height;
+        var maxWidth = constraint.Width.IsCloseTo(0d) ? double.PositiveInfinity : constraint.Width;
+        var maxHeight = constraint.Height.IsCloseTo(0d) ? double.PositiveInfinity : constraint.Height;
         var textLayout = new TextLayout(text, typeface, FontFeatures, FontSize, foreground, TextAlignment,
             TextWrapping, maxWidth: maxWidth, maxHeight: maxHeight, textStyleOverrides: textStyleOverrides,
             flowDirection: FlowDirection, lineHeight: LineHeight, letterSpacing: LetterSpacing);
