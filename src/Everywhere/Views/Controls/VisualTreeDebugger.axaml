@@ -1,0 +1,27 @@
+﻿<UserControl
+    x:Class="Everywhere.Views.VisualTreeDebugger"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="clr-namespace:Everywhere.Interfaces"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:v="clr-namespace:Everywhere.Views" d:DesignHeight="450"
+    d:DesignWidth="800" mc:Ignorable="d">
+    <TreeView
+        ItemsSource="{Binding $parent[v:VisualTreeDebugger].RootElements}"
+        PointerMoved="HandleTreeViewPointerMoved">
+        <TreeView.ItemTemplate>
+            <TreeDataTemplate
+                DataType="i:IVisualElement"
+                ItemsSource="{Binding Children}">
+                <TextBlock>
+                    <Run Text="{Binding Id}"/>
+                    <Run
+                        FontWeight="Bold"
+                        Text="{Binding Type, StringFormat={}[{0}]}"/>
+                    <Run Text="{Binding Name}"/>
+                </TextBlock>
+            </TreeDataTemplate>
+        </TreeView.ItemTemplate>
+    </TreeView>
+</UserControl>

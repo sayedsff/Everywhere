@@ -10,7 +10,7 @@ public static class FluentExtension
         return t;
     }
 
-    public static T HandlePropertyChanged<T>(this T source, TypedPropertyChangedEventHandler<T> handler)
+    public static T RegisterPropertyChangedHandler<T>(this T source, TypedPropertyChangedEventHandler<T> handler)
         where T : INotifyPropertyChanged
     {
         source.PropertyChanged += (sender, e) => handler(sender.NotNull<T>(), e);

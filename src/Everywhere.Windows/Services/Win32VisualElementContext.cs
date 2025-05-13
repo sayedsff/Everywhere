@@ -377,10 +377,10 @@ public class Win32VisualElementContext : IVisualElementContext
         {
             // element.FrameworkAutomationElement.RegisterPropertyChangedEvent(
             //     TreeScope.Element,
-            //     HandlePropertyChanged,
+            //     RegisterPropertyChangedHandler,
             //     element.FrameworkAutomationElement.PropertyIdLibrary.BoundingRectangle);
             //
-            // void HandlePropertyChanged(AutomationElement e, PropertyId propertyId, object value)
+            // void RegisterPropertyChangedHandler(AutomationElement e, PropertyId propertyId, object value)
             // {
             //     throw new NotImplementedException();
             // }

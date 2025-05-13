@@ -1,3 +1,4 @@
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
@@ -7,6 +8,8 @@ namespace Everywhere;
 
 public class App : Application
 {
+    private Window? mainWindow, debugWindow;
+
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
@@ -18,14 +21,9 @@ public class App : Application
     {
         switch (ApplicationLifetime)
         {
-            case IClassicDesktopStyleApplicationLifetime desktop:
+            case IClassicDesktopStyleApplicationLifetime:
             {
                 DisableAvaloniaDataAnnotationValidation();
-                desktop.MainWindow = new MainWindow
-                {
-                    Content = ServiceLocator.Resolve<MainView>()
-                };
-                // desktop.MainWindow = ServiceLocator.Resolve<VisualTreeDebuggerWindow>();
                 break;
             }
         }
@@ -42,5 +40,42 @@ public class App : Application
         {
             BindingPlugins.DataValidators.Remove(plugin);
         }
+    }
+
+    private void HandleOpenMainWindowMenuItemClicked(object? sender, EventArgs e)
+    {
+        ShowWindow<MainView>(ref mainWindow);
+    }
+
+    private void HandleOpenDebugWindowMenuItemClicked(object? sender, EventArgs e)
+    {
+        ShowWindow<VisualTreeDebugger>(ref debugWindow);
+    }
+
+    private static void ShowWindow<TContent>(ref Window? window) where TContent : Control
+    {
+        if (window is { IsVisible: true })
+        {
+            var topmost = window.Topmost;
+            window.Topmost = true;
+            window.Activate();
+            window.Topmost = topmost;
+        }
+        else
+        {
+            window?.Close();
+            var content = ServiceLocator.Resolve<TContent>();
+            content.To<ISetLogicalParent>().SetParent(null);
+            window = new MainWindow
+            {
+                Content = content
+            };
+            window.Show();
+        }
+    }
+
+    private void HandleExitMenuItemClicked(object? sender, EventArgs e)
+    {
+        Environment.Exit(0);
     }
 }

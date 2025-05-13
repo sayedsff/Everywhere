@@ -1,6 +1,7 @@
 <Application
     x:Class="Everywhere.App" xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:suki="https://github.com/kikipoulet/SukiUI">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:suki="https://github.com/kikipoulet/SukiUI">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -19,4 +20,27 @@
         <StyleInclude Source="avares://Everywhere/Views/Controls/DynamicKeyMenuItem.axaml"/>
         <StyleInclude Source="avares://Everywhere/Views/Controls/AssistantInputBox.axaml"/>
     </Application.Styles>
+
+    <TrayIcon.Icons>
+        <TrayIcons>
+            <TrayIcon
+                Clicked="HandleOpenMainWindowMenuItemClicked"
+                Icon="avares://Everywhere/Assets/Everywhere.png" ToolTipText="Everywhere">
+                <TrayIcon.Menu>
+                    <NativeMenu>
+                        <NativeMenuItem
+                            Click="HandleOpenMainWindowMenuItemClicked"
+                            Header="{DynamicResource Application_TrayIcon_Menu_OpenMainWindow}"/>
+                        <NativeMenuItem
+                            Click="HandleOpenDebugWindowMenuItemClicked"
+                            Header="{DynamicResource Application_TrayIcon_Menu_OpenDebugWindow}"/>
+                        <NativeMenuItemSeparator/>
+                        <NativeMenuItem
+                            Click="HandleExitMenuItemClicked"
+                            Header="{DynamicResource Application_TrayIcon_Menu_Exit}"/>
+                    </NativeMenu>
+                </TrayIcon.Menu>
+            </TrayIcon>
+        </TrayIcons>
+    </TrayIcon.Icons>
 </Application>

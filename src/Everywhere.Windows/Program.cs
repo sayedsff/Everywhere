@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using Avalonia;
+using Avalonia.Controls;
 using Everywhere.Enums;
 using Everywhere.Extensions;
 using Everywhere.Initialization;
@@ -59,7 +60,7 @@ public static class Program
                     })
                 .AddSingleton<IVisualElementContext, Win32VisualElementContext>()
                 .AddSingleton<IUserInputTrigger, Win32UserInputTrigger>()
-                .AddSingleton<IPlatformHelper, Win32PlatformHelper>()
+                .AddSingleton<IWindowHelper, Win32WindowHelper>()
 
                 #endregion
 
@@ -72,8 +73,7 @@ public static class Program
 
                 #region View & ViewModel
 
-                .AddSingleton<VisualTreeDebuggerWindowViewModel>()
-                .AddSingleton<VisualTreeDebuggerWindow>()
+                .AddSingleton<VisualTreeDebugger>()
                 .AddSingleton<AssistantFloatingWindowViewModel>()
                 .AddSingleton<AssistantFloatingWindow>()
                 .AddSingleton<SettingsPageViewModel>()
@@ -91,7 +91,7 @@ public static class Program
 
         );
 
-        BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+        BuildAvaloniaApp().StartWithClassicDesktopLifetime(args, ShutdownMode.OnExplicitShutdown);
     }
 
     private static AppBuilder BuildAvaloniaApp() =>

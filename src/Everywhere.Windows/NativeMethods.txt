@@ -72,3 +72,8 @@ ReleaseDC
 ShowWindow
 SetLayeredWindowAttributes
 PrintWindow
+
+CreateRoundRectRgn
+CreateRectRgn
+CombineRgn
+SetWindowRgn

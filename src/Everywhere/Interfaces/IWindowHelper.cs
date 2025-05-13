@@ -2,7 +2,7 @@
 
 namespace Everywhere.Interfaces;
 
-public interface IPlatformHelper
+public interface IWindowHelper
 {
     /// <summary>
     /// Make the window cannot be focused by the system.
@@ -11,4 +11,8 @@ public interface IPlatformHelper
     void SetWindowNoFocus(Window window);
 
     void SetWindowAutoHide(Window window);
+
+    void SetWindowHitTestInvisible(Window window);
+
+    void SetWindowCornerRadius(Window window, CornerRadius cornerRadius);
 }

@@ -1,6 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using Windows.Win32;
 using Windows.Win32.Foundation;
+using Windows.Win32.Graphics.Gdi;
 using Windows.Win32.UI.Accessibility;
 using Windows.Win32.UI.WindowsAndMessaging;
 using Avalonia;
@@ -9,7 +10,7 @@ using Everywhere.Interfaces;
 
 namespace Everywhere.Windows.Services;
 
-public class Win32PlatformHelper : IPlatformHelper
+public class Win32WindowHelper : IWindowHelper
 {
     // ReSharper disable InconsistentNaming
     // ReSharper disable IdentifierTypo
@@ -365,5 +366,57 @@ public class Win32PlatformHelper : IPlatformHelper
                 window.IsVisible = false;
             }
         }
+    }
+
+    public void SetWindowHitTestInvisible(Window window)
+    {
+        window.Loaded += delegate
+        {
+            if (window.TryGetPlatformHandle() is not { } handle) return;
+            var hWnd = (HWND)handle.Handle;
+            var style = PInvoke.GetWindowLong(hWnd, WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE);
+            _ = PInvoke.SetWindowLong(
+                hWnd,
+                WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE,
+                style | (int)WINDOW_EX_STYLE.WS_EX_LAYERED | (int)WINDOW_EX_STYLE.WS_EX_TRANSPARENT);
+            PInvoke.SetLayeredWindowAttributes(hWnd, new COLORREF(), 255, LAYERED_WINDOW_ATTRIBUTES_FLAGS.LWA_ALPHA);
+        };
+    }
+
+    public void SetWindowCornerRadius(Window window, CornerRadius cornerRadius)
+    {
+        // TODO
+        // https://github.com/selastingeorge/Win32-Acrylic-Effect
+        // https://gist.github.com/ADeltaX/aea6aac248604d0cb7d423a61b06e247
+        var hWnd = window.TryGetPlatformHandle()?.Handle ?? 0;
+        if (hWnd == 0) return;
+
+        var bounds = window.Bounds;
+        var scale = window.DesktopScaling;
+        var (w, h) = ((int)(bounds.Width * scale), (int)(bounds.Height * scale));
+        if (w <= 0 || h <= 0) return;
+
+        var (rTL, rTR, rBR, rBL) =
+            ((int)(cornerRadius.TopLeft * scale),
+                (int)(cornerRadius.TopRight * scale),
+                (int)(cornerRadius.BottomRight * scale),
+                (int)(cornerRadius.BottomLeft * scale));
+
+        using var rgnTL = PInvoke.CreateRoundRectRgn_SafeHandle(0, 0, rTL * 2, rTL * 2, rTL * 2, rTL * 2);
+        using var rgnTR = PInvoke.CreateRoundRectRgn_SafeHandle(w - rTR * 2, 0, w, rTR * 2, rTR * 2, rTR * 2);
+        using var rgnBR = PInvoke.CreateRoundRectRgn_SafeHandle(w - rBR * 2, h - rBR * 2, w, h, rBR * 2, rBR * 2);
+        using var rgnBL = PInvoke.CreateRoundRectRgn_SafeHandle(0, h - rBL * 2, rBL * 2, h, rBL * 2, rBL * 2);
+
+        // using var rgnCenter = PInvoke.CreateRectRgn_SafeHandle(rTL, 0, w - rTR, h);
+        // using var rgnMiddle = PInvoke.CreateRectRgn_SafeHandle(0, rTL, w, h - rBL);
+
+        using var finalRgn = PInvoke.CreateRectRgn_SafeHandle(0, 0, 0, 0);
+        // PInvoke.CombineRgn(finalRgn, rgnCenter, rgnTL, RGN_COMBINE_MODE.RGN_OR);
+        PInvoke.CombineRgn(finalRgn, finalRgn, rgnTR, RGN_COMBINE_MODE.RGN_OR);
+        PInvoke.CombineRgn(finalRgn, finalRgn, rgnBR, RGN_COMBINE_MODE.RGN_OR);
+        PInvoke.CombineRgn(finalRgn, finalRgn, rgnBL, RGN_COMBINE_MODE.RGN_OR);
+        // PInvoke.CombineRgn(finalRgn, finalRgn, rgnMiddle, RGN_COMBINE_MODE.RGN_OR);
+
+        PInvoke.SetWindowRgn((HWND)hWnd, (HRGN)finalRgn.DangerousGetHandle(), true);
     }
 }

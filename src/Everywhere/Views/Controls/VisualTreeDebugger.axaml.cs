@@ -1,3 +1,5 @@
+﻿using System.Collections.ObjectModel;
+using System.Diagnostics;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
@@ -5,13 +7,37 @@ using Avalonia.Threading;
 
 namespace Everywhere.Views;
 
-public partial class VisualTreeDebuggerWindow : ReactiveSukiWindow<VisualTreeDebuggerWindowViewModel>
+public partial class VisualTreeDebugger : UserControl
 {
+    public ObservableCollection<IVisualElement> RootElements { get; } = [];
+
     private readonly Window treeViewFocusMask;
 
-    public VisualTreeDebuggerWindow(IVisualElementContext visualElementContext)
+    public VisualTreeDebugger(
+        IUserInputTrigger userInputTrigger,
+        IVisualElementContext visualElementContext,
+        IWindowHelper windowHelper)
     {
         InitializeComponent();
+
+        visualElementContext.KeyboardFocusedElementChanged += element =>
+        {
+            Debug.WriteLine(element?.ToString());
+        };
+
+        userInputTrigger.KeyboardHotkeyActivated += () =>
+        {
+            RootElements.Clear();
+            var element = visualElementContext.PointerOverElement;
+            if (element == null) return;
+            element = element
+                .GetAncestors()
+                .CurrentAndNext()
+                .Where(p => p.current.ProcessId != p.next.ProcessId)
+                .Select(p => p.current)
+                .First();
+            RootElements.Add(element);
+        };
 
         treeViewFocusMask = new Window
         {
@@ -29,7 +55,7 @@ public partial class VisualTreeDebuggerWindow : ReactiveSukiWindow<VisualTreeDeb
                 Opacity = 0.5
             }
         };
-        EnableClickThrough(treeViewFocusMask);
+        windowHelper.SetWindowHitTestInvisible(treeViewFocusMask);
 
         var keyboardFocusMask = new Window
         {
@@ -47,7 +73,7 @@ public partial class VisualTreeDebuggerWindow : ReactiveSukiWindow<VisualTreeDeb
                 Opacity = 0.5
             }
         };
-        EnableClickThrough(keyboardFocusMask);
+        windowHelper.SetWindowHitTestInvisible(keyboardFocusMask);
 
         visualElementContext.KeyboardFocusedElementChanged += element =>
         {
@@ -85,31 +111,5 @@ public partial class VisualTreeDebuggerWindow : ReactiveSukiWindow<VisualTreeDeb
             mask.Width = boundingRectangle.Width / mask.DesktopScaling;
             mask.Height = boundingRectangle.Height / mask.DesktopScaling;
         }
-    }
-
-    private const int GWL_EXSTYLE   = -20;
-    private const int WS_EX_LAYERED = 0x80000;
-    private const int WS_EX_TRANSPARENT = 0x20;
-    private const uint LWA_ALPHA    = 0x2;
-
-    [DllImport("user32.dll", SetLastError = true)]
-    private static extern int GetWindowLong(IntPtr hWnd, int index);
-
-    [DllImport("user32.dll", SetLastError = true)]
-    private static extern int SetWindowLong(IntPtr hWnd, int index, int newStyle);
-
-    [DllImport("user32.dll", SetLastError = true)]
-    private static extern bool SetLayeredWindowAttributes(IntPtr hWnd, uint crKey, byte bAlpha, uint flags);
-
-    public static void EnableClickThrough(Window window)
-    {
-        window.Loaded += delegate
-        {
-            if (window.TryGetPlatformHandle() is not { } handle) return;
-            var hWnd = handle.Handle;
-            var style = GetWindowLong(hWnd, GWL_EXSTYLE);
-            SetWindowLong(hWnd, GWL_EXSTYLE, style | WS_EX_LAYERED | WS_EX_TRANSPARENT);
-            SetLayeredWindowAttributes(hWnd, 0, 255, LWA_ALPHA);
-        };
     }
 }
