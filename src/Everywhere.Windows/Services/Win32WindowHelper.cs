@@ -373,13 +373,17 @@ public class Win32WindowHelper : IWindowHelper
     {
         window.Loaded += delegate
         {
+            Win32Properties.AddWindowStylesCallback(window, WindowStylesCallback);
+
+            static (uint style, uint exStyle) WindowStylesCallback(uint style, uint exStyle)
+            {
+                return (style, exStyle |
+                    (uint)WINDOW_EX_STYLE.WS_EX_LAYERED |
+                    (uint)WINDOW_EX_STYLE.WS_EX_TRANSPARENT);
+            }
+
             if (window.TryGetPlatformHandle() is not { } handle) return;
             var hWnd = (HWND)handle.Handle;
-            var style = PInvoke.GetWindowLong(hWnd, WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE);
-            _ = PInvoke.SetWindowLong(
-                hWnd,
-                WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE,
-                style | (int)WINDOW_EX_STYLE.WS_EX_LAYERED | (int)WINDOW_EX_STYLE.WS_EX_TRANSPARENT);
             PInvoke.SetLayeredWindowAttributes(hWnd, new COLORREF(), 255, LAYERED_WINDOW_ATTRIBUTES_FLAGS.LWA_ALPHA);
         };
     }
