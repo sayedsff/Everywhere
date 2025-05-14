@@ -1,4 +1,4 @@
-﻿using IconPacks.Avalonia.Material;
+﻿using Lucide.Avalonia;
 
 namespace Everywhere.Interfaces;
 
@@ -6,5 +6,5 @@ public interface IMainViewPage
 {
     string Title { get; }
 
-    PackIconMaterialKind Icon { get; }
+    LucideIconKind Icon { get; }
 }

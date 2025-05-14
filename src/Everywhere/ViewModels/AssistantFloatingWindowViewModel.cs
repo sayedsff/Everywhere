@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 using Avalonia.Controls.Documents;
@@ -11,7 +10,7 @@ using Everywhere.Enums;
 using Everywhere.Models;
 using Everywhere.Utils;
 using Everywhere.Views;
-using IconPacks.Avalonia.Material;
+using Lucide.Avalonia;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
@@ -64,7 +63,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
         [
             new DynamicKeyMenuItem
             {
-                Icon = PackIconMaterialKind.Translate,
+                Icon = LucideIconKind.Languages,
                 Header = "AssistantFloatingWindowViewModel_Translate",
                 // Command = GenerateAndReplaceCommand,
                 // CommandParameter =
@@ -72,7 +71,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
             },
             new DynamicKeyMenuItem
             {
-                Icon = PackIconMaterialKind.FastForward,
+                Icon = LucideIconKind.StepForward,
                 Header = "AssistantFloatingWindowViewModel_ContinueWriting",
                 // Command = GenerateAndAppendCommand,
                 // CommandParameter =
@@ -81,7 +80,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
             },
             new DynamicKeyMenuItem
             {
-                Icon = PackIconMaterialKind.MessageTextClock,
+                Icon = LucideIconKind.ScrollText,
                 Header = "AssistantFloatingWindowViewModel_Summarize",
                 // Command = GenerateAndAppendCommand,
                 // CommandParameter =
@@ -247,7 +246,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
 
                 var analysisMessage = new ActionChatMessage(
                     ActionRole,
-                    PackIconMaterialKind.LayersSearch,
+                    LucideIconKind.TextSearch,
                     "ActionChatMessage_Header_AnalyzingContext");
                 chatMessages.Add(analysisMessage);
 
@@ -393,7 +392,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
                     {
                         "web_search" => new ActionChatMessage(
                             AuthorRole.Tool,
-                            PackIconMaterialKind.Earth,
+                            LucideIconKind.Globe,
                             "ActionChatMessage_Header_WebSearching"),
                         _ => throw new NotImplementedException()
                     };

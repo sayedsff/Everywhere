@@ -1,32 +1,23 @@
 ﻿using Avalonia.Controls;
-using Avalonia.Controls.Notifications;
 using CommunityToolkit.Mvvm.ComponentModel;
-using SukiUI.Controls;
-using SukiUI.Dialogs;
-using SukiUI.Toasts;
+using ShadUI.Dialogs;
+using ShadUI.Toasts;
 
 namespace Everywhere.ViewModels;
 
 public abstract class ReactiveViewModelBase : ObservableValidator
 {
-    protected internal ISukiDialogManager DialogManager { get; } = ServiceLocator.Resolve<ISukiDialogManager>();
-    protected internal ISukiToastManager ToastManager { get; } = ServiceLocator.Resolve<ISukiToastManager>();
+    protected internal DialogManager DialogManager { get; } = ServiceLocator.Resolve<DialogManager>();
+    protected internal ToastManager ToastManager { get; } = ServiceLocator.Resolve<ToastManager>();
 
     protected void DialogExceptionHandler(Exception exception, string? message = null, [CallerMemberName] object? source = null) =>
-        DialogManager.TryShowDialog(
-            new SukiDialog
-            {
-                Title = message ?? "Error",
-                Content = exception.GetFriendlyMessage(),
-            });
+        DialogManager.CreateDialog(message ?? "Error", exception.GetFriendlyMessage());
 
     protected void ToastExceptionHandler(Exception exception, string? message = null, [CallerMemberName] object? source = null) =>
-        ToastManager.CreateToast()
-            .SetType(NotificationType.Error)
-            .SetTitle(message ?? "Error")
-            .SetContent(exception.GetFriendlyMessage())
-            .SetCanDismissByClicking()
-            .Queue();
+        ToastManager.CreateToast(message ?? "Error")
+            .WithContent(exception.GetFriendlyMessage())
+            .DismissOnClick()
+            .ShowError();
 
     protected internal virtual Task ViewLoaded(CancellationToken cancellationToken) => Task.CompletedTask;
 
@@ -38,12 +29,10 @@ public abstract class ReactiveViewModelBase : ObservableValidator
     {
         if (LifetimeExceptionHandler is not { } lifetimeExceptionHandler)
         {
-            ToastManager.CreateToast()
-                .SetType(NotificationType.Error)
-                .SetTitle($"Lifetime Exception: [{stage}]")
-                .SetContent(e.GetFriendlyMessage())
-                .SetCanDismissByClicking()
-                .Queue();
+            ToastManager.CreateToast($"Lifetime Exception: [{stage}]")
+                .WithContent(e.GetFriendlyMessage())
+                .DismissOnClick()
+                .ShowError();
         }
         else
         {

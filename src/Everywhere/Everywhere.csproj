@@ -13,7 +13,7 @@
         </PackageReference>
         <PackageReference Include="HotAvalonia" PrivateAssets="All"/>
         <PackageReference Include="CommunityToolkit.Mvvm"/>
-        <PackageReference Include="IconPacks.Avalonia.Material"/>
+        <PackageReference Include="Lucide.Avalonia"/>
         <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="JetBrains.Profiler.Api"/>
         <PackageReference Include="Microsoft.Extensions.Configuration" />
         <PackageReference Include="Microsoft.SemanticKernel"/>
@@ -24,7 +24,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\3rd\SukiUI\SukiUI\SukiUI.csproj"/>
+        <ProjectReference Include="..\..\3rd\shad-ui\src\ShadUI\ShadUI.csproj" />
         <ProjectReference Include="..\..\3rd\WritableJsonConfiguration\src\WritableJsonConfiguration\WritableJsonConfiguration.csproj" />
     </ItemGroup>
 

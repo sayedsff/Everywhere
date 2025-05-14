@@ -1,14 +1,17 @@
-﻿<suki:SukiWindow
+﻿<shadui:Window
     x:Class="Everywhere.Views.MainWindow" xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:dialogs="clr-namespace:SukiUI.Dialogs;assembly=SukiUI"
-    xmlns:markupExtensions="clr-namespace:Everywhere.MarkupExtensions" xmlns:suki="https://github.com/kikipoulet/SukiUI"
-    xmlns:toasts="clr-namespace:SukiUI.Toasts;assembly=SukiUI" Title="Everywhere"
-    Icon="avares://Everywhere/Assets/Everywhere.png" TitleFontSize="18"
-    MinWidth="640"
-    TitleFontWeight="Bold">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:markupExtensions="clr-namespace:Everywhere.MarkupExtensions"
+    xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI"
+    xmlns:dialogs="clr-namespace:ShadUI.Dialogs;assembly=ShadUI"
+    xmlns:toasts="clr-namespace:ShadUI.Toasts;assembly=ShadUI"
+    Title="Everywhere"
+    Icon="avares://Everywhere/Assets/Everywhere.png"
+    TitleFontWeight="SemiBold"
+    MinWidth="640">
 
-    <suki:SukiWindow.Hosts>
-        <suki:SukiDialogHost Manager="{markupExtensions:ServiceLocator Type=dialogs:ISukiDialogManager}"/>
-        <suki:SukiToastHost Manager="{markupExtensions:ServiceLocator Type=toasts:ISukiToastManager}"/>
-    </suki:SukiWindow.Hosts>
-</suki:SukiWindow>
+    <shadui:Window.Hosts>
+        <dialogs:DialogHost Manager="{markupExtensions:ServiceLocator Type=dialogs:DialogManager}"/>
+        <toasts:ToastHost Manager="{markupExtensions:ServiceLocator Type=toasts:ToastManager}"/>
+    </shadui:Window.Hosts>
+</shadui:Window>

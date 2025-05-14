@@ -2,7 +2,6 @@
 using Avalonia;
 using Avalonia.Controls;
 using Everywhere.Enums;
-using Everywhere.Extensions;
 using Everywhere.Initialization;
 using Everywhere.Interfaces;
 using Everywhere.Models;
@@ -12,9 +11,8 @@ using Everywhere.Views.Pages;
 using Everywhere.Windows.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.SemanticKernel;
-using SukiUI.Dialogs;
-using SukiUI.Toasts;
+using ShadUI.Dialogs;
+using ShadUI.Toasts;
 using WritableJsonConfiguration;
 
 namespace Everywhere.Windows;
@@ -66,8 +64,8 @@ public static class Program
 
                 #region Avalonia Basic
 
-                .AddSingleton<ISukiDialogManager, SukiDialogManager>()
-                .AddSingleton<ISukiToastManager, SukiToastManager>()
+                .AddSingleton<DialogManager>()
+                .AddSingleton<ToastManager>()
 
                 #endregion
 

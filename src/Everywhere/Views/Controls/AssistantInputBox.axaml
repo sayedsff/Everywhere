@@ -1,6 +1,6 @@
 ﻿<Styles
     xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:ip="https://github.com/MahApps/IconPacks.Avalonia" xmlns:v="clr-namespace:Everywhere.Views">
+    xmlns:v="clr-namespace:Everywhere.Views">
     <Design.PreviewWith>
         <v:AssistantInputBox/>
     </Design.PreviewWith>
@@ -8,8 +8,6 @@
     <Style Selector="v|AssistantInputBox">
         <Setter Property="Watermark" Value="{DynamicResource AssistantInputBox_Watermark}"/>
         <Setter Property="FontSize" Value="14"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource SukiControlBorderBrush}"/>
-        <Setter Property="Foreground" Value="{DynamicResource SukiText}"/>
         <Setter Property="Padding" Value="6"/>
 
         <Style Selector="^ ToggleButton">
@@ -129,7 +127,7 @@
                                                         <Button
                                                             Padding="0" Background="Transparent"
                                                             BorderThickness="0">
-                                                            <ip:PackIconMaterial Kind="Cross"/>
+                                                            <LucideIcon Kind="X"/>
                                                         </Button>
                                                     </StackPanel>
                                                 </Border>
@@ -145,12 +143,12 @@
                                 <Button
                                     Width="30" Height="30"
                                     Padding="0"
-                                    BorderBrush="{DynamicResource SukiControlBorderBrush}"
+                                    BorderThickness="1"
+                                    Background="Transparent"
+                                    BorderBrush="{DynamicResource AcrylicLowSolidBorderBrush}"
                                     CornerRadius="15"
                                     ToolTip.Tip="{DynamicResource AssistantInputBox_AddButton_ToolTip}">
-                                    <ip:PackIconMaterial
-                                        Width="12" VerticalAlignment="Center"
-                                        Kind="Plus"/>
+                                    <LucideIcon Kind="Plus" Size="18" VerticalAlignment="Center"/>
 
                                     <Button.Flyout>
                                         <MenuFlyout
@@ -161,46 +159,54 @@
                                 </Button>
 
                                 <ToggleButton
-                                    Height="30" Padding="8,4"
+                                    Height="30"
+                                    MinHeight="30"
+                                    Padding="8, 0"
                                     CornerRadius="15"
+                                    Classes="Outline"
                                     IsChecked="{Binding IsImageEnabled, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
                                     IsVisible="{TemplateBinding IsImageSupported}"
                                     ToolTip.Tip="{DynamicResource AssistantInputBox_ImageButton_ToolTip}">
                                     <StackPanel Orientation="Horizontal">
-                                        <ip:PackIconMaterial
-                                            Width="14" VerticalAlignment="Center"
-                                            Kind="Image"/>
+                                        <LucideIcon Kind="Image" Size="18" VerticalAlignment="Center"/>
                                         <TextBlock
+                                            Classes="Caption"
                                             Margin="4,0,0,0"
                                             Text="{DynamicResource AssistantInputBox_ImageButton_Text}"/>
                                     </StackPanel>
                                 </ToggleButton>
 
                                 <ToggleButton
-                                    Height="30" Padding="8,4"
+                                    Height="30"
+                                    MinHeight="30"
                                     CornerRadius="15"
+                                    Padding="8, 0"
+                                    Classes="Outline"
                                     IsChecked="{Binding IsWebSearchEnabled, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
                                     IsVisible="{TemplateBinding IsWebSearchSupported}"
                                     ToolTip.Tip="{DynamicResource AssistantInputBox_WebSearchButton_ToolTip}">
                                     <StackPanel Orientation="Horizontal">
-                                        <ip:PackIconMaterial
-                                            Width="14" Kind="Earth"/>
+                                        <LucideIcon Kind="Globe" Size="18"/>
                                         <TextBlock
+                                            Classes="Caption"
                                             Margin="4,0,0,0" VerticalAlignment="Center"
                                             Text="{DynamicResource AssistantInputBox_WebSearchButton_Text}"/>
                                     </StackPanel>
                                 </ToggleButton>
 
                                 <ToggleButton
-                                    Height="30" Padding="8,4"
+                                    Height="30"
+                                    MinHeight="30"
                                     CornerRadius="15"
+                                    Padding="8, 0"
+                                    Classes="Outline"
                                     IsChecked="{Binding IsToolCallEnabled, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
                                     IsVisible="{TemplateBinding IsToolCallSupported}"
                                     ToolTip.Tip="{DynamicResource AssistantInputBox_ToolCallButton_ToolTip}">
                                     <StackPanel Orientation="Horizontal">
-                                        <ip:PackIconMaterial
-                                            Width="14" Kind="Tools"/>
+                                        <LucideIcon Kind="Hammer" Size="18"/>
                                         <TextBlock
+                                            Classes="Caption"
                                             Margin="4,0,0,0"
                                             Text="{DynamicResource AssistantInputBox_ToolCallButton_Text}"/>
                                     </StackPanel>
@@ -228,9 +234,7 @@
                                         </MultiBinding>
                                     </Button.IsEnabled>
 
-                                    <ip:PackIconMaterial
-                                        Width="15" Foreground="White"
-                                        Kind="ArrowUp"/>
+                                    <LucideIcon Kind="Send" Size="15"/>
                                 </Button>
                             </StackPanel>
                         </Grid>

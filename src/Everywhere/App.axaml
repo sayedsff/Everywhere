@@ -1,7 +1,7 @@
 <Application
     x:Class="Everywhere.App" xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:suki="https://github.com/kikipoulet/SukiUI">
+    xmlns:themes="clr-namespace:ShadUI.Themes;assembly=ShadUI">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -13,9 +13,7 @@
     </Application.Resources>
 
     <Application.Styles>
-        <suki:SukiTheme ThemeColor="Blue"/>
-        <StyleInclude Source="avares://IconPacks.Avalonia.Material/Material.axaml"/>
-
+        <themes:ShadTheme />
         <StyleInclude Source="avares://Everywhere/Assets/Styles.axaml"/>
         <StyleInclude Source="avares://Everywhere/Views/Controls/DynamicKeyMenuItem.axaml"/>
         <StyleInclude Source="avares://Everywhere/Views/Controls/AssistantInputBox.axaml"/>
