@@ -4,3 +4,6 @@
 [submodule "3rd/WritableJsonConfiguration"]
 	path = 3rd/WritableJsonConfiguration
 	url = https://github.com/DearVa/WritableJsonConfiguration
+[submodule "src/shad-ui"]
+	path = src/shad-ui
+	url = https://github.com/AuroraZiling/shad-ui
