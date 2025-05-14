@@ -6,6 +6,7 @@ using Windows.Win32.UI.Accessibility;
 using Windows.Win32.UI.WindowsAndMessaging;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Utilities;
 using Everywhere.Interfaces;
 
 namespace Everywhere.Windows.Services;
@@ -393,30 +394,90 @@ public class Win32WindowHelper : IWindowHelper
 
         var bounds = window.Bounds;
         var scale = window.DesktopScaling;
-        var (w, h) = ((int)(bounds.Width * scale), (int)(bounds.Height * scale));
-        if (w <= 0 || h <= 0) return;
+        var size = new Size(bounds.Width * scale, bounds.Height * scale);
+        if (size.Width <= 0d || size.Height <= 0d) return;
 
-        var (rTL, rTR, rBR, rBL) =
-            ((int)(cornerRadius.TopLeft * scale),
-                (int)(cornerRadius.TopRight * scale),
-                (int)(cornerRadius.BottomRight * scale),
-                (int)(cornerRadius.BottomLeft * scale));
+        scale *= 2;
+        var shortestDimension = Math.Min(size.Width, size.Height);
+        var topLeftRadius = Math.Min(cornerRadius.TopLeft * scale, shortestDimension / 2);
 
-        using var rgnTL = PInvoke.CreateRoundRectRgn_SafeHandle(0, 0, rTL * 2, rTL * 2, rTL * 2, rTL * 2);
-        using var rgnTR = PInvoke.CreateRoundRectRgn_SafeHandle(w - rTR * 2, 0, w, rTR * 2, rTR * 2, rTR * 2);
-        using var rgnBR = PInvoke.CreateRoundRectRgn_SafeHandle(w - rBR * 2, h - rBR * 2, w, h, rBR * 2, rBR * 2);
-        using var rgnBL = PInvoke.CreateRoundRectRgn_SafeHandle(0, h - rBL * 2, rBL * 2, h, rBL * 2, rBL * 2);
+        var hRgn = new DeleteObjectSafeHandle();
+        try
+        {
+            if (cornerRadius.IsUniform)
+            {
+                hRgn = CreateRoundRectRgn(new Rect(size), topLeftRadius);
+            }
+            else
+            {
+                // We need to combine HRGNs for each of the corners.
+                // Create one for each quadrant, but let it overlap into the two adjacent ones
+                // by the radius amount to ensure that there aren't corners etched into the middle
+                // of the window.
+                hRgn = CreateRoundRectRgn(new Rect(0, 0, size.Width / 2 + topLeftRadius, size.Height / 2 + topLeftRadius), topLeftRadius);
 
-        // using var rgnCenter = PInvoke.CreateRectRgn_SafeHandle(rTL, 0, w - rTR, h);
-        // using var rgnMiddle = PInvoke.CreateRectRgn_SafeHandle(0, rTL, w, h - rBL);
+                var topRightRadius = Math.Min(cornerRadius.TopRight * scale, shortestDimension / 2);
+                var topRightRegionRect = new Rect(
+                    size.Width / 2 - topRightRadius,
+                    0,
+                    size.Width / 2 + topRightRadius,
+                    size.Height / 2 + topRightRadius);
 
-        using var finalRgn = PInvoke.CreateRectRgn_SafeHandle(0, 0, 0, 0);
-        // PInvoke.CombineRgn(finalRgn, rgnCenter, rgnTL, RGN_COMBINE_MODE.RGN_OR);
-        PInvoke.CombineRgn(finalRgn, finalRgn, rgnTR, RGN_COMBINE_MODE.RGN_OR);
-        PInvoke.CombineRgn(finalRgn, finalRgn, rgnBR, RGN_COMBINE_MODE.RGN_OR);
-        PInvoke.CombineRgn(finalRgn, finalRgn, rgnBL, RGN_COMBINE_MODE.RGN_OR);
-        // PInvoke.CombineRgn(finalRgn, finalRgn, rgnMiddle, RGN_COMBINE_MODE.RGN_OR);
+                using var _0 = CreateAndCombineRoundRectRgn(hRgn, topRightRegionRect, topRightRadius);
 
-        PInvoke.SetWindowRgn((HWND)hWnd, (HRGN)finalRgn.DangerousGetHandle(), true);
+                var bottomLeftRadius = Math.Min(cornerRadius.BottomLeft * scale, shortestDimension / 2);
+                var bottomLeftRegionRect = new Rect(
+                    0,
+                    size.Height / 2 - bottomLeftRadius,
+                    size.Width / 2 + bottomLeftRadius,
+                    size.Height / 2 + bottomLeftRadius);
+
+                using var _1 = CreateAndCombineRoundRectRgn(hRgn, bottomLeftRegionRect, bottomLeftRadius);
+
+                var bottomRightRadius = Math.Min(cornerRadius.BottomRight * scale, shortestDimension / 2);
+                var bottomRightRegionRect = new Rect(
+                    size.Width / 2 - bottomRightRadius,
+                    size.Height / 2 - bottomRightRadius,
+                    size.Width / 2 + bottomRightRadius,
+                    size.Height / 2 + bottomRightRadius);
+
+                using var _2 = CreateAndCombineRoundRectRgn(hRgn, bottomRightRegionRect, bottomRightRadius);
+            }
+
+            PInvoke.SetWindowRgn((HWND)hWnd, hRgn, window.IsVisible);
+        }
+        finally
+        {
+            hRgn.Dispose();
+        }
+
+        static DeleteObjectSafeHandle CreateRoundRectRgn(Rect region, double radius)
+        {
+            return MathUtilities.AreClose(0.0, radius) ?
+                PInvoke.CreateRectRgn_SafeHandle(
+                    (int)Math.Floor(region.Left),
+                    (int)Math.Floor(region.Top),
+                    (int)Math.Ceiling(region.Right),
+                    (int)Math.Ceiling(region.Bottom)) :
+                PInvoke.CreateRoundRectRgn_SafeHandle(
+                    (int)Math.Floor(region.Left),
+                    (int)Math.Floor(region.Top),
+                    (int)Math.Ceiling(region.Right) + 1,
+                    (int)Math.Ceiling(region.Bottom) + 1,
+                    (int)Math.Ceiling(radius),
+                    (int)Math.Ceiling(radius));
+        }
+
+        static DeleteObjectSafeHandle CreateAndCombineRoundRectRgn(DeleteObjectSafeHandle hRgnSource, Rect region, double radius)
+        {
+            var hRgn = CreateRoundRectRgn(region, radius);
+            if (PInvoke.CombineRgn(hRgnSource, hRgnSource, hRgn, RGN_COMBINE_MODE.RGN_OR) == GDI_REGION_TYPE.RGN_ERROR)
+            {
+                hRgn.Dispose();
+                throw new InvalidOperationException("Unable to combine two HRGNs.");
+            }
+
+            return hRgn;
+        }
     }
 }
