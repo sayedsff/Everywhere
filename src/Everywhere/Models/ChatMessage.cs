@@ -1,7 +1,7 @@
 ﻿using Avalonia.Controls.Documents;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Everywhere.Collections;
-using IconPacks.Avalonia.Material;
+using Lucide.Avalonia;
 using Microsoft.SemanticKernel.ChatCompletion;
 
 namespace Everywhere.Models;
@@ -52,13 +52,13 @@ public class UserChatMessage(string? actualContent = null) : ChatMessage(AuthorR
 public partial class ActionChatMessage : ChatMessage
 {
     [ObservableProperty]
-    public partial PackIconMaterialKind Icon { get; set; }
+    public partial LucideIconKind Icon { get; set; }
 
     [ObservableProperty]
     public partial DynamicResourceKey? HeaderKey { get; set; }
 
     public ActionChatMessage(AuthorRole role,
-        PackIconMaterialKind icon = PackIconMaterialKind.ThoughtBubble,
+        LucideIconKind icon = LucideIconKind.Brain,
         DynamicResourceKey? headerKey = null,
         string? actualContent = null) : base(role, actualContent)
     {

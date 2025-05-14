@@ -1,6 +1,4 @@
 ﻿using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
-using SukiUI.Controls;
 
 namespace Everywhere.Views;
 
@@ -26,11 +24,11 @@ public abstract class ReactiveWindow<TViewModel> : Window where TViewModel : Rea
     }
 }
 
-public abstract class ReactiveSukiWindow<TViewModel> : SukiWindow where TViewModel : ReactiveViewModelBase
+public abstract class ReactiveShadWindow<TViewModel> : ShadUI.Controls.Window where TViewModel : ReactiveViewModelBase
 {
     public TViewModel ViewModel { get; }
 
-    protected ReactiveSukiWindow()
+    protected ReactiveShadWindow()
     {
         ViewModel = ServiceLocator.Resolve<TViewModel>();
         ViewModel.Bind(this);

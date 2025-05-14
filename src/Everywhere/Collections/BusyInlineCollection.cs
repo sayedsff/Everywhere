@@ -1,5 +1,5 @@
 ﻿using Avalonia.Controls.Documents;
-using SukiUI.Controls;
+using ShadUI.Controls;
 
 namespace Everywhere.Collections;
 

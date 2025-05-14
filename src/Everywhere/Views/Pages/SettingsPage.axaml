@@ -3,8 +3,9 @@
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:m="clr-namespace:Everywhere.Models"
-    xmlns:suki="https://github.com/kikipoulet/SukiUI"
     xmlns:vm="clr-namespace:Everywhere.ViewModels"
+    xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI"
+    xmlns:contents="clr-namespace:ShadUI.Contents;assembly=ShadUI"
     x:DataType="vm:SettingsPageViewModel">
     <ScrollViewer
         HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
@@ -14,15 +15,18 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="Expander">
-                            <suki:GlassCard>
+                            <shadui:Card>
                                 <StackPanel>
                                 <LayoutTransformControl Name="PART_ToggleTransform">
                                     <Panel>
+                                        <Panel.Styles>
+                                            <Style Selector="ToggleButton#PART_ToggleButton:checked /template/ Border#RootBorder">
+                                                <Setter Property="Background" Value="Transparent"></Setter>
+                                            </Style>
+                                        </Panel.Styles>
                                         <ToggleButton
                                             x:Name="PART_ToggleButton" Classes="Basic"
                                             DockPanel.Dock="Right" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
-                                            Background="{TemplateBinding Background}"
-                                            BorderBrush="{DynamicResource SukiBorderBrush}"
                                             BorderThickness="0" CornerRadius="8"
                                             IsEnabled="True"
                                             IsChecked="{TemplateBinding IsExpanded, Mode=TwoWay}">
@@ -31,23 +35,22 @@
                                             <ContentPresenter
                                                 Grid.Column="0" HorizontalAlignment="Left"
                                                 VerticalAlignment="Center"
-                                                Content="{TemplateBinding Header}"
-                                                FontWeight="{DynamicResource DefaultDemiBold}"/>
+                                                Content="{TemplateBinding Header}"/>
                                             <PathIcon
                                                 IsHitTestVisible="False"
                                                 x:Name="PART_Icon" Grid.Column="1"
                                                 Width="20" Height="20"
                                                 Margin="20, 0"
                                                 HorizontalAlignment="Left"
-                                                Data="{x:Static suki:Icons.ChevronDown}"/>
+                                                Data="{x:Static contents:Icons.ChevronDown}"/>
                                         </Grid>
                                     </Panel>
                                 </LayoutTransformControl>
 
                                 <ContentControl
                                     IsVisible="{Binding ElementName=PART_ToggleButton, Path=IsChecked}"
-                                    x:Name="ContentExpandControlContainer" Padding="32,0">
-                                    <suki:ContentExpandControl
+                                    x:Name="ContentExpandControlContainer" Padding="0, 8, 0, 0">
+                                    <shadui:ContentExpandControl
                                         x:Name="PART_ContentExpand"
                                         HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                                         VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
@@ -55,14 +58,14 @@
                                         ContentTemplate="{TemplateBinding ContentTemplate}"/>
                                 </ContentControl>
                             </StackPanel>
-                            </suki:GlassCard>
+                            </shadui:Card>
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>
             </Style>
 
             <Style Selector="Expander.SettingsItemContainer:down">
-                <Style Selector="^ /template/ suki|ContentExpandControl#PART_ContentExpand">
+                <Style Selector="^ /template/ ContentPresenter#PART_ContentExpand">
                     <Setter Property="Margin" Value="0, 12" />
                 </Style>
             </Style>
@@ -80,16 +83,6 @@
                 </Style>
             </Style>
 
-            <Style Selector="Expander.SettingsItemContainer:pointerover">
-                <Setter Property="Background">
-                    <Setter.Value>
-                        <SolidColorBrush
-                            Opacity="0.2"
-                            Color="{DynamicResource SukiGlassCardBackground}"/>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-
             <Style Selector="ItemsControl.SettingsItemItemsControl">
                 <Setter Property="ItemTemplate">
                     <DataTemplate DataType="m:SettingsItemBase">
@@ -97,17 +90,17 @@
                             Classes="SettingsItemContainer"
                             Classes.NotExpandable="{Binding !Items.Count}"
                             CornerRadius="4"
+                            Background="Transparent"
                             IsEnabled="{Binding IsEnabledProxy.Value, FallbackValue=True}">
                             <Expander.Header>
-                                <StackPanel Margin="8">
+                                <StackPanel>
                                     <TextBlock
-                                        FontSize="16"
+                                        Classes="Large"
                                         Text="{Binding HeaderKey^}"
                                         TextWrapping="WrapWithOverflow"/>
                                     <TextBlock
                                         Margin="0,8"
-                                        FontWeight="Regular"
-                                        Foreground="{DynamicResource SukiLowText}"
+                                        Classes="Small"
                                         Text="{Binding DescriptionKey^}"
                                         TextWrapping="WrapWithOverflow"/>
                                     <ContentPresenter Content="{Binding}">
@@ -193,23 +186,18 @@
             Padding="64, 32" ItemsSource="{Binding Groups}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate DataType="m:SettingsItemGroup">
-                    <StackPanel Margin="0,16">
+                    <StackPanel Margin="0,16" Spacing="16">
                         <TextBlock
-                            FontSize="24" FontWeight="Heavy"
+                            Classes="h3"
                             Text="{Binding HeaderKey^}"
                             TextWrapping="WrapWithOverflow"/>
-
-                        <Border
-                            Height="1" Margin="0,8"
-                            Background="{DynamicResource SukiControlBorderBrush}"
-                            BorderThickness="0"/>
 
                         <ItemsControl
                             Classes="SettingsItemItemsControl" HorizontalAlignment="Stretch"
                             ItemsSource="{Binding Items}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
-                                    <StackPanel Spacing="10"/>
+                                    <StackPanel Spacing="8"/>
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
                         </ItemsControl> 

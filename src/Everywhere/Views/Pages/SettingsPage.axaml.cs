@@ -1,4 +1,4 @@
-﻿using IconPacks.Avalonia.Material;
+﻿using Lucide.Avalonia;
 
 namespace Everywhere.Views.Pages;
 
@@ -6,7 +6,7 @@ public partial class SettingsPage : ReactiveUserControl<SettingsPageViewModel>, 
 {
     public string Title => "SettingsPage_Title";
 
-    public PackIconMaterialKind Icon => PackIconMaterialKind.Cog;
+    public LucideIconKind Icon => LucideIconKind.Cog;
 
     public SettingsPage()
     {

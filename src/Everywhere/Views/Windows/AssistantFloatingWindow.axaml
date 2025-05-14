@@ -1,9 +1,11 @@
 ﻿<v:ReactiveWindow
     x:Class="Everywhere.Views.AssistantFloatingWindow" xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ip="https://github.com/MahApps/IconPacks.Avalonia"
-    xmlns:m="clr-namespace:Everywhere.Models" xmlns:suki="https://github.com/kikipoulet/SukiUI"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:m="clr-namespace:Everywhere.Models"
     xmlns:system="clr-namespace:System;assembly=System.Runtime" xmlns:v="clr-namespace:Everywhere.Views"
     xmlns:vc="clr-namespace:Everywhere.ValueConverters" xmlns:vm="clr-namespace:Everywhere.ViewModels"
+    xmlns:contents="clr-namespace:ShadUI.Contents;assembly=ShadUI"
+    xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI"
     x:DataType="vm:AssistantFloatingWindowViewModel" x:TypeArguments="vm:AssistantFloatingWindowViewModel"
     Background="Transparent" CanResize="False"
     IsOpened="{Binding TargetElement, Converter={x:Static ObjectConverters.IsNotNull}}"
@@ -107,7 +109,7 @@
                 <PathIcon
                     Width="12" Height="12"
                     HorizontalAlignment="Center" VerticalAlignment="Center"
-                    Data="{x:Static suki:Icons.WindowClose}"/>
+                    Data="{x:Static contents:Icons.WindowClose}"/>
             </Button>
 
             <TextBlock
@@ -131,7 +133,7 @@
             <PathIcon
                 Width="9" Height="9"
                 HorizontalAlignment="Center" VerticalAlignment="Center"
-                Data="{x:Static suki:Icons.WindowClose}"/>
+                Data="{x:Static contents:Icons.WindowClose}"/>
         </Button>
 
         <Border
@@ -145,7 +147,7 @@
             Grid.Row="1" Grid.Column="0"
             IsVisible="{Binding IsExpanded}">
             <Panel.Styles>
-                <Style Selector="suki|Loading">
+                <Style Selector="shadui|Loading">
                     <Setter Property="Foreground" Value="{DynamicResource SukiLowText}"/>
                 </Style>
             </Panel.Styles>
@@ -167,17 +169,17 @@
                                         <ControlTemplate TargetType="v:DynamicKeyMenuItem">
                                             <Button
                                                 Height="36"
+                                                Padding="8, 2"
                                                 Background="{DynamicResource AcrylicBackgroundBrush}"
                                                 BorderBrush="{DynamicResource AcrylicLowBorderBrush}"
                                                 BorderThickness="1.6"
                                                 Command="{TemplateBinding Command}"
                                                 CommandParameter="{TemplateBinding CommandParameter}"
-                                                CornerRadius="18" FontSize="16"
-                                                Foreground="{DynamicResource SukiText}">
+                                                CornerRadius="18" FontSize="16">
                                                 <StackPanel
                                                     Orientation="Horizontal" Spacing="6">
-                                                    <ip:PackIconMaterial Kind="{TemplateBinding Icon}"/>
-                                                    <ContentPresenter Content="{Binding HeaderKey^, RelativeSource={RelativeSource TemplatedParent}}"/>
+                                                    <LucideIcon Kind="{TemplateBinding Icon}" Size="18" />
+                                                    <TextBlock Classes="Small" Text="{Binding HeaderKey^, RelativeSource={RelativeSource TemplatedParent}}"/>
                                                 </StackPanel>
                                             </Button>
                                         </ControlTemplate>
@@ -213,10 +215,8 @@
                                     <Setter Property="Opacity" Value="0"/>
                                 </Style>
 
-                                <Style Selector="Button ip|PackIconMaterial">
-                                    <Setter Property="Foreground" Value="{DynamicResource SukiText}"/>
-                                    <Setter Property="Width" Value="12"/>
-                                    <Setter Property="Height" Value="12"/>
+                                <Style Selector="Button LucideIcon">
+                                    <Setter Property="Size" Value="12"/>
                                 </Style>
 
                                 <Style Selector="SelectableTextBlock">
@@ -231,9 +231,9 @@
                                         HorizontalAlignment="Left" Background="Transparent"
                                         Classes="ChatMessage Assistant" Orientation="Vertical"
                                         Spacing="4">
-                                        <suki:GlassCard>
+                                        <shadui:Card>
                                             <SelectableTextBlock Inlines="{Binding InlineCollection}"/>
-                                        </suki:GlassCard>
+                                        </shadui:Card>
 
                                         <StackPanel
                                             x:Name="ChatMessageOperationPanel" HorizontalAlignment="Right"
@@ -243,14 +243,14 @@
                                                 Command="{Binding $parent[v:AssistantFloatingWindow].ViewModel.RetryCommand}"
                                                 CommandParameter="{Binding}"
                                                 ToolTip.Tip="{DynamicResource AssistantFloatingWindow_ChatMessage_Assistant_Regenerate}">
-                                                <ip:PackIconMaterial Kind="Refresh"/>
+                                                <LucideIcon Kind="RefreshCcw"/>
                                             </Button>
                                             <Button
                                                 Padding="4" Classes="Basic"
                                                 Command="{Binding $parent[v:AssistantFloatingWindow].ViewModel.CopyCommand}"
                                                 CommandParameter="{Binding}"
                                                 ToolTip.Tip="{DynamicResource AssistantFloatingWindow_ChatMessage_Assistant_Copy}">
-                                                <ip:PackIconMaterial Kind="ContentCopy"/>
+                                                <LucideIcon Kind="ClipboardCopy"/>
                                             </Button>
                                         </StackPanel>
                                     </StackPanel>
@@ -261,25 +261,25 @@
                                         HorizontalAlignment="Right" Background="Transparent"
                                         Classes="ChatMessage User" Orientation="Vertical"
                                         Spacing="4">
-                                        <suki:GlassCard>
+                                        <shadui:Card>
                                             <SelectableTextBlock Inlines="{Binding InlineCollection}"/>
-                                        </suki:GlassCard>
+                                        </shadui:Card>
 
                                         <!--  TODO: Edit operations  -->
                                     </StackPanel>
                                 </DataTemplate>
 
                                 <DataTemplate DataType="m:ActionChatMessage">
-                                    <suki:GlassCard
+                                    <shadui:Card
                                         HorizontalAlignment="Left" Classes="ChatMessage Action">
                                         <Expander
                                             Background="Transparent" BorderThickness="0">
                                             <Expander.Header>
                                                 <StackPanel
                                                     Orientation="Horizontal" Spacing="4">
-                                                    <ip:PackIconMaterial Kind="{Binding Icon}"/>
+                                                    <LucideIcon Kind="{Binding Icon}"/>
                                                     <SelectableTextBlock Text="{Binding HeaderKey^, FallbackValue={x:Null}}"/>
-                                                    <suki:Loading
+                                                    <shadui:Loading
                                                         Width="15" Height="15"
                                                         IsHitTestVisible="False"
                                                         IsVisible="{Binding IsBusy}"/>
@@ -288,7 +288,7 @@
 
                                             <SelectableTextBlock Inlines="{Binding InlineCollection}"/>
                                         </Expander>
-                                    </suki:GlassCard>
+                                    </shadui:Card>
                                 </DataTemplate>
                             </ItemsControl.DataTemplates>
                         </ItemsControl>
