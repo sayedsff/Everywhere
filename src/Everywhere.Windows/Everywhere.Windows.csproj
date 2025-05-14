@@ -22,6 +22,7 @@
         <PackageReference Include="Microsoft.Windows.CsWin32"/>
         <PackageReference Include="FlaUI.UIA3"/>
         <PackageReference Include="Vortice.Direct3D11" />
+        <PackageReference Include="Vortice.DirectComposition" />
     </ItemGroup>
 
     <ItemGroup>

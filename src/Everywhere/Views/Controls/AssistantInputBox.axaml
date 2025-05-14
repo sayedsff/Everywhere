@@ -1,8 +1,6 @@
 ﻿<Styles
-    xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:ip="https://github.com/MahApps/IconPacks.Avalonia"
-    xmlns:v="clr-namespace:Everywhere.Views">
+    xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ip="https://github.com/MahApps/IconPacks.Avalonia" xmlns:v="clr-namespace:Everywhere.Views">
     <Design.PreviewWith>
         <v:AssistantInputBox/>
     </Design.PreviewWith>
@@ -14,18 +12,23 @@
         <Setter Property="Foreground" Value="{DynamicResource SukiText}"/>
         <Setter Property="Padding" Value="6"/>
 
+        <Style Selector="^ ToggleButton">
+            <Setter Property="BorderBrush" Value="{DynamicResource AcrylicLowBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+
         <Setter Property="Template">
             <ControlTemplate>
                 <Border
-                    BorderBrush="{TemplateBinding BorderBrush}"
-                    BorderThickness="1.5" CornerRadius="20">
+                    BorderBrush="{DynamicResource AcrylicLowBorderBrush}"
+                    BorderThickness="1.6" CornerRadius="20">
                     <ExperimentalAcrylicBorder
                         Padding="{TemplateBinding Padding}"
-                        CornerRadius="19.25">
+                        CornerRadius="19.2">
                         <ExperimentalAcrylicBorder.Material>
                             <ExperimentalAcrylicMaterial
-                                MaterialOpacity="0.05" TintColor="White"
-                                TintOpacity="0.05"/>
+                                MaterialOpacity="0.1" TintColor="Black"
+                                TintOpacity="0.2"/>
                         </ExperimentalAcrylicBorder.Material>
 
                         <Grid
@@ -209,9 +212,9 @@
                                 Margin="8,0,0,0" Orientation="Horizontal"
                                 Spacing="4">
                                 <Button
-                                    x:Name="PART_SendButton" Classes="Flat"
-                                    Width="30" Height="30"
-                                    Padding="0" CornerRadius="15"
+                                    x:Name="PART_SendButton" Width="30"
+                                    Height="30" Padding="0"
+                                    Classes="Flat" CornerRadius="15"
                                     ToolTip.Tip="{DynamicResource AssistantInputBox_SendButton_ToolTip}">
                                     <Button.IsEnabled>
                                         <MultiBinding Converter="{x:Static BoolConverters.And}">

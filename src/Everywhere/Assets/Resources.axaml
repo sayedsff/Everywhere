@@ -1,6 +1,5 @@
 ﻿<ResourceDictionary
-    xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <LinearGradientBrush x:Key="AssistantBackgroundBrush" SpreadMethod="Pad" StartPoint="0%,0%" EndPoint="100%,100%">
         <GradientStop Offset="0" Color="#FFAC45F1"/>
         <GradientStop Offset="0.1" Color="#FFA64BF1"/>
@@ -14,6 +13,25 @@
         <GradientStop Offset="0" Color="#FF8134b5"/>
         <GradientStop Offset="1" Color="#FF2f99bf"/>
     </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="AcrylicBorderBrush" SpreadMethod="Pad" StartPoint="45.5%,0%" EndPoint="46%,60%">
+        <GradientStop Offset="0" Color="#5DFFFFFF"/>
+        <GradientStop Offset="1" Color="#1DFFFFFF"/>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="AcrylicLowBorderBrush" SpreadMethod="Pad" StartPoint="45.5%,0%" EndPoint="46%,60%">
+        <GradientStop Offset="0" Color="#3DFFFFFF"/>
+        <GradientStop Offset="1" Color="#0FFFFFFF"/>
+    </LinearGradientBrush>
+
+    <SolidColorBrush
+        x:Key="AcrylicSolidBorderBrush" Color="#5DFFFFFF"/>
+
+    <SolidColorBrush
+        x:Key="AcrylicLowSolidBorderBrush" Color="#3DFFFFFF"/>
+
+    <SolidColorBrush
+        x:Key="AcrylicBackgroundBrush" Color="#0FFFFFFF"/>
 
     <Panel x:Key="AssistantAvatar">
         <Panel.Styles>
@@ -87,9 +105,9 @@
         </Image>
 
         <Image
-            Classes="Eyes" Width="18"
-            Height="18" Margin="0,0,0,1"
-            HorizontalAlignment="Center" VerticalAlignment="Center"
+            Width="18" Height="18"
+            Margin="0,0,0,1" HorizontalAlignment="Center"
+            VerticalAlignment="Center" Classes="Eyes"
             Focusable="False">
             <Image.RenderTransform>
                 <ScaleTransform/>
@@ -99,8 +117,7 @@
                 <DrawingImage>
                     <DrawingImage.Drawing>
                         <GeometryDrawing
-                            Brush="#FF000000"
-                            Geometry="F1 M612,440C612,471 624,496 651,496 678,496 689,471 689,440 689,409 677,384 651,384 625,384 612,409 612,440z M430,440C430,471 418,496 391,496 364,496 353,471 353,440 353,409 365,384 391,384 417,384 430,409 430,440z"/>
+                            Brush="#FF000000" Geometry="F1 M612,440C612,471 624,496 651,496 678,496 689,471 689,440 689,409 677,384 651,384 625,384 612,409 612,440z M430,440C430,471 418,496 391,496 364,496 353,471 353,440 353,409 365,384 391,384 417,384 430,409 430,440z"/>
                     </DrawingImage.Drawing>
                 </DrawingImage>
             </Image.Source>

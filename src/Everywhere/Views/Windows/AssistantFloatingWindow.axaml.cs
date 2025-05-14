@@ -2,8 +2,6 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Rendering.Composition;
-using SukiUI.Helpers;
 
 namespace Everywhere.Views;
 
@@ -45,7 +43,7 @@ public partial class AssistantFloatingWindow : ReactiveWindow<AssistantFloatingW
         this.windowHelper = windowHelper;
 
         InitializeComponent();
-        windowHelper.SetWindowNoFocus(this);
+        // windowHelper.SetWindowNoFocus(this);
 
         BackgroundBorder.PropertyChanged += HandleBackgroundBorderPropertyChanged;
     }
@@ -66,7 +64,7 @@ public partial class AssistantFloatingWindow : ReactiveWindow<AssistantFloatingW
         Topmost = false;
         Topmost = true;
 
-        ElementComposition.GetElementVisual(this).MakeSizeAnimated(easing: Easing);
+        // ElementComposition.GetElementVisual(this).MakeSizeAnimated(easing: Easing);
     }
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)

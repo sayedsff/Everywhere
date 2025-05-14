@@ -34,7 +34,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
     public partial PixelRect TargetBoundingRect { get; private set; }
 
     [ObservableProperty]
-    public partial string? Title { get; private set; }
+    public partial DynamicResourceKey? Title { get; private set; }
 
     [ObservableProperty]
     public partial List<DynamicKeyMenuItem> Actions { get; private set; } = [];
@@ -62,23 +62,32 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
 
         textEditActions =
         [
-            // new DynamicKeyMenuItem
-            // {
-            //     Icon = MakeIcon(PackIconMaterialKind.Translate),
-            //     Header = "AssistantFloatingWindowViewModel_Translate",
-            //     Command = GenerateAndReplaceCommand,
-            //     CommandParameter =
-            //         "Translate the content of XML node with id=\"{ElementId}\" between **{SystemLanguage}** and **English**" // todo
-            // },
-            // new DynamicKeyMenuItem
-            // {
-            //     Icon = MakeIcon(PackIconMaterialKind.FastForward),
-            //     Header = "AssistantFloatingWindowViewModel_ContinueWriting",
-            //     Command = GenerateAndAppendCommand,
-            //     CommandParameter =
-            //         "The user has already written a beginning as the content of XML node with id=\"{ElementId}\". " +
-            //         "You should try to imitate the user's writing style and tone, and continue writing in the user's perspective"
-            // },
+            new DynamicKeyMenuItem
+            {
+                Icon = PackIconMaterialKind.Translate,
+                Header = "AssistantFloatingWindowViewModel_Translate",
+                // Command = GenerateAndReplaceCommand,
+                // CommandParameter =
+                //     "Translate the content of XML node with id=\"{ElementId}\" between **{SystemLanguage}** and **English**" // todo
+            },
+            new DynamicKeyMenuItem
+            {
+                Icon = PackIconMaterialKind.FastForward,
+                Header = "AssistantFloatingWindowViewModel_ContinueWriting",
+                // Command = GenerateAndAppendCommand,
+                // CommandParameter =
+                //     "The user has already written a beginning as the content of XML node with id=\"{ElementId}\". " +
+                //     "You should try to imitate the user's writing style and tone, and continue writing in the user's perspective"
+            },
+            new DynamicKeyMenuItem
+            {
+                Icon = PackIconMaterialKind.MessageTextClock,
+                Header = "AssistantFloatingWindowViewModel_Summarize",
+                // Command = GenerateAndAppendCommand,
+                // CommandParameter =
+                //     "The user has already written a beginning as the content of XML node with id=\"{ElementId}\". " +
+                //     "You should try to imitate the user's writing style and tone, and continue writing in the user's perspective"
+            },
             // new DynamicKeyMenuItem
             // {
             //     Header = "Change Tone to",
@@ -172,10 +181,11 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
                     return;
                 }
 
-                using (var process = Process.GetProcessById(targetElement.ProcessId))
-                {
-                    Title = Path.GetFileNameWithoutExtension(process.ProcessName);
-                }
+                // using (var process = Process.GetProcessById(targetElement.ProcessId))
+                // {
+                //     Title = Path.GetFileNameWithoutExtension(process.ProcessName);
+                // }
+                Title = "AssistantFloatingWindow_Title_NoonGreeting";
 
                 TargetBoundingRect = targetElement.BoundingRectangle;
                 TargetElement = targetElement;

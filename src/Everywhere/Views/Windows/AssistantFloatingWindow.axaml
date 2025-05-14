@@ -8,7 +8,7 @@
     Background="Transparent" CanResize="False"
     IsOpened="{Binding TargetElement, Converter={x:Static ObjectConverters.IsNotNull}}"
     ShowActivated="False" ShowInTaskbar="False"
-    SizeToContent="WidthAndHeight" SystemDecorations="BorderOnly"
+    SizeToContent="WidthAndHeight" SystemDecorations="None"
     TargetBoundingRect="{Binding TargetBoundingRect}"
     Topmost="True" TransparencyLevelHint="AcrylicBlur"
     WindowStartupLocation="Manual">
@@ -37,9 +37,9 @@
         <Border
             x:Name="BackgroundBorder" Grid.Row="0"
             Grid.RowSpan="2" Grid.Column="0"
-            Background="{DynamicResource AssistantBackgroundBrush}"
-            Classes.IsExpanded="{Binding IsExpanded}"
-            Opacity="0">
+            BorderBrush="{DynamicResource AcrylicBorderBrush}"
+            BorderThickness="2"
+            Classes.IsExpanded="{Binding IsExpanded}">
             <Border.CornerRadius>
                 <MultiBinding Converter="{StaticResource PlacementToCornerRadiusConverter}">
                     <Binding>
@@ -70,6 +70,17 @@
             </Border.Transitions>
         </Border>
 
+        <ExperimentalAcrylicBorder
+            Grid.Row="0" Grid.RowSpan="2"
+            Grid.Column="0"
+            CornerRadius="{Binding CornerRadius, ElementName=BackgroundBorder}">
+            <ExperimentalAcrylicBorder.Material>
+                <ExperimentalAcrylicMaterial
+                    MaterialOpacity="0.4" TintColor="Black"
+                    TintOpacity="0.8"/>
+            </ExperimentalAcrylicBorder.Material>
+        </ExperimentalAcrylicBorder>
+
         <DockPanel
             Grid.Row="0" Grid.Column="0"
             Margin="8" Background="Transparent"
@@ -79,11 +90,6 @@
                 Background="{x:Null}"
                 BorderThickness="0" Focusable="False"
                 IsChecked="{Binding IsExpanded, Mode=TwoWay}">
-                <ToggleButton.Effect>
-                    <DropShadowEffect
-                        BlurRadius="9" Opacity="0.3"/>
-                </ToggleButton.Effect>
-
                 <Viewbox
                     Width="36" Height="36">
                     <ContentPresenter Content="{StaticResource AssistantAvatar}"/>
@@ -110,7 +116,7 @@
                 Foreground="{DynamicResource SukiText}"
                 IsHitTestVisible="False"
                 IsVisible="{Binding IsExpanded}"
-                Text="{Binding Title}"/>
+                Text="{Binding Title^, FallbackValue={x:Null}}"/>
         </DockPanel>
 
         <Button
@@ -130,9 +136,9 @@
 
         <Border
             Grid.Row="0" Grid.Column="0"
-            Height="1" Margin="0,-4,0,4"
+            Height="1" Margin="2,-4,2,4"
             VerticalAlignment="Bottom"
-            Background="{DynamicResource SukiBorderBrush}"
+            Background="{DynamicResource AcrylicLowSolidBorderBrush}"
             IsVisible="{Binding IsExpanded}"/>
 
         <Panel
@@ -160,13 +166,17 @@
                                     <Setter Property="Template">
                                         <ControlTemplate TargetType="v:DynamicKeyMenuItem">
                                             <Button
-                                                Height="32"
+                                                Height="36"
+                                                Background="{DynamicResource AcrylicBackgroundBrush}"
+                                                BorderBrush="{DynamicResource AcrylicLowBorderBrush}"
+                                                BorderThickness="1.6"
                                                 Command="{TemplateBinding Command}"
                                                 CommandParameter="{TemplateBinding CommandParameter}"
-                                                CornerRadius="16">
+                                                CornerRadius="18" FontSize="16"
+                                                Foreground="{DynamicResource SukiText}">
                                                 <StackPanel
-                                                    Orientation="Horizontal" Spacing="4">
-                                                    <ContentPresenter Content="{TemplateBinding Icon}"/>
+                                                    Orientation="Horizontal" Spacing="6">
+                                                    <ip:PackIconMaterial Kind="{TemplateBinding Icon}"/>
                                                     <ContentPresenter Content="{Binding HeaderKey^, RelativeSource={RelativeSource TemplatedParent}}"/>
                                                 </StackPanel>
                                             </Button>
@@ -178,7 +188,8 @@
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <WrapPanel
-                                        ItemSpacing="4" LineSpacing="4"/>
+                                        HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        ItemSpacing="8" LineSpacing="6"/>
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
                         </ItemsControl>

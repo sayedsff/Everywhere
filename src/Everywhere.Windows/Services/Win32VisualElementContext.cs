@@ -1,14 +1,16 @@
-﻿using System.Drawing;
-using System.Drawing.Imaging;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 using Windows.Graphics.Capture;
 using Windows.Graphics.DirectX;
 using Windows.Graphics.DirectX.Direct3D11;
 using Windows.Win32;
 using Windows.Win32.Foundation;
+using Windows.Win32.Graphics.Dwm;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
+using Windows.Win32.UI.WindowsAndMessaging;
 using Avalonia;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform;
 using Everywhere.Enums;
 using Everywhere.Extensions;
 using Everywhere.Interfaces;
@@ -20,6 +22,7 @@ using FlaUI.Core.Tools;
 using FlaUI.UIA3;
 using Vortice.Direct3D;
 using Vortice.Direct3D11;
+using Vortice.DirectComposition;
 using Vortice.DXGI;
 using WinRT;
 
@@ -27,13 +30,13 @@ namespace Everywhere.Windows.Services;
 
 public class Win32VisualElementContext : IVisualElementContext
 {
-    private const string PipeName = "everywhere_text_service";
+    // private const string PipeName = "everywhere_text_service";
 
     private static readonly UIA3Automation Automation = new();
     private static readonly ITreeWalker TreeWalker = Automation.TreeWalkerFactory.GetRawViewWalker();
     // private static readonly TextServiceImpl TextService = new();
     private static readonly int CurrentProcessId = (int)PInvoke.GetCurrentProcessId();
-    // private static readonly Lazy<DwmScreenCaptureHelper> DwmScreenCaptureHelper = new();
+    private static readonly Lazy<DwmScreenCaptureHelper> DwmScreenCaptureHelper = new();
     private static readonly Lazy<Direct3D11ScreenCaptureHelper> Direct3D11ScreenCaptureHelper = new();
 
     public event IVisualElementContext.KeyboardFocusedElementChangedHandler? KeyboardFocusedElementChanged;
@@ -352,16 +355,14 @@ public class Win32VisualElementContext : IVisualElementContext
             if (!TryGetWindow(element, out var hWnd))
                 throw new InvalidOperationException("Cannot capture an element without a valid window handle.");
 
-            return Direct3D11ScreenCaptureHelper.Value.CaptureAsync(hWnd);
-
-            // try
-            // {
-            //     return Task.FromResult(DwmScreenCaptureHelper.Value.Capture(hWnd));
-            // }
-            // catch
-            // {
-            //     return Direct3D11ScreenCaptureHelper.Value.CaptureAsync(hWnd);
-            // }
+            try
+            {
+                return Task.FromResult(DwmScreenCaptureHelper.Value.Capture(hWnd));
+            }
+            catch
+            {
+                return Direct3D11ScreenCaptureHelper.Value.CaptureAsync(hWnd);
+            }
         }
 
         #region Events
@@ -652,85 +653,163 @@ public class Win32VisualElementContext : IVisualElementContext
     // }
 }
 
-// internal unsafe class DwmScreenCaptureHelper : IDisposable
-// {
-//     private readonly HWND hostWnd;
+internal unsafe class DwmScreenCaptureHelper : IDisposable
+{
+    private readonly HWND hostWnd;
+
+    public DwmScreenCaptureHelper()
+    {
+        hostWnd = PInvoke.CreateWindowEx(
+            WINDOW_EX_STYLE.WS_EX_TOOLWINDOW | WINDOW_EX_STYLE.WS_EX_NOACTIVATE |
+            WINDOW_EX_STYLE.WS_EX_LAYERED | WINDOW_EX_STYLE.WS_EX_TRANSPARENT,
+            "STATIC",
+            string.Empty,
+            WINDOW_STYLE.WS_POPUP | WINDOW_STYLE.WS_VISIBLE,
+            0,
+            0,
+            0,
+            0,
+            HWND.Null,
+            null,
+            null,
+            null);
+        PInvoke.SetLayeredWindowAttributes(hostWnd, new COLORREF(0), 0, LAYERED_WINDOW_ATTRIBUTES_FLAGS.LWA_ALPHA);
+    }
+
+    ~DwmScreenCaptureHelper()
+    {
+        if (!hostWnd.IsNull) PInvoke.DestroyWindow(hostWnd);
+    }
+
+    // https://blog.adeltax.com/dwm-thumbnails-but-with-idcompositionvisual/
+    // https://gist.github.com/ADeltaX/aea6aac248604d0cb7d423a61b06e247
+    public Bitmap Capture(nint hWnd)
+    {
+        DwmpQueryWindowThumbnailSourceSize((HWND)hWnd, false, out var srcSize).ThrowOnFailure();
+        if (srcSize.Width == 0 || srcSize.Height == 0)
+            throw new InvalidOperationException("Failed to query thumbnail source size.");
+
+        using var device = D3D11.D3D11CreateDevice(DriverType.Hardware, DeviceCreationFlags.BgraSupport);
+        using var dxgiDevice = device.QueryInterface<IDXGIDevice>();
+        var iid = typeof(IDCompositionDesktopDevice).GUID;
+        DCompositionCreateDevice3(
+            dxgiDevice.NativePointer,
+            ref iid,
+            out var pDCompositionDesktopDevice).ThrowOnFailure();
+        using var dCompositionDesktopDevice = new IDCompositionDesktopDevice(pDCompositionDesktopDevice);
+
+        var thumbProperties = new DWM_THUMBNAIL_PROPERTIES
+        {
+            dwFlags = 0x00000001 | 0x00000002 | 0x00000004 | 0x00000008 | 0x00000010,
+            fVisible = true,
+            fSourceClientAreaOnly = false,
+            opacity = 255,
+            rcDestination = new RECT(0, 0, srcSize.Width, srcSize.Height),
+            rcSource = new RECT(0, 0, srcSize.Width, srcSize.Height),
+        };
+        DwmpCreateSharedThumbnailVisual(
+            hostWnd,
+            (HWND)hWnd,
+            2,
+            ref thumbProperties,
+            pDCompositionDesktopDevice,
+            out var pDCompositionVisual,
+            out var thumb).ThrowOnFailure();
+        using var dCompositionVisual = new IDCompositionVisual2(pDCompositionVisual);
+
+        // using var dxgiAdapter = dxgiDevice.GetAdapter();
+        // using var dxgiFactory = dxgiAdapter.GetParent<IDXGIFactory2>();
+        // using var swapChain = dxgiFactory.CreateSwapChainForComposition(
+        //     device,
+        //     new SwapChainDescription1
+        //     {
+        //         Width = (uint)srcSize.Width,
+        //         Height = (uint)srcSize.Height,
+        //         Format = Format.B8G8R8A8_UNorm,
+        //         Stereo = false,
+        //         SampleDescription = new SampleDescription(1, 0),
+        //         BufferUsage = Usage.RenderTargetOutput,
+        //         BufferCount = 1,
+        //         Scaling = Scaling.Stretch,
+        //         SwapEffect = SwapEffect.Discard,
+        //         AlphaMode = AlphaMode.Premultiplied,
+        //         Flags = SwapChainFlags.None
+        //     });
+        // using var buffer = swapChain.GetBuffer<ID3D11Texture2D>(0);
+        // using var resource = new IDXGIResource(buffer.NativePointer);
+        //
+        // using var dCompositionSurface = dCompositionDesktopDevice.CreateSurfaceFromHandle(resource.SharedHandle);
+
+        dCompositionDesktopDevice.CreateTargetForHwnd(
+            hostWnd,
+            false,
+            out var dCompositionTarget).CheckError();
+        dCompositionTarget.SetRoot(dCompositionVisual).CheckError();
+
+        // using var dCompositionSurface = dCompositionDesktopDevice.CreateSurface(
+        //     (uint)srcSize.Width,
+        //     (uint)srcSize.Height,
+        //     Format.B8G8R8A8_UNorm,
+        //     AlphaMode.Premultiplied);
+        // dCompositionVisual.SetContent(dCompositionSurface).CheckError(); // <- ERROR
+
+        dCompositionDesktopDevice.Commit().CheckError();
+        dCompositionDesktopDevice.WaitForCommitCompletion().CheckError();
+
+        // dCompositionSurface.BeginDraw<IDXGISurface>(null, out var dxgiSurface, out _).CheckError();
+        // if (dxgiSurface == null) throw new InvalidOperationException("Failed to begin draw.");
 //
-//     public DwmScreenCaptureHelper()
-//     {
-//         hostWnd = PInvoke.CreateWindowEx(
-//             WINDOW_EX_STYLE.WS_EX_TOOLWINDOW | WINDOW_EX_STYLE.WS_EX_NOACTIVATE |
-//             WINDOW_EX_STYLE.WS_EX_LAYERED | WINDOW_EX_STYLE.WS_EX_TRANSPARENT,
-//             "STATIC",
-//             string.Empty,
-//             WINDOW_STYLE.WS_POPUP | WINDOW_STYLE.WS_VISIBLE,
-//             0,
-//             0,
-//             0,
-//             0,
-//             HWND.Null,
-//             null,
-//             null,
-//             null);
-//         PInvoke.SetLayeredWindowAttributes(hostWnd, new COLORREF(0), 0, LAYERED_WINDOW_ATTRIBUTES_FLAGS.LWA_ALPHA);
-//     }
-//
-//     ~DwmScreenCaptureHelper()
-//     {
-//         if (!hostWnd.IsNull) PInvoke.DestroyWindow(hostWnd);
-//     }
-//
-//     public Bitmap Capture(nint hWnd)
-//     {
-//         PInvoke.GetWindowRect((HWND)hWnd, out var rect);
-//         if (rect.Width <= 0 || rect.Height <= 0)
-//             throw new InvalidOperationException("Cannot capture a window with zero width or height.");
-//
-//         PInvoke.DwmRegisterThumbnail(hostWnd, (HWND)hWnd, out var thumb).ThrowOnFailure();
-//         PInvoke.DwmQueryThumbnailSourceSize(thumb, out var srcSize);
-//         if (srcSize.Width == 0 || srcSize.Height == 0)
-//             throw new InvalidOperationException("Failed to query thumbnail source size.");
-//
-//         PInvoke.SetWindowPos(
-//             hostWnd,
-//             HWND.Null,
-//             0,
-//             0,
-//             srcSize.Width,
-//             srcSize.Height,
-//             SET_WINDOW_POS_FLAGS.SWP_NOZORDER | SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE);
-//         PInvoke.ShowWindow(hostWnd, SHOW_WINDOW_CMD.SW_SHOW);
-//
-//         PInvoke.DwmUpdateThumbnailProperties(
-//             thumb,
-//             new DWM_THUMBNAIL_PROPERTIES
-//             {
-//                 dwFlags = 0x00000001 | 0x00000008 | 0x00000010,
-//                 rcDestination = new RECT(0, 0, srcSize.Width, srcSize.Height),
-//                 fVisible = true,
-//                 fSourceClientAreaOnly = false,
-//             }).ThrowOnFailure();
-//
-//         var bitmap = new Bitmap(srcSize.Width, srcSize.Height, PixelFormat.Format32bppArgb);
-//         using var graphics = Graphics.FromImage(bitmap);
-//         var hdcDest = graphics.GetHdc();
-//         var hdcSrc = PInvoke.GetDC(hostWnd);
-//         PInvoke.BitBlt((HDC)hdcDest, 0, 0, srcSize.Width, srcSize.Height, hdcSrc, 0, 0, ROP_CODE.SRCCOPY);
-//         _ = PInvoke.ReleaseDC(hostWnd, hdcSrc);
-//         graphics.ReleaseHdc(hdcDest);
-//
-//         PInvoke.DwmUnregisterThumbnail(thumb);
-//         PInvoke.ShowWindow(hostWnd, SHOW_WINDOW_CMD.SW_HIDE);
-//
-//         return bitmap;
-//     }
-//
-//     public void Dispose()
-//     {
-//         if (!hostWnd.IsNull) PInvoke.DestroyWindow(hostWnd);
-//         GC.SuppressFinalize(this);
-//     }
-// }
+        // try
+        // {
+        //     var data = dxgiSurface.Map(Vortice.DXGI.MapFlags.Read);
+        //     return new Bitmap(
+        //         PixelFormat.Bgra8888,
+        //         AlphaFormat.Premul,
+        //         data.DataPointer,
+        //         new PixelSize(srcSize.Width, srcSize.Height),
+        //         new Vector(96d, 96d),
+        //         (int)data.Pitch
+        //     );
+        // }
+        // finally
+        // {
+        //     dxgiSurface.Unmap();
+        //     dCompositionSurface.EndDraw().CheckError();
+        // }
+
+        throw new NotImplementedException();
+    }
+
+    public void Dispose()
+    {
+        if (!hostWnd.IsNull) PInvoke.DestroyWindow(hostWnd);
+        GC.SuppressFinalize(this);
+    }
+
+    [DllImport("dcomp.dll", ExactSpelling = true),DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+    private static extern HRESULT DCompositionCreateDevice3(
+        [In] nint renderingDevice,
+        [In] ref Guid iid,
+        [Out] out nint pDCompositionDesktopDevice);
+
+    [DllImport("dwmapi.dll", CallingConvention = CallingConvention.Winapi, PreserveSig = true, EntryPoint = "#147")]
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+    private static extern HRESULT DwmpCreateSharedThumbnailVisual(
+        [In] HWND hWndDestination,
+        [In] HWND hWndSource,
+        [In] uint thumbnailFlags,
+        [In] ref DWM_THUMBNAIL_PROPERTIES thumbnailProperties,
+        [In] nint pDCompositionDesktopDevice,
+        [Out] out nint pDCompositionVisual,
+        [Out] out nint hThumbnailId);
+
+    [DllImport("dwmapi.dll", CallingConvention = CallingConvention.Winapi, PreserveSig = true, EntryPoint = "#162")]
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+    private static extern HRESULT DwmpQueryWindowThumbnailSourceSize(
+        [In] HWND hWndSource,
+        [In] BOOL fSourceClientAreaOnly,
+        [Out] out SIZE pSize);
+}
 
 internal class Direct3D11ScreenCaptureHelper
 {
@@ -786,11 +865,12 @@ internal class Direct3D11ScreenCaptureHelper
         var mappedSource = device.ImmediateContext.Map(stagingTexture, 0);
         var stagingDescription = stagingTexture.Description;
         return new Bitmap(
-            (int)stagingDescription.Width,
-            (int)stagingDescription.Height,
-            (int)mappedSource.RowPitch,
-            PixelFormat.Format32bppArgb,
-            mappedSource.DataPointer
+            PixelFormat.Bgra8888,
+            AlphaFormat.Premul,
+            mappedSource.DataPointer,
+            new PixelSize((int)stagingDescription.Width, (int)stagingDescription.Height),
+            new Vector(96d, 96d),
+            (int)mappedSource.RowPitch
         );
     }
 
