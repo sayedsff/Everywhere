@@ -44,7 +44,7 @@
                                     TextAlignment="{TemplateBinding TextAlignment}"
                                     TextWrapping="{TemplateBinding TextWrapping}"/>
                                 <v:AssistantInputTextPresenter
-                                    Name="PART_TextPresenter"
+                                    x:Name="PART_TextPresenter"
                                     CaretBrush="{DynamicResource SukiLowText}"
                                     CaretIndex="{TemplateBinding CaretIndex}"
                                     PasswordChar="{TemplateBinding PasswordChar}"
