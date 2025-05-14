@@ -42,7 +42,7 @@ Settings_Model_WebSearchApiKey_Description	网络搜索服务API访问秘钥，�
 Settings_Model_WebSearchEndpoint_Header	网络搜索服务API接口地址	Web search service API endpoint address.
 Settings_Model_WebSearchEndpoint_Description	（选填）如果使用官方的API接口，请留空使用默认值。	(Optional) Leave blank to use the default value if using the official API endpoint.
 AssistantInputBox_Watermark	询问Everywhere助手	Ask the Everywhere assistant
-AssistantInputBox_AddButton_ToolTip	添加附加内容到对话	Add extra content to the conversation
+AssistantInputBox_AddAttachmentButton_ToolTip	添加附加内容到对话	Add extra content to the conversation
 AssistantInputBox_ImageButton_ToolTip	允许访问屏幕上的图像	Allow access to aware your screen
 AssistantInputBox_ImageButton_Text	图像	Image
 AssistantInputBox_WebSearchButton_ToolTip	在网络上搜索	Search the web
@@ -59,7 +59,8 @@ AssistantFloatingWindow_ChatMessage_Assistant_Copy	复制回答	Copy
 Application_TrayIcon_Menu_OpenMainWindow	打开主窗口	Open Window
 Application_TrayIcon_Menu_Exit	退出	Exit
 Application_TrayIcon_Menu_OpenDebugWindow	打开调试窗口	Open Debug Window
-AssistantFloatingWindowViewModel_Translate	翻译
-AssistantFloatingWindowViewModel_ContinueWriting	续写
-AssistantFloatingWindowViewModel_Summarize	总结
+AssistantFloatingWindowViewModel_AddAttachmentCommands_Screen	屏幕
+AssistantFloatingWindowViewModel_TextEditActions_Translate	翻译
+AssistantFloatingWindowViewModel_TextEditActions_ContinueWriting	续写
+AssistantFloatingWindowViewModel_TextEditActions_Summarize	总结
 AssistantFloatingWindow_Title_NoonGreeting	中午好，有什么可以帮忙的？

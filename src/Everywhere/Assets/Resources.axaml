@@ -14,14 +14,18 @@
         <GradientStop Offset="1" Color="#FF2f99bf"/>
     </LinearGradientBrush>
 
-    <LinearGradientBrush x:Key="AcrylicBorderBrush" SpreadMethod="Pad" StartPoint="45.5%,0%" EndPoint="46%,60%">
+    <LinearGradientBrush x:Key="AcrylicBorderBrush" SpreadMethod="Pad" StartPoint="0%,0%" EndPoint="100%,100%">
         <GradientStop Offset="0" Color="#5DFFFFFF"/>
-        <GradientStop Offset="1" Color="#1DFFFFFF"/>
+        <GradientStop Offset="0.3" Color="#1DFFFFFF"/>
+        <GradientStop Offset="0.7" Color="#1DFFFFFF"/>
+        <GradientStop Offset="1" Color="#5DFFFFFF"/>
     </LinearGradientBrush>
 
-    <LinearGradientBrush x:Key="AcrylicLowBorderBrush" SpreadMethod="Pad" StartPoint="45.5%,0%" EndPoint="46%,60%">
+    <LinearGradientBrush x:Key="AcrylicLowBorderBrush" SpreadMethod="Pad" StartPoint="0%,0%" EndPoint="100%,100%">
         <GradientStop Offset="0" Color="#3DFFFFFF"/>
-        <GradientStop Offset="1" Color="#0FFFFFFF"/>
+        <GradientStop Offset="0.3" Color="#0FFFFFFF"/>
+        <GradientStop Offset="0.7" Color="#0FFFFFFF"/>
+        <GradientStop Offset="1" Color="#3DFFFFFF"/>
     </LinearGradientBrush>
 
     <SolidColorBrush

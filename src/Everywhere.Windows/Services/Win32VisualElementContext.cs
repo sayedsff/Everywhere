@@ -45,6 +45,11 @@ public class Win32VisualElementContext : IVisualElementContext
 
     public IVisualElement? PointerOverElement => TryFrom(static () => PInvoke.GetCursorPos(out var point) ? Automation.FromPoint(point) : null);
 
+    public Task<IVisualElement?> PickElementAsync(PickElementMode mode)
+    {
+        throw new NotImplementedException();
+    }
+
     public Win32VisualElementContext()
     {
         Automation.RegisterFocusChangedEvent(

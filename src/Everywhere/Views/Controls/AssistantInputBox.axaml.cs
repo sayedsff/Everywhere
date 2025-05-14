@@ -14,9 +14,8 @@ using Everywhere.Models;
 
 namespace Everywhere.Views;
 
-[TemplatePart("PART_TextBox", typeof(TextBox))]
 [TemplatePart("PART_SendButton", typeof(Button))]
-public class AssistantInputBox : ItemsControl
+public class AssistantInputBox : TextBox
 {
     public static IDataTemplate DynamicKeyMenuItemTemplate { get; } = new FuncDataTemplate<object>(
         (item, _) => item switch
@@ -37,20 +36,17 @@ public class AssistantInputBox : ItemsControl
             }
         });
 
-    public static readonly StyledProperty<string?> TextProperty =
-        TextBox.TextProperty.AddOwner<AssistantInputBox>();
-
-    public static readonly StyledProperty<string?> WatermarkProperty =
-        TextBox.WatermarkProperty.AddOwner<AssistantInputBox>();
-
     public static readonly StyledProperty<bool> PressCtrlEnterToSendProperty =
         AvaloniaProperty.Register<AssistantInputBox, bool>(nameof(PressCtrlEnterToSend));
 
     public static readonly StyledProperty<IRelayCommand<string>?> CommandProperty =
         AvaloniaProperty.Register<AssistantInputBox, IRelayCommand<string>?>(nameof(Command));
 
-    public static readonly StyledProperty<IEnumerable> AddableAttachmentItemsSourceProperty =
-        AvaloniaProperty.Register<AssistantInputBox, IEnumerable>(nameof(AddableAttachmentItemsSource));
+    public static readonly StyledProperty<IEnumerable> AttachmentItemsSourceProperty =
+        AvaloniaProperty.Register<AssistantInputBox, IEnumerable>(nameof(AttachmentItemsSource));
+
+    public static readonly StyledProperty<IEnumerable> AddAttachmentCommandItemsSourceProperty =
+        AvaloniaProperty.Register<AssistantInputBox, IEnumerable>(nameof(AddAttachmentCommandItemsSource));
 
     public static readonly StyledProperty<IEnumerable<AssistantCommand>> AssistantCommandItemsSourceProperty =
         AvaloniaProperty.Register<AssistantInputBox, IEnumerable<AssistantCommand>>(nameof(AssistantCommandItemsSource));
@@ -86,21 +82,6 @@ public class AssistantInputBox : ItemsControl
         AvaloniaProperty.Register<AssistantInputBox, bool>(nameof(IsSendButtonEnabled), true);
 
     /// <summary>
-    /// Actual text that being input.
-    /// </summary>
-    public string? Text
-    {
-        get => GetValue(TextProperty);
-        set => SetValue(TextProperty, value);
-    }
-
-    public string? Watermark
-    {
-        get => GetValue(WatermarkProperty);
-        set => SetValue(WatermarkProperty, value);
-    }
-
-    /// <summary>
     /// If true, pressing Ctrl+Enter will send the message, Enter will break the line.
     /// </summary>
     public bool PressCtrlEnterToSend
@@ -118,10 +99,16 @@ public class AssistantInputBox : ItemsControl
         set => SetValue(CommandProperty, value);
     }
 
-    public IEnumerable AddableAttachmentItemsSource
+    public IEnumerable AttachmentItemsSource
     {
-        get => GetValue(AddableAttachmentItemsSourceProperty);
-        set => SetValue(AddableAttachmentItemsSourceProperty, value);
+        get => GetValue(AttachmentItemsSourceProperty);
+        set => SetValue(AttachmentItemsSourceProperty, value);
+    }
+
+    public IEnumerable AddAttachmentCommandItemsSource
+    {
+        get => GetValue(AddAttachmentCommandItemsSourceProperty);
+        set => SetValue(AddAttachmentCommandItemsSourceProperty, value);
     }
 
     public IEnumerable<AssistantCommand> AssistantCommandItemsSource
@@ -184,11 +171,7 @@ public class AssistantInputBox : ItemsControl
         set => SetValue(IsSendButtonEnabledProperty, value);
     }
 
-    private IDisposable? textBoxKeyDownSubscription;
-    private IDisposable? textBoxTextChangedSubscription;
     private IDisposable? sendButtonClickSubscription;
-
-    private TextBox? textBox;
 
     static AssistantInputBox()
     {
@@ -199,24 +182,16 @@ public class AssistantInputBox : ItemsControl
     {
         SelectedAssistantCommandProperty.Changed.Subscribe(
             new AnonymousObserver<AvaloniaPropertyChangedEventArgs<AssistantCommand?>>(HandleSelectedAssistantCommandPropertyChanged));
+        this.AddDisposableHandler(KeyDownEvent, HandleTextBoxKeyDown, RoutingStrategies.Tunnel);
+        this.AddDisposableHandler(TextChangedEvent, HandleTextBoxTextChanged, RoutingStrategies.Bubble);
     }
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
 
-        textBoxKeyDownSubscription?.Dispose();
-        textBoxTextChangedSubscription?.Dispose();
         sendButtonClickSubscription?.Dispose();
 
-        if ((textBox = e.NameScope.Find<TextBox>("PART_TextBox")) != null)
-        {
-            textBoxKeyDownSubscription = textBox.AddDisposableHandler(KeyDownEvent, HandleTextBoxKeyDown, RoutingStrategies.Tunnel);
-            textBoxTextChangedSubscription = textBox.AddDisposableHandler(
-                TextBox.TextChangedEvent,
-                HandleTextBoxTextChanged,
-                RoutingStrategies.Bubble);
-        }
         if (e.NameScope.Find<Button>("PART_SendButton") is { } sendButton)
         {
             sendButtonClickSubscription = sendButton.AddDisposableHandler(Button.ClickEvent, HandleSendButtonClick, handledEventsToo: true);
@@ -249,7 +224,7 @@ public class AssistantInputBox : ItemsControl
             text = text.IndexOf(' ') is var i and >= 0 ? text[i..] : string.Empty;
         }
         Text = command.Command + ' ' + text?.TrimStart();
-        if (textBox != null) textBox.CaretIndex = Text.Length;
+        CaretIndex = Text.Length;
     }
 
     private void HandleTextBoxTextChanged(object? sender, TextChangedEventArgs e)
@@ -276,16 +251,6 @@ public class AssistantInputBox : ItemsControl
         Command.Execute(Text);
         Text = string.Empty;
         e.Handled = true;
-    }
-
-    protected override Control CreateContainerForItemOverride(object? item, int index, object? recycleKey)
-    {
-        return new MenuItem();
-    }
-
-    protected override bool NeedsContainerOverride(object? item, int index, out object? recycleKey)
-    {
-        return NeedsContainer<MenuItem>(item, out recycleKey);
     }
 }
 

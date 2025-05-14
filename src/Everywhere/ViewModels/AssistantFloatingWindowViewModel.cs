@@ -1,8 +1,11 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
+using Avalonia.Controls;
 using Avalonia.Controls.Documents;
 using Avalonia.Media;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Everywhere.Agents;
@@ -35,11 +38,17 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
     [ObservableProperty]
     public partial DynamicResourceKey? Title { get; private set; }
 
-    [ObservableProperty]
-    public partial List<DynamicKeyMenuItem> Actions { get; private set; } = [];
+    [field: AllowNull, MaybeNull]
+    public NotifyCollectionChangedSynchronizedViewList<MenuItem> Attachments =>
+        field ??= attachments.ToNotifyCollectionChangedSlim(SynchronizationContextCollectionEventDispatcher.Current);
 
     [ObservableProperty]
-    public partial List<AssistantCommand> AssistantCommands { get; private set; } = [];
+    public partial IReadOnlyList<DynamicKeyMenuItem> QuickActions { get; private set; } = [];
+
+    [ObservableProperty]
+    public partial IReadOnlyList<AssistantCommand> AssistantCommands { get; private set; } = [];
+
+    public IReadOnlyList<DynamicKeyMenuItem> AddAttachmentCommands { get; }
 
     [ObservableProperty]
     public partial bool IsExpanded { get; set; }
@@ -51,6 +60,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
 
     private readonly List<DynamicKeyMenuItem> textEditActions;
     private readonly List<AssistantCommand> textEditCommands;
+    private readonly ObservableList<MenuItem> attachments = [];
     private readonly ObservableList<ChatMessage> chatMessages = [];
 
     private CancellationTokenSource? cancellationTokenSource;
@@ -59,12 +69,21 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
     {
         Settings = settings;
 
+        AddAttachmentCommands =
+        [
+            new DynamicKeyMenuItem
+            {
+                Icon = LucideIconKind.Monitor,
+                Header = "AssistantFloatingWindowViewModel_AddAttachmentCommands_Screen",
+            }
+        ];
+
         textEditActions =
         [
             new DynamicKeyMenuItem
             {
                 Icon = LucideIconKind.Languages,
-                Header = "AssistantFloatingWindowViewModel_Translate",
+                Header = "AssistantFloatingWindowViewModel_TextEditActions_Translate",
                 // Command = GenerateAndReplaceCommand,
                 // CommandParameter =
                 //     "Translate the content of XML node with id=\"{ElementId}\" between **{SystemLanguage}** and **English**" // todo
@@ -72,16 +91,16 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
             new DynamicKeyMenuItem
             {
                 Icon = LucideIconKind.StepForward,
-                Header = "AssistantFloatingWindowViewModel_ContinueWriting",
+                Header = "AssistantFloatingWindowViewModel_TextEditActions_ContinueWriting",
                 // Command = GenerateAndAppendCommand,
                 // CommandParameter =
-                //     "The user has already written a beginning as the content of XML node with id=\"{ElementId}\". " +
-                //     "You should try to imitate the user's writing style and tone, and continue writing in the user's perspective"
+                //     "The user has already written a beginning as the content of the XML node with id=\"{ElementId}\". " +
+                //     "You should try to imitate the user's writing style and tone, then continue writing in the user's perspective"
             },
             new DynamicKeyMenuItem
             {
                 Icon = LucideIconKind.ScrollText,
-                Header = "AssistantFloatingWindowViewModel_Summarize",
+                Header = "AssistantFloatingWindowViewModel_TextEditActions_Summarize",
                 // Command = GenerateAndAppendCommand,
                 // CommandParameter =
                 //     "The user has already written a beginning as the content of XML node with id=\"{ElementId}\". " +
@@ -180,15 +199,20 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
                     return;
                 }
 
-                // using (var process = Process.GetProcessById(targetElement.ProcessId))
-                // {
-                //     Title = Path.GetFileNameWithoutExtension(process.ProcessName);
-                // }
+                using var process = Process.GetProcessById(targetElement.ProcessId);
                 Title = "AssistantFloatingWindow_Title_NoonGreeting";
 
                 TargetBoundingRect = targetElement.BoundingRectangle;
                 TargetElement = targetElement;
-                Actions = textEditActions;
+                attachments.Reset(
+                [
+                    Dispatcher.UIThread.Invoke(() => new MenuItem
+                    {
+                        Icon = LucideIconKind.TextCursorInput,
+                        Header = $"{Path.GetFileNameWithoutExtension(process.ProcessName)} - EditBox"
+                    })
+                ]);
+                QuickActions = textEditActions;
                 AssistantCommands = textEditCommands;
             },
             flags: ExecutionFlags.EnqueueIfBusy,
@@ -198,76 +222,73 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
     private static readonly AuthorRole ActionRole = new("Action");
 
     [RelayCommand]
-    private Task ProcessChatMessageSentAsync(string message) => ExecuteBusyTaskAsync(
-        async cancellationToken =>
+    private Task ProcessChatMessageSentAsync(string message) => ExecuteBusyTaskAsync(async cancellationToken =>
+    {
+        message = message.Trim();
+        if (message.Length == 0) return;
+
+        string? systemPrompt = null;
+        ChatMessage? userMessage = null;
+
+        if (message[0] == '/')
         {
-            message = message.Trim();
-            if (message.Length == 0) return;
-
-            string? systemPrompt = null;
-            ChatMessage? userMessage = null;
-
-            if (message[0] == '/')
+            var commandString = message.IndexOf(' ') is var index and > 0 ? message[..index] : message;
+            if (AssistantCommands.FirstOrDefault(c => c.Command.Equals(commandString, StringComparison.OrdinalIgnoreCase)) is { } command)
             {
-                var commandString = message.IndexOf(' ') is var index and > 0 ? message[..index] : message;
-                if (AssistantCommands.FirstOrDefault(
-                        c => c.Command.Equals(commandString, StringComparison.OrdinalIgnoreCase)) is { } command)
+                systemPrompt = command.SystemPrompt;
+                var commandArgument = message[commandString.Length..].Trim();
+                if (commandArgument.Length == 0)
                 {
-                    systemPrompt = command.SystemPrompt;
-                    var commandArgument = message[commandString.Length..].Trim();
-                    if (commandArgument.Length == 0)
-                    {
-                        commandArgument = command.DefaultValueFactory?.Invoke() ?? string.Empty;
-                    }
-                    var userPrompt = string.Format(command.UserPrompt, commandArgument);
-                    userMessage = new UserChatMessage(userPrompt)
-                    {
-                        InlineCollection =
-                        {
-                            new Run(commandString) { TextDecorations = TextDecorations.Underline },
-                            new Run(' ' + commandArgument)
-                        }
-                    };
+                    commandArgument = command.DefaultValueFactory?.Invoke() ?? string.Empty;
                 }
-            }
-
-            systemPrompt ??= Prompts.RenderPrompt(
-                Prompts.DefaultSystemPromptWithMission,
-                new Dictionary<string, Func<string>>
+                var userPrompt = string.Format(command.UserPrompt, commandArgument);
+                userMessage = new UserChatMessage(userPrompt)
                 {
-                    { "Mission", () => "Focused XML node id=\"{ElementId}\". Based on context, answer the user's question" }
-                });
-            userMessage ??= new UserChatMessage(message) { InlineCollection = { message } };
-            chatMessages.Add(userMessage);
-
-            if (chatMessages.Count == 1)
-            {
-                if (TargetElement is not { } targetElement) return;
-
-                var analysisMessage = new ActionChatMessage(
-                    ActionRole,
-                    LucideIconKind.TextSearch,
-                    "ActionChatMessage_Header_AnalyzingContext");
-                chatMessages.Add(analysisMessage);
-
-                analysisMessage.IsBusy = true;
-                var builtSystemPrompt = await Task.Run(() => BuildSystemPrompt(targetElement, systemPrompt, cancellationToken), cancellationToken);
-                analysisMessage.IsBusy = false;
-                chatMessages.Insert(0, new SystemChatMessage(builtSystemPrompt));
+                    InlineCollection =
+                    {
+                        new Run(commandString) { TextDecorations = TextDecorations.Underline },
+                        new Run(' ' + commandArgument)
+                    }
+                };
             }
+        }
 
-            await GenerateAsync(cancellationToken);
-        });
+        systemPrompt ??= Prompts.RenderPrompt(
+            Prompts.DefaultSystemPromptWithMission,
+            new Dictionary<string, Func<string>>
+            {
+                { "Mission", () => "Focused XML node id=\"{ElementId}\". Based on context, answer the user's question" }
+            });
+        userMessage ??= new UserChatMessage(message) { InlineCollection = { message } };
+        chatMessages.Add(userMessage);
+
+        if (chatMessages.Count == 1)
+        {
+            if (TargetElement is not { } targetElement) return;
+
+            var analysisMessage = new ActionChatMessage(
+                ActionRole,
+                LucideIconKind.TextSearch,
+                "ActionChatMessage_Header_AnalyzingContext");
+            chatMessages.Add(analysisMessage);
+
+            analysisMessage.IsBusy = true;
+            var builtSystemPrompt = await Task.Run(() => BuildSystemPrompt(targetElement, systemPrompt, cancellationToken), cancellationToken);
+            analysisMessage.IsBusy = false;
+            chatMessages.Insert(0, new SystemChatMessage(builtSystemPrompt));
+        }
+
+        await GenerateAsync(cancellationToken);
+    });
 
     [RelayCommand]
-    private Task RetryAsync(ChatMessage chatMessage) => ExecuteBusyTaskAsync(
-        cancellationToken =>
-        {
-            var index = chatMessages.IndexOf(chatMessage);
-            if (index == -1) return Task.CompletedTask;
-            chatMessages.RemoveRange(index, chatMessages.Count - index); // TODO: history tree
-            return GenerateAsync(cancellationToken);
-        });
+    private Task RetryAsync(ChatMessage chatMessage) => ExecuteBusyTaskAsync(cancellationToken =>
+    {
+        var index = chatMessages.IndexOf(chatMessage);
+        if (index == -1) return Task.CompletedTask;
+        chatMessages.RemoveRange(index, chatMessages.Count - index); // TODO: history tree
+        return GenerateAsync(cancellationToken);
+    });
 
     [RelayCommand]
     private static Task CopyAsync(ChatMessage chatMessage) =>
@@ -285,19 +306,20 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
         cancellationTokenSource?.Cancel();
         IsExpanded = false;
         chatMessages.Clear();
-        Actions = [];
+        QuickActions = [];
         AssistantCommands = [];
     }
 
     private string BuildSystemPrompt(IVisualElement element, string systemPrompt, CancellationToken cancellationToken)
     {
-        var xmlBuilder = new VisualElementXmlBuilder(new OptimizedVisualElement(
-            element
-                .GetAncestors()
-                .CurrentAndNext()
-                .Where(p => p.current.ProcessId != p.next.ProcessId)
-                .Select(p => p.current)
-                .First()));
+        var xmlBuilder = new VisualElementXmlBuilder(
+            new OptimizedVisualElement(
+                element
+                    .GetAncestors()
+                    .CurrentAndNext()
+                    .Where(p => p.current.ProcessId != p.next.ProcessId)
+                    .Select(p => p.current)
+                    .First()));
 
         var renderedSystemPrompt = Prompts.RenderPrompt(
             systemPrompt,
@@ -326,13 +348,16 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
         if (modelSettings is { IsWebSearchEnabled: true, WebSearchApiKey: { } webSearchApiKey } && !string.IsNullOrWhiteSpace(webSearchApiKey))
         {
             Uri.TryCreate(modelSettings.WebSearchEndpoint, UriKind.Absolute, out var webSearchEndPoint);
-            builder.Plugins.AddFromObject(new WebSearchEnginePlugin(modelSettings.WebSearchProvider switch
-            {
-                // TODO: "google" => new GoogleConnector(webSearchApiKey, webSearchEndPoint),
-                "brave" => new BraveConnector(webSearchApiKey, webSearchEndPoint),
-                "bocha" => new BoChaConnector(webSearchApiKey, webSearchEndPoint),
-                _ => new BingConnector(webSearchApiKey, webSearchEndPoint)
-            }), "web_search");
+            builder.Plugins.AddFromObject(
+                new WebSearchEnginePlugin(
+                    modelSettings.WebSearchProvider switch
+                    {
+                        // TODO: "google" => new GoogleConnector(webSearchApiKey, webSearchEndPoint),
+                        "brave" => new BraveConnector(webSearchApiKey, webSearchEndPoint),
+                        "bocha" => new BoChaConnector(webSearchApiKey, webSearchEndPoint),
+                        _ => new BingConnector(webSearchApiKey, webSearchEndPoint)
+                    }),
+                "web_search");
         }
 
         var kernel = builder.Build();
@@ -420,4 +445,5 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
             assistantMessage.IsBusy = false;
         }
     }
+
 }

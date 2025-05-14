@@ -162,7 +162,7 @@
                     <Panel>
                         <ItemsControl
                             IsVisible="{Binding !ChatMessages.Count}"
-                            ItemsSource="{Binding Actions}">
+                            ItemsSource="{Binding QuickActions}">
                             <ItemsControl.Styles>
                                 <Style Selector="v|DynamicKeyMenuItem">
                                     <Setter Property="Template">
@@ -297,7 +297,9 @@
 
                 <v:AssistantInputBox
                     Margin="0,0,0,1"
+                    AddAttachmentCommandItemsSource="{Binding AddAttachmentCommands}"
                     AssistantCommandItemsSource="{Binding AssistantCommands}"
+                    AttachmentItemsSource="{Binding Attachments}"
                     Command="{Binding ProcessChatMessageSentCommand}"
                     IsImageSupported="{Binding Settings.Model.IsImageEnabled}"
                     IsSendButtonEnabled="{Binding !IsBusy}"
