@@ -10,25 +10,20 @@
 
 <br />
 <div align="center">
-  <a href="https://github.com/DearVa/Everywhere">
-    <img src="https://raw.githubusercontent.com/DearVa/Everywhere/refs/heads/main/img/Everywhere.svg" alt="Logo" width="100" height="120">
-  </a>
-
-<h3 align="center">Everywhere</h3>
+  <img src="https://raw.githubusercontent.com/DearVa/Everywhere/refs/heads/main/img/banner.png" alt="Banner"/>
 
   <p align="center">
-    如影随形的 AI 助手
     <br />
-    <i>⚠️ 开发中 ⚠️</i>
+    <h2>🚧 注意：本项目正在积极开发，尚无法投入使用 🚧</h2>
     <br/>
     <a href="https://github.com/DearVa/Everywhere"><strong>（开发中）查看文档 »</strong></a>
     <br />
     <br />
     <a href="https://github.com/DearVa/Everywhere">查看演示</a>
     &middot;
-    <a href="https://github.com/DearVa/Everywhere/issues/new?labels=bug&template=bug-report-zh.md">报告错误</a>
+    <a href="https://github.com/DearVa/Everywhere/issues/new?labels=bug&template=bug-report.md">报告错误</a>
     &middot;
-    <a href="https://github.com/DearVa/Everywhere/issues/new?labels=enhancement&template=feature-request-zh.md">请求功能</a>
+    <a href="https://github.com/DearVa/Everywhere/issues/new?labels=enhancement&template=feature-request.md">功能请求</a>
   </p>
 </div>
 
@@ -89,8 +84,8 @@
 
 ## 🙏 致谢
 
-* [kikipoulet/SukiUI](https://github.com/kikipoulet/SukiUI) UI 样式和组件
-* [ahopper/Avalonia.IconPacks](https://github.com/ahopper/Avalonia.IconPacks) 图标
+* [accntech/shad-ui](https://github.com/accntech/shad-ui) UI 样式和组件
+* [dme-compunet/Lucide.Avalonia](https://github.com/dme-compunet/Lucide.Avalonia) 图标
 * [Kira-NT/HotAvalonia](https://github.com/Kira-NT/HotAvalonia) Avalonia 热重载
 * [microsoft/CommunityToolkit.Mvvm](https://github.com/CommunityToolkit/dotnet) & [Cysharp/ObservableCollections](https://github.com/Cysharp/ObservableCollections) MVVM
 * [FlaUI](https://github.com/FlaUI/FlaUI) 屏幕感知和 UI 自动化

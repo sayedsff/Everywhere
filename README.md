@@ -83,11 +83,11 @@ Distributed under the Apache 2.0 License. See [LICENSE](LICENSE) for more inform
 
 ## Acknowledgments
 
-* [kikipoulet/SukiUI](https://github.com/kikipoulet/SukiUI) UI Styles and Components
-* [ahopper/Avalonia.IconPacks](https://github.com/ahopper/Avalonia.IconPacks) Icons
+* [accntech/shad-ui](https://github.com/accntech/shad-ui) UI Styles and Components
+* [dme-compunet/Lucide.Avalonia](https://github.com/dme-compunet/Lucide.Avalonia) Icons
 * [Kira-NT/HotAvalonia](https://github.com/Kira-NT/HotAvalonia) Avalonia hot reload
 * [microsoft/CommunityToolkit.Mvvm](https://github.com/CommunityToolkit/dotnet) & [Cysharp/ObservableCollections](https://github.com/Cysharp/ObservableCollections) MVVM
-* [FlaUI](https://github.com/FlaUI/FlaUI) Screen Aware & UI Automation
+* [FlaUI/FlaUI](https://github.com/FlaUI/FlaUI) Screen Aware & UI Automation
 * [microsoft/CsWin32](https://github.com/microsoft/CsWin32) Win32 API Autogen
 * [Kibnet/WritableJsonConfiguration](https://github.com/Kibnet/WritableJsonConfiguration) Settings storage
 * [microsoft/semantic-kernel](https://github.com/microsoft/semantic-kernel) LLMs, RAG, Tool call, etc.
