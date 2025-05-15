@@ -1,8 +1,51 @@
 ﻿using System.ComponentModel;
 using Avalonia.Media.Imaging;
-using Everywhere.Enums;
 
 namespace Everywhere.Interfaces;
+
+public enum VisualElementType
+{
+    Unknown,
+    Label,
+    TextEdit,
+    Document,
+    Button,
+    Hyperlink,
+    Image,
+    CheckBox,
+    RadioButton,
+    ComboBox,
+    ListView,
+    ListViewItem,
+    TreeView,
+    TreeViewItem,
+    DataGrid,
+    DataGridItem,
+    TabControl,
+    TabItem,
+    Table,
+    TableRow,
+    Menu,
+    MenuItem,
+    Slider,
+    ScrollBar,
+    ProgressBar,
+    Panel,
+    TopLevel,
+    Screen
+}
+
+[Flags]
+public enum VisualElementStates
+{
+    None = 0,
+    Offscreen = 1 << 0,
+    Disabled = 1 << 1,
+    Focused = 1 << 2,
+    Selected = 1 << 3,
+    ReadOnly = 1 << 4,
+    Password = 1 << 5,
+}
 
 public interface IVisualElement : INotifyPropertyChanged
 {
@@ -34,7 +77,7 @@ public interface IVisualElement : INotifyPropertyChanged
     /// <param name="maxLength">allowed max length of the text, -1 means no limit.</param>
     /// <returns></returns>
     /// <remarks>
-    /// set maxLength to 0 can check if the text is null, with minimal performance impact.
+    /// set maxLength to 1 can check if the text is null or empty, with minimal performance impact.
     /// </remarks>
     string? GetText(int maxLength = -1);
 
