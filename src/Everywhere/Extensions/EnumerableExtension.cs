@@ -192,6 +192,22 @@ public static class EnumerableExtension
         }
     }
     
+    public static int IndexOf<T>(this IEnumerable<T> source, T item)
+    {
+        var index = 0;
+        foreach (var i in source)
+        {
+            if (EqualityComparer<T>.Default.Equals(i, item))
+            {
+                return index;
+            }
+
+            index++;
+        }
+
+        return -1;
+    }
+
     public static int FindIndexOf<T>(this IEnumerable<T> source, Predicate<T> predicate)
     {
         var index = 0;
@@ -207,7 +223,7 @@ public static class EnumerableExtension
 
         return -1;
     }
-    
+
     public static IEnumerable<T> Generate<T>(Func<T> generator, int count)
     {
         for (var i = 0; i < count; i++)
