@@ -83,3 +83,4 @@ EnumDisplayDevices
 GetMonitorInfo
 MonitorFromWindow
 IsWindowVisible
+GetWindowPlacement

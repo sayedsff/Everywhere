@@ -177,6 +177,15 @@ public partial class VisualTreeDebugger : UserControl
         window.Show();
     }
 
+    private void HandleOptimizeButtonClicked(object? sender, RoutedEventArgs e)
+    {
+        if (rootElements.Count == 0) return;
+        if (rootElements[0] is not OptimizedVisualElement)
+        {
+            rootElements[0] = new OptimizedVisualElement(rootElements[0]);
+        }
+    }
+
     private async void HandleCaptureButtonClicked(object? sender, RoutedEventArgs e)
     {
         if (VisualTreeView.SelectedItem is not IVisualElement selectedItem) return;

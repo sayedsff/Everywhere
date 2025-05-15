@@ -17,7 +17,6 @@ using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Platform;
-using Everywhere.Enums;
 using Everywhere.Extensions;
 using Everywhere.Interfaces;
 using Everywhere.Windows.Interop;
@@ -37,6 +36,7 @@ using Bitmap = Avalonia.Media.Imaging.Bitmap;
 using Brushes = Avalonia.Media.Brushes;
 using Image = Avalonia.Controls.Image;
 using PixelFormat = System.Drawing.Imaging.PixelFormat;
+using Point = System.Drawing.Point;
 using Rect = Avalonia.Rect;
 using Size = System.Drawing.Size;
 using Window = Avalonia.Controls.Window;
@@ -62,11 +62,6 @@ public class Win32VisualElementContext : IVisualElementContext
 
     private readonly IWindowHelper windowHelper;
 
-    public Task<IVisualElement?> PickElementAsync(PickElementMode mode)
-    {
-        return new ElementPickerWindow(windowHelper).PickElementAsync(mode);
-    }
-
     public Win32VisualElementContext(IWindowHelper windowHelper)
     {
         this.windowHelper = windowHelper;
@@ -78,6 +73,11 @@ public class Win32VisualElementContext : IVisualElementContext
             if (pid == CurrentProcessId) return;
             handler(element == null ? null : new AutomationVisualElementImpl(element));
         });
+    }
+
+    public Task<IVisualElement?> PickElementAsync(PickElementMode mode)
+    {
+        return new ElementPickerWindow(windowHelper).PickElementAsync(mode);
     }
 
     private static AutomationVisualElementImpl? TryFrom(Func<AutomationElement?> factory)
@@ -200,7 +200,7 @@ public class Win32VisualElementContext : IVisualElementContext
                         ControlType.ComboBox => VisualElementType.ComboBox,
                         ControlType.DataGrid => VisualElementType.DataGrid,
                         ControlType.DataItem => VisualElementType.DataGridItem,
-                        ControlType.Document => VisualElementType.TextEdit,
+                        ControlType.Document => VisualElementType.Document,
                         ControlType.Edit => VisualElementType.TextEdit,
                         ControlType.Group => VisualElementType.Panel,
                         ControlType.Header => VisualElementType.TableRow,
@@ -427,16 +427,6 @@ public class Win32VisualElementContext : IVisualElementContext
                     rect.Y - windowRect.Y,
                     rect.Width,
                     rect.Height));
-
-            // TODO
-            // try
-            // {
-            //     return Task.FromResult(DwmScreenCaptureHelper.Value.Capture(hWnd));
-            // }
-            // catch
-            // {
-            //
-            // }
         }
 
         #region Events
@@ -558,8 +548,16 @@ public class Win32VisualElementContext : IVisualElementContext
                 var windows = new List<HWND>();
                 PInvoke.EnumWindows((hWnd, _) =>
                 {
-                    if (!PInvoke.IsWindowVisible(hWnd)) return true;
                     if (PInvoke.GetAncestor(hWnd, GET_ANCESTOR_FLAGS.GA_ROOTOWNER) != hWnd) return true; // ignore child windows
+                    if (!PInvoke.IsWindowVisible(hWnd)) return true;
+
+                    var windowPlacement = new WINDOWPLACEMENT();
+                    if (!PInvoke.GetWindowPlacement(hWnd, ref windowPlacement) ||
+                        windowPlacement.showCmd == SHOW_WINDOW_CMD.SW_SHOWMINIMIZED) return true;
+
+                    var pid = 0U;
+                    if (PInvoke.GetWindowThreadProcessId(hWnd, &pid) == 0 || pid == CurrentProcessId) return true;
+
                     if (PInvoke.MonitorFromWindow(hWnd, MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONULL) != hMonitor) return true;
                     windows.Add(hWnd);
                     return true;
@@ -844,45 +842,7 @@ public class Win32VisualElementContext : IVisualElementContext
                 {
                     case (uint)WINDOW_MESSAGE.WM_MOUSEMOVE when PInvoke.GetCursorPos(out var point):
                     {
-                        var maskRect = new Rect();
-
-                        var pixelPoint = new PixelPoint(point.X, point.Y);
-                        switch (mode)
-                        {
-                            case PickElementMode.Screen:
-                            {
-                                allScreens = Screens.All;
-                                var screen = allScreens.FirstOrDefault(s => s.Bounds.Contains(pixelPoint));
-                                if (screen == null) break;
-
-                                maskRect = screen.Bounds.ToRect(scale);
-                                break;
-                            }
-                            case PickElementMode.Window:
-                            {
-                                var hWnd = PInvoke.WindowFromPoint(point);
-                                if (hWnd == HWND.Null) break;
-
-                                var topLevel = PInvoke.GetAncestor(hWnd, GET_ANCESTOR_FLAGS.GA_ROOTOWNER);
-                                if (topLevel == HWND.Null) break;
-
-                                selectedElement = TryFrom(() => Automation.FromHandle(topLevel));
-                                if (selectedElement == null) break;
-
-                                maskRect = selectedElement.BoundingRectangle.ToRect(scale);
-                                break;
-                            }
-                            case PickElementMode.Element:
-                            {
-                                selectedElement = TryFrom(() => Automation.FromPoint(point));
-                                if (selectedElement == null) break;
-
-                                maskRect = selectedElement.BoundingRectangle.ToRect(scale);
-                                break;
-                            }
-                        }
-
-                        SetMask(maskRect);
+                        Pick(point);
                         return false;
                     }
                     case (uint)WINDOW_MESSAGE.WM_LBUTTONUP:
@@ -928,7 +888,50 @@ public class Win32VisualElementContext : IVisualElementContext
                 taskCompletionSource.TrySetResult(null);
             };
 
+            if (PInvoke.GetCursorPos(out var p)) Pick(p); // Update once
             return await taskCompletionSource.Task;
+
+            void Pick(Point point)
+            {
+                var maskRect = new Rect();
+                var pixelPoint = new PixelPoint(point.X, point.Y);
+                switch (mode)
+                {
+                    case PickElementMode.Screen:
+                    {
+                        allScreens = Screens.All;
+                        var screen = allScreens.FirstOrDefault(s => s.Bounds.Contains(pixelPoint));
+                        if (screen == null) break;
+
+                        maskRect = screen.Bounds.ToRect(scale);
+                        break;
+                    }
+                    case PickElementMode.Window:
+                    {
+                        var hWnd = PInvoke.WindowFromPoint(point);
+                        if (hWnd == HWND.Null) break;
+
+                        var topLevel = PInvoke.GetAncestor(hWnd, GET_ANCESTOR_FLAGS.GA_ROOTOWNER);
+                        if (topLevel == HWND.Null) break;
+
+                        selectedElement = TryFrom(() => Automation.FromHandle(topLevel));
+                        if (selectedElement == null) break;
+
+                        maskRect = selectedElement.BoundingRectangle.ToRect(scale);
+                        break;
+                    }
+                    case PickElementMode.Element:
+                    {
+                        selectedElement = TryFrom(() => Automation.FromPoint(point));
+                        if (selectedElement == null) break;
+
+                        maskRect = selectedElement.BoundingRectangle.ToRect(scale);
+                        break;
+                    }
+                }
+
+                SetMask(maskRect);
+            }
 
             void SetMask(Rect rect)
             {

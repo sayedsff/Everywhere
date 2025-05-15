@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 using Avalonia.Media.Imaging;
-using Everywhere.Enums;
 
 namespace Everywhere.Models;
 
@@ -8,7 +7,26 @@ public class OptimizedVisualElement(IVisualElement original) : IVisualElement
 {
     public string Id => original.Id;
 
-    public IVisualElement? Parent { get; private init; }
+    public IVisualElement? Parent
+    {
+        get
+        {
+            var parent = original.Parent;
+            while (parent != null)
+            {
+                if (IsElementVisible(parent) &&
+                    IsElementImportant(parent) ||
+                    IsPanelLikeElement(parent) && !string.IsNullOrEmpty(parent.Name))
+                {
+                    break;
+                }
+
+                parent = parent.Parent;
+            }
+
+            return parent != null ? new OptimizedVisualElement(parent) : null;
+        }
+    }
 
     public IEnumerable<IVisualElement> Children => GetOptimizedChildren(original);
 
@@ -38,53 +56,62 @@ public class OptimizedVisualElement(IVisualElement original) : IVisualElement
     {
         foreach (var child in element.Children)
         {
-            if (element.BoundingRectangle is not { Width: > 0, Height: > 0 })
-                continue;
+            if (!IsElementVisible(child)) continue;
 
-            if (element.States.HasFlag(VisualElementStates.Offscreen))
-                continue;
-
-            if (IsPanelLikeElement(child) &&
-                string.IsNullOrEmpty(child.Name))
+            if (IsElementImportant(child))
             {
-                // Flatten the panel if it has no name and no text
-                // Skip the panel and add its children directly
+                yield return new OptimizedVisualElement(child);
+            }
+            else if (IsPanelLikeElement(child) && string.IsNullOrEmpty(child.Name))
+            {
+                // Flatten the panel if it has no name and no text.
+                // Skip the panel and add its children directly.
                 foreach (var optimizedChild in GetOptimizedChildren(child))
                 {
                     yield return optimizedChild;
                 }
             }
-            else if (ShouldIncludeElement(child))
-            {
-                yield return new OptimizedVisualElement(child)
-                {
-                    Parent = element
-                };
-            }
         }
     }
 
-    private static bool ShouldIncludeElement(IVisualElement element)
+    private static bool IsElementVisible(IVisualElement element)
+    {
+        var boundingRectangle = element.BoundingRectangle;
+
+        if (boundingRectangle.Width <= 0 || boundingRectangle.Height <= 0)
+            return false;
+
+        if (boundingRectangle.X + boundingRectangle.Width <= 0 ||
+            boundingRectangle.Y + boundingRectangle.Height <= 0)
+            return false;
+
+        if (element.States.HasFlag(VisualElementStates.Offscreen))
+            return false;
+
+        return true;
+    }
+
+    private static bool IsElementImportant(IVisualElement element)
     {
         // Interactive elements are always included
-        if (IsInteractiveElement(element.Type) ||
-            IsSignificantElementType(element.Type))
+        if (IsElementTypeImportant(element.Type))
             return true;
 
         // Check if the element has a name or text
         if (!string.IsNullOrEmpty(element.Name) ||
-            element.GetText(0) != null)
+            !string.IsNullOrEmpty(element.GetText(1)))
             return true;
 
         return false;
     }
 
-    private static bool IsInteractiveElement(VisualElementType type)
+    private static bool IsElementTypeImportant(VisualElementType type)
     {
         return type switch
         {
             VisualElementType.Button => true,
             VisualElementType.TextEdit => true,
+            VisualElementType.Document => true,
             VisualElementType.CheckBox => true,
             VisualElementType.RadioButton => true,
             VisualElementType.ComboBox => true,
@@ -96,16 +123,6 @@ public class OptimizedVisualElement(IVisualElement original) : IVisualElement
             VisualElementType.Menu => true,
             VisualElementType.MenuItem => true,
             VisualElementType.Slider => true,
-            VisualElementType.ScrollBar => true,
-            _ => false
-        };
-    }
-
-    private static bool IsSignificantElementType(VisualElementType type)
-    {
-        return type switch
-        {
-            VisualElementType.TextEdit => true,
             VisualElementType.Table => true,
             VisualElementType.TableRow => true,
             VisualElementType.Image => true,
