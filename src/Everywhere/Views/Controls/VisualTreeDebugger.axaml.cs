@@ -16,6 +16,8 @@ namespace Everywhere.Views;
 
 public partial class VisualTreeDebugger : UserControl
 {
+    private readonly IVisualElementContext visualElementContext;
+    private readonly IWindowHelper windowHelper;
     private readonly ObservableCollection<IVisualElement> rootElements = [];
     private readonly IReadOnlyList<VisualElementProperty> properties = typeof(DebuggerVisualElement)
         .GetProperties(BindingFlags.Instance | BindingFlags.Public)
@@ -28,6 +30,9 @@ public partial class VisualTreeDebugger : UserControl
         IVisualElementContext visualElementContext,
         IWindowHelper windowHelper)
     {
+        this.visualElementContext = visualElementContext;
+        this.windowHelper = windowHelper;
+
         InitializeComponent();
 
         VisualTreeView.ItemsSource = rootElements;
@@ -40,16 +45,14 @@ public partial class VisualTreeDebugger : UserControl
             if (element == null) return;
             element = element
                 .GetAncestors()
-                .CurrentAndNext()
-                .Where(p => p.current.ProcessId != p.next.ProcessId)
-                .Select(p => p.current)
-                .FirstOrDefault() ?? element;
+                .LastOrDefault() ?? element;
             rootElements.Add(element);
         };
 
         treeViewPointerOverMask = new Window
         {
             Topmost = true,
+            CanResize = false,
             ShowInTaskbar = false,
             ShowActivated = false,
             SystemDecorations = SystemDecorations.None,
@@ -68,6 +71,7 @@ public partial class VisualTreeDebugger : UserControl
         var keyboardFocusMask = new Window
         {
             Topmost = true,
+            CanResize = false,
             ShowInTaskbar = false,
             ShowActivated = false,
             SystemDecorations = SystemDecorations.None,
@@ -86,11 +90,10 @@ public partial class VisualTreeDebugger : UserControl
 
         visualElementContext.KeyboardFocusedElementChanged += element =>
         {
-            Dispatcher.UIThread.Invoke(
-                () =>
-                {
-                    if (ShowKeyboardFocusedElementCheckBox.IsChecked is true) SetMask(keyboardFocusMask, element);
-                });
+            Dispatcher.UIThread.Invoke(() =>
+            {
+                if (ShowKeyboardFocusedElementCheckBox.IsChecked is true) SetMask(keyboardFocusMask, element);
+            });
         };
 
         ShowKeyboardFocusedElementCheckBox.IsCheckedChanged += delegate
@@ -150,6 +153,28 @@ public partial class VisualTreeDebugger : UserControl
         {
             window.Title = nameof(VisualTreeDebugger);
         }
+    }
+
+    private async void HandlePickElementButtonClicked(object? sender, RoutedEventArgs e)
+    {
+        if (TopLevel.GetTopLevel(this) is not Window window) return;
+
+        windowHelper.HideWindowWithoutAnimation(window);
+
+        try
+        {
+            rootElements.Clear();
+            if (await visualElementContext.PickElementAsync(PickElementMode.Element) is { } element)
+            {
+                rootElements.Add(element);
+            }
+        }
+        catch
+        {
+            // ignored
+        }
+
+        window.Show();
     }
 
     private async void HandleCaptureButtonClicked(object? sender, RoutedEventArgs e)

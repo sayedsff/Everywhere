@@ -7,16 +7,11 @@ DestroyWindow
 RegisterHotKey
 UnregisterHotKey
 VIRTUAL_KEY
-WM_HOTKEY
-WM_TIMER
 
 SetWindowsHookEx
-UnhookWindowsHookEx
 CallNextHookEx
 GetModuleHandle
 MSLLHOOKSTRUCT
-WM_XBUTTONDOWN
-WM_XBUTTONUP
 XBUTTON1
 XBUTTON2
 
@@ -77,3 +72,13 @@ CreateRoundRectRgn
 CreateRectRgn
 CombineRgn
 SetWindowRgn
+
+WindowFromPoint
+GetAncestor
+GetWindowText
+
+EnumDisplayMonitors
+EnumDisplayDevices
+GetMonitorInfo
+MonitorFromWindow
+IsWindowVisible

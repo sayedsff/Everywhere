@@ -15,4 +15,6 @@ public interface IWindowHelper
     void SetWindowHitTestInvisible(Window window);
 
     void SetWindowCornerRadius(Window window, CornerRadius cornerRadius);
+
+    void HideWindowWithoutAnimation(Window window);
 }

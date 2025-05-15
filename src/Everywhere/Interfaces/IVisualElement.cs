@@ -1,9 +1,10 @@
-﻿using Avalonia.Media.Imaging;
+﻿using System.ComponentModel;
+using Avalonia.Media.Imaging;
 using Everywhere.Enums;
 
 namespace Everywhere.Interfaces;
 
-public interface IVisualElement
+public interface IVisualElement : INotifyPropertyChanged
 {
     /// <summary>
     /// Unique identifier in one Visual Tree.
@@ -40,10 +41,6 @@ public interface IVisualElement
     void SetText(string text, bool append);
 
     Task<Bitmap> CaptureAsync();
-
-    event Action<IVisualElement> TextChanged;
-
-    event Action<IVisualElement> BoundingRectangleChanged;
 }
 
 public static class VisualElementExtension

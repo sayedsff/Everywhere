@@ -8,6 +8,7 @@ using Avalonia;
 using Avalonia.Threading;
 using Everywhere.Extensions;
 using Everywhere.Interfaces;
+using Everywhere.Windows.Interop;
 
 namespace Everywhere.Windows.Services;
 
@@ -75,25 +76,19 @@ public unsafe class Win32UserInputTrigger : IUserInputTrigger
             (uint)VIRTUAL_KEY.VK_TAB
         );
 
-        var mouseHookProc = new HOOKPROC(MouseHookProc);
-        var mouseHookProcHandle = GCHandle.Alloc(mouseHookProc);
-        // PInvoke.SetWindowsHookEx(
-        //     WINDOWS_HOOK_ID.WH_MOUSE_LL,
-        //     mouseHookProc,
-        //     hModule,
-        //     0);
+
 
         MSG msg;
         while (PInvoke.GetMessage(&msg, HWND.Null, 0, 0) != 0)
         {
             switch (msg.message)
             {
-                case PInvoke.WM_HOTKEY:
+                case (uint)WINDOW_MESSAGE.WM_HOTKEY:
                 {
                     Dispatcher.UIThread.Post(() => keyboardHotkeyActivated?.Invoke());
                     break;
                 }
-                case PInvoke.WM_TIMER when msg.wParam == TimerId:
+                case (uint)WINDOW_MESSAGE.WM_TIMER when msg.wParam == TimerId:
                 {
                     isXButtonEventTriggered = true;
                     PInvoke.KillTimer(hotkeyWindowHWnd, TimerId);
@@ -113,7 +108,6 @@ public unsafe class Win32UserInputTrigger : IUserInputTrigger
         }
 
         PInvoke.DestroyWindow(hotkeyWindowHWnd);
-        mouseHookProcHandle.Free();
     }
 
     private static LRESULT MouseHookProc(int code, WPARAM wParam, LPARAM lParam)
@@ -127,13 +121,13 @@ public unsafe class Win32UserInputTrigger : IUserInputTrigger
         var button = hookStruct.mouseData >> 16 & 0xFFFF;
         switch (wParam.Value)
         {
-            case PInvoke.WM_XBUTTONDOWN when button is PInvoke.XBUTTON1:
+            case (uint)WINDOW_MESSAGE.WM_XBUTTONDOWN when button is PInvoke.XBUTTON1:
             {
                 pressedXButton = button;
                 PInvoke.SetTimer(hotkeyWindowHWnd, TimerId, 500, null);
                 return new LRESULT(1); // block XButton1 down event
             }
-            case PInvoke.WM_XBUTTONUP when button == pressedXButton:
+            case (uint)WINDOW_MESSAGE.WM_XBUTTONUP when button == pressedXButton:
             {
                 pressedXButton = 0;
 

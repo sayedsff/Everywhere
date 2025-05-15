@@ -1,4 +1,5 @@
-﻿using Avalonia.Media.Imaging;
+﻿using System.ComponentModel;
+using Avalonia.Media.Imaging;
 using Everywhere.Enums;
 
 namespace Everywhere.Models;
@@ -27,16 +28,10 @@ public class OptimizedVisualElement(IVisualElement original) : IVisualElement
 
     public Task<Bitmap> CaptureAsync() => original.CaptureAsync();
 
-    public event Action<IVisualElement>? TextChanged
+    public event PropertyChangedEventHandler? PropertyChanged
     {
-        add => original.TextChanged += value;
-        remove => original.TextChanged -= value;
-    }
-
-    public event Action<IVisualElement>? BoundingRectangleChanged
-    {
-        add => original.BoundingRectangleChanged += value;
-        remove => original.BoundingRectangleChanged -= value;
+        add => original.PropertyChanged += value;
+        remove => original.PropertyChanged -= value;
     }
 
     private static IEnumerable<IVisualElement> GetOptimizedChildren(IVisualElement element)

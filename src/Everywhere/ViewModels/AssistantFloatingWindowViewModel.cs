@@ -445,5 +445,4 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
             assistantMessage.IsBusy = false;
         }
     }
-
 }
