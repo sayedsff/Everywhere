@@ -819,7 +819,7 @@ public class Win32VisualElementContext : IVisualElementContext
             IVisualElement? selectedElement = null;
 
             var taskCompletionSource = new TaskCompletionSource<IVisualElement?>();
-            var mouseHook = new LowLevelMouseHook((w, ref s) =>
+            var mouseHook = new LowLevelMouseHook((w, ref _) =>
             {
                 switch (w)
                 {
@@ -883,9 +883,29 @@ public class Win32VisualElementContext : IVisualElementContext
                 return true;
             });
 
+            var keyboardHook = new LowLevelKeyboardHook((w, ref k) =>
+            {
+                switch (w)
+                {
+                    case (uint)WINDOW_MESSAGE.WM_KEYDOWN:
+                    case (uint)WINDOW_MESSAGE.WM_SYSKEYDOWN:
+                    {
+                        if (k.vkCode == 0x1B) // ESCAPE
+                        {
+                            taskCompletionSource.TrySetResult(null);
+                            Close();
+                        }
+                        break;
+                    }
+                }
+
+                return true;
+            });
+
             Closed += delegate
             {
                 mouseHook.Dispose();
+                keyboardHook.Dispose();
                 taskCompletionSource.TrySetResult(null);
             };
 
