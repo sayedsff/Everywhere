@@ -9,7 +9,6 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Everywhere.Enums;
 using Everywhere.Models;
 
 namespace Everywhere.Views;
@@ -24,6 +23,16 @@ public partial class VisualTreeDebugger : UserControl
         .Select(p => new VisualElementProperty(p))
         .ToReadOnlyList();
     private readonly Window treeViewPointerOverMask;
+
+#if DEBUG
+    [Obsolete("This constructor is for design time only.", true)]
+    public VisualTreeDebugger()
+    {
+        visualElementContext = ServiceLocator.Resolve<IVisualElementContext>();
+        windowHelper = ServiceLocator.Resolve<IWindowHelper>();
+        treeViewPointerOverMask = new Window();
+    }
+#endif
 
     public VisualTreeDebugger(
         IUserInputTrigger userInputTrigger,

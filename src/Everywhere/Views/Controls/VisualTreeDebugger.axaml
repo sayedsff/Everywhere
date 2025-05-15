@@ -4,6 +4,11 @@
     xmlns:i="clr-namespace:Everywhere.Interfaces" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:v="clr-namespace:Everywhere.Views" d:DesignHeight="450"
     d:DesignWidth="800" mc:Ignorable="d">
+
+    <Design.PreviewWith>
+        <v:VisualTreeDebugger/>
+    </Design.PreviewWith>
+
     <Grid
         Margin="8,4,8,8" ColumnDefinitions="3*,1,1*"
         RowDefinitions="Auto,*">
@@ -28,7 +33,7 @@
                     Content="Show keyboard focused element"/>
                 <Button
                     Height="24" Padding="2"
-                    Classes="Primary" Click="HandleOptimizeButtonClicked"
+                    Classes="Outline" Click="HandleOptimizeButtonClicked"
                     Content="Optimize"/>
             </StackPanel>
         </Border>

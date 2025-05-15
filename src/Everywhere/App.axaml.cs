@@ -4,6 +4,15 @@ using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 using Everywhere.Views;
 
+#if DEBUG
+using Everywhere.Enums;
+using Everywhere.Models;
+using Everywhere.Views.Pages;
+using Microsoft.Extensions.DependencyInjection;
+using ShadUI.Dialogs;
+using ShadUI.Toasts;
+#endif
+
 namespace Everywhere;
 
 public class App : Application
@@ -14,6 +23,42 @@ public class App : Application
     {
         AvaloniaXamlLoader.Load(this);
 
+#if DEBUG
+        if (Design.IsDesignMode)
+        {
+            ServiceLocator.Build(x => x
+
+                #region Basic
+
+                .AddSingleton<IRuntimeConstantProvider, DesignTimeRuntimeConstantProvider>()
+                .AddSingleton<IVisualElementContext, DesignTimeVisualElementContext>()
+                .AddSingleton<IUserInputTrigger, DesignTimeUserInputTrigger>()
+                .AddSingleton<IWindowHelper, DesignTimeWindowHelper>()
+                .AddSingleton<Settings>()
+
+                #endregion
+
+                #region Avalonia Basic
+
+                .AddSingleton<DialogManager>()
+                .AddSingleton<ToastManager>()
+
+                #endregion
+
+                #region View & ViewModel
+
+                .AddSingleton<VisualTreeDebugger>()
+                .AddSingleton<AssistantFloatingWindowViewModel>()
+                .AddSingleton<AssistantFloatingWindow>()
+                .AddSingleton<SettingsPageViewModel>()
+                .AddSingleton<IMainViewPage, SettingsPage>()
+                .AddSingleton<MainViewModel>()
+                .AddSingleton<MainView>()
+
+                #endregion
+            );
+        }
+#endif
         Task.WhenAll(ServiceLocator.Resolve<IEnumerable<IAsyncInitializer>>().Select(i => i.InitializeAsync()));
     }
 
@@ -79,3 +124,35 @@ public class App : Application
         Environment.Exit(0);
     }
 }
+
+#if DEBUG
+
+file class DesignTimeRuntimeConstantProvider : IRuntimeConstantProvider
+{
+    public object? this[RuntimeConstantType type] => null;
+}
+
+file class DesignTimeVisualElementContext : IVisualElementContext
+{
+    public event IVisualElementContext.KeyboardFocusedElementChangedHandler? KeyboardFocusedElementChanged;
+    public IVisualElement? KeyboardFocusedElement => null;
+    public IVisualElement? PointerOverElement => null;
+    public Task<IVisualElement?> PickElementAsync(PickElementMode mode) => Task.FromResult<IVisualElement?>(null);
+}
+
+file class DesignTimeUserInputTrigger : IUserInputTrigger
+{
+    public event IUserInputTrigger.PointerHotkeyActivatedHandler? PointerHotkeyActivated;
+    public event IUserInputTrigger.KeyboardHotkeyActivatedHandler? KeyboardHotkeyActivated;
+}
+
+file class DesignTimeWindowHelper : IWindowHelper
+{
+    public void SetWindowNoFocus(Window window) { }
+    public void SetWindowAutoHide(Window window) { }
+    public void SetWindowHitTestInvisible(Window window) { }
+    public void SetWindowCornerRadius(Window window, CornerRadius cornerRadius) { }
+    public void HideWindowWithoutAnimation(Window window) { }
+}
+
+#endif

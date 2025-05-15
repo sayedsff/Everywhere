@@ -28,6 +28,10 @@ public static class Program
                 #region Basic
 
                 .AddSingleton<IRuntimeConstantProvider, RuntimeConstantProvider>()
+                .AddSingleton<IVisualElementContext, Win32VisualElementContext>()
+                .AddSingleton<IUserInputTrigger, Win32UserInputTrigger>()
+                .AddSingleton<IWindowHelper, Win32WindowHelper>()
+
                 .AddSingleton<Settings>(
                     xx =>
                     {
@@ -56,9 +60,6 @@ public static class Program
                         SettingsBase.Configuration = configuration;
                         return settings;
                     })
-                .AddSingleton<IVisualElementContext, Win32VisualElementContext>()
-                .AddSingleton<IUserInputTrigger, Win32UserInputTrigger>()
-                .AddSingleton<IWindowHelper, Win32WindowHelper>()
 
                 #endregion
 
