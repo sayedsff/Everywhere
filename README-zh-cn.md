@@ -88,7 +88,7 @@
 * [dme-compunet/Lucide.Avalonia](https://github.com/dme-compunet/Lucide.Avalonia) 图标
 * [Kira-NT/HotAvalonia](https://github.com/Kira-NT/HotAvalonia) Avalonia 热重载
 * [microsoft/CommunityToolkit.Mvvm](https://github.com/CommunityToolkit/dotnet) & [Cysharp/ObservableCollections](https://github.com/Cysharp/ObservableCollections) MVVM
-* [FlaUI](https://github.com/FlaUI/FlaUI) 屏幕感知和 UI 自动化
+* [FlaUI/FlaUI](https://github.com/FlaUI/FlaUI) 屏幕感知和 UI 自动化
 * [microsoft/CsWin32](https://github.com/microsoft/CsWin32) 自动生成 Win32 API
 * [Kibnet/WritableJsonConfiguration](https://github.com/Kibnet/WritableJsonConfiguration) 设置存储
 * [microsoft/semantic-kernel](https://github.com/microsoft/semantic-kernel) 大模型、RAG 和工具调用等

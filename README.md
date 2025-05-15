@@ -77,11 +77,11 @@ We welcome issues, feature ideas, and PRs! See [CONTRIBUTING.md](CONTRIBUTING.md
   <img src="https://contrib.rocks/image?repo=DearVa/Everywhere" alt="contrib.rocks image" />
 </a>
 
-## License
+## 📄 License
 
 Distributed under the Apache 2.0 License. See [LICENSE](LICENSE) for more information.
 
-## Acknowledgments
+## 🙏 Acknowledgments
 
 * [accntech/shad-ui](https://github.com/accntech/shad-ui) UI Styles and Components
 * [dme-compunet/Lucide.Avalonia](https://github.com/dme-compunet/Lucide.Avalonia) Icons
