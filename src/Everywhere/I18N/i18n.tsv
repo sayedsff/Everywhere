@@ -5,6 +5,11 @@ Settings_Common_Language_Header	语言	Language
 Settings_Common_Language_Description	选择软件界面语言。	Select the display language for the software.
 SettingsSelectionItem_Common_Language_zh-CN	中文（简体）	中文（简体）
 SettingsSelectionItem_Common_Language_en-US	English (United States)	English (United States)
+Settings_Common_Theme_Header	主题	Theme
+Settings_Common_Theme_Description	选择软件界面主题。	Select the display theme for the software.
+SettingsSelectionItem_Common_Theme_System	跟随系统	Follow System
+SettingsSelectionItem_Common_Theme_Dark	深色主题	Dark Theme
+SettingsSelectionItem_Common_Theme_Light	浅色主题	Light Theme
 SettingsGroup_Behavior_Header	行为	Behavior
 Settings_Behavior_IsInputAssistantEnabled_Header	启用输入助手	Enable Input Assistant
 Settings_Behavior_IsInputAssistantEnabled_Description	当你在任何软件中输入时，输入助手可以根据上下文为你提供帮助。	When you’re typing in any application, the input assistant can offer suggestions from context.

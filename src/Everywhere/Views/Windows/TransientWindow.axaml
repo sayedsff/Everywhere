@@ -1,0 +1,13 @@
+﻿<shadui:Window
+    x:Class="Everywhere.Views.TransientWindow" xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:dialogs="clr-namespace:ShadUI.Dialogs;assembly=ShadUI"
+    xmlns:markupExtensions="clr-namespace:Everywhere.MarkupExtensions" xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI"
+    xmlns:toasts="clr-namespace:ShadUI.Toasts;assembly=ShadUI" Title="Everywhere"
+    MinWidth="640" Icon="avares://Everywhere/Assets/Everywhere.png"
+    TitleFontWeight="SemiBold" TransparencyLevelHint="Mica">
+
+    <shadui:Window.Hosts>
+        <dialogs:DialogHost Manager="{markupExtensions:ServiceLocator Type=dialogs:DialogManager}"/>
+        <toasts:ToastHost Manager="{markupExtensions:ServiceLocator Type=toasts:ToastManager}"/>
+    </shadui:Window.Hosts>
+</shadui:Window>

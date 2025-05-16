@@ -46,6 +46,12 @@ public partial class CommonSettings() : SettingsBase("Common")
 
     [JsonIgnore]
     public static IEnumerable<string> LanguageSource => LocaleManager.AvailableLocaleNames;
+
+    [ObservableProperty]
+    [SettingsSelectionItem(ItemsSource = nameof(ThemeSource))]
+    public partial string Theme { get; set; } = ThemeSource.First();
+
+    public static IEnumerable<string> ThemeSource => ["System", "Dark", "Light"];
 }
 
 public partial class BehaviorSettings() : SettingsBase("Behavior")

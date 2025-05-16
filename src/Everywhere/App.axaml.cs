@@ -17,7 +17,7 @@ namespace Everywhere;
 
 public class App : Application
 {
-    private Window? mainWindow, debugWindow;
+    private TransientWindow? mainWindow, debugWindow;
 
     public override void Initialize()
     {
@@ -102,7 +102,7 @@ public class App : Application
     /// </summary>
     private static bool isShowWindowBusy;
 
-    private static void ShowWindow<TContent>(ref Window? window) where TContent : Control
+    private static void ShowWindow<TContent>(ref TransientWindow? window) where TContent : Control
     {
         if (isShowWindowBusy) return;
         try
@@ -120,7 +120,7 @@ public class App : Application
                 window?.Close();
                 var content = ServiceLocator.Resolve<TContent>();
                 content.To<ISetLogicalParent>().SetParent(null);
-                window = new MainWindow
+                window = new TransientWindow
                 {
                     Content = content
                 };
