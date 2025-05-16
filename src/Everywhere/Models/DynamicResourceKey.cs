@@ -1,9 +1,13 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Avalonia.Controls;
-using Avalonia.Controls.Documents;
+using Avalonia.Reactive;
 
 namespace Everywhere.Models;
 
+/// <summary>
+/// This class is used to create a dynamic resource key for axaml Binding.
+/// </summary>
+/// <param name="key"></param>
 public class DynamicResourceKey(object key) : IObservable<object?>
 {
     /// <summary>
@@ -11,7 +15,9 @@ public class DynamicResourceKey(object key) : IObservable<object?>
     /// </summary>
     public DynamicResourceKey Self => this;
 
-    public IDisposable Subscribe(IObserver<object?> observer) =>
+    protected object Key => key;
+
+    public virtual IDisposable Subscribe(IObserver<object?> observer) =>
         Application.Current!.Resources.GetResourceObservable(key).Subscribe(observer);
 
     [return: NotNullIfNotNull(nameof(key))]
@@ -30,7 +36,23 @@ public class DynamicResourceKeyWrapper<T>(object key, T value) : DynamicResource
     public override int GetHashCode() => Value?.GetHashCode() ?? 0;
 }
 
-public class DynamicResourceKeyRun(object key) : Run(key.ToString())
+public class DirectResourceKey(object key) : DynamicResourceKey(key)
 {
-    public IObservable<object?> Key => Application.Current!.Resources.GetResourceObservable(key);
+    private static readonly IDisposable NullDisposable = new AnonymousDisposable(() => { });
+
+    public override IDisposable Subscribe(IObserver<object?> observer)
+    {
+        observer.OnNext(Key);
+        return NullDisposable;
+    }
+}
+
+public class FormattedDynamicResourceKey(object key, IReadOnlyList<string> args) : DynamicResourceKey(key)
+{
+    public override IDisposable Subscribe(IObserver<object?> observer) =>
+        Application.Current!.Resources.GetResourceObservable(Key).Subscribe(
+            new AnonymousObserver<object?>(o =>
+            {
+                observer.OnNext(string.Format(o?.ToString() ?? string.Empty, args));
+            }));
 }

@@ -2,14 +2,12 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
-using Avalonia.Controls;
 using Avalonia.Controls.Documents;
 using Avalonia.Media;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Everywhere.Agents;
-using Everywhere.Enums;
 using Everywhere.Models;
 using Everywhere.Utils;
 using Everywhere.Views;
@@ -39,7 +37,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
     public partial DynamicResourceKey? Title { get; private set; }
 
     [field: AllowNull, MaybeNull]
-    public NotifyCollectionChangedSynchronizedViewList<MenuItem> Attachments =>
+    public NotifyCollectionChangedSynchronizedViewList<DynamicKeyMenuItem> Attachments =>
         field ??= attachments.ToNotifyCollectionChangedSlim(SynchronizationContextCollectionEventDispatcher.Current);
 
     [ObservableProperty]
@@ -60,7 +58,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
 
     private readonly List<DynamicKeyMenuItem> textEditActions;
     private readonly List<AssistantCommand> textEditCommands;
-    private readonly ObservableList<MenuItem> attachments = [];
+    private readonly ObservableList<DynamicKeyMenuItem> attachments = [];
     private readonly ObservableList<ChatMessage> chatMessages = [];
 
     private CancellationTokenSource? cancellationTokenSource;
@@ -74,7 +72,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
             new DynamicKeyMenuItem
             {
                 Icon = LucideIconKind.Monitor,
-                Header = "AssistantFloatingWindowViewModel_AddAttachmentCommands_Screen",
+                Header = "AssistantFloatingWindowViewModel_AddAttachmentCommands_AddScreen",
             }
         ];
 
@@ -106,30 +104,30 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
                 //     "The user has already written a beginning as the content of XML node with id=\"{ElementId}\". " +
                 //     "You should try to imitate the user's writing style and tone, and continue writing in the user's perspective"
             },
-            // new DynamicKeyMenuItem
+            // new DynamicResourceItem
             // {
             //     Header = "Change Tone to",
             //     Items =
             //     {
-            //         new DynamicKeyMenuItem
+            //         new DynamicResourceItem
             //         {
             //             Header = "Formal",
             //             Command = GenerateAndReplaceCommand,
             //             CommandParameter = "Change the tone of content of XML node with id=\"{ElementId}\" to **Formal**"
             //         },
-            //         new DynamicKeyMenuItem
+            //         new DynamicResourceItem
             //         {
             //             Header = "Casual",
             //             Command = GenerateAndReplaceCommand,
             //             CommandParameter = "Change the tone of content of XML node with id=\"{ElementId}\" to **Casual**"
             //         },
-            //         new DynamicKeyMenuItem
+            //         new DynamicResourceItem
             //         {
             //             Header = "Creative",
             //             Command = GenerateAndReplaceCommand,
             //             CommandParameter = "Change the tone of content of XML node with id=\"{ElementId}\" to **Creative**"
             //         },
-            //         new DynamicKeyMenuItem
+            //         new DynamicResourceItem
             //         {
             //             Header = "Professional",
             //             Command = GenerateAndReplaceCommand,
@@ -206,10 +204,10 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
                 TargetElement = targetElement;
                 attachments.Reset(
                 [
-                    Dispatcher.UIThread.Invoke(() => new MenuItem
+                    Dispatcher.UIThread.Invoke(() => new DynamicKeyMenuItem
                     {
                         Icon = LucideIconKind.TextCursorInput,
-                        Header = $"{Path.GetFileNameWithoutExtension(process.ProcessName)} - EditBox"
+                        Header = new DirectResourceKey($"{Path.GetFileNameWithoutExtension(process.ProcessName)} - EditBox")
                     })
                 ]);
                 QuickActions = textEditActions;

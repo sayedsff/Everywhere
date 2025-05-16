@@ -1,16 +1,14 @@
 ﻿<v:ReactiveUserControl
     x:Class="Everywhere.Views.MainView" xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI"
     xmlns:v="clr-namespace:Everywhere.Views" xmlns:vm="clr-namespace:Everywhere.ViewModels"
-    xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI"
     x:DataType="vm:MainViewModel" x:TypeArguments="vm:MainViewModel">
 
     <shadui:SidebarMenu
-        x:Name="SidebarMenu"
-        IsMenuExpanded="False"
+        x:Name="SidebarMenu" IsMenuExpanded="False"
         ItemsSource="{Binding Pages}">
         <shadui:SidebarMenu.BodyContent>
-            <TransitioningContentControl Content="{Binding ((shadui:SidebarMenuItem)SelectedItem).Content, ElementName=SidebarMenu, FallbackValue={x:Null}}" />
+            <TransitioningContentControl Content="{Binding ((shadui:SidebarMenuItem)SelectedItem).Content, ElementName=SidebarMenu, FallbackValue={x:Null}}"/>
         </shadui:SidebarMenu.BodyContent>
         <shadui:SidebarMenu.Styles>
             <Style Selector="LucideIcon">

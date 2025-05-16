@@ -77,7 +77,7 @@ public partial class ModelSettings() : SettingsBase("Model")
     public partial string Endpoint { get; set; } = "https://api.openai.com/v1";
 
     [ObservableProperty]
-    [SettingsStringItem(Watermark = "sk-xxxxxxxxxxxxxxx")]
+    [SettingsStringItem(Watermark = "sk-xxxxxxxxxxxxxxx", IsPassword = true)]
     public partial string ApiKey { get; set; } = string.Empty;
 
     [ObservableProperty]
@@ -112,6 +112,7 @@ public partial class ModelSettings() : SettingsBase("Model")
 
     [ObservableProperty]
     [SettingsGroup(nameof(IsWebSearchEnabled))]
+    [SettingsStringItem(IsPassword = true)]
     public partial string WebSearchApiKey { get; set; } = string.Empty;
 
     [ObservableProperty]

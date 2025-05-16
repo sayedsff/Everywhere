@@ -16,13 +16,13 @@
         <Border
             Grid.Row="0" Grid.Column="0"
             Grid.ColumnSpan="3" Padding="0,4"
-            BorderBrush="{DynamicResource SukiBorderBrush}"
+            BorderBrush="{DynamicResource BorderColor}"
             BorderThickness="0,0,0,1">
             <StackPanel
                 Orientation="Horizontal" Spacing="8">
                 <Button
-                    Width="24" Height="24"
-                    Padding="0" Classes="Ghost"
+                    Classes="Ghost" Width="24"
+                    Height="24" Padding="0"
                     Click="HandlePickElementButtonClicked">
                     <LucideIcon
                         HorizontalAlignment="Center" VerticalAlignment="Center"
@@ -32,8 +32,8 @@
                     x:Name="ShowKeyboardFocusedElementCheckBox" VerticalAlignment="Center"
                     Content="Show keyboard focused element"/>
                 <Button
-                    Height="24" Padding="2"
-                    Classes="Outline" Click="HandleOptimizeButtonClicked"
+                    Classes="Outline" Height="24"
+                    Padding="2" Click="HandleOptimizeButtonClicked"
                     Content="Optimize"/>
             </StackPanel>
         </Border>
@@ -90,11 +90,11 @@
                 Background="Transparent"/>
             <Border
                 Grid.Row="1" Height="1"
-                Background="{DynamicResource SukiBorderBrush}"
+                Background="{DynamicResource BorderColor}"
                 IsHitTestVisible="False"/>
 
             <Button
-                Grid.Row="2" Classes="Basic"
+                Classes="Basic" Grid.Row="2"
                 Click="HandleCaptureButtonClicked" Cursor="Hand">
                 <Panel>
                     <TextBlock
@@ -111,7 +111,7 @@
         <Border
             Grid.Row="1" Grid.Column="1"
             Width="1"
-            Background="{DynamicResource SukiBorderBrush}"
+            Background="{DynamicResource BorderColor}"
             IsHitTestVisible="False"/>
     </Grid>
 </UserControl>

@@ -2,7 +2,6 @@
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
-using Avalonia.Controls.Templates;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
@@ -17,33 +16,14 @@ namespace Everywhere.Views;
 [TemplatePart("PART_SendButton", typeof(Button))]
 public class AssistantInputBox : TextBox
 {
-    public static IDataTemplate DynamicKeyMenuItemTemplate { get; } = new FuncDataTemplate<object>(
-        (item, _) => item switch
-        {
-            DynamicKeyMenuItem assistantAttachmentItem => assistantAttachmentItem,
-            MenuItem menuItem => new DynamicKeyMenuItem
-            {
-                [!HeaderedSelectingItemsControl.HeaderProperty] = menuItem[!HeaderedSelectingItemsControl.HeaderProperty],
-                [!MenuItem.IconProperty] = menuItem[!MenuItem.IconProperty],
-                [!MenuItem.CommandProperty] = menuItem[!MenuItem.CommandProperty],
-                [!MenuItem.CommandParameterProperty] = menuItem[!MenuItem.CommandParameterProperty],
-                [!IsEnabledProperty] = menuItem[!IsEnabledProperty],
-                [!MenuItem.IsCheckedProperty] = menuItem[!MenuItem.IsCheckedProperty]
-            },
-            _ => new DynamicKeyMenuItem
-            {
-                Header = item
-            }
-        });
-
     public static readonly StyledProperty<bool> PressCtrlEnterToSendProperty =
         AvaloniaProperty.Register<AssistantInputBox, bool>(nameof(PressCtrlEnterToSend));
 
     public static readonly StyledProperty<IRelayCommand<string>?> CommandProperty =
         AvaloniaProperty.Register<AssistantInputBox, IRelayCommand<string>?>(nameof(Command));
 
-    public static readonly StyledProperty<IEnumerable> AttachmentItemsSourceProperty =
-        AvaloniaProperty.Register<AssistantInputBox, IEnumerable>(nameof(AttachmentItemsSource));
+    public static readonly StyledProperty<IList<AssistantAttachment>> AttachmentItemsSourceProperty =
+        AvaloniaProperty.Register<AssistantInputBox, IList<AssistantAttachment>>(nameof(AttachmentItemsSource));
 
     public static readonly StyledProperty<IEnumerable> AddAttachmentCommandItemsSourceProperty =
         AvaloniaProperty.Register<AssistantInputBox, IEnumerable>(nameof(AddAttachmentCommandItemsSource));
@@ -99,7 +79,7 @@ public class AssistantInputBox : TextBox
         set => SetValue(CommandProperty, value);
     }
 
-    public IEnumerable AttachmentItemsSource
+    public IList<AssistantAttachment> AttachmentItemsSource
     {
         get => GetValue(AttachmentItemsSourceProperty);
         set => SetValue(AttachmentItemsSourceProperty, value);
@@ -196,6 +176,11 @@ public class AssistantInputBox : TextBox
         {
             sendButtonClickSubscription = sendButton.AddDisposableHandler(Button.ClickEvent, HandleSendButtonClick, handledEventsToo: true);
         }
+    }
+
+    private void Remove()
+    {
+
     }
 
     private void HandleTextBoxKeyDown(object? sender, KeyEventArgs e)

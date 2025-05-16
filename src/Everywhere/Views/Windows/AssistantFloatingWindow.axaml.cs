@@ -1,5 +1,4 @@
-﻿using Avalonia.Animation.Easings;
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 
@@ -33,8 +32,6 @@ public partial class AssistantFloatingWindow : ReactiveWindow<AssistantFloatingW
         get => GetValue(PlacementProperty);
         set => SetValue(PlacementProperty, value);
     }
-
-    private static readonly Easing Easing = new BounceEaseInOut();
 
     private readonly IWindowHelper windowHelper;
 

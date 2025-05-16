@@ -1,12 +1,8 @@
 ﻿<UserControl
-    x:Class="Everywhere.Views.Pages.SettingsPage"
-    xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:m="clr-namespace:Everywhere.Models"
-    xmlns:vm="clr-namespace:Everywhere.ViewModels"
-    xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI"
-    xmlns:contents="clr-namespace:ShadUI.Contents;assembly=ShadUI"
-    x:DataType="vm:SettingsPageViewModel">
+    x:Class="Everywhere.Views.Pages.SettingsPage" xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:contents="clr-namespace:ShadUI.Contents;assembly=ShadUI"
+    xmlns:m="clr-namespace:Everywhere.Models" xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI"
+    xmlns:vm="clr-namespace:Everywhere.ViewModels" x:DataType="vm:SettingsPageViewModel">
     <ScrollViewer
         HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
         <ScrollViewer.Styles>
@@ -20,15 +16,16 @@
                                         <Panel>
                                             <Panel.Styles>
                                                 <Style Selector="ToggleButton#PART_ToggleButton:checked /template/ Border#RootBorder">
-                                                    <Setter Property="Background" Value="Transparent"></Setter>
+                                                    <Setter Property="Background" Value="Transparent"/>
                                                 </Style>
                                             </Panel.Styles>
                                             <ToggleButton
-                                                x:Name="PART_ToggleButton" Classes="Basic"
-                                                DockPanel.Dock="Right" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
-                                                BorderThickness="0" CornerRadius="8"
-                                                IsEnabled="True"
-                                                IsChecked="{TemplateBinding IsExpanded, Mode=TwoWay}">
+                                                x:Name="PART_ToggleButton" DockPanel.Dock="Right"
+                                                HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
+                                                BorderThickness="0" Classes="Basic"
+                                                CornerRadius="8"
+                                                IsChecked="{TemplateBinding IsExpanded, Mode=TwoWay}"
+                                                IsEnabled="True">
                                             </ToggleButton>
                                             <Grid ColumnDefinitions="*, Auto">
                                                 <ContentPresenter
@@ -36,19 +33,18 @@
                                                     VerticalAlignment="Center"
                                                     Content="{TemplateBinding Header}"/>
                                                 <PathIcon
-                                                    IsHitTestVisible="False"
                                                     x:Name="PART_Icon" Grid.Column="1"
                                                     Width="20" Height="20"
-                                                    Margin="20, 0"
-                                                    HorizontalAlignment="Left"
-                                                    Data="{x:Static contents:Icons.ChevronDown}"/>
+                                                    Margin="20,0" HorizontalAlignment="Left"
+                                                    Data="{x:Static contents:Icons.ChevronDown}"
+                                                    IsHitTestVisible="False"/>
                                             </Grid>
                                         </Panel>
                                     </LayoutTransformControl>
 
                                     <ContentControl
-                                        IsVisible="{Binding ElementName=PART_ToggleButton, Path=IsChecked}"
-                                        x:Name="ContentExpandControlContainer" Padding="0, 8, 0, 0">
+                                        x:Name="ContentExpandControlContainer" Padding="0,8,0,0"
+                                        IsVisible="{Binding ElementName=PART_ToggleButton, Path=IsChecked}">
                                         <shadui:ContentExpandControl
                                             x:Name="PART_ContentExpand"
                                             HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
@@ -65,7 +61,7 @@
 
             <Style Selector="Expander.SettingsItemContainer:down">
                 <Style Selector="^ /template/ ContentPresenter#PART_ContentExpand">
-                    <Setter Property="Margin" Value="0, 12" />
+                    <Setter Property="Margin" Value="0, 12"/>
                 </Style>
             </Style>
 
@@ -85,20 +81,19 @@
                 <Setter Property="ItemTemplate">
                     <DataTemplate DataType="m:SettingsItemBase">
                         <Expander
-                            Classes="SettingsItemContainer"
+                            Background="Transparent" Classes="SettingsItemContainer"
                             Classes.NotExpandable="{Binding !Items.Count}"
                             CornerRadius="4"
-                            Background="Transparent"
                             IsEnabled="{Binding IsEnabledProxy.Value, FallbackValue=True}">
                             <Expander.Header>
                                 <StackPanel>
                                     <TextBlock
-                                        Classes="Large"
+                                        Classes="Large" IsHitTestVisible="False"
                                         Text="{Binding HeaderKey^}"
                                         TextWrapping="WrapWithOverflow"/>
                                     <TextBlock
-                                        Margin="0,8"
-                                        Classes="Small"
+                                        Margin="0,8" Classes="Small"
+                                        IsHitTestVisible="False"
                                         Text="{Binding DescriptionKey^}"
                                         TextWrapping="WrapWithOverflow"/>
                                     <ContentPresenter Content="{Binding}">
@@ -125,14 +120,12 @@
                                                     HorizontalAlignment="Left" Orientation="Horizontal"
                                                     Spacing="8">
                                                     <Slider
-                                                        Width="320"
+                                                        Width="320" IsSnapToTickEnabled="True"
                                                         Maximum="{Binding MaxValue}"
                                                         Minimum="{Binding MinValue}"
-                                                        IsSnapToTickEnabled="True"
                                                         Value="{Binding ValueProxy.Value, Mode=TwoWay}"/>
                                                     <TextBox
-                                                        MinHeight="32"
-                                                        VerticalAlignment="Center"
+                                                        MinHeight="32" VerticalAlignment="Center"
                                                         Text="{Binding ValueProxy.Value, Mode=TwoWay}"/>
                                                 </StackPanel>
                                             </DataTemplate>
@@ -142,15 +135,13 @@
                                                     HorizontalAlignment="Left" Orientation="Horizontal"
                                                     Spacing="8">
                                                     <Slider
-                                                        Width="320"
+                                                        Width="320" IsSnapToTickEnabled="True"
                                                         Maximum="{Binding MaxValue}"
                                                         Minimum="{Binding MinValue}"
                                                         TickFrequency="{Binding Step}"
-                                                        IsSnapToTickEnabled="True"
                                                         Value="{Binding ValueProxy.Value, Mode=TwoWay}"/>
                                                     <TextBox
-                                                        MinHeight="32"
-                                                        VerticalAlignment="Center"
+                                                        MinHeight="32" VerticalAlignment="Center"
                                                         Text="{Binding ValueProxy.Value, Mode=TwoWay, StringFormat={}{0:F1}}"/>
                                                 </StackPanel>
                                             </DataTemplate>
@@ -169,7 +160,7 @@
                             </Expander.Header>
 
                             <ItemsControl
-                                Classes="SettingsItemItemsControl" HorizontalAlignment="Stretch"
+                                HorizontalAlignment="Stretch" Classes="SettingsItemItemsControl"
                                 ItemsSource="{Binding Items}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -184,24 +175,26 @@
         </ScrollViewer.Styles>
 
         <ItemsControl
-            Padding="64, 32" ItemsSource="{Binding Groups}">
+            Padding="64,32"
+            ItemsSource="{Binding Groups}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate DataType="m:SettingsItemGroup">
-                    <StackPanel Margin="0,16" Spacing="16">
+                    <StackPanel
+                        Margin="0,16" Spacing="16">
                         <TextBlock
                             Classes="h3"
                             Text="{Binding HeaderKey^}"
                             TextWrapping="WrapWithOverflow"/>
 
                         <ItemsControl
-                            Classes="SettingsItemItemsControl" HorizontalAlignment="Stretch"
+                            HorizontalAlignment="Stretch" Classes="SettingsItemItemsControl"
                             ItemsSource="{Binding Items}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <StackPanel Spacing="8"/>
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
-                        </ItemsControl> 
+                        </ItemsControl>
                     </StackPanel>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
