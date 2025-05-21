@@ -22,14 +22,17 @@ public class AssistantInputBox : TextBox
     public static readonly StyledProperty<IRelayCommand<string>?> CommandProperty =
         AvaloniaProperty.Register<AssistantInputBox, IRelayCommand<string>?>(nameof(Command));
 
-    public static readonly StyledProperty<IList<AssistantAttachment>> AttachmentItemsSourceProperty =
-        AvaloniaProperty.Register<AssistantInputBox, IList<AssistantAttachment>>(nameof(AttachmentItemsSource));
+    public static readonly StyledProperty<IRelayCommand?> CancelCommandProperty =
+        AvaloniaProperty.Register<AssistantInputBox, IRelayCommand?>(nameof(CancelCommand));
 
-    public static readonly StyledProperty<IEnumerable> AddAttachmentCommandItemsSourceProperty =
-        AvaloniaProperty.Register<AssistantInputBox, IEnumerable>(nameof(AddAttachmentCommandItemsSource));
+    public static readonly StyledProperty<IEnumerable<AssistantAttachment>?> AttachmentItemsSourceProperty =
+        AvaloniaProperty.Register<AssistantInputBox, IEnumerable<AssistantAttachment>?>(nameof(AttachmentItemsSource));
 
-    public static readonly StyledProperty<IEnumerable<AssistantCommand>> AssistantCommandItemsSourceProperty =
-        AvaloniaProperty.Register<AssistantInputBox, IEnumerable<AssistantCommand>>(nameof(AssistantCommandItemsSource));
+    public static readonly StyledProperty<IEnumerable<DynamicNamedCommand>?> AddAttachmentCommandItemsSourceProperty =
+        AvaloniaProperty.Register<AssistantInputBox, IEnumerable<DynamicNamedCommand>?>(nameof(AddAttachmentCommandItemsSource));
+
+    public static readonly StyledProperty<IEnumerable<AssistantCommand>?> AssistantCommandItemsSourceProperty =
+        AvaloniaProperty.Register<AssistantInputBox, IEnumerable<AssistantCommand>?>(nameof(AssistantCommandItemsSource));
 
     public static readonly StyledProperty<AssistantCommand?> SelectedAssistantCommandProperty =
         AvaloniaProperty.Register<AssistantInputBox, AssistantCommand?>(nameof(SelectedAssistantCommand));
@@ -79,19 +82,25 @@ public class AssistantInputBox : TextBox
         set => SetValue(CommandProperty, value);
     }
 
-    public IList<AssistantAttachment> AttachmentItemsSource
+    public IRelayCommand? CancelCommand
+    {
+        get => GetValue(CancelCommandProperty);
+        set => SetValue(CancelCommandProperty, value);
+    }
+
+    public IEnumerable<AssistantAttachment>? AttachmentItemsSource
     {
         get => GetValue(AttachmentItemsSourceProperty);
         set => SetValue(AttachmentItemsSourceProperty, value);
     }
 
-    public IEnumerable AddAttachmentCommandItemsSource
+    public IEnumerable<DynamicNamedCommand>? AddAttachmentCommandItemsSource
     {
         get => GetValue(AddAttachmentCommandItemsSourceProperty);
         set => SetValue(AddAttachmentCommandItemsSourceProperty, value);
     }
 
-    public IEnumerable<AssistantCommand> AssistantCommandItemsSource
+    public IEnumerable<AssistantCommand>? AssistantCommandItemsSource
     {
         get => GetValue(AssistantCommandItemsSourceProperty);
         set => SetValue(AssistantCommandItemsSourceProperty, value);

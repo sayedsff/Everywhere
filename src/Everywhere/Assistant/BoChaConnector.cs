@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.SemanticKernel.Plugins.Web;
 
-namespace Everywhere.Agents;
+namespace Everywhere.Assistant;
 
 public class BoChaConnector : IWebSearchEngineConnector
 {

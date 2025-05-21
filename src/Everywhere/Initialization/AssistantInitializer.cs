@@ -19,7 +19,7 @@ public class AssistantInitializer(
                     IsInputAssistantEnabled: true,
                     ShowInputAssistantFloatingWindow: true
                 }) return;
-            assistantFloatingWindow.ViewModel.SetTargetElementAsync(element).Detach();
+            assistantFloatingWindow.ViewModel.TryFloatToTargetElementAsync(element).Detach();
         };
 
         userInputTrigger.PointerHotkeyActivated += point =>

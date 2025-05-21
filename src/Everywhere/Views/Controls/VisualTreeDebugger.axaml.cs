@@ -189,10 +189,7 @@ public partial class VisualTreeDebugger : UserControl
     private void HandleOptimizeButtonClicked(object? sender, RoutedEventArgs e)
     {
         if (rootElements.Count == 0) return;
-        if (rootElements[0] is not OptimizedVisualElement)
-        {
-            rootElements[0] = new OptimizedVisualElement(rootElements[0]);
-        }
+        rootElements.Reset(rootElements.Select(OptimizedVisualElement.Create).ToList());
     }
 
     private async void HandleCaptureButtonClicked(object? sender, RoutedEventArgs e)

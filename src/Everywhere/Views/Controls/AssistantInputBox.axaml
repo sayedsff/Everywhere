@@ -28,6 +28,10 @@
             <Setter Property="CornerRadius" Value="15"/>
         </Style>
 
+        <Style Selector="^ /template/ Button#PART_CancelButton:disabled">
+            <Setter Property="IsVisible" Value="False"/>
+        </Style>
+
         <Setter Property="Watermark" Value="{DynamicResource AssistantInputBox_Watermark}"/>
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="Padding" Value="6"/>
@@ -76,32 +80,22 @@
                                     CornerRadius="6" Grid.IsSharedSizeScope="True"
                                     ItemsSource="{TemplateBinding AssistantCommandItemsSource}"
                                     SelectedItem="{Binding SelectedAssistantCommand, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
-                                    <ListBox.Styles>
-                                        <Style Selector="ListBoxItem">
-                                            <Setter Property="Template">
-                                                <Setter.Value>
-                                                    <ControlTemplate TargetType="ListBoxItem">
-                                                        <Border
-                                                            Padding="{TemplateBinding Padding}"
-                                                            BorderThickness="{TemplateBinding BorderThickness}"
-                                                            CornerRadius="{TemplateBinding CornerRadius}">
-                                                            <ContentPresenter
-                                                                x:Name="PART_ContentPresenter"
-                                                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                                Content="{TemplateBinding Content}"
-                                                                ContentTemplate="{TemplateBinding ContentTemplate}"/>
-                                                        </Border>
-                                                    </ControlTemplate>
-                                                </Setter.Value>
-                                            </Setter>
-                                        </Style>
-                                    </ListBox.Styles>
+                                    <ListBox.DataTemplates>
+                                        <DataTemplate DataType="m:AssistantCommand">
+                                            <TextBlock>
+                                                <Run
+                                                    FontWeight="Black"
+                                                    Text="{Binding Command}"/>
+                                                <Run Text="{Binding DescriptionKey^, FallbackValue={x:Null}}"/>
+                                            </TextBlock>
+                                        </DataTemplate>
+                                    </ListBox.DataTemplates>
                                 </ListBox>
                             </Popup>
 
                             <ItemsControl
                                 Grid.Row="1" Grid.Column="0"
-                                Grid.ColumnSpan="2"
+                                Grid.ColumnSpan="2" Margin="0,2"
                                 ItemsSource="{TemplateBinding AttachmentItemsSource}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -113,20 +107,23 @@
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate DataType="m:AssistantAttachment">
                                         <Border
-                                            Height="24" CornerRadius="12">
+                                            Height="24" Padding="4,0"
+                                            BorderBrush="{DynamicResource BorderColor}"
+                                            BorderThickness="1" CornerRadius="12">
                                             <StackPanel
                                                 Orientation="Horizontal" Spacing="4">
                                                 <LucideIcon
                                                     VerticalAlignment="Center"
                                                     Kind="{Binding Icon}"
-                                                    Size="12"/>
+                                                    Size="14"/>
                                                 <TextBlock
-                                                    Classes="Muted" VerticalAlignment="Center"
+                                                    VerticalAlignment="Center" FontSize="12"
                                                     Text="{Binding HeaderKey^}"/>
                                                 <Button
                                                     Padding="2" VerticalAlignment="Center"
                                                     Background="Transparent" BorderThickness="0">
                                                     <LucideIcon
+                                                        Foreground="{DynamicResource MutedColor}"
                                                         Kind="X" Size="12"/>
                                                 </Button>
                                             </StackPanel>
@@ -140,14 +137,35 @@
                                 Orientation="Horizontal" Spacing="4">
                                 <Menu>
                                     <MenuItem
-                                        Classes="Outline Rounded" extensions:MenuItemAssist.PopupPlacement="TopEdgeAlignedLeft"
-                                        ItemsSource="{Binding AddAttachmentCommandItemsSource, RelativeSource={RelativeSource TemplatedParent}}"
+                                        Classes="Outline Rounded" extensions:MenuItemAssist.Label="Add Attachment"
+                                        extensions:MenuItemAssist.PopupPlacement="TopEdgeAlignedLeft" extensions:MenuItemAssist.PopupVerticalOffset="-4"
+                                        ItemsSource="{TemplateBinding AddAttachmentCommandItemsSource}"
                                         ToolTip.Tip="{DynamicResource AssistantInputBox_AddAttachmentButton_ToolTip}">
                                         <MenuItem.Header>
                                             <LucideIcon
                                                 HorizontalAlignment="Center" VerticalAlignment="Center"
                                                 Kind="Plus" Size="18"/>
                                         </MenuItem.Header>
+
+                                        <MenuItem.ItemContainerTheme>
+                                            <ControlTheme
+                                                x:DataType="m:DynamicNamedCommand"
+                                                BasedOn="{StaticResource {x:Type MenuItem}}"
+                                                TargetType="MenuItem">
+                                                <Setter Property="Icon">
+                                                    <Setter.Value>
+                                                        <Template>
+                                                            <LucideIcon
+                                                                Kind="{Binding Icon}"
+                                                                Size="16"/>
+                                                        </Template>
+                                                    </Setter.Value>
+                                                </Setter>
+                                                <Setter Property="Header" Value="{Binding HeaderKey^}"/>
+                                                <Setter Property="Command" Value="{Binding Command}"/>
+                                                <Setter Property="CommandParameter" Value="{Binding CommandParameter}"/>
+                                            </ControlTheme>
+                                        </MenuItem.ItemContainerTheme>
                                     </MenuItem>
                                 </Menu>
 
@@ -197,6 +215,7 @@
                                 Spacing="4">
                                 <Button
                                     x:Name="PART_SendButton" Classes="Primary Rounded"
+                                    IsVisible="{Binding !IsVisible, ElementName=PART_CancelButton}"
                                     ToolTip.Tip="{DynamicResource AssistantInputBox_SendButton_ToolTip}">
                                     <Button.IsEnabled>
                                         <MultiBinding Converter="{x:Static BoolConverters.And}">
@@ -213,6 +232,16 @@
                                     <LucideIcon
                                         Margin="-1,1,1,-1" Kind="Send"
                                         Size="16"/>
+                                </Button>
+
+                                <Button
+                                    x:Name="PART_CancelButton" Classes="Primary Rounded"
+                                    Command="{TemplateBinding CancelCommand}"
+                                    ToolTip.Tip="{DynamicResource AssistantInputBox_CancelButton_ToolTip}">
+                                    <Border
+                                        Width="12" Height="12"
+                                        Background="{DynamicResource ForegroundColor}"
+                                        CornerRadius="1"/>
                                 </Button>
                             </StackPanel>
                         </Grid>

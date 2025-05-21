@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Text;
 
 namespace Everywhere.Extensions;
 
@@ -38,4 +39,18 @@ public static class StringExtension
     }
     
     public static string AppendIf(this string str, bool condition, string append) => condition ? str + append : str;
+
+    public static StringBuilder TrimEnd(this StringBuilder sb)
+    {
+        var i = sb.Length - 1;
+        for (; i >= 0; i--)
+        {
+            if (!char.IsWhiteSpace(sb[i])) break;
+        }
+        if (i < sb.Length - 1)
+        {
+            sb.Remove(i + 1, sb.Length - i - 1);
+        }
+        return sb;
+    }
 }

@@ -21,6 +21,7 @@
         <PackageReference Include="Microsoft.SemanticKernel.Plugins.Web" />
         <PackageReference Include="ObservableCollections" />
         <PackageReference Include="System.Drawing.Common" />
+        <PackageReference Include="ZLinq" />
     </ItemGroup>
 
     <ItemGroup>

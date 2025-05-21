@@ -5,10 +5,13 @@ using System.Text;
 
 namespace Everywhere.Utils;
 
-public class VisualElementXmlBuilder(IVisualElement rootElement)
+public class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreElements, int softLimit = 16000)
 {
     private readonly Dictionary<IVisualElement, int> idMap = [];
+    private readonly Dictionary<IVisualElement, double> weightMap = [];
+    private readonly HashSet<IVisualElement> essentialElements = [];
     private StringBuilder? visualTreeXmlBuilder;
+    private int currentSize;
 
     public string BuildXml(CancellationToken cancellationToken)
     {
@@ -33,64 +36,247 @@ public class VisualElementXmlBuilder(IVisualElement rootElement)
 #endif
 
         visualTreeXmlBuilder = new StringBuilder();
-        BuildInternal(rootElement, 0);
-        visualTreeXmlBuilder.Remove(visualTreeXmlBuilder.Length - 1, 1);
+        currentSize = 0;
+
+        essentialElements.AddRange(coreElements);
+
+        var roots = FindRootElements();
+
+        CalculateWeights();
+
+        foreach (var root in roots)
+        {
+            BuildElementXml(root, 0, cancellationToken);
+            visualTreeXmlBuilder.AppendLine();
+        }
+
+        visualTreeXmlBuilder.TrimEnd();
 
 #if DEBUG
         sw.Stop();
         Debug.WriteLine($"BuildInternal finished in {sw.ElapsedMilliseconds}ms");
 #endif
+    }
 
-        void BuildInternal(IVisualElement currentElement, int indentLevel)
+    // Find the root elements of all core elements
+    private IEnumerable<IVisualElement> FindRootElements()
+    {
+        if (coreElements.Count == 0) return [];
+
+        // Find common ancestors
+        var commonAncestors = FindCommonAncestors();
+        if (commonAncestors.Count <= 0)
         {
-            cancellationToken.ThrowIfCancellationRequested();
+            // No common ancestors, each core element is an independent root
+            return coreElements.Select(e => e.GetAncestors().Last());
+        }
 
-            var indent = new string(' ', indentLevel * 2);
-            visualTreeXmlBuilder.Append(indent);
-            visualTreeXmlBuilder.Append('<').Append(currentElement.Type);
+        // Mark the found common ancestors as essential elements
+        essentialElements.AddRange(commonAncestors);
+        return commonAncestors.Select(e => e.GetAncestors().Last());
+    }
 
-            var id = idMap.Count;
-            idMap.Add(currentElement, id);
-            visualTreeXmlBuilder.Append(" id=\"").Append(id).Append('"');
+    private List<IVisualElement> FindCommonAncestors()
+    {
+        if (coreElements.Count <= 1) return [.. coreElements];
 
-            if (currentElement.Name is { } name && !string.IsNullOrWhiteSpace(name))
+        // Get the ancestor path for each core element
+        var ancestorPaths = new Dictionary<IVisualElement, HashSet<IVisualElement>>();
+
+        foreach (var element in coreElements)
+        {
+            var path = new HashSet<IVisualElement>();
+            var current = element;
+
+            // Add the element itself and all its ancestors
+            while (current != null)
             {
-                visualTreeXmlBuilder.Append(" name=\"").Append(SecurityElement.Escape(name)).Append('"');
+                path.Add(current);
+                current = current.Parent;
             }
 
-            var textLines = currentElement.GetText()?.Split(Environment.NewLine);
+            ancestorPaths[element] = path;
+        }
 
-            using var childrenEnumerator = currentElement.Children.GetEnumerator();
-            if (textLines is [{ } text] && !string.IsNullOrWhiteSpace(text))
+        // Find all common ancestors
+        var commonAncestors = new HashSet<IVisualElement>(ancestorPaths[coreElements[0]]);
+
+        for (var i = 1; i < coreElements.Count; i++)
+        {
+            commonAncestors.IntersectWith(ancestorPaths[coreElements[i]]);
+
+            if (commonAncestors.Count == 0) return []; // No common ancestors
+        }
+
+        // Find the lowest common ancestors (closest to the core elements)
+        return FindLowestCommonAncestors(commonAncestors);
+    }
+
+    private static List<IVisualElement> FindLowestCommonAncestors(HashSet<IVisualElement> commonAncestors)
+    {
+        // Check if any child node is also a common ancestor
+        return (from ancestor in commonAncestors
+            let isLowest = ancestor.Children.All(child => !commonAncestors.Contains(child))
+            where isLowest
+            select ancestor).ToList();
+    }
+
+    private void CalculateWeights()
+    {
+        weightMap.Clear();
+
+        // Assign the highest weight to core elements
+        foreach (var element in coreElements)
+        {
+            weightMap[element] = 1000;
+
+            // Assign decreasing weights to the parents of core elements
+            AssignAncestorWeights(element);
+
+            // Assign decreasing weights to the children of core elements
+            AssignDescendantWeights(element);
+        }
+
+        // Assign weights to siblings of existing elements
+        AssignSiblingWeights();
+    }
+
+    private void AssignAncestorWeights(IVisualElement element)
+    {
+        var current = element.Parent;
+        double weight = 900;
+
+        while (current != null)
+        {
+            // If the ancestor already has a higher weight, keep the higher weight
+            if (!weightMap.TryGetValue(current, out var existingWeight) || existingWeight < weight)
             {
-                visualTreeXmlBuilder.Append(" text=\"").Append(SecurityElement.Escape(text)).Append('"');
+                weightMap[current] = weight;
             }
 
-            if (!childrenEnumerator.MoveNext())
+            weight *= 0.9; // Weight decreases with distance
+            current = current.Parent;
+        }
+    }
+
+    private void AssignDescendantWeights(IVisualElement element, double weight = 900)
+    {
+        foreach (var child in element.Children)
+        {
+            var childWeight = weight * 0.8;
+
+            // If the child already has a higher weight, keep the higher weight
+            if (weightMap.TryGetValue(child, out var existingWeight) && !(existingWeight < childWeight)) continue;
+
+            // Recursively process the children of the child node
+            weightMap[child] = childWeight;
+            AssignDescendantWeights(child, childWeight);
+        }
+    }
+
+    private void AssignSiblingWeights()
+    {
+        foreach (var element in weightMap.Keys.ToReadOnlyList())
+        {
+            if (element.Parent == null) continue;
+
+            // Assign weights to sibling nodes
+            var siblingWeight = weightMap[element] * 0.6;
+            foreach (var sibling in element.Parent.Children)
             {
-                // If the element has no children, we can omit the text node in a single line.
-                visualTreeXmlBuilder.AppendLine("/>");
-            }
-            else
-            {
-                visualTreeXmlBuilder.AppendLine(">");
-                if (textLines is { Length: > 1 })
+                if (!weightMap.TryGetValue(sibling, out var existingWeight) || existingWeight < siblingWeight)
                 {
-                    var textLineIndent = new string(' ', indentLevel * 2 + 2);
-                    foreach (var textLine in textLines)
-                    {
-                        if (string.IsNullOrWhiteSpace(textLine)) continue;
-                        visualTreeXmlBuilder.Append(textLineIndent).AppendLine(SecurityElement.Escape(textLine));
-                    }
+                    weightMap[sibling] = siblingWeight;
                 }
-
-                do
-                {
-                    BuildInternal(childrenEnumerator.Current, indentLevel + 1);
-                }
-                while (childrenEnumerator.MoveNext());
-                visualTreeXmlBuilder.Append(indent).Append("</").Append(currentElement.Type).AppendLine(">");
             }
         }
+    }
+
+    private bool BuildElementXml(IVisualElement element, int indentLevel, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        // Skip if over soft limit and not an essential element
+        if (currentSize >= softLimit && !essentialElements.Contains(element))
+            return false;
+
+        // Calculate the maximum text length
+        var maxTextLength = coreElements.Count > 0 ? softLimit / (coreElements.Count * 2) : softLimit / 10;
+
+        var indent = new string(' ', indentLevel * 2);
+
+        // Start tag
+        AppendWithLimit($"{indent}<{element.Type}");
+
+        // Add ID
+        var id = idMap.Count;
+        idMap[element] = id;
+        AppendWithLimit($" id=\"{id}\"");
+
+        // Add name attribute
+        if (element.Type != VisualElementType.Label && element.Name is { } name && !string.IsNullOrWhiteSpace(name))
+        {
+            AppendWithLimit($" description=\"{SecurityElement.Escape(TruncateIfNeeded(name, maxTextLength))}\"");
+        }
+
+        // Get text
+        var text = element.GetText();
+        var textLines = text?.Split(Environment.NewLine);
+
+        // Sort child elements by weight
+        var childrenByWeight = element.Children
+            .OrderByDescending(c => essentialElements.Contains(c))
+            .ThenByDescending(c => weightMap.GetValueOrDefault(c, 0))
+            .ToList();
+
+        // If there is only a single line of text and no child elements, simplify output
+        if (textLines is [{ } singleLine] && !string.IsNullOrWhiteSpace(singleLine) && childrenByWeight.Count == 0)
+        {
+            AppendWithLimit($" content=\"{SecurityElement.Escape(TruncateIfNeeded(singleLine, maxTextLength))}\"/>");
+            AppendWithLimit(Environment.NewLine);
+            return true;
+        }
+
+        // Has child elements or multiline text
+        AppendWithLimit(">");
+        AppendWithLimit(Environment.NewLine);
+
+        // Handle multiline text
+        if (textLines is { Length: > 0 })
+        {
+            var textIndent = new string(' ', (indentLevel + 1) * 2);
+            foreach (var line in textLines)
+            {
+                if (string.IsNullOrWhiteSpace(line)) continue;
+                AppendWithLimit($"{textIndent}{SecurityElement.Escape(TruncateIfNeeded(line, maxTextLength))}");
+                AppendWithLimit(Environment.NewLine);
+            }
+        }
+
+        // Handle child elements
+        foreach (var child in childrenByWeight.Where(c => currentSize < softLimit || essentialElements.Contains(c)))
+        {
+            if (!BuildElementXml(child, indentLevel + 1, cancellationToken)) break;
+        }
+
+        // End tag
+        AppendWithLimit($"{indent}</{element.Type}>");
+        AppendWithLimit(Environment.NewLine);
+
+        return true;
+    }
+
+    private void AppendWithLimit(string content)
+    {
+        visualTreeXmlBuilder!.Append(content);
+        currentSize += content.Length;
+    }
+
+    private static string TruncateIfNeeded(string text, int maxLength)
+    {
+        if (maxLength <= 0 || text.Length <= maxLength)
+            return text;
+
+        return text[..Math.Max(0, maxLength - 3)] + "...";
     }
 }

@@ -1,5 +1,4 @@
-﻿using Avalonia.Controls.Documents;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Everywhere.Collections;
 using Lucide.Avalonia;
 using Microsoft.SemanticKernel.ChatCompletion;
@@ -21,15 +20,7 @@ public abstract class ChatMessage(AuthorRole role, string? actualContent = null)
         }
     }
 
-    public override string ToString() => ActualContent ?? string.Join(
-        null,
-        InlineCollection.Select(
-            i => i switch
-            {
-                Run run => run.Text,
-                LineBreak => "\n",
-                _ => string.Empty
-            }));
+    public override string? ToString() => ActualContent ?? InlineCollection.Text;
 }
 
 public class SystemChatMessage(string systemPrompt) : ChatMessage(AuthorRole.System, systemPrompt);

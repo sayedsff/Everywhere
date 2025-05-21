@@ -1,13 +1,13 @@
 ﻿<v:ReactiveWindow
     x:Class="Everywhere.Views.AssistantFloatingWindow" xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:contents="clr-namespace:ShadUI.Contents;assembly=ShadUI"
-    xmlns:m="clr-namespace:Everywhere.Models" xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI"
-    xmlns:system="clr-namespace:System;assembly=System.Runtime" xmlns:themes="clr-namespace:ShadUI.Themes;assembly=ShadUI"
-    xmlns:v="clr-namespace:Everywhere.Views" xmlns:vc="clr-namespace:Everywhere.ValueConverters"
-    xmlns:vm="clr-namespace:Everywhere.ViewModels" x:DataType="vm:AssistantFloatingWindowViewModel"
-    x:TypeArguments="vm:AssistantFloatingWindowViewModel" Background="Transparent"
-    CanResize="False"
-    IsOpened="{Binding TargetElement, Converter={x:Static ObjectConverters.IsNotNull}}"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:c="clr-namespace:Everywhere.Collections"
+    xmlns:contents="clr-namespace:ShadUI.Contents;assembly=ShadUI" xmlns:m="clr-namespace:Everywhere.Models"
+    xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI" xmlns:system="clr-namespace:System;assembly=System.Runtime"
+    xmlns:themes="clr-namespace:ShadUI.Themes;assembly=ShadUI" xmlns:v="clr-namespace:Everywhere.Views"
+    xmlns:vc="clr-namespace:Everywhere.ValueConverters" xmlns:vm="clr-namespace:Everywhere.ViewModels"
+    x:DataType="vm:AssistantFloatingWindowViewModel" x:TypeArguments="vm:AssistantFloatingWindowViewModel"
+    Background="Transparent" CanResize="False"
+    IsOpened="{Binding IsVisible}"
     RequestedThemeVariant="{x:Static themes:ThemeVariants.Acrylic}"
     ShowActivated="False" ShowInTaskbar="False"
     SizeToContent="WidthAndHeight" SystemDecorations="None"
@@ -89,8 +89,7 @@
                 Classes="Basic WindowControlsButton Close" DockPanel.Dock="Right"
                 Width="24" Height="24"
                 Margin="0,0,0,4" VerticalAlignment="Center"
-                Command="{Binding SetTargetElementCommand}"
-                CommandParameter="{x:Null}"
+                Command="{Binding CloseCommand}"
                 CornerRadius="4"
                 IsVisible="{Binding IsExpanded}">
                 <PathIcon
@@ -132,33 +131,37 @@
                         <ItemsControl
                             IsVisible="{Binding !ChatMessages.Count}"
                             ItemsSource="{Binding QuickActions}">
-                            <ItemsControl.Styles>
-                                <Style Selector="v|DynamicKeyMenuItem">
-                                    <Setter Property="Template">
-                                        <ControlTemplate TargetType="v:DynamicKeyMenuItem">
-                                            <Button
-                                                Height="36" Padding="16,4"
-                                                Background="{DynamicResource AcrylicBackgroundBrush}"
-                                                BorderBrush="{DynamicResource AcrylicLowBorderBrush}"
-                                                BorderThickness="1.6"
-                                                Command="{TemplateBinding Command}"
-                                                CommandParameter="{TemplateBinding CommandParameter}"
-                                                CornerRadius="18">
-                                                <StackPanel
-                                                    Orientation="Horizontal" Spacing="6">
-                                                    <LucideIcon
-                                                        VerticalAlignment="Center"
-                                                        Kind="{TemplateBinding Icon}"
-                                                        Size="18"/>
-                                                    <TextBlock
-                                                        VerticalAlignment="Center"
-                                                        Text="{Binding HeaderKey^, RelativeSource={RelativeSource TemplatedParent}}"/>
-                                                </StackPanel>
-                                            </Button>
-                                        </ControlTemplate>
-                                    </Setter>
-                                </Style>
-                            </ItemsControl.Styles>
+                            <ItemsControl.DataTemplates>
+                                <DataTemplate DataType="m:DynamicNamedCommand">
+                                    <Button
+                                        Height="36" Padding="16,4"
+                                        Background="{DynamicResource AcrylicBackgroundBrush}"
+                                        BorderBrush="{DynamicResource AcrylicLowBorderBrush}"
+                                        BorderThickness="1.6"
+                                        Command="{Binding Command}"
+                                        CommandParameter="{Binding CommandParameter}"
+                                        CornerRadius="18">
+                                        <StackPanel
+                                            Orientation="Vertical" Spacing="4">
+                                            <StackPanel
+                                                Orientation="Horizontal" Spacing="6">
+                                                <LucideIcon
+                                                    VerticalAlignment="Center"
+                                                    Kind="{Binding Icon}"
+                                                    Size="19"/>
+                                                <TextBlock
+                                                    VerticalAlignment="Center"
+                                                    Text="{Binding HeaderKey^}"/>
+                                            </StackPanel>
+
+                                            <TextBlock
+                                                IsVisible="{Binding !!DescriptionKey}"
+                                                Text="{Binding DescriptionKey^, FallbackValue={x:Null}}"
+                                                TextWrapping="Wrap"/>
+                                        </StackPanel>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.DataTemplates>
 
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
@@ -180,16 +183,27 @@
                             </ItemsControl.ItemsPanel>
 
                             <ItemsControl.Styles>
-                                <Style Selector=":is(Control).ChatMessage">
-                                    <Setter Property="MaxWidth" Value="{Binding $parent[ItemsControl].Bounds.Width}"/>
-                                </Style>
-
                                 <Style Selector="StackPanel.ChatMessage.Assistant:not(:pointerover) StackPanel#ChatMessageOperationPanel">
                                     <Setter Property="Opacity" Value="0"/>
                                 </Style>
 
+                                <Style Selector="Border.ChatBubble">
+                                    <Setter Property="Padding" Value="8,4"/>
+                                    <Setter Property="CornerRadius" Value="12"/>
+                                    <Setter Property="BorderThickness" Value="1"/>
+                                    <Setter Property="Background" Value="{DynamicResource CardBackgroundColor}"/>
+                                    <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}"/>
+                                </Style>
+
+                                <Style Selector="Button.Ghost">
+                                    <Setter Property="Padding" Value="4"/>
+                                    <Setter Property="MinHeight" Value="0"/>
+                                    <Setter Property="Height" Value="NaN"/>
+                                    <Setter Property="Cursor" Value="Hand"/>
+                                </Style>
+
                                 <Style Selector="Button LucideIcon">
-                                    <Setter Property="Size" Value="12"/>
+                                    <Setter Property="Size" Value="14"/>
                                 </Style>
 
                                 <Style Selector="SelectableTextBlock">
@@ -200,25 +214,25 @@
                             <ItemsControl.DataTemplates>
                                 <DataTemplate DataType="m:AssistantChatMessage">
                                     <StackPanel
-                                        Classes="ChatMessage Assistant" HorizontalAlignment="Left"
-                                        Background="Transparent" Orientation="Vertical"
-                                        Spacing="4">
-                                        <shadui:Card>
+                                        Classes="ChatMessage Assistant" Margin="0,0,36,0"
+                                        HorizontalAlignment="Left" Background="Transparent"
+                                        Orientation="Vertical" Spacing="4">
+                                        <Border Classes="ChatBubble">
                                             <SelectableTextBlock Inlines="{Binding InlineCollection}"/>
-                                        </shadui:Card>
+                                        </Border>
 
                                         <StackPanel
                                             x:Name="ChatMessageOperationPanel" HorizontalAlignment="Right"
                                             Orientation="Horizontal">
                                             <Button
-                                                Classes="Basic" Padding="4"
+                                                Classes="Ghost"
                                                 Command="{Binding $parent[v:AssistantFloatingWindow].ViewModel.RetryCommand}"
                                                 CommandParameter="{Binding}"
                                                 ToolTip.Tip="{DynamicResource AssistantFloatingWindow_ChatMessage_Assistant_Regenerate}">
                                                 <LucideIcon Kind="RefreshCcw"/>
                                             </Button>
                                             <Button
-                                                Classes="Basic" Padding="4"
+                                                Classes="Ghost"
                                                 Command="{Binding $parent[v:AssistantFloatingWindow].ViewModel.CopyCommand}"
                                                 CommandParameter="{Binding}"
                                                 ToolTip.Tip="{DynamicResource AssistantFloatingWindow_ChatMessage_Assistant_Copy}">
@@ -230,37 +244,95 @@
 
                                 <DataTemplate DataType="m:UserChatMessage">
                                     <StackPanel
-                                        Classes="ChatMessage User" HorizontalAlignment="Right"
-                                        Background="Transparent" Orientation="Vertical"
-                                        Spacing="4">
-                                        <shadui:Card>
+                                        Classes="ChatMessage User" Margin="36,0,0,0"
+                                        HorizontalAlignment="Right" Background="Transparent"
+                                        Orientation="Vertical" Spacing="4">
+                                        <Border Classes="ChatBubble">
                                             <SelectableTextBlock Inlines="{Binding InlineCollection}"/>
-                                        </shadui:Card>
+                                        </Border>
 
                                         <!--  TODO: Edit operations  -->
                                     </StackPanel>
                                 </DataTemplate>
 
                                 <DataTemplate DataType="m:ActionChatMessage">
-                                    <shadui:Card
-                                        Classes="ChatMessage Action" HorizontalAlignment="Left">
+                                    <Border
+                                        Classes="ChatMessage Action ChatBubble" Margin="0,0,36,0"
+                                        HorizontalAlignment="Left">
+                                        <Border.Styles>
+                                            <Style Selector="Expander:not(.CanExpand)">
+                                                <Style Selector="^ ToggleButton#PART_ToggleButton">
+                                                    <Setter Property="IsEnabled" Value="False"/>
+                                                </Style>
+                                                <Style Selector="^ LucideIcon#PART_Icon">
+                                                    <Setter Property="IsVisible" Value="False"/>
+                                                </Style>
+                                                <Style Selector="^ ContentControl#ContentExpandControlContainer">
+                                                    <Setter Property="IsVisible" Value="False"/>
+                                                </Style>
+                                            </Style>
+                                        </Border.Styles>
+
                                         <Expander
-                                            Background="Transparent" BorderThickness="0">
+                                            Background="Transparent" BorderThickness="0"
+                                            Classes.CanExpand="{Binding InlineCollection.Count, Converter={x:Static c:BusyInlineCollection.IsNotEmpty}}">
+                                            <Expander.Template>
+                                                <ControlTemplate TargetType="Expander">
+                                                    <StackPanel>
+                                                        <LayoutTransformControl Name="PART_ToggleTransform">
+                                                            <Panel>
+                                                                <ToggleButton
+                                                                    x:Name="PART_ToggleButton" DockPanel.Dock="Right"
+                                                                    MinHeight="0" Background="Transparent"
+                                                                    BorderThickness="0"
+                                                                    IsChecked="{TemplateBinding IsExpanded, Mode=TwoWay}"/>
+                                                                <StackPanel
+                                                                    Orientation="Horizontal" Spacing="4">
+                                                                    <ContentPresenter
+                                                                        VerticalAlignment="Center"
+                                                                        Content="{TemplateBinding Header}"/>
+                                                                    <LucideIcon
+                                                                        x:Name="PART_Icon" VerticalAlignment="Center"
+                                                                        IsHitTestVisible="False" Kind="Maximize2"
+                                                                        Size="20"/>
+                                                                </StackPanel>
+                                                            </Panel>
+                                                        </LayoutTransformControl>
+
+                                                        <ContentControl
+                                                            x:Name="ContentExpandControlContainer" Padding="0,8,0,0"
+                                                            IsVisible="{Binding ElementName=PART_ToggleButton, Path=IsChecked}">
+                                                            <shadui:ContentExpandControl
+                                                                x:Name="PART_ContentExpand"
+                                                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                                Content="{TemplateBinding Content}"
+                                                                ContentTemplate="{TemplateBinding ContentTemplate}"/>
+                                                        </ContentControl>
+                                                    </StackPanel>
+                                                </ControlTemplate>
+                                            </Expander.Template>
+
                                             <Expander.Header>
                                                 <StackPanel
                                                     Orientation="Horizontal" Spacing="4">
-                                                    <LucideIcon Kind="{Binding Icon}"/>
-                                                    <SelectableTextBlock Text="{Binding HeaderKey^, FallbackValue={x:Null}}"/>
+                                                    <LucideIcon
+                                                        VerticalAlignment="Center"
+                                                        Kind="{Binding Icon}"
+                                                        Size="18"/>
+                                                    <SelectableTextBlock
+                                                        VerticalAlignment="Center"
+                                                        Text="{Binding HeaderKey^, FallbackValue={x:Null}}"/>
                                                     <shadui:Loading
-                                                        Width="15" Height="15"
-                                                        IsHitTestVisible="False"
+                                                        Width="14" Height="14"
+                                                        VerticalAlignment="Center" IsHitTestVisible="False"
                                                         IsVisible="{Binding IsBusy}"/>
                                                 </StackPanel>
                                             </Expander.Header>
 
                                             <SelectableTextBlock Inlines="{Binding InlineCollection}"/>
                                         </Expander>
-                                    </shadui:Card>
+                                    </Border>
                                 </DataTemplate>
                             </ItemsControl.DataTemplates>
                         </ItemsControl>
@@ -272,6 +344,7 @@
                     AddAttachmentCommandItemsSource="{Binding AddAttachmentCommands}"
                     AssistantCommandItemsSource="{Binding AssistantCommands}"
                     AttachmentItemsSource="{Binding Attachments}"
+                    CancelCommand="{Binding CancelCommand}"
                     Command="{Binding ProcessChatMessageSentCommand}"
                     IsImageSupported="{Binding Settings.Model.IsImageEnabled}"
                     IsSendButtonEnabled="{Binding !IsBusy}"

@@ -1,10 +1,13 @@
 ﻿using Avalonia.Controls.Documents;
+using Avalonia.Data.Converters;
 using ShadUI.Controls;
 
 namespace Everywhere.Collections;
 
 public class BusyInlineCollection : InlineCollection
 {
+    public static IValueConverter IsNotEmpty { get; } = new FuncValueConverter<int, bool>(i => i > 1);
+
     public bool IsBusy
     {
         get => loading.IsVisible;
