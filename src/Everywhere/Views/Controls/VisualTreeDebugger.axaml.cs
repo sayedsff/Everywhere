@@ -16,31 +16,27 @@ namespace Everywhere.Views;
 public partial class VisualTreeDebugger : UserControl
 {
     private readonly IVisualElementContext visualElementContext;
-    private readonly IWindowHelper windowHelper;
     private readonly ObservableCollection<IVisualElement> rootElements = [];
     private readonly IReadOnlyList<VisualElementProperty> properties = typeof(DebuggerVisualElement)
         .GetProperties(BindingFlags.Instance | BindingFlags.Public)
         .Select(p => new VisualElementProperty(p))
         .ToReadOnlyList();
-    private readonly Window treeViewPointerOverMask;
+    private readonly OverlayWindow treeViewPointerOverOverlayWindow;
 
 #if DEBUG
     [Obsolete("This constructor is for design time only.", true)]
     public VisualTreeDebugger()
     {
         visualElementContext = ServiceLocator.Resolve<IVisualElementContext>();
-        windowHelper = ServiceLocator.Resolve<IWindowHelper>();
-        treeViewPointerOverMask = new Window();
+        treeViewPointerOverOverlayWindow = new OverlayWindow();
     }
 #endif
 
     public VisualTreeDebugger(
         IHotkeyListener hotkeyListener,
-        IVisualElementContext visualElementContext,
-        IWindowHelper windowHelper)
+        IVisualElementContext visualElementContext)
     {
         this.visualElementContext = visualElementContext;
-        this.windowHelper = windowHelper;
 
         InitializeComponent();
 
@@ -58,34 +54,17 @@ public partial class VisualTreeDebugger : UserControl
             rootElements.Add(element);
         };
 
-        treeViewPointerOverMask = new Window
+        treeViewPointerOverOverlayWindow = new OverlayWindow
         {
-            Topmost = true,
-            CanResize = false,
-            ShowInTaskbar = false,
-            ShowActivated = false,
-            SystemDecorations = SystemDecorations.None,
-            TransparencyLevelHint = [WindowTransparencyLevel.Transparent],
-            Background = null,
             Content = new Border
             {
                 Background = Brushes.DodgerBlue,
                 Opacity = 0.2
             },
         };
-        treeViewPointerOverMask.Closing += (_, e) => e.Cancel = true;
-        windowHelper.SetWindowNoFocus(treeViewPointerOverMask);
-        windowHelper.SetWindowHitTestInvisible(treeViewPointerOverMask);
 
-        var keyboardFocusMask = new Window
+        var keyboardFocusMask = new OverlayWindow
         {
-            Topmost = true,
-            CanResize = false,
-            ShowInTaskbar = false,
-            ShowActivated = false,
-            SystemDecorations = SystemDecorations.None,
-            TransparencyLevelHint = [WindowTransparencyLevel.Transparent],
-            Background = null,
             Content = new Border
             {
                 BorderThickness = new Thickness(1),
@@ -93,21 +72,18 @@ public partial class VisualTreeDebugger : UserControl
                 Opacity = 0.5
             }
         };
-        keyboardFocusMask.Closing += (_, e) => e.Cancel = true;
-        windowHelper.SetWindowNoFocus(keyboardFocusMask);
-        windowHelper.SetWindowHitTestInvisible(keyboardFocusMask);
 
         visualElementContext.KeyboardFocusedElementChanged += element =>
         {
-            Dispatcher.UIThread.Invoke(() =>
+            Dispatcher.UIThread.InvokeOnDemand(() =>
             {
-                if (ShowKeyboardFocusedElementCheckBox.IsChecked is true) SetMask(keyboardFocusMask, element);
+                if (ShowKeyboardFocusedElementCheckBox.IsChecked is true) keyboardFocusMask.UpdateForVisualElement(element);
             });
         };
 
         ShowKeyboardFocusedElementCheckBox.IsCheckedChanged += delegate
         {
-            if (ShowKeyboardFocusedElementCheckBox.IsChecked is not true) SetMask(keyboardFocusMask, null);
+            if (ShowKeyboardFocusedElementCheckBox.IsChecked is not true) keyboardFocusMask.UpdateForVisualElement(null);
         };
     }
 
@@ -124,7 +100,7 @@ public partial class VisualTreeDebugger : UserControl
             }
         }
 
-        SetMask(treeViewPointerOverMask, visualElement);
+        treeViewPointerOverOverlayWindow.UpdateForVisualElement(visualElement);
     }
 
     private void HandleVisualTreeViewSelectionChanged(object? sender, SelectionChangedEventArgs e)
@@ -133,24 +109,6 @@ public partial class VisualTreeDebugger : UserControl
         foreach (var property in properties)
         {
             property.Target = debuggerElement;
-        }
-    }
-
-    private static void SetMask(Window mask, IVisualElement? element)
-    {
-        if (element == null)
-        {
-            mask.Hide();
-            mask.Topmost = false;
-        }
-        else
-        {
-            mask.Show();
-            mask.Topmost = true;
-            var boundingRectangle = element.BoundingRectangle;
-            mask.Position = new PixelPoint(boundingRectangle.X, boundingRectangle.Y);
-            mask.Width = boundingRectangle.Width / mask.DesktopScaling;
-            mask.Height = boundingRectangle.Height / mask.DesktopScaling;
         }
     }
 
@@ -188,9 +146,9 @@ public partial class VisualTreeDebugger : UserControl
 
     private async void HandleCaptureButtonClicked(object? sender, RoutedEventArgs e)
     {
-        if (VisualTreeView.SelectedItem is not IVisualElement selectedItem) return;
         try
         {
+            if (VisualTreeView.SelectedItem is not IVisualElement selectedItem) return;
             CaptureImage.Source = await selectedItem.CaptureAsync();
         }
         catch (Exception ex)

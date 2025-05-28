@@ -97,8 +97,9 @@
                             </Popup>
 
                             <ItemsControl
-                                Grid.Row="1" Grid.Column="0"
-                                Grid.ColumnSpan="2" Margin="0,2"
+                                x:Name="PART_AttachmentItemsControl" Grid.Row="1"
+                                Grid.Column="0" Grid.ColumnSpan="2"
+                                Margin="0,2"
                                 ItemsSource="{TemplateBinding AttachmentItemsSource}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>

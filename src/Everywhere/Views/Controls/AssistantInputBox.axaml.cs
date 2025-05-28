@@ -16,6 +16,7 @@ using Everywhere.Models;
 namespace Everywhere.Views;
 
 [TemplatePart("PART_SendButton", typeof(Button))]
+[TemplatePart("PART_AttachmentItemsControl", typeof(ItemsControl))]
 public class AssistantInputBox : TextBox
 {
     public static readonly StyledProperty<bool> PressCtrlEnterToSendProperty =
@@ -98,7 +99,6 @@ public class AssistantInputBox : TextBox
         set => SetValue(AttachmentItemsSourceProperty, value);
     }
 
-
     public ObservableCollection<MenuItem> AddAttachmentMenuItems
     {
         get;
@@ -166,6 +166,17 @@ public class AssistantInputBox : TextBox
     }
 
     private IDisposable? sendButtonClickSubscription;
+    private IDisposable? attachmentItemsControlPointerMovedSubscription;
+    private IDisposable? attachmentItemsControlPointerExitedSubscription;
+
+    private readonly OverlayWindow visualElementAttachmentOverlayWindow = new()
+    {
+        Content = new Border
+        {
+            Background = Brushes.DodgerBlue,
+            Opacity = 0.2
+        },
+    };
 
     static AssistantInputBox()
     {
@@ -185,10 +196,44 @@ public class AssistantInputBox : TextBox
         base.OnApplyTemplate(e);
 
         sendButtonClickSubscription?.Dispose();
+        attachmentItemsControlPointerMovedSubscription?.Dispose();
+        attachmentItemsControlPointerExitedSubscription?.Dispose();
 
         if (e.NameScope.Find<Button>("PART_SendButton") is { } sendButton)
         {
-            sendButtonClickSubscription = sendButton.AddDisposableHandler(Button.ClickEvent, HandleSendButtonClick, handledEventsToo: true);
+            sendButtonClickSubscription = sendButton.AddDisposableHandler(
+                Button.ClickEvent,
+                (_, args) =>
+                {
+                    if (Command?.CanExecute(Text) is not true) return;
+
+                    Command.Execute(Text);
+                    Text = string.Empty;
+                    args.Handled = true;
+                },
+                handledEventsToo: true);
+        }
+        if (e.NameScope.Find<ItemsControl>("PART_AttachmentItemsControl") is { } attachmentItemsControl)
+        {
+            attachmentItemsControlPointerMovedSubscription = attachmentItemsControl.AddDisposableHandler(
+                PointerMovedEvent,
+                (_, args) =>
+                {
+                    var element = args.Source as StyledElement;
+                    while (element != null)
+                    {
+                        element = element.Parent;
+                        if (element is not { DataContext: AssistantVisualElementAttachment attachment }) continue;
+                        visualElementAttachmentOverlayWindow.UpdateForVisualElement(attachment.Element);
+                        return;
+                    }
+                    visualElementAttachmentOverlayWindow.UpdateForVisualElement(null);
+                },
+                handledEventsToo: true);
+            attachmentItemsControlPointerExitedSubscription = attachmentItemsControl.AddDisposableHandler(
+                PointerExitedEvent,
+                (_, _) => visualElementAttachmentOverlayWindow.UpdateForVisualElement(null),
+                handledEventsToo: true);
         }
     }
 
@@ -253,15 +298,6 @@ public class AssistantInputBox : TextBox
         }
 
         IsAssistantCommandFlyoutOpen = text.StartsWith('/') && SelectedAssistantCommand == null;
-    }
-
-    private void HandleSendButtonClick(object? sender, RoutedEventArgs e)
-    {
-        if (Command?.CanExecute(Text) is not true) return;
-
-        Command.Execute(Text);
-        Text = string.Empty;
-        e.Handled = true;
     }
 }
 

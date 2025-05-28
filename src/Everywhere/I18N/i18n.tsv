@@ -75,11 +75,11 @@ AssistantVisualElementAttachment_Header_Document	文档	Document
 AssistantVisualElementAttachment_Header_Image	图像	Image
 AssistantVisualElementAttachment_Header_Screen	屏幕	Screen
 AssistantVisualElementAttachment_Header_TopLevel	窗口	Window
-AssistantVisualElementAttachment_Header_WithProcess_Label	文本 {0}	Text {0}
-AssistantVisualElementAttachment_Header_WithProcess_TextEdit	输入框 {0}	Input Box {0}
-AssistantVisualElementAttachment_Header_WithProcess_Document	文档 {0}	Document {0}
-AssistantVisualElementAttachment_Header_WithProcess_Image	图像 {0}	Image {0}
-AssistantVisualElementAttachment_Header_WithProcess_Screen	屏幕 {0}	Screen {0}
-AssistantVisualElementAttachment_Header_WithProcess_TopLevel	窗口 {0}	Window {0}
+AssistantVisualElementAttachment_Header_WithProcess_Label	{0} - 文本	{0} - Text
+AssistantVisualElementAttachment_Header_WithProcess_TextEdit	{0} - 输入框	{0} - Input Box
+AssistantVisualElementAttachment_Header_WithProcess_Document	{0} - 文档	{0} - Document
+AssistantVisualElementAttachment_Header_WithProcess_Image	{0} - 图像	{0} - Image
+AssistantVisualElementAttachment_Header_WithProcess_Screen	{0} - 屏幕	{0} - Screen
+AssistantVisualElementAttachment_Header_WithProcess_TopLevel	{0} - 窗口	{0} - Window
 AssistantFloatingWindow_Title_NoonGreeting	中午好，有什么可以帮忙的？	Good afternoon! How can I assist you?
 KeyboardHotkeyInputBox_Watermark	点击设置快捷键
