@@ -104,7 +104,7 @@ public static class EnumerableExtension
         }
     }
     
-    public static IEnumerable<(T current, T next)> CurrentAndNext<T>(this IEnumerable<T> source)
+    public static IEnumerable<(T Current, T Next)> CurrentAndNext<T>(this IEnumerable<T> source)
     {
         using var enumerator = source.GetEnumerator();
         if (!enumerator.MoveNext())

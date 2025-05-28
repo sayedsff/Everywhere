@@ -2,7 +2,8 @@
     x:Class="Everywhere.Views.Pages.SettingsPage" xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:contents="clr-namespace:ShadUI.Contents;assembly=ShadUI"
     xmlns:m="clr-namespace:Everywhere.Models" xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI"
-    xmlns:vm="clr-namespace:Everywhere.ViewModels" x:DataType="vm:SettingsPageViewModel">
+    xmlns:v="clr-namespace:Everywhere.Views" xmlns:vm="clr-namespace:Everywhere.ViewModels"
+    x:DataType="vm:SettingsPageViewModel">
     <ScrollViewer
         HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
         <ScrollViewer.Styles>
@@ -20,9 +21,9 @@
                                                 </Style>
                                             </Panel.Styles>
                                             <ToggleButton
-                                                x:Name="PART_ToggleButton" DockPanel.Dock="Right"
-                                                HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
-                                                BorderThickness="0" Classes="Basic"
+                                                x:Name="PART_ToggleButton" Classes="Basic"
+                                                DockPanel.Dock="Right" HorizontalAlignment="Stretch"
+                                                HorizontalContentAlignment="Stretch" BorderThickness="0"
                                                 CornerRadius="8"
                                                 IsChecked="{TemplateBinding IsExpanded, Mode=TwoWay}"
                                                 IsEnabled="True">
@@ -81,7 +82,7 @@
                 <Setter Property="ItemTemplate">
                     <DataTemplate DataType="m:SettingsItemBase">
                         <Expander
-                            Background="Transparent" Classes="SettingsItemContainer"
+                            Classes="SettingsItemContainer" Background="Transparent"
                             Classes.NotExpandable="{Binding !Items.Count}"
                             CornerRadius="4"
                             IsEnabled="{Binding IsEnabledProxy.Value, FallbackValue=True}">
@@ -92,7 +93,7 @@
                                         Text="{Binding HeaderKey^}"
                                         TextWrapping="WrapWithOverflow"/>
                                     <TextBlock
-                                        Margin="0,8" Classes="Small"
+                                        Classes="Small" Margin="0,8"
                                         IsHitTestVisible="False"
                                         Text="{Binding DescriptionKey^}"
                                         TextWrapping="WrapWithOverflow"/>
@@ -154,13 +155,20 @@
                                                     ItemsSource="{Binding ItemsSource}"
                                                     SelectedItem="{Binding SelectedItem, Mode=TwoWay}"/>
                                             </DataTemplate>
+
+                                            <DataTemplate DataType="m:SettingsKeyboardHotkeyItem">
+                                                <v:KeyboardHotkeyInputBox
+                                                    MinWidth="320" MinHeight="32"
+                                                    HorizontalAlignment="Left"
+                                                    Hotkey="{Binding ValueProxy.Value, Mode=TwoWay}"/>
+                                            </DataTemplate>
                                         </ContentPresenter.DataTemplates>
                                     </ContentPresenter>
                                 </StackPanel>
                             </Expander.Header>
 
                             <ItemsControl
-                                HorizontalAlignment="Stretch" Classes="SettingsItemItemsControl"
+                                Classes="SettingsItemItemsControl" HorizontalAlignment="Stretch"
                                 ItemsSource="{Binding Items}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -187,7 +195,7 @@
                             TextWrapping="WrapWithOverflow"/>
 
                         <ItemsControl
-                            HorizontalAlignment="Stretch" Classes="SettingsItemItemsControl"
+                            Classes="SettingsItemItemsControl" HorizontalAlignment="Stretch"
                             ItemsSource="{Binding Items}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>

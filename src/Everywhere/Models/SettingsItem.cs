@@ -98,7 +98,7 @@ public class SettingsSelectionItem(
     }
 }
 
-public class SettingsHotkeyItem(
+public class SettingsKeyboardHotkeyItem(
     string name,
-    IValueProxy<Hotkey> valueProxy
-) : SettingsItemBase<Hotkey>(name, valueProxy);
+    IValueProxy<KeyboardHotkey> valueProxy
+) : SettingsItemBase<KeyboardHotkey>(name, valueProxy);

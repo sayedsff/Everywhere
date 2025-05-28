@@ -88,8 +88,13 @@ public interface IVisualElement : INotifyPropertyChanged
 
 public static class VisualElementExtension
 {
-    public static IEnumerable<IVisualElement> GetDescendants(this IVisualElement element)
+    public static IEnumerable<IVisualElement> GetDescendants(this IVisualElement element, bool includeSelf = false)
     {
+        if (includeSelf)
+        {
+            yield return element;
+        }
+
         foreach (var child in element.Children)
         {
             yield return child;
@@ -100,9 +105,9 @@ public static class VisualElementExtension
         }
     }
 
-    public static IEnumerable<IVisualElement> GetAncestors(this IVisualElement element)
+    public static IEnumerable<IVisualElement> GetAncestors(this IVisualElement element, bool includeSelf = false)
     {
-        var current = element.Parent;
+        var current = includeSelf ? element : element.Parent;
         while (current != null)
         {
             yield return current;

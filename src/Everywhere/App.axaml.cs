@@ -32,7 +32,7 @@ public class App : Application
 
                 .AddSingleton<IRuntimeConstantProvider, DesignTimeRuntimeConstantProvider>()
                 .AddSingleton<IVisualElementContext, DesignTimeVisualElementContext>()
-                .AddSingleton<IUserInputTrigger, DesignTimeUserInputTrigger>()
+                .AddSingleton<IHotkeyListener, DesignTimeHotkeyListener>()
                 .AddSingleton<IWindowHelper, DesignTimeWindowHelper>()
                 .AddSingleton<Settings>()
 
@@ -154,10 +154,12 @@ file class DesignTimeVisualElementContext : IVisualElementContext
     public Task<IVisualElement?> PickElementAsync(PickElementMode mode) => Task.FromResult<IVisualElement?>(null);
 }
 
-file class DesignTimeUserInputTrigger : IUserInputTrigger
+file class DesignTimeHotkeyListener : IHotkeyListener
 {
-    public event IUserInputTrigger.PointerHotkeyActivatedHandler? PointerHotkeyActivated;
-    public event IUserInputTrigger.KeyboardHotkeyActivatedHandler? KeyboardHotkeyActivated;
+    public event PointerHotkeyActivatedHandler? PointerHotkeyActivated;
+    public event KeyboardHotkeyActivatedHandler? KeyboardHotkeyActivated;
+    public KeyboardHotkey KeyboardHotkey { get; set; }
+    public IKeyboardHotkeyScope StartCaptureKeyboardHotkey() => throw new NotSupportedException();
 }
 
 file class DesignTimeWindowHelper : IWindowHelper

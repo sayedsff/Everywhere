@@ -3,8 +3,10 @@ using Avalonia.Input;
 
 namespace Everywhere.Models;
 
-public readonly record struct Hotkey(Key Key, KeyModifiers Modifiers)
+public readonly record struct KeyboardHotkey(Key Key, KeyModifiers Modifiers)
 {
+    public bool IsEmpty => Key == Key.None && Modifiers == KeyModifiers.None;
+
     public override string ToString()
     {
 #if IsOSX
@@ -29,7 +31,7 @@ public readonly record struct Hotkey(Key Key, KeyModifiers Modifiers)
         if (Modifiers.HasFlag(KeyModifiers.Shift)) sb.Append(shift);
         if (Modifiers.HasFlag(KeyModifiers.Alt)) sb.Append(alt);
         if (Modifiers.HasFlag(KeyModifiers.Meta)) sb.Append(meta);
-        sb.Append(Key);
+        if (Key != Key.None) sb.Append(Key);
         return sb.ToString();
     }
 }

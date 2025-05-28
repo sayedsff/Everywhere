@@ -30,7 +30,7 @@ public static class Program
                 .AddSingleton(typeof(ILogger<>), typeof(ConsoleLogger<>))
                 .AddSingleton<IRuntimeConstantProvider, RuntimeConstantProvider>()
                 .AddSingleton<IVisualElementContext, Win32VisualElementContext>()
-                .AddSingleton<IUserInputTrigger, Win32UserInputTrigger>()
+                .AddSingleton<IHotkeyListener, Win32HotkeyListener>()
                 .AddSingleton<IWindowHelper, Win32WindowHelper>()
                 .AddSingleton<Settings>(xx =>
                 {

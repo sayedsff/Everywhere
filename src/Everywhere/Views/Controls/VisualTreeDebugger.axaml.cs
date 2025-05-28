@@ -35,7 +35,7 @@ public partial class VisualTreeDebugger : UserControl
 #endif
 
     public VisualTreeDebugger(
-        IUserInputTrigger userInputTrigger,
+        IHotkeyListener hotkeyListener,
         IVisualElementContext visualElementContext,
         IWindowHelper windowHelper)
     {
@@ -47,7 +47,7 @@ public partial class VisualTreeDebugger : UserControl
         VisualTreeView.ItemsSource = rootElements;
         PropertyItemsControl.ItemsSource = properties;
 
-        userInputTrigger.KeyboardHotkeyActivated += () =>
+        hotkeyListener.KeyboardHotkeyActivated += () =>
         {
             rootElements.Clear();
             var element = visualElementContext.PointerOverElement;
@@ -166,10 +166,6 @@ public partial class VisualTreeDebugger : UserControl
 
     private async void HandlePickElementButtonClicked(object? sender, RoutedEventArgs e)
     {
-        if (TopLevel.GetTopLevel(this) is not Window window) return;
-
-        windowHelper.HideWindowWithoutAnimation(window);
-
         try
         {
             rootElements.Clear();
@@ -182,8 +178,6 @@ public partial class VisualTreeDebugger : UserControl
         {
             // ignored
         }
-
-        window.Show();
     }
 
     private void HandleOptimizeButtonClicked(object? sender, RoutedEventArgs e)

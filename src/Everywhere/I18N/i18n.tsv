@@ -11,12 +11,10 @@ SettingsSelectionItem_Common_Theme_System	跟随系统	Follow System
 SettingsSelectionItem_Common_Theme_Dark	深色主题	Dark Theme
 SettingsSelectionItem_Common_Theme_Light	浅色主题	Light Theme
 SettingsGroup_Behavior_Header	行为	Behavior
-Settings_Behavior_IsInputAssistantEnabled_Header	启用输入助手	Enable Input Assistant
-Settings_Behavior_IsInputAssistantEnabled_Description	当你在任何软件中输入时，输入助手可以根据上下文为你提供帮助。	When you’re typing in any application, the input assistant can offer suggestions from context.
-Settings_Behavior_ShowInputAssistantFloatingWindow_Header	显示输入助手悬浮框	Show Input Assistant Flyout
-Settings_Behavior_ShowInputAssistantFloatingWindow_Description	开启后，在任意软件中输入时，输入助手会在旁边弹出悬浮面板以便快速访问；关闭后，可通过快捷键手动唤出。	When enabled, the input assistant pops up a floating panel next to any focused input field for quick access; when disabled, you can still invoke it via a keyboard shortcut.
-Settings_Behavior_InputAssistantHotkey_Header	输入助手快捷键	Input Assistant Hotkey
-Settings_Behavior_InputAssistantHotkey_Description	当你在任何软件中输入时，按下快捷键即可唤出输入助手。	Press the keyboard shortcut to invoke the input assistant while typing in any software.
+Settings_Behavior_AssistantHotkey_Header	助手快捷键	Assistant Hotkey
+Settings_Behavior_AssistantHotkey_Description	设置一个快捷键，在任何时候按下即可唤出助手。	Set a hotkey to invoke the assistant at any time.
+Settings_Behavior_ShowAssistantFloatingWindowWhenInput_Header	输入时显示助手悬浮框	Show Assistant Floating Window When Input
+Settings_Behavior_ShowAssistantFloatingWindowWhenInput_Description	开启后，在任意软件中输入时，会在旁边弹出悬浮面板以便快速访问。	When enabled, a floating panel will pop up beside the input area in any software for quick access while typing.
 SettingsGroup_Model_Header	模型	Model
 Settings_Model_ModelName_Header	模型名称	Model Name
 Settings_Model_ModelName_Description	指定助手调用的模型名称。	Specify the name of the model the assistant will use.
@@ -45,7 +43,8 @@ Settings_Model_WebSearchApiKey_Description	指定网络搜索服务的 API 访�
 Settings_Model_WebSearchEndpoint_Header	网络搜索服务API接口地址	Web Search Service API Endpoint
 Settings_Model_WebSearchEndpoint_Description	（可选）如使用官方 API 接口，请留空以使用默认值。	(Optional) Leave blank to use the default value when using the official API endpoint.
 AssistantInputBox_Watermark	询问 Everywhere 助手	Ask Everywhere
-AssistantInputBox_AddAttachmentButton_ToolTip	添加附加内容到对话	Add extra content to the conversation
+AssistantInputBox_AddAttachmentButton_ToolTip	添加附件到对话	Add attachments to the conversation
+AssistantInputBox_AddAttachmentMenuItem_Header	添加附件	Add Attachment
 AssistantInputBox_ImageButton_ToolTip	允许访问屏幕上的图像	Allow access to aware your screen
 AssistantInputBox_ImageButton_Text	图像	Image
 AssistantInputBox_WebSearchButton_ToolTip	在网络上搜索	Search the web
@@ -62,8 +61,25 @@ AssistantFloatingWindow_ChatMessage_Assistant_Copy	复制回答	Copy
 Application_TrayIcon_Menu_OpenMainWindow	打开主窗口	Open Window
 Application_TrayIcon_Menu_Exit	退出	Exit
 Application_TrayIcon_Menu_OpenDebugWindow	打开调试窗口	Open Debug Window
-AssistantFloatingWindowViewModel_AddAttachmentCommands_AddScreen	添加屏幕	Add Screen
+AssistantFloatingWindow_AssistantInputBox_AddAttachmentMenuItems_AddScreen	添加屏幕	Add Screen
+AssistantFloatingWindow_AssistantInputBox_AddAttachmentMenuItems_AddWindow	添加窗口	Add Window
+AssistantFloatingWindow_AssistantInputBox_AddAttachmentMenuItems_AddElement	添加元素	Add Element
+AssistantFloatingWindow_AssistantInputBox_AddAttachmentMenuItems_AddClipboard	添加剪切板	Add Clipboard
+AssistantFloatingWindow_AssistantInputBox_AddAttachmentMenuItems_AddFile	添加文件	Add File
 AssistantFloatingWindowViewModel_TextEditActions_Translate	翻译	Translate
 AssistantFloatingWindowViewModel_TextEditActions_ContinueWriting	续写	Continue
 AssistantFloatingWindowViewModel_TextEditActions_Summarize	总结	Summary
+AssistantVisualElementAttachment_Header_Label	文本	Text
+AssistantVisualElementAttachment_Header_TextEdit	输入框	Input Box
+AssistantVisualElementAttachment_Header_Document	文档	Document
+AssistantVisualElementAttachment_Header_Image	图像	Image
+AssistantVisualElementAttachment_Header_Screen	屏幕	Screen
+AssistantVisualElementAttachment_Header_TopLevel	窗口	Window
+AssistantVisualElementAttachment_Header_WithProcess_Label	文本 {0}	Text {0}
+AssistantVisualElementAttachment_Header_WithProcess_TextEdit	输入框 {0}	Input Box {0}
+AssistantVisualElementAttachment_Header_WithProcess_Document	文档 {0}	Document {0}
+AssistantVisualElementAttachment_Header_WithProcess_Image	图像 {0}	Image {0}
+AssistantVisualElementAttachment_Header_WithProcess_Screen	屏幕 {0}	Screen {0}
+AssistantVisualElementAttachment_Header_WithProcess_TopLevel	窗口 {0}	Window {0}
 AssistantFloatingWindow_Title_NoonGreeting	中午好，有什么可以帮忙的？	Good afternoon! How can I assist you?
+KeyboardHotkeyInputBox_Watermark	点击设置快捷键

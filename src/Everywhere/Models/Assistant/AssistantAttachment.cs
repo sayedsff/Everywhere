@@ -1,4 +1,5 @@
-﻿using Lucide.Avalonia;
+﻿using Avalonia.Media.Imaging;
+using Lucide.Avalonia;
 
 namespace Everywhere.Models;
 
@@ -6,3 +7,9 @@ public record AssistantAttachment(LucideIconKind Icon, DynamicResourceKey Header
 
 public record AssistantVisualElementAttachment(IVisualElement Element, LucideIconKind Icon, DynamicResourceKey HeaderKey) :
     AssistantAttachment(Icon, HeaderKey);
+
+public record AssistantTextAttachment(string Text, DynamicResourceKey HeaderKey) : AssistantAttachment(LucideIconKind.Text, HeaderKey);
+
+public record AssistantImageAttachment(Bitmap Image, DynamicResourceKey HeaderKey) : AssistantAttachment(LucideIconKind.Image, HeaderKey);
+
+public record AssistantFileAttachment(string FilePath, DynamicResourceKey HeaderKey) : AssistantAttachment(LucideIconKind.File, HeaderKey);

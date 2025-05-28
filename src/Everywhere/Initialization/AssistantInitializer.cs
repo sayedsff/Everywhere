@@ -6,7 +6,7 @@ namespace Everywhere.Initialization;
 
 public class AssistantInitializer(
     Settings settings,
-    IUserInputTrigger userInputTrigger,
+    IHotkeyListener hotkeyListener,
     IVisualElementContext visualElementContext,
     AssistantFloatingWindow assistantFloatingWindow) : IAsyncInitializer
 {
@@ -14,24 +14,47 @@ public class AssistantInitializer(
     {
         visualElementContext.KeyboardFocusedElementChanged += element =>
         {
-            if (settings.Behavior is not
-                {
-                    IsInputAssistantEnabled: true,
-                    ShowInputAssistantFloatingWindow: true
-                }) return;
+            if (!settings.Behavior.ShowAssistantFloatingWindowWhenInput) return;
+            if (element is not { Type: VisualElementType.TextEdit } ||
+                (element.States & (
+                    VisualElementStates.Offscreen |
+                    VisualElementStates.Disabled |
+                    VisualElementStates.ReadOnly |
+                    VisualElementStates.Password)) != 0)
+            {
+                element = null;
+            }
             assistantFloatingWindow.ViewModel.TryFloatToTargetElementAsync(element).Detach();
         };
 
-        userInputTrigger.PointerHotkeyActivated += point =>
+        // initialize hotkey listener
+        settings.Behavior.PropertyChanged += (_, args) =>
         {
-            Dispatcher.UIThread.InvokeOnDemandAsync(
-                () =>
-                {
-                    var window = ServiceLocator.Resolve<AssistantFloatingWindow>();
-                    window.Position = point;
-                    window.IsVisible = true;
-                });
+            if (args.PropertyName == nameof(settings.Behavior.AssistantHotkey))
+            {
+                hotkeyListener.KeyboardHotkey = settings.Behavior.AssistantHotkey;
+            }
         };
+        hotkeyListener.KeyboardHotkey = settings.Behavior.AssistantHotkey;
+        hotkeyListener.KeyboardHotkeyActivated += () =>
+        {
+            var element = visualElementContext.KeyboardFocusedElement?.GetAncestors(true)
+                .CurrentAndNext().FirstOrDefault(t => t.Current.ProcessId != t.Next.ProcessId).Current ??
+                visualElementContext.PointerOverElement?.GetAncestors(true).LastOrDefault();
+            if (element == null) return;
+            Dispatcher.UIThread.InvokeOnDemandAsync(
+                () => ServiceLocator.Resolve<AssistantFloatingWindow>().ViewModel.TryFloatToTargetElementAsync(element, true).Detach());
+        };
+        // hotkeyListener.PointerHotkeyActivated += point =>
+        // {
+        //     Dispatcher.UIThread.InvokeOnDemandAsync(
+        //         () =>
+        //         {
+        //             var window = ServiceLocator.Resolve<AssistantFloatingWindow>();
+        //             window.Position = point;
+        //             window.IsVisible = true;
+        //         });
+        // };
 
         return Task.CompletedTask;
     }

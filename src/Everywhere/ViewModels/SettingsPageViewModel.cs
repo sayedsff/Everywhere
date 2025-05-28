@@ -148,9 +148,9 @@ public class SettingsPageViewModel : ReactiveViewModelBase
                                                 attribute?.Step ?? 0.1d);
                                         }
 
-                                        if (pp.PropertyType == typeof(Hotkey))
+                                        if (pp.PropertyType == typeof(KeyboardHotkey))
                                         {
-                                            result = new SettingsHotkeyItem(name, new SettingsValueProxy<Hotkey>(group, pp));
+                                            result = new SettingsKeyboardHotkeyItem(name, new SettingsValueProxy<KeyboardHotkey>(group, pp));
                                         }
                                     }
 

@@ -7,9 +7,9 @@ using Windows.Win32.UI.WindowsAndMessaging;
 namespace Everywhere.Windows.Interop;
 
 /// <summary>
-/// Callback for <see cref="LowLevelHook"/>. Return true to block the message.
+/// Callback for <see cref="LowLevelHook{T}"/>. Return true to block the message.
 /// </summary>
-internal delegate bool LowLevelHookHandler<T>(nuint wParam, ref T lParam) where T : unmanaged;
+internal delegate void LowLevelHookHandler<T>(nuint wParam, ref T lParam, ref bool blockNext) where T : unmanaged;
 
 internal abstract class LowLevelHook<T> : IDisposable where T : unmanaged
 {
@@ -42,8 +42,9 @@ internal abstract class LowLevelHook<T> : IDisposable where T : unmanaged
         if (code < 0) return PInvoke.CallNextHookEx(null, code, wParam, lParam);
 
         ref var hookStruct = ref Unsafe.AsRef<T>(lParam.Value.ToPointer());
-        var handled = Callback?.Invoke(wParam, ref hookStruct) ?? false;
-        return handled ? (LRESULT)1 : PInvoke.CallNextHookEx(null, code, wParam, lParam);
+        var blockNext = false;
+        Callback?.Invoke(wParam, ref hookStruct, ref blockNext);
+        return blockNext ? (LRESULT)1 : PInvoke.CallNextHookEx(null, code, wParam, lParam);
     }
 
     public void Dispose()

@@ -57,13 +57,10 @@ public partial class CommonSettings() : SettingsBase("Common")
 public partial class BehaviorSettings() : SettingsBase("Behavior")
 {
     [ObservableProperty]
-    public partial bool IsInputAssistantEnabled { get; set; }
+    public partial KeyboardHotkey AssistantHotkey { get; set; }
 
     [ObservableProperty]
-    public partial bool ShowInputAssistantFloatingWindow { get; set; }
-
-    [ObservableProperty]
-    public partial Hotkey InputAssistantHotkey { get; set; }
+    public partial bool ShowAssistantFloatingWindowWhenInput { get; set; }
 }
 
 public partial class ModelSettings() : SettingsBase("Model")
