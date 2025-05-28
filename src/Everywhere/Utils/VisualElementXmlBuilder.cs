@@ -228,15 +228,24 @@ public class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreElements,
         essentialElements[element] = true;
         AppendAndCalculateCurrentSize($" id=\"{id}\"");
 
-        // Add name attribute
-        if (element.Type != VisualElementType.Label && element.Name is { } name && !string.IsNullOrWhiteSpace(name))
+        var isTextElement = element.Type is VisualElementType.Label or VisualElementType.TextEdit or VisualElementType.Document;
+        var text = element.GetText();
+
+        if (element.Name is { Length: > 0 } name)
         {
-            AppendAndCalculateCurrentSize($" description=\"{SecurityElement.Escape(TruncateIfNeeded(name, maxTextLength))}\"");
+            if (isTextElement && string.IsNullOrEmpty(text))
+            {
+                AppendAndCalculateCurrentSize($" content=\"{SecurityElement.Escape(TruncateIfNeeded(name, maxTextLength))}\"");
+            }
+            else if (!isTextElement || name != text)
+            {
+                // If the element is not a text element, or the name is different from the text, add the name as a description
+                // because some text elements' name is the same as text.
+                AppendAndCalculateCurrentSize($" description=\"{SecurityElement.Escape(TruncateIfNeeded(name, maxTextLength))}\"");
+            }
         }
 
-        // Get text
-        var text = element.GetText();
-        var textLines = text?.Split(Environment.NewLine);
+        var textLines = text?.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
 
         // Sort child elements by weight
         var childrenByWeight = element.Children
@@ -244,12 +253,23 @@ public class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreElements,
             .ThenByDescending(c => weightMap.GetValueOrDefault(c, 0))
             .ToList();
 
-        // If there is only a single line of text and no child elements, simplify output
-        if (textLines is [{ } singleLine] && !string.IsNullOrWhiteSpace(singleLine) && childrenByWeight.Count == 0)
+        // If there is only a single line of text and no child elements, simplify the output
+        if (childrenByWeight.Count == 0)
         {
-            AppendAndCalculateCurrentSize($" content=\"{SecurityElement.Escape(TruncateIfNeeded(singleLine, maxTextLength))}\"/>");
-            AppendAndCalculateCurrentSize(Environment.NewLine);
-            return true;
+            if (textLines == null || textLines.Length == 0 || string.IsNullOrEmpty(textLines[0]))
+            {
+                // No text and no children, self-closing tag
+                AppendAndCalculateCurrentSize("/>");
+                AppendAndCalculateCurrentSize(Environment.NewLine);
+                return true;
+            }
+
+            if (textLines is [{ } singleLine] && !string.IsNullOrEmpty(singleLine))
+            {
+                AppendAndCalculateCurrentSize($" content=\"{SecurityElement.Escape(TruncateIfNeeded(singleLine, maxTextLength))}\"/>");
+                AppendAndCalculateCurrentSize(Environment.NewLine);
+                return true;
+            }
         }
 
         // Has child elements or multiline text
