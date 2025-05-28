@@ -74,7 +74,7 @@ public class OptimizedVisualElement : IVisualElement
             {
                 // remove the label if it is not visible or no text
                 if (!IsElementVisible(child) ||
-                    string.IsNullOrEmpty(element.GetText(1)))
+                    string.IsNullOrEmpty(child.Name) && string.IsNullOrEmpty(child.GetText(1)))
                 {
                     continue;
                 }
@@ -97,11 +97,11 @@ public class OptimizedVisualElement : IVisualElement
                 {
                     yield return new OptimizedLabelVisualElement(labels);
                     labels.Clear();
+                    continue;
                 }
-                else
-                {
-                    yield return first;
-                }
+
+                yield return first;
+                continue;
             }
 
             if (!IsElementVisible(child)) continue;
@@ -110,7 +110,7 @@ public class OptimizedVisualElement : IVisualElement
             {
                 yield return Create(child);
             }
-            else if (IsPanelLikeElement(child) && string.IsNullOrEmpty(child.Name))
+            else if (IsPanelLikeElement(child) && string.IsNullOrEmpty(child.Name) && string.IsNullOrEmpty(child.GetText(1)))
             {
                 // Flatten the panel if it has no name and no text.
                 // Skip the panel and add its children directly.
