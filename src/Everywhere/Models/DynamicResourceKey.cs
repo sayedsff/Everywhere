@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Avalonia.Controls;
 using Avalonia.Reactive;
+using Everywhere.Utils;
 
 namespace Everywhere.Models;
 
@@ -47,7 +48,7 @@ public class DirectResourceKey(object key) : DynamicResourceKey(key)
     }
 }
 
-public class FormattedDynamicResourceKey(object key, IReadOnlyList<string> args) : DynamicResourceKey(key)
+public class FormattedDynamicResourceKey(object key, params object?[] args) : DynamicResourceKey(key)
 {
     public override IDisposable Subscribe(IObserver<object?> observer) =>
         Application.Current!.Resources.GetResourceObservable(Key).Subscribe(

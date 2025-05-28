@@ -3,7 +3,9 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 using Avalonia.Controls.Documents;
+using Avalonia.Input;
 using Avalonia.Media;
+using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Everywhere.Assistant;
@@ -47,8 +49,6 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
     [ObservableProperty]
     public partial IReadOnlyList<AssistantCommand>? AssistantCommands { get; private set; }
 
-    public IReadOnlyList<DynamicNamedCommand> AddAttachmentCommands { get; }
-
     [ObservableProperty]
     public partial bool IsExpanded { get; set; }
 
@@ -66,28 +66,6 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
     {
         this.visualElementContext = visualElementContext;
         Settings = settings;
-
-        AddAttachmentCommands =
-        [
-            new DynamicNamedCommand(
-                LucideIconKind.Monitor,
-                "AssistantFloatingWindowViewModel_AddAttachmentCommands_AddScreen",
-                Command: AddElementCommand,
-                CommandParameter: PickElementMode.Screen
-            ),
-            new DynamicNamedCommand(
-                LucideIconKind.AppWindow,
-                "AssistantFloatingWindowViewModel_AddAttachmentCommands_AddWindow",
-                Command: AddElementCommand,
-                CommandParameter: PickElementMode.Window
-            ),
-            new DynamicNamedCommand(
-                LucideIconKind.SquareMousePointer,
-                "AssistantFloatingWindowViewModel_AddAttachmentCommands_AddElement",
-                Command: AddElementCommand,
-                CommandParameter: PickElementMode.Element
-            ),
-        ];
 
         InitializeCommands();
     }
@@ -150,7 +128,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
                 () => "Refine it"),
         ];
 
-        attachments.CollectionChanged += (in args) =>
+        attachments.CollectionChanged += (in _) =>
         {
             QuickActions = null;
             AssistantCommands = null;
@@ -171,8 +149,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
 
     private CancellationTokenSource? targetElementChangedTokenSource;
 
-    [RelayCommand]
-    public async Task TryFloatToTargetElementAsync(IVisualElement? targetElement)
+    public async Task TryFloatToTargetElementAsync(IVisualElement? targetElement, bool showExpanded = false)
     {
         // debouncing
         if (targetElementChangedTokenSource is not null) await targetElementChangedTokenSource.CancelAsync();
@@ -195,24 +172,17 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
 
                 Reset();
 
-                if (targetElement is not { Type: VisualElementType.TextEdit } ||
-                    (targetElement.States & (
-                        VisualElementStates.Offscreen |
-                        VisualElementStates.Disabled |
-                        VisualElementStates.ReadOnly |
-                        VisualElementStates.Password)) != 0)
+                if (targetElement == null)
                 {
-                    IsVisible = false;
                     return;
                 }
 
-                using var process = Process.GetProcessById(targetElement.ProcessId);
-                Title = "AssistantFloatingWindow_Title_NoonGreeting";
-
                 TargetBoundingRect = targetElement.BoundingRectangle;
+                Title = "AssistantFloatingWindow_Title_NoonGreeting";
                 attachments.Clear();
                 attachments.Add(CreateFromVisualElement(targetElement));
                 IsVisible = true;
+                IsExpanded = showExpanded;
             },
             flags: ExecutionFlags.EnqueueIfBusy,
             cancellationToken: cancellationToken);
@@ -222,7 +192,53 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
     private async Task AddElementAsync(PickElementMode mode)
     {
         if (await visualElementContext.PickElementAsync(mode) is not { } element) return;
+        if (Attachments.OfType<AssistantVisualElementAttachment>().Any(a => a.Element.Id == element.Id)) return;
         Attachments.Add(await Task.Run(() => CreateFromVisualElement(element)));
+    }
+
+    [RelayCommand]
+    private async Task AddClipboardAsync()
+    {
+        var clipboard = ServiceLocator.Resolve<AssistantFloatingWindow>().Clipboard;
+        if (clipboard is null) return;
+
+        var formats = await clipboard.GetFormatsAsync();
+        if (formats.Length == 0)
+        {
+            Console.WriteLine("Clipboard is empty."); // TODO: logging
+            return;
+        }
+
+        if (formats[0] == DataFormats.Text)
+        {
+
+        }
+    }
+
+    [RelayCommand]
+    private async Task AddFileAsync()
+    {
+        var files = await ServiceLocator.Resolve<AssistantFloatingWindow>().StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions());
+        if (files.Count <= 0) return;
+        if (files[0].TryGetLocalPath() is not { } filePath)
+        {
+            Console.WriteLine("File path is not available."); // TODO: logging
+            return;
+        }
+
+        AddFile(filePath);
+    }
+
+    private void AddFile(string filePath)
+    {
+        if (string.IsNullOrWhiteSpace(filePath)) return;
+        if (!File.Exists(filePath))
+        {
+            Console.WriteLine($"File not found: {filePath}"); // TODO: logging
+            return;
+        }
+
+        Attachments.Add(new AssistantFileAttachment(filePath, new DirectResourceKey(Path.GetFileName(filePath))));
     }
 
     private static AssistantVisualElementAttachment CreateFromVisualElement(IVisualElement element)
@@ -232,11 +248,11 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
         if (element.ProcessId != 0)
         {
             using var process = Process.GetProcessById(element.ProcessId);
-            headerKey = new FormattedDynamicResourceKey("", [process.ProcessName]);
+            headerKey = new FormattedDynamicResourceKey($"AssistantVisualElementAttachment_Header_WithProcess_{element.Type}", process.ProcessName);
         }
         else
         {
-            headerKey = "";
+            headerKey = new DynamicResourceKey($"AssistantVisualElementAttachment_Header_{element.Type}");
         }
 
         return new AssistantVisualElementAttachment(
@@ -246,6 +262,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
                 VisualElementType.Label => LucideIconKind.Type,
                 VisualElementType.TextEdit => LucideIconKind.TextCursorInput,
                 VisualElementType.Document => LucideIconKind.FileText,
+                VisualElementType.Image => LucideIconKind.Image,
                 VisualElementType.Screen => LucideIconKind.Monitor,
                 VisualElementType.TopLevel => LucideIconKind.AppWindow,
                 _ => LucideIconKind.Component
@@ -384,6 +401,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
     private void Reset()
     {
         cancellationTokenSource.Cancel();
+        TargetBoundingRect = default;
         IsExpanded = false;
         chatMessages.Clear();
         QuickActions = [];

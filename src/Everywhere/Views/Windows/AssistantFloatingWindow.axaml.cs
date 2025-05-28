@@ -61,7 +61,7 @@ public partial class AssistantFloatingWindow : ReactiveWindow<AssistantFloatingW
         Topmost = false;
         Topmost = true;
 
-        // ElementComposition.GetElementVisual(this).MakeSizeAnimated(easing: Easing);
+        CalculatePositionAndPlacement();
     }
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
@@ -87,11 +87,20 @@ public partial class AssistantFloatingWindow : ReactiveWindow<AssistantFloatingW
     private void CalculatePositionAndPlacement()
     {
         // 1. Get the available area of all screens
-        var screenAreas = Screens.All.Select(s => s.Bounds).ToReadOnlyList();
         var actualSize = Bounds.Size.To(s => new PixelSize((int)(s.Width * DesktopScaling), (int)(s.Height * DesktopScaling)));
+        if (actualSize == PixelSize.Empty)
+        {
+            // If the size is empty, we cannot calculate the position and placement
+            return;
+        }
 
         // 2. Screen coordinates and this window size of the target element
         var targetBoundingRectangle = TargetBoundingRect;
+        if (targetBoundingRectangle.Width <= 0 || targetBoundingRectangle.Height <= 0)
+        {
+            // If the target bounding rectangle is invalid, we cannot calculate the position and placement
+            return;
+        }
 
         // 3. Generate a candidate list based on the priority of attachment (right → bottom → top → left) and alignment priority (top/left priority)
         var candidates = new List<(PlacementMode mode, PixelPoint pos)>
@@ -114,15 +123,26 @@ public partial class AssistantFloatingWindow : ReactiveWindow<AssistantFloatingW
             // ↑
             (PlacementMode.TopEdgeAlignedLeft, new PixelPoint(targetBoundingRectangle.X, targetBoundingRectangle.Y - actualSize.Height)),
             (PlacementMode.TopEdgeAlignedRight,
-                new PixelPoint(targetBoundingRectangle.X + targetBoundingRectangle.Width - actualSize.Width, targetBoundingRectangle.Y - actualSize.Height)),
+                new PixelPoint(
+                    targetBoundingRectangle.X + targetBoundingRectangle.Width - actualSize.Width,
+                    targetBoundingRectangle.Y - actualSize.Height)),
 
             // ←
             (PlacementMode.LeftEdgeAlignedTop, new PixelPoint(targetBoundingRectangle.X - actualSize.Width, targetBoundingRectangle.Y)),
             (PlacementMode.LeftEdgeAlignedBottom,
-                new PixelPoint(targetBoundingRectangle.X - actualSize.Width, targetBoundingRectangle.Y + targetBoundingRectangle.Height - actualSize.Height))
+                new PixelPoint(
+                    targetBoundingRectangle.X - actualSize.Width,
+                    targetBoundingRectangle.Y + targetBoundingRectangle.Height - actualSize.Height)),
+
+            // center
+            (PlacementMode.Center,
+                new PixelPoint(
+                    targetBoundingRectangle.X + targetBoundingRectangle.Width / 2 - actualSize.Width / 2,
+                    targetBoundingRectangle.Y + targetBoundingRectangle.Height / 2 - actualSize.Height / 2))
         };
 
         // 4. Search for the first candidate that completely falls into any screen workspace
+        var screenAreas = Screens.All.Select(s => s.Bounds).ToReadOnlyList();
         foreach (var (mode, pos) in candidates)
         {
             var rect = new PixelRect(pos, actualSize);

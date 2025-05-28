@@ -35,6 +35,9 @@
         <Setter Property="Watermark" Value="{DynamicResource AssistantInputBox_Watermark}"/>
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="Padding" Value="6"/>
+        <Setter Property="SelectionBrush" Value="{DynamicResource PrimaryColor}"/>
+        <Setter Property="SelectionForegroundBrush" Value="{DynamicResource PrimaryForegroundColor}"/>
+        <Setter Property="CaretBrush" Value="{DynamicResource ForegroundColor}"/>
         <Setter Property="Template">
             <ControlTemplate>
                 <Panel>
@@ -107,11 +110,12 @@
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate DataType="m:AssistantAttachment">
                                         <Border
-                                            Height="24" Padding="4,0"
-                                            BorderBrush="{DynamicResource BorderColor}"
-                                            BorderThickness="1" CornerRadius="12">
+                                            Height="24"
+                                            Background="{DynamicResource CardBackgroundColor}"
+                                            CornerRadius="12">
                                             <StackPanel
-                                                Orientation="Horizontal" Spacing="4">
+                                                Margin="6,0,4,0" Orientation="Horizontal"
+                                                Spacing="4">
                                                 <LucideIcon
                                                     VerticalAlignment="Center"
                                                     Kind="{Binding Icon}"
@@ -120,7 +124,7 @@
                                                     VerticalAlignment="Center" FontSize="12"
                                                     Text="{Binding HeaderKey^}"/>
                                                 <Button
-                                                    Padding="2" VerticalAlignment="Center"
+                                                    Padding="1" VerticalAlignment="Center"
                                                     Background="Transparent" BorderThickness="0">
                                                     <LucideIcon
                                                         Foreground="{DynamicResource MutedColor}"
@@ -137,35 +141,16 @@
                                 Orientation="Horizontal" Spacing="4">
                                 <Menu>
                                     <MenuItem
-                                        Classes="Outline Rounded" extensions:MenuItemAssist.Label="Add Attachment"
+                                        Classes="Outline Rounded"
+                                        extensions:MenuItemAssist.Label="{DynamicResource AssistantInputBox_AddAttachmentMenuItem_Header}"
                                         extensions:MenuItemAssist.PopupPlacement="TopEdgeAlignedLeft" extensions:MenuItemAssist.PopupVerticalOffset="-4"
-                                        ItemsSource="{TemplateBinding AddAttachmentCommandItemsSource}"
+                                        ItemsSource="{TemplateBinding AddAttachmentMenuItems}"
                                         ToolTip.Tip="{DynamicResource AssistantInputBox_AddAttachmentButton_ToolTip}">
                                         <MenuItem.Header>
                                             <LucideIcon
                                                 HorizontalAlignment="Center" VerticalAlignment="Center"
                                                 Kind="Plus" Size="18"/>
                                         </MenuItem.Header>
-
-                                        <MenuItem.ItemContainerTheme>
-                                            <ControlTheme
-                                                x:DataType="m:DynamicNamedCommand"
-                                                BasedOn="{StaticResource {x:Type MenuItem}}"
-                                                TargetType="MenuItem">
-                                                <Setter Property="Icon">
-                                                    <Setter.Value>
-                                                        <Template>
-                                                            <LucideIcon
-                                                                Kind="{Binding Icon}"
-                                                                Size="16"/>
-                                                        </Template>
-                                                    </Setter.Value>
-                                                </Setter>
-                                                <Setter Property="Header" Value="{Binding HeaderKey^}"/>
-                                                <Setter Property="Command" Value="{Binding Command}"/>
-                                                <Setter Property="CommandParameter" Value="{Binding CommandParameter}"/>
-                                            </ControlTheme>
-                                        </MenuItem.ItemContainerTheme>
                                     </MenuItem>
                                 </Menu>
 

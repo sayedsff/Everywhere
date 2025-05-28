@@ -1,9 +1,11 @@
-﻿using Avalonia.Controls;
+﻿using System.Collections.ObjectModel;
+using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.LogicalTree;
 using Avalonia.Media;
 using Avalonia.Media.TextFormatting;
 using Avalonia.Reactive;
@@ -28,8 +30,10 @@ public class AssistantInputBox : TextBox
     public static readonly StyledProperty<IEnumerable<AssistantAttachment>?> AttachmentItemsSourceProperty =
         AvaloniaProperty.Register<AssistantInputBox, IEnumerable<AssistantAttachment>?>(nameof(AttachmentItemsSource));
 
-    public static readonly StyledProperty<IEnumerable<DynamicNamedCommand>?> AddAttachmentCommandItemsSourceProperty =
-        AvaloniaProperty.Register<AssistantInputBox, IEnumerable<DynamicNamedCommand>?>(nameof(AddAttachmentCommandItemsSource));
+    public static readonly DirectProperty<AssistantInputBox, ObservableCollection<MenuItem>> AddAttachmentMenuItemsProperty =
+        AvaloniaProperty.RegisterDirect<AssistantInputBox, ObservableCollection<MenuItem>>(
+            nameof(AddAttachmentMenuItems),
+            o => o.AddAttachmentMenuItems);
 
     public static readonly StyledProperty<IEnumerable<AssistantCommand>?> AssistantCommandItemsSourceProperty =
         AvaloniaProperty.Register<AssistantInputBox, IEnumerable<AssistantCommand>?>(nameof(AssistantCommandItemsSource));
@@ -94,11 +98,12 @@ public class AssistantInputBox : TextBox
         set => SetValue(AttachmentItemsSourceProperty, value);
     }
 
-    public IEnumerable<DynamicNamedCommand>? AddAttachmentCommandItemsSource
+
+    public ObservableCollection<MenuItem> AddAttachmentMenuItems
     {
-        get => GetValue(AddAttachmentCommandItemsSourceProperty);
-        set => SetValue(AddAttachmentCommandItemsSourceProperty, value);
-    }
+        get;
+        set => SetAndRaise(AddAttachmentMenuItemsProperty, ref field, value);
+    } = [];
 
     public IEnumerable<AssistantCommand>? AssistantCommandItemsSource
     {
@@ -187,6 +192,18 @@ public class AssistantInputBox : TextBox
         }
     }
 
+    protected override void OnPointerPressed(PointerPressedEventArgs e)
+    {
+        // Because this control is inherited from TextBox, it will receive pointer events and broke the MenuItem's pointer events.
+        // We need to ignore pointer events if the source is a StyledElement that is inside a MenuItem.
+        if (e.Source is StyledElement element && element.FindLogicalAncestorOfType<MenuItem>() != null)
+        {
+            return;
+        }
+
+        base.OnPointerPressed(e);
+    }
+
     private void Remove()
     {
 
@@ -264,8 +281,7 @@ public class AssistantInputTextPresenter : TextPresenter
     public AssistantInputTextPresenter()
     {
         SelectedAssistantCommandProperty.Changed.Subscribe(
-            new AnonymousObserver<AvaloniaPropertyChangedEventArgs<AssistantCommand?>>(
-                _ => InvalidateTextLayout()));
+            new AnonymousObserver<AvaloniaPropertyChangedEventArgs<AssistantCommand?>>(_ => InvalidateTextLayout()));
     }
 
     protected override Size MeasureOverride(Size availableSize)
@@ -330,9 +346,20 @@ public class AssistantInputTextPresenter : TextPresenter
 
         var maxWidth = constraint.Width.IsCloseTo(0d) ? double.PositiveInfinity : constraint.Width;
         var maxHeight = constraint.Height.IsCloseTo(0d) ? double.PositiveInfinity : constraint.Height;
-        var textLayout = new TextLayout(text, typeface, FontFeatures, FontSize, foreground, TextAlignment,
-            TextWrapping, maxWidth: maxWidth, maxHeight: maxHeight, textStyleOverrides: textStyleOverrides,
-            flowDirection: FlowDirection, lineHeight: LineHeight, letterSpacing: LetterSpacing);
+        var textLayout = new TextLayout(
+            text,
+            typeface,
+            FontFeatures,
+            FontSize,
+            foreground,
+            TextAlignment,
+            TextWrapping,
+            maxWidth: maxWidth,
+            maxHeight: maxHeight,
+            textStyleOverrides: textStyleOverrides,
+            flowDirection: FlowDirection,
+            lineHeight: LineHeight,
+            letterSpacing: LetterSpacing);
         return textLayout;
     }
 

@@ -1,12 +1,13 @@
 ﻿<v:ReactiveWindow
     x:Class="Everywhere.Views.AssistantFloatingWindow" xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:c="clr-namespace:Everywhere.Collections"
-    xmlns:contents="clr-namespace:ShadUI.Contents;assembly=ShadUI" xmlns:m="clr-namespace:Everywhere.Models"
-    xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI" xmlns:system="clr-namespace:System;assembly=System.Runtime"
-    xmlns:themes="clr-namespace:ShadUI.Themes;assembly=ShadUI" xmlns:v="clr-namespace:Everywhere.Views"
-    xmlns:vc="clr-namespace:Everywhere.ValueConverters" xmlns:vm="clr-namespace:Everywhere.ViewModels"
-    x:DataType="vm:AssistantFloatingWindowViewModel" x:TypeArguments="vm:AssistantFloatingWindowViewModel"
-    Background="Transparent" CanResize="False"
+    xmlns:contents="clr-namespace:ShadUI.Contents;assembly=ShadUI" xmlns:i="clr-namespace:Everywhere.Interfaces"
+    xmlns:m="clr-namespace:Everywhere.Models" xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI"
+    xmlns:system="clr-namespace:System;assembly=System.Runtime" xmlns:themes="clr-namespace:ShadUI.Themes;assembly=ShadUI"
+    xmlns:v="clr-namespace:Everywhere.Views" xmlns:vc="clr-namespace:Everywhere.ValueConverters"
+    xmlns:vm="clr-namespace:Everywhere.ViewModels" x:DataType="vm:AssistantFloatingWindowViewModel"
+    x:TypeArguments="vm:AssistantFloatingWindowViewModel" Background="Transparent"
+    CanResize="False"
     IsOpened="{Binding IsVisible}"
     RequestedThemeVariant="{x:Static themes:ThemeVariants.Acrylic}"
     ShowActivated="False" ShowInTaskbar="False"
@@ -86,9 +87,10 @@
             </ToggleButton>
 
             <Button
-                Classes="Basic WindowControlsButton Close" DockPanel.Dock="Right"
+                Classes="Ghost" DockPanel.Dock="Right"
                 Width="24" Height="24"
-                Margin="0,0,0,4" VerticalAlignment="Center"
+                Margin="0,0,0,4" Padding="0"
+                VerticalAlignment="Center"
                 Command="{Binding CloseCommand}"
                 CornerRadius="4"
                 IsVisible="{Binding IsExpanded}">
@@ -157,7 +159,7 @@
                                             <TextBlock
                                                 IsVisible="{Binding !!DescriptionKey}"
                                                 Text="{Binding DescriptionKey^, FallbackValue={x:Null}}"
-                                                TextWrapping="Wrap"/>
+                                                TextWrapping="WrapWithOverflow"/>
                                         </StackPanel>
                                     </Button>
                                 </DataTemplate>
@@ -183,10 +185,6 @@
                             </ItemsControl.ItemsPanel>
 
                             <ItemsControl.Styles>
-                                <Style Selector="StackPanel.ChatMessage.Assistant:not(:pointerover) StackPanel#ChatMessageOperationPanel">
-                                    <Setter Property="Opacity" Value="0"/>
-                                </Style>
-
                                 <Style Selector="Border.ChatBubble">
                                     <Setter Property="Padding" Value="8,4"/>
                                     <Setter Property="CornerRadius" Value="12"/>
@@ -214,20 +212,18 @@
                             <ItemsControl.DataTemplates>
                                 <DataTemplate DataType="m:AssistantChatMessage">
                                     <StackPanel
-                                        Classes="ChatMessage Assistant" Margin="0,0,36,0"
-                                        HorizontalAlignment="Left" Background="Transparent"
-                                        Orientation="Vertical" Spacing="4">
-                                        <Border Classes="ChatBubble">
-                                            <SelectableTextBlock Inlines="{Binding InlineCollection}"/>
-                                        </Border>
+                                        Classes="ChatMessage Assistant" Margin="4,0"
+                                        Background="Transparent" Orientation="Vertical"
+                                        Spacing="4">
+                                        <SelectableTextBlock Inlines="{Binding InlineCollection}"/>
 
                                         <StackPanel
-                                            x:Name="ChatMessageOperationPanel" HorizontalAlignment="Right"
-                                            Orientation="Horizontal">
+                                            x:Name="ChatMessageOperationPanel" Orientation="Horizontal">
                                             <Button
                                                 Classes="Ghost"
                                                 Command="{Binding $parent[v:AssistantFloatingWindow].ViewModel.RetryCommand}"
                                                 CommandParameter="{Binding}"
+                                                IsEnabled="{Binding !IsBusy}"
                                                 ToolTip.Tip="{DynamicResource AssistantFloatingWindow_ChatMessage_Assistant_Regenerate}">
                                                 <LucideIcon Kind="RefreshCcw"/>
                                             </Button>
@@ -235,8 +231,9 @@
                                                 Classes="Ghost"
                                                 Command="{Binding $parent[v:AssistantFloatingWindow].ViewModel.CopyCommand}"
                                                 CommandParameter="{Binding}"
+                                                IsEnabled="{Binding !IsBusy}"
                                                 ToolTip.Tip="{DynamicResource AssistantFloatingWindow_ChatMessage_Assistant_Copy}">
-                                                <LucideIcon Kind="ClipboardCopy"/>
+                                                <LucideIcon Kind="Copy"/>
                                             </Button>
                                         </StackPanel>
                                     </StackPanel>
@@ -341,7 +338,6 @@
 
                 <v:AssistantInputBox
                     Margin="0,0,0,1"
-                    AddAttachmentCommandItemsSource="{Binding AddAttachmentCommands}"
                     AssistantCommandItemsSource="{Binding AssistantCommands}"
                     AttachmentItemsSource="{Binding Attachments}"
                     CancelCommand="{Binding CancelCommand}"
@@ -349,7 +345,53 @@
                     IsImageSupported="{Binding Settings.Model.IsImageEnabled}"
                     IsSendButtonEnabled="{Binding !IsBusy}"
                     IsToolCallSupported="{Binding Settings.Model.IsToolCallEnabled}"
-                    IsWebSearchSupported="{Binding Settings.Model.IsWebSearchEnabled}"/>
+                    IsWebSearchSupported="{Binding Settings.Model.IsWebSearchEnabled}">
+                    <v:AssistantInputBox.AddAttachmentMenuItems>
+                        <MenuItem
+                            Command="{Binding AddElementCommand}"
+                            CommandParameter="{x:Static i:PickElementMode.Screen}"
+                            Header="{DynamicResource AssistantFloatingWindow_AssistantInputBox_AddAttachmentMenuItems_AddScreen}">
+                            <MenuItem.Icon>
+                                <LucideIcon
+                                    Kind="Monitor" Size="18"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem
+                            Command="{Binding AddElementCommand}"
+                            CommandParameter="{x:Static i:PickElementMode.Window}"
+                            Header="{DynamicResource AssistantFloatingWindow_AssistantInputBox_AddAttachmentMenuItems_AddWindow}">
+                            <MenuItem.Icon>
+                                <LucideIcon
+                                    Kind="AppWindow" Size="18"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem
+                            Command="{Binding AddElementCommand}"
+                            CommandParameter="{x:Static i:PickElementMode.Element}"
+                            Header="{DynamicResource AssistantFloatingWindow_AssistantInputBox_AddAttachmentMenuItems_AddElement}">
+                            <MenuItem.Icon>
+                                <LucideIcon
+                                    Kind="SquareMousePointer" Size="18"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem
+                            Command="{Binding AddClipboardCommand}"
+                            Header="{DynamicResource AssistantFloatingWindow_AssistantInputBox_AddAttachmentMenuItems_AddClipboard}">
+                            <MenuItem.Icon>
+                                <LucideIcon
+                                    Kind="ClipboardPaste" Size="18"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem
+                            Command="{Binding AddFileCommand}"
+                            Header="{DynamicResource AssistantFloatingWindow_AssistantInputBox_AddAttachmentMenuItems_AddFile}">
+                            <MenuItem.Icon>
+                                <LucideIcon
+                                    Kind="File" Size="18"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </v:AssistantInputBox.AddAttachmentMenuItems>
+                </v:AssistantInputBox>
             </StackPanel>
         </Panel>
     </Grid>
