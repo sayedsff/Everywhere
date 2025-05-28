@@ -1,4 +1,4 @@
-﻿namespace Everywhere;
+﻿namespace Everywhere.Utils;
 
 public class AnonymousDisposable(Action disposeAction) : IDisposable
 {
