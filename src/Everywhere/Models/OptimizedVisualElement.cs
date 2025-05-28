@@ -124,13 +124,7 @@ public class OptimizedVisualElement : IVisualElement
 
     private static bool IsElementVisible(IVisualElement element)
     {
-        var boundingRectangle = element.BoundingRectangle;
-
-        if (boundingRectangle.Width <= 0 || boundingRectangle.Height <= 0)
-            return false;
-
-        if (boundingRectangle.X + boundingRectangle.Width <= 0 ||
-            boundingRectangle.Y + boundingRectangle.Height <= 0)
+        if (element.BoundingRectangle is not { Width: > 0, Height: > 0 })
             return false;
 
         if (element.States.HasFlag(VisualElementStates.Offscreen))
