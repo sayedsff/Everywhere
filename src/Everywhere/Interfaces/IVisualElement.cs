@@ -77,6 +77,8 @@ public interface IVisualElement : INotifyPropertyChanged
 
     int ProcessId { get; }
 
+    nint NativeWindowHandle { get; }
+
     /// <summary>
     /// get text content of the visual element.
     /// </summary>

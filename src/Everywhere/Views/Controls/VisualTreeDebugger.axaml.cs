@@ -161,6 +161,12 @@ internal class DebuggerVisualElement(IVisualElement element) : ObservableObject
     public VisualElementType Type => element.Type;
 
     public VisualElementStates States => element.States;
+    
+    public IVisualElement? Parent => element.Parent;
+
+    public IVisualElement? PreviousSibling => element.PreviousSibling;
+
+    public IVisualElement? NextSibling => element.NextSibling;
 
     public int ProcessId => element.ProcessId;
 
@@ -179,6 +185,8 @@ internal class DebuggerVisualElement(IVisualElement element) : ObservableObject
             }
         }
     }
+
+    public nint NativeWindowHandle => element.NativeWindowHandle;
 
     public PixelRect BoundingRectangle => element.BoundingRectangle;
 

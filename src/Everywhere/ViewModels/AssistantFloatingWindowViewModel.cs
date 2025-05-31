@@ -337,7 +337,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
                             "ActionChatMessage_Header_AnalyzingContext");
                         chatMessages.Add(analyzingContextMessage);
                         analyzingContextMessage.IsBusy = true;
-                        builtSystemPrompt = BuildSystemPrompt(elements, systemPrompt, cancellationToken);
+                        builtSystemPrompt = await Task.Run(() => BuildSystemPrompt(elements, systemPrompt, cancellationToken), cancellationToken);
                         analyzingContextMessage.IsBusy = false;
                     }
                     else

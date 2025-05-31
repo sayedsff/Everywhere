@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Security;
 using System.Text;
+using JetBrains.Profiler.Api;
 using Microsoft.ML.Tokenizers;
 
 namespace Everywhere.Assistant;
@@ -20,7 +21,7 @@ public class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreElements,
         Parent,
         PreviousSibling,
         NextSibling,
-        Child
+        FirstChild
     }
 
     private record QueuedElement(IVisualElement Element, QueueOrigin Origin, string? ParentId);
@@ -62,7 +63,7 @@ public class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreElements,
 #if DEBUG
         Debug.WriteLine("BuildInternal started...");
         var sw = Stopwatch.StartNew();
-        JetBrains.Profiler.Api.MeasureProfiler.StartCollectingData();
+        MeasureProfiler.StartCollectingData();
 #endif
 
         var buildQueue = new Queue<QueuedElement>(coreElements.Select(e => new QueuedElement(e, QueueOrigin.CoreElement, e.Parent?.Id)));
@@ -101,7 +102,7 @@ public class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreElements,
             var contents = content?.Split('\n') ?? [];
 
             var tokenCount = 8; // estimated token count for the indentation, start tag and id
-            if (description != null) tokenCount += tokenizer.CountTokens(description);
+            if (description != null) tokenCount += tokenizer.CountTokens(description) + 3;
             tokenCount += contents.Length switch
             {
                 1 => contents.Sum(line => tokenizer.CountTokens(line)),
@@ -120,7 +121,7 @@ public class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreElements,
             remainingTokenCount -= tokenCount;
             if (remainingTokenCount < 0) break;
 
-            if (queueOrigin is not QueueOrigin.Child)
+            if (queueOrigin is not QueueOrigin.FirstChild)
             {
                 var parent = element.Parent;
                 if (parent != null)
@@ -129,10 +130,10 @@ public class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreElements,
                 }
             }
 
-            if (queueOrigin is not QueueOrigin.NextSibling and not QueueOrigin.Child)
+            if (queueOrigin is not QueueOrigin.NextSibling and not QueueOrigin.FirstChild) // first child's previous sibling is always null
             {
                 var previousSibling = element.PreviousSibling;
-                if (previousSibling != null && !visitedElements.ContainsKey(element.Id))
+                if (previousSibling != null && !visitedElements.ContainsKey(previousSibling.Id))
                 {
                     buildQueue.Enqueue(new QueuedElement(previousSibling, QueueOrigin.PreviousSibling, parentId));
                 }
@@ -152,7 +153,7 @@ public class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreElements,
                 var firstChild = element.Children.FirstOrDefault();
                 if (firstChild != null && !visitedElements.ContainsKey(firstChild.Id))
                 {
-                    buildQueue.Enqueue(new QueuedElement(firstChild, QueueOrigin.Child, id));
+                    buildQueue.Enqueue(new QueuedElement(firstChild, QueueOrigin.FirstChild, id));
                 }
             }
         }
@@ -170,13 +171,10 @@ public class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreElements,
         foreach (var rootElement in rootElements) InternalBuildXml(rootElement, 0);
         visualTreeXmlBuilder.TrimEnd();
 
-        Console.WriteLine(visualTreeXmlBuilder.ToString());
-
 #if DEBUG
-        JetBrains.Profiler.Api.MeasureProfiler.SaveData();
+        MeasureProfiler.SaveData();
         sw.Stop();
         Debug.WriteLine($"BuildInternal finished in {sw.ElapsedMilliseconds}ms");
-        Environment.Exit(0);
 #endif
 
         string TruncateIfNeeded(string text, int maxLength)

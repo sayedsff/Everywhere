@@ -1,5 +1,4 @@
-﻿using System.Collections.Concurrent;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
@@ -66,7 +65,6 @@ public class Win32VisualElementContext : IVisualElementContext
     public IVisualElement? PointerOverElement => TryFrom(static () => PInvoke.GetCursorPos(out var point) ? Automation.FromPoint(point) : null);
 
     private readonly IWindowHelper windowHelper;
-    private readonly ConcurrentDictionary<string, AutomationVisualElementImpl> cachedAutomationVisualElement = new();
 
     public Win32VisualElementContext(IWindowHelper windowHelper)
     {
@@ -82,7 +80,7 @@ public class Win32VisualElementContext : IVisualElementContext
             }
 
             if (element.FrameworkAutomationElement.ProcessId.ValueOrDefault == CurrentProcessId) return;
-            handler(CreateAutomationVisualElement(element));
+            handler(new AutomationVisualElementImpl(this, element, true));
         });
     }
 
@@ -102,18 +100,12 @@ public class Win32VisualElementContext : IVisualElementContext
         return result;
     }
 
-    private AutomationVisualElementImpl CreateAutomationVisualElement(AutomationElement element)
-    {
-        var id = string.Join('.', element.Properties.RuntimeId.ValueOrDefault ?? []);
-        return cachedAutomationVisualElement.GetOrAdd(id, i => new AutomationVisualElementImpl(this, element, i));
-    }
-
-    private AutomationVisualElementImpl? TryFrom(Func<AutomationElement?> factory)
+    private AutomationVisualElementImpl? TryFrom(Func<AutomationElement?> factory, bool windowBarrier = true)
     {
         try
         {
             if (factory() is { } element && element.FrameworkAutomationElement.ProcessId.ValueOrDefault != CurrentProcessId)
-                return CreateAutomationVisualElement(element);
+                return new AutomationVisualElementImpl(this, element, windowBarrier);
         }
         catch (Exception ex)
         {
@@ -155,11 +147,14 @@ public class Win32VisualElementContext : IVisualElementContext
         return bitmap;
     }
 
-    private class AutomationVisualElementImpl(Win32VisualElementContext context, AutomationElement element, string id) : IVisualElement
+    private class AutomationVisualElementImpl(
+        Win32VisualElementContext context,
+        AutomationElement element,
+        bool windowBarrier) : IVisualElement
     {
         public IVisualElementContext Context => context;
 
-        public string Id { get; } = id;
+        public string Id { get; } = string.Join('.', element.Properties.RuntimeId.ValueOrDefault ?? []);
 
         public IVisualElement? Parent
         {
@@ -167,16 +162,17 @@ public class Win32VisualElementContext : IVisualElementContext
             {
                 try
                 {
-                    var hWnd = element.FrameworkAutomationElement.NativeWindowHandle.ValueOrDefault;
-                    if (hWnd != IntPtr.Zero && PInvoke.GetAncestor((HWND)hWnd, GET_ANCESTOR_FLAGS.GA_ROOTOWNER) == hWnd)
+                    if (IsTopLevelWindow)
                     {
-                        // this is a top level window, we should return it's ScreenVisualElement
-                        var screen = PInvoke.MonitorFromWindow((HWND)hWnd, MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST);
+                        // this is a top level window
+                        if (windowBarrier) return null;
+
+                        var screen = PInvoke.MonitorFromWindow((HWND)NativeWindowHandle, MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST);
                         return screen == HMONITOR.Null ? null : new ScreenVisualElementImpl(context, screen);
                     }
 
                     var parent = TreeWalker.GetParent(element);
-                    return parent is null ? null : context.CreateAutomationVisualElement(parent);
+                    return parent is null ? null : new AutomationVisualElementImpl(context, parent, windowBarrier);
                 }
                 catch (COMException)
                 {
@@ -201,7 +197,7 @@ public class Win32VisualElementContext : IVisualElementContext
 
                 while (child is not null)
                 {
-                    yield return context.CreateAutomationVisualElement(child);
+                    yield return new AutomationVisualElementImpl(context, child, windowBarrier);
 
                     try
                     {
@@ -219,10 +215,12 @@ public class Win32VisualElementContext : IVisualElementContext
         {
             get
             {
+                if (windowBarrier && IsTopLevelWindow) return null;
+
                 try
                 {
                     var sibling = TreeWalker.GetPreviousSibling(element);
-                    return sibling is null ? null : context.CreateAutomationVisualElement(sibling);
+                    return sibling is null ? null : new AutomationVisualElementImpl(context, sibling, windowBarrier);
                 }
                 catch (COMException)
                 {
@@ -235,10 +233,12 @@ public class Win32VisualElementContext : IVisualElementContext
         {
             get
             {
+                if (windowBarrier && IsTopLevelWindow) return null;
+
                 try
                 {
                     var sibling = TreeWalker.GetNextSibling(element);
-                    return sibling is null ? null : context.CreateAutomationVisualElement(sibling);
+                    return sibling is null ? null : new AutomationVisualElementImpl(context, sibling, windowBarrier);
                 }
                 catch (COMException)
                 {
@@ -365,6 +365,8 @@ public class Win32VisualElementContext : IVisualElementContext
         }
 
         public int ProcessId { get; } = element.FrameworkAutomationElement.ProcessId.ValueOrDefault;
+
+        public nint NativeWindowHandle { get; } = element.FrameworkAutomationElement.NativeWindowHandle.ValueOrDefault;
 
         public string? GetText(int maxLength = -1)
         {
@@ -569,6 +571,16 @@ public class Win32VisualElementContext : IVisualElementContext
             if (inputBlocked) PInvoke.BlockInput(false);
         }
 
+        /// <summary>
+        ///     Determines if the current element is a top-level window in a Win32 context.
+        /// </summary>
+        /// <remarks>
+        ///     e.g. A control inside a window or a non-win32 element will return false.
+        /// </remarks>
+        private bool IsTopLevelWindow =>
+            NativeWindowHandle != IntPtr.Zero &&
+            PInvoke.GetAncestor((HWND)NativeWindowHandle, GET_ANCESTOR_FLAGS.GA_ROOTOWNER) == NativeWindowHandle;
+
         #endregion
 
         public override bool Equals(object? obj)
@@ -579,7 +591,7 @@ public class Win32VisualElementContext : IVisualElementContext
 
         public override int GetHashCode() => Id.GetHashCode();
 
-        public override string ToString() => $"[{element.ControlType}] {Name} - {GetText(128)}";
+        public override string ToString() => $"({Id}) [{element.ControlType}] {Name} - {GetText(128)}";
     }
 
     private unsafe class ScreenVisualElementImpl(Win32VisualElementContext context, HMONITOR hMonitor) : IVisualElement
@@ -616,7 +628,7 @@ public class Win32VisualElementContext : IVisualElementContext
                         return true;
                     },
                     0);
-                return windows.Select(h => context.TryFrom(() => Automation.FromHandle(h))).OfType<IVisualElement>();
+                return windows.Select(h => context.TryFrom(() => Automation.FromHandle(h), false)).OfType<IVisualElement>();
             }
         }
 
@@ -710,6 +722,8 @@ public class Win32VisualElementContext : IVisualElementContext
         }
 
         public int ProcessId => 0;
+
+        public nint NativeWindowHandle => 0;
 
         public string? GetText(int maxLength = -1) => null;
 

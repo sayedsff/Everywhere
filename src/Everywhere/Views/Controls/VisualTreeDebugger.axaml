@@ -73,6 +73,7 @@
                                 <TextBox
                                     AcceptsReturn="True"
                                     IsReadOnly="{Binding IsReadOnly}"
+                                    MaxLines="5"
                                     Text="{Binding Value, Mode=TwoWay}"
                                     TextWrapping="WrapWithOverflow"/>
                             </StackPanel>
