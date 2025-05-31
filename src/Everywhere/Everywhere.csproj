@@ -16,6 +16,7 @@
         <PackageReference Include="Lucide.Avalonia"/>
         <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="JetBrains.Profiler.Api"/>
         <PackageReference Include="Microsoft.Extensions.Configuration" />
+        <PackageReference Include="Microsoft.ML.Tokenizers.Data.O200kBase" />
         <PackageReference Include="Microsoft.SemanticKernel"/>
         <PackageReference Include="Microsoft.SemanticKernel.Connectors.OpenAI"/>
         <PackageReference Include="Microsoft.SemanticKernel.Plugins.Web" />

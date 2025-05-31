@@ -29,6 +29,13 @@ public interface IVisualElementContext
     IVisualElement? PointerOverElement { get; }
 
     /// <summary>
+    /// Get the element at the specified point.
+    /// </summary>
+    /// <param name="point">Point in screen pixels.</param>
+    /// <returns></returns>
+    IVisualElement? ElementFromPoint(PixelPoint point);
+
+    /// <summary>
     /// Let the user pick an element from the screen.
     /// </summary>
     /// <returns></returns>

@@ -218,12 +218,13 @@
                                         <SelectableTextBlock Inlines="{Binding InlineCollection}"/>
 
                                         <StackPanel
-                                            x:Name="ChatMessageOperationPanel" Orientation="Horizontal">
+                                            x:Name="ChatMessageOperationPanel"
+                                            IsVisible="{Binding !IsBusy}"
+                                            Orientation="Horizontal">
                                             <Button
                                                 Classes="Ghost"
                                                 Command="{Binding $parent[v:AssistantFloatingWindow].ViewModel.RetryCommand}"
                                                 CommandParameter="{Binding}"
-                                                IsEnabled="{Binding !IsBusy}"
                                                 ToolTip.Tip="{DynamicResource AssistantFloatingWindow_ChatMessage_Assistant_Regenerate}">
                                                 <LucideIcon Kind="RefreshCcw"/>
                                             </Button>
@@ -231,7 +232,6 @@
                                                 Classes="Ghost"
                                                 Command="{Binding $parent[v:AssistantFloatingWindow].ViewModel.CopyCommand}"
                                                 CommandParameter="{Binding}"
-                                                IsEnabled="{Binding !IsBusy}"
                                                 ToolTip.Tip="{DynamicResource AssistantFloatingWindow_ChatMessage_Assistant_Copy}">
                                                 <LucideIcon Kind="Copy"/>
                                             </Button>

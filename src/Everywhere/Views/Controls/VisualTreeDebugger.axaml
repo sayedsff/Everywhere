@@ -31,10 +31,6 @@
                 <CheckBox
                     x:Name="ShowKeyboardFocusedElementCheckBox" VerticalAlignment="Center"
                     Content="Show keyboard focused element"/>
-                <Button
-                    Classes="Outline" Height="24"
-                    Padding="2" Click="HandleOptimizeButtonClicked"
-                    Content="Optimize"/>
             </StackPanel>
         </Border>
 

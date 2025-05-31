@@ -138,12 +138,6 @@ public partial class VisualTreeDebugger : UserControl
         }
     }
 
-    private void HandleOptimizeButtonClicked(object? sender, RoutedEventArgs e)
-    {
-        if (rootElements.Count == 0) return;
-        rootElements.Reset(rootElements.Select(OptimizedVisualElement.Create).ToList());
-    }
-
     private async void HandleCaptureButtonClicked(object? sender, RoutedEventArgs e)
     {
         try

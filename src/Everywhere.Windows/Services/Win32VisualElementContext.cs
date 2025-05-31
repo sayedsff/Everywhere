@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Concurrent;
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
@@ -51,7 +52,8 @@ public class Win32VisualElementContext : IVisualElementContext
     // private const string PipeName = "everywhere_text_service";
 
     private static readonly UIA3Automation Automation = new();
-    private static readonly ITreeWalker TreeWalker = Automation.TreeWalkerFactory.GetRawViewWalker();
+    private static readonly ITreeWalker TreeWalker = Automation.TreeWalkerFactory.GetContentViewWalker();
+
     // private static readonly TextServiceImpl TextService = new();
     private static readonly int CurrentProcessId = (int)PInvoke.GetCurrentProcessId();
     // private static readonly Lazy<DwmScreenCaptureHelper> DwmScreenCaptureHelper = new();
@@ -64,6 +66,7 @@ public class Win32VisualElementContext : IVisualElementContext
     public IVisualElement? PointerOverElement => TryFrom(static () => PInvoke.GetCursorPos(out var point) ? Automation.FromPoint(point) : null);
 
     private readonly IWindowHelper windowHelper;
+    private readonly ConcurrentDictionary<string, AutomationVisualElementImpl> cachedAutomationVisualElement = new();
 
     public Win32VisualElementContext(IWindowHelper windowHelper)
     {
@@ -72,28 +75,45 @@ public class Win32VisualElementContext : IVisualElementContext
         Automation.RegisterFocusChangedEvent(element =>
         {
             if (KeyboardFocusedElementChanged is not { } handler) return;
-            var pid = element?.FrameworkAutomationElement.ProcessId.ValueOrDefault ?? 0;
-            if (pid == CurrentProcessId) return;
-            handler(element == null ? null : new AutomationVisualElementImpl(element));
+            if (element == null)
+            {
+                handler(null);
+                return;
+            }
+
+            if (element.FrameworkAutomationElement.ProcessId.ValueOrDefault == CurrentProcessId) return;
+            handler(CreateAutomationVisualElement(element));
         });
     }
 
+    public IVisualElement? ElementFromPoint(PixelPoint point) => TryFrom(() => Automation.FromPoint(new Point(point.X, point.Y)));
+
     public async Task<IVisualElement?> PickElementAsync(PickElementMode mode)
     {
-        var windows = Application.Current!.ApplicationLifetime.To<ClassicDesktopStyleApplicationLifetime>()!.Windows
-            .AsValueEnumerable().Where(w => w.IsVisible).ToList();
+        if (Application.Current is not { ApplicationLifetime: ClassicDesktopStyleApplicationLifetime desktopLifetime })
+        {
+            return null;
+        }
+
+        var windows = desktopLifetime.Windows.AsValueEnumerable().Where(w => w.IsVisible).ToList();
         foreach (var window in windows) windowHelper.HideWindowWithoutAnimation(window);
-        var result = await new ElementPickerWindow(windowHelper).PickElementAsync(mode);
+        var result = await new ElementPickerWindow(this, windowHelper).PickElementAsync(mode);
         foreach (var window in windows) window.IsVisible = true;
         return result;
     }
 
-    private static AutomationVisualElementImpl? TryFrom(Func<AutomationElement?> factory)
+    private AutomationVisualElementImpl CreateAutomationVisualElement(AutomationElement element)
+    {
+        var id = string.Join('.', element.Properties.RuntimeId.ValueOrDefault ?? []);
+        return cachedAutomationVisualElement.GetOrAdd(id, i => new AutomationVisualElementImpl(this, element, i));
+    }
+
+    private AutomationVisualElementImpl? TryFrom(Func<AutomationElement?> factory)
     {
         try
         {
             if (factory() is { } element && element.FrameworkAutomationElement.ProcessId.ValueOrDefault != CurrentProcessId)
-                return new AutomationVisualElementImpl(element);
+                return CreateAutomationVisualElement(element);
         }
         catch (Exception ex)
         {
@@ -135,11 +155,11 @@ public class Win32VisualElementContext : IVisualElementContext
         return bitmap;
     }
 
-    private class AutomationVisualElementImpl(AutomationElement element) : IVisualElement
+    private class AutomationVisualElementImpl(Win32VisualElementContext context, AutomationElement element, string id) : IVisualElement
     {
-        private const int CONNECT_E_ADVISELIMIT = unchecked((int)0x80040201);
+        public IVisualElementContext Context => context;
 
-        public string Id { get; } = string.Join('.', element.Properties.RuntimeId.ValueOrDefault ?? []);
+        public string Id { get; } = id;
 
         public IVisualElement? Parent
         {
@@ -147,18 +167,18 @@ public class Win32VisualElementContext : IVisualElementContext
             {
                 try
                 {
-                    var hWnd = element.Properties.NativeWindowHandle.ValueOrDefault;
+                    var hWnd = element.FrameworkAutomationElement.NativeWindowHandle.ValueOrDefault;
                     if (hWnd != IntPtr.Zero && PInvoke.GetAncestor((HWND)hWnd, GET_ANCESTOR_FLAGS.GA_ROOTOWNER) == hWnd)
                     {
                         // this is a top level window, we should return it's ScreenVisualElement
                         var screen = PInvoke.MonitorFromWindow((HWND)hWnd, MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST);
-                        return screen == HMONITOR.Null ? null : new ScreenVisualElementImpl(screen);
+                        return screen == HMONITOR.Null ? null : new ScreenVisualElementImpl(context, screen);
                     }
 
                     var parent = TreeWalker.GetParent(element);
-                    return parent is null ? null : new AutomationVisualElementImpl(parent);
+                    return parent is null ? null : context.CreateAutomationVisualElement(parent);
                 }
-                catch (COMException ex) when (ex.HResult == CONNECT_E_ADVISELIMIT)
+                catch (COMException)
                 {
                     return null;
                 }
@@ -178,9 +198,11 @@ public class Win32VisualElementContext : IVisualElementContext
                 {
                     yield break;
                 }
+
                 while (child is not null)
                 {
-                    yield return new AutomationVisualElementImpl(child);
+                    yield return context.CreateAutomationVisualElement(child);
+
                     try
                     {
                         child = TreeWalker.GetNextSibling(child);
@@ -189,6 +211,38 @@ public class Win32VisualElementContext : IVisualElementContext
                     {
                         yield break;
                     }
+                }
+            }
+        }
+
+        public IVisualElement? PreviousSibling
+        {
+            get
+            {
+                try
+                {
+                    var sibling = TreeWalker.GetPreviousSibling(element);
+                    return sibling is null ? null : context.CreateAutomationVisualElement(sibling);
+                }
+                catch (COMException)
+                {
+                    return null;
+                }
+            }
+        }
+
+        public IVisualElement? NextSibling
+        {
+            get
+            {
+                try
+                {
+                    var sibling = TreeWalker.GetNextSibling(element);
+                    return sibling is null ? null : context.CreateAutomationVisualElement(sibling);
+                }
+                catch (COMException)
+                {
+                    return null;
                 }
             }
         }
@@ -261,7 +315,8 @@ public class Win32VisualElementContext : IVisualElementContext
                     if (element.Properties.IsOffscreen.ValueOrDefault) states |= VisualElementStates.Offscreen;
                     if (!element.Properties.IsEnabled.ValueOrDefault) states |= VisualElementStates.Disabled;
                     if (element.Properties.HasKeyboardFocus.ValueOrDefault) states |= VisualElementStates.Focused;
-                    if (element.Patterns.SelectionItem.TryGetPattern() is { IsSelected.ValueOrDefault: true }) states |= VisualElementStates.Selected;
+                    if (element.Patterns.SelectionItem.TryGetPattern() is { IsSelected.ValueOrDefault: true })
+                        states |= VisualElementStates.Selected;
                     if (element.Patterns.Value.TryGetPattern() is { IsReadOnly.ValueOrDefault: true }) states |= VisualElementStates.ReadOnly;
                     if (element.Properties.IsPassword.ValueOrDefault) states |= VisualElementStates.Password;
                     return states;
@@ -309,20 +364,7 @@ public class Win32VisualElementContext : IVisualElementContext
             }
         }
 
-        public int ProcessId
-        {
-            get
-            {
-                try
-                {
-                    return element.FrameworkAutomationElement.ProcessId.ValueOrDefault;
-                }
-                catch (COMException)
-                {
-                    return 0;
-                }
-            }
-        }
+        public int ProcessId { get; } = element.FrameworkAutomationElement.ProcessId.ValueOrDefault;
 
         public string? GetText(int maxLength = -1)
         {
@@ -540,8 +582,10 @@ public class Win32VisualElementContext : IVisualElementContext
         public override string ToString() => $"[{element.ControlType}] {Name} - {GetText(128)}";
     }
 
-    private unsafe class ScreenVisualElementImpl(HMONITOR hMonitor) : IVisualElement
+    private unsafe class ScreenVisualElementImpl(Win32VisualElementContext context, HMONITOR hMonitor) : IVisualElement
     {
+        public IVisualElementContext Context => context;
+
         public string Id => $"Screen {hMonitor}";
 
         public IVisualElement? Parent => null;
@@ -572,7 +616,75 @@ public class Win32VisualElementContext : IVisualElementContext
                         return true;
                     },
                     0);
-                return windows.Select(h => TryFrom(() => Automation.FromHandle(h))).OfType<IVisualElement>();
+                return windows.Select(h => context.TryFrom(() => Automation.FromHandle(h))).OfType<IVisualElement>();
+            }
+        }
+
+        public IVisualElement? PreviousSibling
+        {
+            get
+            {
+                var previousMonitor = HMONITOR.Null;
+                var result = HMONITOR.Null;
+                var hDc = PInvoke.GetDC(HWND.Null);
+                try
+                {
+                    PInvoke.EnumDisplayMonitors(
+                        hDc,
+                        null,
+                        (hm, _, _, _) =>
+                        {
+                            if (hm == hMonitor)
+                            {
+                                result = previousMonitor;
+                                return false;
+                            }
+
+                            previousMonitor = hm;
+                            return true;
+                        },
+                        default);
+                }
+                finally
+                {
+                    _ = PInvoke.ReleaseDC(HWND.Null, hDc);
+                }
+
+                return result != HMONITOR.Null ? new ScreenVisualElementImpl(context, result) : null;
+            }
+        }
+
+        public IVisualElement? NextSibling
+        {
+            get
+            {
+                var previousMonitor = HMONITOR.Null;
+                var result = HMONITOR.Null;
+                var hDc = PInvoke.GetDC(HWND.Null);
+                try
+                {
+                    PInvoke.EnumDisplayMonitors(
+                        hDc,
+                        null,
+                        (hm, _, _, _) =>
+                        {
+                            if (previousMonitor == hMonitor)
+                            {
+                                result = hm;
+                                return false;
+                            }
+
+                            previousMonitor = hm;
+                            return true;
+                        },
+                        default);
+                }
+                finally
+                {
+                    _ = PInvoke.ReleaseDC(HWND.Null, hDc);
+                }
+
+                return result != HMONITOR.Null ? new ScreenVisualElementImpl(context, result) : null;
             }
         }
 
@@ -792,8 +904,12 @@ public class Win32VisualElementContext : IVisualElementContext
 
     private class ElementPickerWindow : Window
     {
-        public ElementPickerWindow(IWindowHelper windowHelper)
+        private readonly Win32VisualElementContext context;
+
+        public ElementPickerWindow(Win32VisualElementContext context, IWindowHelper windowHelper)
         {
+            this.context = context;
+
             CanResize = false;
             ShowInTaskbar = false;
             ShowActivated = false;
@@ -925,7 +1041,7 @@ public class Win32VisualElementContext : IVisualElementContext
                         var topLevel = PInvoke.GetAncestor(hWnd, GET_ANCESTOR_FLAGS.GA_ROOTOWNER);
                         if (topLevel == HWND.Null) break;
 
-                        selectedElement = TryFrom(() => Automation.FromHandle(topLevel));
+                        selectedElement = context.TryFrom(() => Automation.FromHandle(topLevel));
                         if (selectedElement == null) break;
 
                         maskRect = selectedElement.BoundingRectangle.Translate(-(PixelVector)screenBounds.Position).ToRect(scale);
@@ -933,7 +1049,7 @@ public class Win32VisualElementContext : IVisualElementContext
                     }
                     case PickElementMode.Element:
                     {
-                        selectedElement = TryFrom(() => Automation.FromPoint(point));
+                        selectedElement = context.TryFrom(() => Automation.FromPoint(point));
                         if (selectedElement == null) break;
 
                         maskRect = selectedElement.BoundingRectangle.Translate(-(PixelVector)screenBounds.Position).ToRect(scale);

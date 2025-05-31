@@ -151,6 +151,8 @@ file class DesignTimeVisualElementContext : IVisualElementContext
     public event IVisualElementContext.KeyboardFocusedElementChangedHandler? KeyboardFocusedElementChanged;
     public IVisualElement? KeyboardFocusedElement => null;
     public IVisualElement? PointerOverElement => null;
+    public IDisposable CreateCacheScope() => throw new NotSupportedException();
+    public IVisualElement? ElementFromPoint(PixelPoint point) => null;
     public Task<IVisualElement?> PickElementAsync(PickElementMode mode) => Task.FromResult<IVisualElement?>(null);
 }
 

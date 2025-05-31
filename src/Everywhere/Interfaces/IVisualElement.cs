@@ -49,6 +49,8 @@ public enum VisualElementStates
 
 public interface IVisualElement : INotifyPropertyChanged
 {
+    IVisualElementContext Context { get; }
+
     /// <summary>
     /// Unique identifier in one Visual Tree.
     /// </summary>
@@ -57,6 +59,10 @@ public interface IVisualElement : INotifyPropertyChanged
     IVisualElement? Parent { get; }
 
     IEnumerable<IVisualElement> Children { get; }
+
+    IVisualElement? PreviousSibling { get; }
+
+    IVisualElement? NextSibling { get; }
 
     VisualElementType Type { get; }
 
@@ -82,6 +88,12 @@ public interface IVisualElement : INotifyPropertyChanged
     string? GetText(int maxLength = -1);
 
     void SetText(string text, bool append);
+
+    /// <summary>
+    /// Create a scope for caching visual elements and its properties until the scope is disposed.
+    /// </summary>
+    /// <returns></returns>
+    // IDisposable CreateCacheScope();
 
     Task<Bitmap> CaptureAsync();
 }

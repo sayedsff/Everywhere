@@ -13,6 +13,7 @@ using Everywhere.Models;
 using Everywhere.Utils;
 using Everywhere.Views;
 using Lucide.Avalonia;
+using Microsoft.ML.Tokenizers;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
@@ -316,7 +317,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
                     var elements = attachments
                         .AsValueEnumerable()
                         .OfType<AssistantVisualElementAttachment>()
-                        .Select(vea => OptimizedVisualElement.Create(vea.Element))
+                        .Select(vea => vea.Element)
                         .ToList();
 
                     string builtSystemPrompt;
@@ -336,7 +337,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
                             "ActionChatMessage_Header_AnalyzingContext");
                         chatMessages.Add(analyzingContextMessage);
                         analyzingContextMessage.IsBusy = true;
-                        builtSystemPrompt = await Task.Run(() => BuildSystemPrompt(elements, systemPrompt, cancellationToken), cancellationToken);
+                        builtSystemPrompt = BuildSystemPrompt(elements, systemPrompt, cancellationToken);
                         analyzingContextMessage.IsBusy = false;
                     }
                     else
@@ -408,9 +409,9 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
         AssistantCommands = [];
     }
 
-    private string BuildSystemPrompt(List<OptimizedVisualElement> elements, string systemPrompt, CancellationToken cancellationToken)
+    private string BuildSystemPrompt(List<IVisualElement> elements, string systemPrompt, CancellationToken cancellationToken)
     {
-        var xmlBuilder = new VisualElementXmlBuilder(elements);
+        var xmlBuilder = new VisualElementXmlBuilder(elements, TiktokenTokenizer.CreateForModel("gpt-4o"), 8192);
 
         var renderedSystemPrompt = Prompts.RenderPrompt(
             systemPrompt,
@@ -420,7 +421,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
                 { "Time", () => DateTime.Now.ToString("F") },
                 { "SystemLanguage", () => new CultureInfo(Settings.Common.Language).DisplayName },
                 { "VisualTree", () => xmlBuilder.BuildXml(cancellationToken) },
-                { "FocusedElementId", () => xmlBuilder.GetIdMap(cancellationToken)[elements[0]].ToString() },
+                { "FocusedElementId", () => xmlBuilder.GetIdMap(cancellationToken)[elements[0].Id].ToString() },
             });
 
         Console.WriteLine($"SystemPrompt\n{renderedSystemPrompt}"); // TODO: logging
