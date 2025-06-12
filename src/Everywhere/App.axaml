@@ -20,7 +20,7 @@
     <TrayIcon.Icons>
         <TrayIcons>
             <TrayIcon
-                Clicked="HandleOpenMainWindowMenuItemClicked" Icon="avares://Everywhere/Assets/Everywhere.png"
+                Clicked="HandleOpenMainWindowMenuItemClicked" Icon="avares://Everywhere/Assets/Everywhere.ico"
                 ToolTipText="Everywhere">
                 <TrayIcon.Menu>
                     <NativeMenu>

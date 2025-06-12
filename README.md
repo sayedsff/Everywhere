@@ -35,9 +35,9 @@
 
 - **Universal Input Assistance** – Call the assistant in any text field to generate, rewrite, translate, or summarize without leaving your workflow.
 - **Screen Awareness** – Capture and analyze the current window or selected region to offer context‑specific suggestions and summaries.
-- **MCP Integration** – Leverage the Model Context Protocol to wire up custom tools and data sources for deeper automation.
+- **MCP Integration** – Leverage the Model Context Protocol to wire up custom tools and data sources for deeper automation.
 - **Multimodal Understanding** – Process text, images, and screenshots for code explanations, UI analysis, or visual Q&A.
-- **LLMs under control** – Choose between cloud LLMs (ChatGPT, DeepSeek, etc.) and fully local models (Ollama, LM Studio).
+- **LLMs under control** – Choose between cloud LLMs (ChatGPT, DeepSeek, etc.) and fully local models (Ollama, LM Studio).
 
 ### 🛠 Built With
 
