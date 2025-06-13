@@ -81,7 +81,6 @@ public partial class AssistantFloatingWindow : ReactiveWindow<AssistantFloatingW
         base.OnSizeChanged(e);
 
         ClampToScreen();
-        windowHelper.SetWindowCornerRadius(this, BackgroundBorder.CornerRadius);
     }
 
     private void CalculatePositionAndPlacement()

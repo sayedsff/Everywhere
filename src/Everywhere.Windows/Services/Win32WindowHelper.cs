@@ -1,15 +1,20 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Numerics;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using Windows.UI.Composition;
+using Windows.UI.Composition.Desktop;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Dwm;
-using Windows.Win32.Graphics.Gdi;
 using Windows.Win32.UI.Accessibility;
 using Windows.Win32.UI.WindowsAndMessaging;
 using Avalonia;
 using Avalonia.Controls;
-using Everywhere.Extensions;
+using Avalonia.Threading;
 using Everywhere.Interfaces;
 using Everywhere.Windows.Interop;
+using MicroCom.Runtime;
+using Visual = Windows.UI.Composition.Visual;
 
 namespace Everywhere.Windows.Services;
 
@@ -79,7 +84,7 @@ public class Win32WindowHelper : IWindowHelper
 
         window.PropertyChanged += (_, e) =>
         {
-            if (e.Property != Visual.IsVisibleProperty || e.NewValue is not false) return;
+            if (e.Property != Avalonia.Visual.IsVisibleProperty || e.NewValue is not false) return;
 #pragma warning disable CS0618 // 类型或成员已过时
             window.FocusManager?.ClearFocus(); // why, avalonia, why!!!!!!!!!!!!!!!!!!
 #pragma warning restore CS0618 // 类型或成员已过时
@@ -170,99 +175,94 @@ public class Win32WindowHelper : IWindowHelper
         };
     }
 
+    private readonly Dictionary<nint, CompositionContext> compositionContexts = [];
+
     // Modify from WPF source code
     // https://referencesource.microsoft.com/#PresentationFramework/src/Framework/System/Windows/Shell/WindowChromeWorker.cs,de42dddb12b0ad8f
     public void SetWindowCornerRadius(Window window, CornerRadius cornerRadius)
     {
+        // Ensure dispatcher queue
+        Dispatcher.UIThread.VerifyAccess();
+
         var hWnd = window.TryGetPlatformHandle()?.Handle ?? 0;
         if (hWnd == 0) return;
 
-        var bounds = window.Bounds;
-        var scale = window.DesktopScaling;
-        var size = new Size(bounds.Width * scale, bounds.Height * scale);
-        if (size.Width <= 0d || size.Height <= 0d) return;
-
-        scale *= 2;
-        var shortestDimension = Math.Min(size.Width, size.Height);
-        var topLeftRadius = Math.Min(cornerRadius.TopLeft * scale, shortestDimension / 2);
-
-        var hRgn = new DeleteObjectSafeHandle();
-        try
+        Compositor compositor;
+        Visual rootVisual;
+        if (!compositionContexts.TryGetValue(hWnd, out var compositionContext))
         {
+            // we will need lots of hacks, let's go
+            if (window.PlatformImpl?.GetType().GetField("_glSurface", BindingFlags.Instance | BindingFlags.NonPublic) is not { } glSurfaceField) return;
+            if (glSurfaceField.GetValue(window.PlatformImpl) is not { } glSurface) return;
+            if (glSurface.GetType().GetField("_window", BindingFlags.Instance | BindingFlags.NonPublic) is not { } windowField) return;
+            if (windowField.GetValue(glSurface) is not { } compositedWindow) return; // Avalonia.Win32.WinRT.Composition.WinUiCompositedWindow
+            if (compositedWindow.GetType().GetField("_shared", BindingFlags.Instance | BindingFlags.NonPublic) is not { } sharedField) return;
+            if (sharedField.GetValue(compositedWindow) is not { } shared) return; // Avalonia.Win32.WinRT.Composition.WinUiCompositionShared
+            if (shared.GetType().GetProperty("Compositor", BindingFlags.Instance | BindingFlags.Public) is not { } compositorProperty) return;
+            if (compositorProperty.GetValue(shared) is not MicroComProxyBase avaloniaCompositor) return; // Avalonia.Win32.WinRT.ICompositor
+            if (compositedWindow.GetType().GetField("_target", BindingFlags.Instance | BindingFlags.NonPublic) is not { } targetField) return;
+            if (targetField.GetValue(compositedWindow) is not MicroComProxyBase avaloniaTarget) return; // Avalonia.Win32.WinRT.ICompositionTarget
+
+            compositor = Compositor.FromAbi(avaloniaCompositor.NativePointer);
+            var target = DesktopWindowTarget.FromAbi(avaloniaTarget.NativePointer);
+            compositionContexts[hWnd] = compositionContext = new CompositionContext(compositor, rootVisual = target.Root);
+
+            // var previousDesktopScaling = window.DesktopScaling;
+            // window.PositionChanged += delegate
+            // {
+            //     if (previousDesktopScaling.IsCloseTo(window.DesktopScaling)) return;
+            //
+            //     previousDesktopScaling = window.DesktopScaling;
+            //     Debug.WriteLine(previousDesktopScaling);
+            //     SetWindowCornerRadiusInternal();
+            // };
+
+            window.Closed += delegate
+            {
+                compositionContext.Clip?.Dispose();
+                compositionContexts.Remove(hWnd);
+            };
+        }
+        else
+        {
+            (compositor, rootVisual) = compositionContext;
+        }
+
+        SetWindowCornerRadiusInternal();
+
+        void SetWindowCornerRadiusInternal()
+        {
+            var bounds = window.Bounds;
+            var scale = window.DesktopScaling;
+            var width = (float)(bounds.Width * scale);
+            var height = (float)(bounds.Height * scale);
+            if (width <= 0d || height <= 0d) return;
+
+            compositionContext.Clip?.Dispose();
+
+            var cornerRadiusLimit = Math.Min(width, height) / 2d;
+            var topLeft = (float)Math.Min(cornerRadius.TopLeft * scale, cornerRadiusLimit);
             if (cornerRadius.IsUniform)
             {
-                hRgn = CreateRoundRectRgn(new Rect(size), topLeftRadius);
+                using var rectGeometry = compositor.CreateRoundedRectangleGeometry();
+                rectGeometry.Size = new Vector2(width, height);
+                rectGeometry.CornerRadius = new Vector2(topLeft, topLeft);
+                rootVisual.Clip = compositionContext.Clip = compositor.CreateGeometricClip(rectGeometry);
             }
             else
             {
-                // We need to combine HRGNs for each of the corners.
-                // Create one for each quadrant, but let it overlap into the two adjacent ones
-                // by the radius amount to ensure that there aren't corners etched into the middle
-                // of the window.
-                hRgn = CreateRoundRectRgn(new Rect(0, 0, size.Width / 2 + topLeftRadius, size.Height / 2 + topLeftRadius), topLeftRadius);
-
-                var topRightRadius = Math.Min(cornerRadius.TopRight * scale, shortestDimension / 2);
-                var topRightRegionRect = new Rect(
-                    size.Width / 2 - topRightRadius,
-                    0,
-                    size.Width / 2 + topRightRadius,
-                    size.Height / 2 + topRightRadius);
-
-                using var _0 = CreateAndCombineRoundRectRgn(hRgn, topRightRegionRect, topRightRadius);
-
-                var bottomLeftRadius = Math.Min(cornerRadius.BottomLeft * scale, shortestDimension / 2);
-                var bottomLeftRegionRect = new Rect(
-                    0,
-                    size.Height / 2 - bottomLeftRadius,
-                    size.Width / 2 + bottomLeftRadius,
-                    size.Height / 2 + bottomLeftRadius);
-
-                using var _1 = CreateAndCombineRoundRectRgn(hRgn, bottomLeftRegionRect, bottomLeftRadius);
-
-                var bottomRightRadius = Math.Min(cornerRadius.BottomRight * scale, shortestDimension / 2);
-                var bottomRightRegionRect = new Rect(
-                    size.Width / 2 - bottomRightRadius,
-                    size.Height / 2 - bottomRightRadius,
-                    size.Width / 2 + bottomRightRadius,
-                    size.Height / 2 + bottomRightRadius);
-
-                using var _2 = CreateAndCombineRoundRectRgn(hRgn, bottomRightRegionRect, bottomRightRadius);
+                CreateComplexRoundedRectangleCompositionPath(
+                    width,
+                    height,
+                    topLeft,
+                    (float)Math.Min(cornerRadius.TopRight * scale, cornerRadiusLimit),
+                    (float)Math.Min(cornerRadius.BottomRight * scale, cornerRadiusLimit),
+                    (float)Math.Min(cornerRadius.BottomLeft * scale, cornerRadiusLimit),
+                    out var pathGeometryPtr).ThrowOnFailure();
+                var pathGeometry = CompositionPath.FromAbi(pathGeometryPtr);
+                using var compositionGeometry = compositor.CreatePathGeometry(pathGeometry);
+                rootVisual.Clip = compositionContext.Clip = compositor.CreateGeometricClip(compositionGeometry);
             }
-
-            PInvoke.SetWindowRgn((HWND)hWnd, hRgn, window.IsVisible);
-        }
-        finally
-        {
-            hRgn.Dispose();
-        }
-
-        static DeleteObjectSafeHandle CreateRoundRectRgn(Rect region, double radius)
-        {
-            return radius.IsCloseTo(0d) ?
-                PInvoke.CreateRectRgn_SafeHandle(
-                    (int)Math.Floor(region.Left),
-                    (int)Math.Floor(region.Top),
-                    (int)Math.Ceiling(region.Right),
-                    (int)Math.Ceiling(region.Bottom)) :
-                PInvoke.CreateRoundRectRgn_SafeHandle(
-                    (int)Math.Floor(region.Left),
-                    (int)Math.Floor(region.Top),
-                    (int)Math.Ceiling(region.Right) + 1,
-                    (int)Math.Ceiling(region.Bottom) + 1,
-                    (int)Math.Ceiling(radius),
-                    (int)Math.Ceiling(radius));
-        }
-
-        static DeleteObjectSafeHandle CreateAndCombineRoundRectRgn(DeleteObjectSafeHandle hRgnSource, Rect region, double radius)
-        {
-            var hRgn = CreateRoundRectRgn(region, radius);
-            if (PInvoke.CombineRgn(hRgnSource, hRgnSource, hRgn, RGN_COMBINE_MODE.RGN_OR) == GDI_REGION_TYPE.RGN_ERROR)
-            {
-                hRgn.Dispose();
-                throw new InvalidOperationException("Unable to combine two HRGNs.");
-            }
-
-            return hRgn;
         }
     }
 
@@ -289,4 +289,19 @@ public class Win32WindowHelper : IWindowHelper
                 (uint)sizeof(BOOL));
         }
     }
+
+    private record CompositionContext(Compositor Compositor, Visual RootVisual)
+    {
+        public CompositionClip? Clip { get; set; }
+    }
+
+    [DllImport("Everywhere.Windows.InteropHelper.dll", ExactSpelling = true)]
+    private static extern HRESULT CreateComplexRoundedRectangleCompositionPath(
+        float width,
+        float height,
+        float topLeft,
+        float topRight,
+        float bottomRight,
+        float bottomLeft,
+        out nint pCompositionPath);
 }

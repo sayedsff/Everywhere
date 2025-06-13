@@ -30,6 +30,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WritableJsonConfiguration",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShadUI", "3rd\shad-ui\src\ShadUI\ShadUI.csproj", "{BCD7009B-3ACA-4FD4-8C64-70DCD2E39D4F}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Everywhere.Windows.InteropHelper", "src\Everywhere.Windows.InteropHelper\Everywhere.Windows.InteropHelper.vcxproj", "{C53E2EB6-688B-467B-96BB-1749E8E9A72E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,10 +46,10 @@ Global
 		{ABC31E74-02FF-46EB-B3B2-4E6AE43B456C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ABC31E74-02FF-46EB-B3B2-4E6AE43B456C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ABC31E74-02FF-46EB-B3B2-4E6AE43B456C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D5F1DA2F-CE8F-4F35-A2C2-6DC5378211DF}.Release|Any CPU.ActiveCfg = Release|Win32
-		{D5F1DA2F-CE8F-4F35-A2C2-6DC5378211DF}.Release|Any CPU.Build.0 = Release|Win32
 		{D5F1DA2F-CE8F-4F35-A2C2-6DC5378211DF}.Debug|Any CPU.ActiveCfg = Debug|x64
 		{D5F1DA2F-CE8F-4F35-A2C2-6DC5378211DF}.Debug|Any CPU.Build.0 = Debug|x64
+		{D5F1DA2F-CE8F-4F35-A2C2-6DC5378211DF}.Release|Any CPU.ActiveCfg = Release|x64
+		{D5F1DA2F-CE8F-4F35-A2C2-6DC5378211DF}.Release|Any CPU.Build.0 = Release|x64
 		{A68C1BEB-0FC2-4A47-BFEB-E96BB14A9913}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A68C1BEB-0FC2-4A47-BFEB-E96BB14A9913}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A68C1BEB-0FC2-4A47-BFEB-E96BB14A9913}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -60,6 +62,10 @@ Global
 		{BCD7009B-3ACA-4FD4-8C64-70DCD2E39D4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BCD7009B-3ACA-4FD4-8C64-70DCD2E39D4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BCD7009B-3ACA-4FD4-8C64-70DCD2E39D4F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C53E2EB6-688B-467B-96BB-1749E8E9A72E}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{C53E2EB6-688B-467B-96BB-1749E8E9A72E}.Debug|Any CPU.Build.0 = Debug|x64
+		{C53E2EB6-688B-467B-96BB-1749E8E9A72E}.Release|Any CPU.ActiveCfg = Release|x64
+		{C53E2EB6-688B-467B-96BB-1749E8E9A72E}.Release|Any CPU.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
