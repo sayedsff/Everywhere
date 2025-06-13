@@ -34,6 +34,9 @@
         <AvaloniaResource Include="..\..\img\Everywhere.png">
             <Link>Assets\Everywhere.png</Link>
         </AvaloniaResource>
+        <AvaloniaResource Include="..\..\img\Everywhere.ico">
+            <Link>Assets\Everywhere.ico</Link>
+        </AvaloniaResource>
     </ItemGroup>
     
     <PropertyGroup>
