@@ -109,7 +109,7 @@ public class Text2Vec
 
     [Test]
     [TestCase("gpt-4o")]
-    public async Task KnowledgeGraphTest(string modelId)
+    public async Task KnowledgeBaseTest(string modelId)
     {
         var apiKey = Environment
             .GetEnvironmentVariable("OPENAI_API_KEY", EnvironmentVariableTarget.User)
