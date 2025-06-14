@@ -4,7 +4,6 @@
 
     <Application.Styles>
         <themes:ShadTheme/>
-        <StyleInclude Source="avares://Everywhere/Assets/Styles.axaml"/>
     </Application.Styles>
 
     <Application.Resources>
