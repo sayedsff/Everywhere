@@ -17,7 +17,7 @@ namespace Everywhere.Views;
 
 [TemplatePart("PART_SendButton", typeof(Button))]
 [TemplatePart("PART_AttachmentItemsControl", typeof(ItemsControl))]
-public class AssistantInputBox : TextBox
+public partial class AssistantInputBox : TextBox
 {
     public static readonly StyledProperty<bool> PressCtrlEnterToSendProperty =
         AvaloniaProperty.Register<AssistantInputBox, bool>(nameof(PressCtrlEnterToSend));
@@ -28,8 +28,8 @@ public class AssistantInputBox : TextBox
     public static readonly StyledProperty<IRelayCommand?> CancelCommandProperty =
         AvaloniaProperty.Register<AssistantInputBox, IRelayCommand?>(nameof(CancelCommand));
 
-    public static readonly StyledProperty<IEnumerable<AssistantAttachment>?> AttachmentItemsSourceProperty =
-        AvaloniaProperty.Register<AssistantInputBox, IEnumerable<AssistantAttachment>?>(nameof(AttachmentItemsSource));
+    public static readonly StyledProperty<IList<AssistantAttachment>?> AttachmentItemsSourceProperty =
+        AvaloniaProperty.Register<AssistantInputBox, IList<AssistantAttachment>?>(nameof(AttachmentItemsSource));
 
     public static readonly DirectProperty<AssistantInputBox, ObservableCollection<MenuItem>> AddAttachmentMenuItemsProperty =
         AvaloniaProperty.RegisterDirect<AssistantInputBox, ObservableCollection<MenuItem>>(
@@ -93,7 +93,7 @@ public class AssistantInputBox : TextBox
         set => SetValue(CancelCommandProperty, value);
     }
 
-    public IEnumerable<AssistantAttachment>? AttachmentItemsSource
+    public IList<AssistantAttachment>? AttachmentItemsSource
     {
         get => GetValue(AttachmentItemsSourceProperty);
         set => SetValue(AttachmentItemsSourceProperty, value);
@@ -249,9 +249,10 @@ public class AssistantInputBox : TextBox
         base.OnPointerPressed(e);
     }
 
-    private void Remove()
+    [RelayCommand]
+    private void RemoveAttachment(AssistantAttachment attachment)
     {
-
+        AttachmentItemsSource?.Remove(attachment);
     }
 
     private void HandleTextBoxKeyDown(object? sender, KeyEventArgs e)

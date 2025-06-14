@@ -4,9 +4,11 @@
     <MicrosoftPackageVersion>9.0.5</MicrosoftPackageVersion>
     <SemanticKernelVersion>1.54.0</SemanticKernelVersion>
     <AvaloniaVersion>11.3.0</AvaloniaVersion>
+    <TokenizersVersion>1.2.0</TokenizersVersion>
   </PropertyGroup>
   <ItemGroup>
     <!-- Base packages -->
+    <PackageVersion Include="BenchmarkDotNet" Version="0.15.1" />
     <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageVersion Include="Google.Protobuf" Version="3.30.2" />
     <PackageVersion Include="Grpc.Core.Api" Version="2.71.0" />
@@ -16,15 +18,19 @@
     <PackageVersion Include="Microsoft.Extensions.Configuration" Version="$(MicrosoftPackageVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="$(MicrosoftPackageVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="$(MicrosoftPackageVersion)" />
-    <PackageVersion Include="Microsoft.ML.Tokenizers.Data.O200kBase" Version="1.0.2" />
     <PackageVersion Include="System.Drawing.Common" Version="$(MicrosoftPackageVersion)" />
     <PackageVersion Include="System.Text.Json" Version="$(MicrosoftPackageVersion)" />
     <PackageVersion Include="ObservableCollections" Version="3.3.3" />
     <PackageVersion Include="Sep" Version="0.10.2" />
+    <PackageVersion Include="ZLinq" Version="1.4.9" />
+    <!-- LLM packages -->
+    <PackageVersion Include="Microsoft.KernelMemory.Core" Version="0.98.250508.3" />
+    <PackageVersion Include="Microsoft.ML.OnnxRuntime" Version="1.22.0" />
     <PackageVersion Include="Microsoft.SemanticKernel" Version="$(SemanticKernelVersion)" />
     <PackageVersion Include="Microsoft.SemanticKernel.Connectors.OpenAI" Version="$(SemanticKernelVersion)" />
     <PackageVersion Include="Microsoft.SemanticKernel.Plugins.Web" Version="$(SemanticKernelVersion)-alpha" />
-    <PackageVersion Include="ZLinq" Version="1.4.9" />
+    <PackageVersion Include="Tokenizers.DotNet" Version="$(TokenizersVersion)" />
+    <PackageVersion Include="Tokenizers.DotNet.runtime.win-x64" Version="$(TokenizersVersion)" />
     <!-- Avalonia packages -->
     <PackageVersion Include="Avalonia" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Skia" Version="$(AvaloniaVersion)" />
@@ -41,6 +47,7 @@
     </PackageVersion>
     <PackageVersion Include="HotAvalonia" Version="3.0.0" />
     <PackageVersion Include="Lucide.Avalonia" Version="0.1.30" />
+    <PackageVersion Include="Xaml.Behaviors.Avalonia" Version="11.3.0.10" />
     <!-- Windows packages -->
     <PackageVersion Include="Microsoft.Windows.CsWin32" Version="0.3.183">
       <PrivateAssets>all</PrivateAssets>

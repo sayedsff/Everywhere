@@ -81,5 +81,5 @@ AssistantVisualElementAttachment_Header_WithProcess_Document	{0} - 文档	{0} - 
 AssistantVisualElementAttachment_Header_WithProcess_Image	{0} - 图像	{0} - Image
 AssistantVisualElementAttachment_Header_WithProcess_Screen	{0} - 屏幕	{0} - Screen
 AssistantVisualElementAttachment_Header_WithProcess_TopLevel	{0} - 窗口	{0} - Window
-AssistantFloatingWindow_Title_NoonGreeting	中午好，有什么可以帮忙的？	Good afternoon! How can I assist you?
-KeyboardHotkeyInputBox_Watermark	点击设置快捷键
+AssistantFloatingWindow_Title	有什么可以帮忙的？	How can I assist you?
+KeyboardHotkeyInputBox_Watermark	点击设置快捷键	Click to set a hotkey

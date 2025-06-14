@@ -1,5 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Everywhere.Collections;
+using Everywhere.Views;
 using Lucide.Avalonia;
 using Microsoft.SemanticKernel.ChatCompletion;
 
@@ -38,7 +38,10 @@ public class AssistantChatMessage : ChatMessage
     }
 }
 
-public class UserChatMessage(string? actualContent = null) : ChatMessage(AuthorRole.User, actualContent);
+public class UserChatMessage(string userPrompt, IReadOnlyList<AssistantAttachment> attachments) : ChatMessage(AuthorRole.User, userPrompt)
+{
+    public IReadOnlyList<AssistantAttachment> Attachments => attachments;
+}
 
 public partial class ActionChatMessage : ChatMessage
 {
@@ -48,7 +51,8 @@ public partial class ActionChatMessage : ChatMessage
     [ObservableProperty]
     public partial DynamicResourceKey? HeaderKey { get; set; }
 
-    public ActionChatMessage(AuthorRole role,
+    public ActionChatMessage(
+        AuthorRole role,
         LucideIconKind icon = LucideIconKind.Brain,
         DynamicResourceKey? headerKey = null,
         string? actualContent = null) : base(role, actualContent)

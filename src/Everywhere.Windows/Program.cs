@@ -1,7 +1,11 @@
 ﻿using System.Text.Json;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input.Platform;
+using Avalonia.Platform.Storage;
+using Everywhere.Assistant;
 using Everywhere.Enums;
+using Everywhere.Extensions;
 using Everywhere.Initialization;
 using Everywhere.Interfaces;
 using Everywhere.Models;
@@ -12,6 +16,11 @@ using Everywhere.Windows.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.KernelMemory;
+using Microsoft.KernelMemory.AI;
+using Microsoft.KernelMemory.Configuration;
+using Microsoft.SemanticKernel.ChatCompletion;
+using Microsoft.SemanticKernel.TextGeneration;
 using ShadUI.Dialogs;
 using ShadUI.Toasts;
 using WritableJsonConfiguration;
@@ -66,6 +75,12 @@ public static class Program
 
                 .AddSingleton<DialogManager>()
                 .AddSingleton<ToastManager>()
+                .AddTransient<IClipboard>(_ =>
+                    Application.Current.As<App>()?.TopLevel.Clipboard ??
+                    throw new InvalidOperationException("Clipboard is not available."))
+                .AddTransient<IStorageProvider>(_ =>
+                    Application.Current.As<App>()?.TopLevel.StorageProvider ??
+                    throw new InvalidOperationException("StorageProvider is not available."))
 
                 #endregion
 
@@ -84,6 +99,40 @@ public static class Program
                 #region Initialize
 
                 .AddSingleton<IAsyncInitializer, AssistantInitializer>()
+
+                #endregion
+
+                #region Senmantic Kernel & Kernel Memory
+
+                .AddSingleton<IKernelMixinFactory, KernelMixinFactory>()
+                .AddTransient<IKernelMixin>(xx => xx.GetRequiredService<IKernelMixinFactory>().Create())
+                .AddTransient<ITextGenerationService>(xx => xx.GetRequiredService<IKernelMixin>())
+                .AddTransient<IChatCompletionService>(xx => xx.GetRequiredService<IKernelMixin>())
+                .AddTransient<ITextGenerator>(xx => xx.GetRequiredService<IKernelMixin>())
+                .AddTransient<ITextTokenizer>(xx => xx.GetRequiredService<IKernelMixin>())
+                .AddSingleton<IKernelMemory>(xx => new KernelMemoryBuilder()
+                    .Configure(builder =>
+                    {
+                        var baseFolder = Path.Combine(
+                            Path.GetDirectoryName(Environment.ProcessPath) ?? Environment.CurrentDirectory,
+                            "Assets",
+                            "text2vec-chinese-base");
+                        var generator = new Text2VecTextEmbeddingGenerator(
+                            Path.Combine(baseFolder, "tokenizer.json"),
+                            Path.Combine(baseFolder, "model.onnx"));
+                        builder.AddSingleton<ITextEmbeddingGenerator>(generator);
+                        builder.AddSingleton<ITextEmbeddingBatchGenerator>(generator);
+                        builder.AddIngestionEmbeddingGenerator(generator);
+                        builder.Services.AddSingleton<ITextGenerator>(_ => xx.GetRequiredService<ITextGenerator>());
+                        builder.AddSingleton(
+                            new TextPartitioningOptions
+                            {
+                                MaxTokensPerParagraph = generator.MaxTokens,
+                                OverlappingTokens = generator.MaxTokens / 20
+                            });
+                    })
+                    .Configure(builder => builder.Services.AddLogging(l => l.AddSimpleConsole()))
+                    .Build<MemoryServerless>())
 
             #endregion
 

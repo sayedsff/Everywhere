@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Everywhere.Windows": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

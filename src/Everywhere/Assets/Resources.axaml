@@ -37,6 +37,8 @@
     <SolidColorBrush
         x:Key="AcrylicBackgroundBrush" Color="#0FFFFFFF"/>
 
+    <BoxShadows x:Key="AcrylicBoxShadows">inset 1 1 0.5 #90FFFFFF, inset 0 0 5 #C0FFFFFF</BoxShadows>
+
     <Panel x:Key="AssistantAvatar">
         <Panel.Styles>
             <Style Selector="Image.Eyes">
@@ -109,9 +111,9 @@
         </Image>
 
         <Image
-            Width="18" Height="18"
-            Margin="0,0,0,1" HorizontalAlignment="Center"
-            VerticalAlignment="Center" Classes="Eyes"
+            Classes="Eyes" Width="18"
+            Height="18" Margin="0,0,0,1"
+            HorizontalAlignment="Center" VerticalAlignment="Center"
             Focusable="False">
             <Image.RenderTransform>
                 <ScaleTransform/>

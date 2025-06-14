@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Text;
 using Avalonia.Controls.Documents;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -11,15 +12,15 @@ using CommunityToolkit.Mvvm.Input;
 using Everywhere.Assistant;
 using Everywhere.Models;
 using Everywhere.Utils;
-using Everywhere.Views;
 using Lucide.Avalonia;
-using Microsoft.ML.Tokenizers;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using Microsoft.SemanticKernel.Plugins.Web;
 using Microsoft.SemanticKernel.Plugins.Web.Bing;
 using Microsoft.SemanticKernel.Plugins.Web.Brave;
+using Microsoft.SemanticKernel.TextGeneration;
 using ObservableCollections;
 using ZLinq;
 using ChatMessage = Everywhere.Models.ChatMessage;
@@ -59,13 +60,26 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
             .ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
 
     private readonly IVisualElementContext visualElementContext;
+    private readonly IClipboard clipboard;
+    private readonly IStorageProvider storageProvider;
+    private readonly IKernelMixinFactory kernelMixinFactory;
+
     private readonly ObservableList<AssistantAttachment> attachments = [];
     private readonly ObservableList<ChatMessage> chatMessages = [];
     private readonly ReusableCancellationTokenSource cancellationTokenSource = new();
 
-    public AssistantFloatingWindowViewModel(IVisualElementContext visualElementContext, Settings settings)
+    public AssistantFloatingWindowViewModel(
+        IVisualElementContext visualElementContext,
+        IClipboard clipboard,
+        IStorageProvider storageProvider,
+        IKernelMixinFactory kernelMixinFactory,
+        Settings settings)
     {
         this.visualElementContext = visualElementContext;
+        this.clipboard = clipboard;
+        this.storageProvider = storageProvider;
+        this.kernelMixinFactory = kernelMixinFactory;
+
         Settings = settings;
 
         InitializeCommands();
@@ -108,28 +122,15 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
             new(
                 "/translate",
                 "AssistantCommand_Translate_Description",
-                $$"""
-                  {{Prompts.DefaultSystemPromptWithVisualTree}}
-
-                  # Mission
-                  Based on context, translate the content of focused element"
-                  """,
-                "Translate it into {0}",
+                "Based on context, translate the content of focused element into {0}",
                 () => Settings.Common.Language),
             new(
                 "/rewrite",
                 "AssistantCommand_Rewrite_Description",
-                $$"""
-                  {{Prompts.DefaultSystemPromptWithVisualTree}}
-
-                  # Mission
-                  Based on context, rewrite the content of focused element"
-                  """,
-                "{0}",
-                () => "Refine it"),
+                "Based on context, rewrite the content of focused element"),
         ];
 
-        attachments.CollectionChanged += (in _) =>
+        void HandleAttachmentsCollectionChanged(in NotifyCollectionChangedEventArgs<AssistantAttachment> x)
         {
             QuickActions = null;
             AssistantCommands = null;
@@ -145,7 +146,9 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
                     break;
                 }
             }
-        };
+        }
+
+        attachments.CollectionChanged += HandleAttachmentsCollectionChanged;
     }
 
     private CancellationTokenSource? targetElementChangedTokenSource;
@@ -179,7 +182,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
                 }
 
                 TargetBoundingRect = targetElement.BoundingRectangle;
-                Title = "AssistantFloatingWindow_Title_NoonGreeting";
+                Title = "AssistantFloatingWindow_Title";
                 attachments.Clear();
                 attachments.Add(CreateFromVisualElement(targetElement));
                 IsVisible = true;
@@ -200,9 +203,6 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
     [RelayCommand]
     private async Task AddClipboardAsync()
     {
-        var clipboard = ServiceLocator.Resolve<AssistantFloatingWindow>().Clipboard;
-        if (clipboard is null) return;
-
         var formats = await clipboard.GetFormatsAsync();
         if (formats.Length == 0)
         {
@@ -219,7 +219,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
     [RelayCommand]
     private async Task AddFileAsync()
     {
-        var files = await ServiceLocator.Resolve<AssistantFloatingWindow>().StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions());
+        var files = await storageProvider.OpenFilePickerAsync(new FilePickerOpenOptions());
         if (files.Count <= 0) return;
         if (files[0].TryGetLocalPath() is not { } filePath)
         {
@@ -271,8 +271,6 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
             headerKey);
     }
 
-    private static readonly AuthorRole ActionRole = new("Action");
-
     [RelayCommand]
     private Task ProcessChatMessageSentAsync(string message) => ExecuteBusyTaskAsync(
         async cancellationToken =>
@@ -283,22 +281,33 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
             CanCancel = true;
             try
             {
-                string? systemPrompt = null;
-                ChatMessage? userMessage = null;
+                if (chatMessages.Count == 0) // new chat, add system prompt
+                {
+                    var renderedSystemPrompt = Prompts.RenderPrompt(
+                        Prompts.DefaultSystemPrompt,
+                        new Dictionary<string, Func<string>>
+                        {
+                            { "OS", () => Environment.OSVersion.ToString() },
+                            { "Time", () => DateTime.Now.ToString("F") },
+                            { "SystemLanguage", () => new CultureInfo(Settings.Common.Language).DisplayName },
+                        });
 
+                    chatMessages.Add(new SystemChatMessage(renderedSystemPrompt));
+                }
+
+                UserChatMessage? userMessage = null;
                 if (message[0] == '/')
                 {
                     var commandString = message.IndexOf(' ') is var index and > 0 ? message[..index] : message;
                     if (AssistantCommands?.FirstOrDefault(c => c.Command.Equals(commandString, StringComparison.OrdinalIgnoreCase)) is { } command)
                     {
-                        systemPrompt = command.SystemPrompt;
                         var commandArgument = message[commandString.Length..].Trim();
                         if (commandArgument.Length == 0)
                         {
                             commandArgument = command.DefaultValueFactory?.Invoke() ?? string.Empty;
                         }
                         var userPrompt = string.Format(command.UserPrompt, commandArgument);
-                        userMessage = new UserChatMessage(userPrompt)
+                        userMessage = new UserChatMessage(userPrompt, attachments.AsValueEnumerable().ToList())
                         {
                             InlineCollection =
                             {
@@ -309,52 +318,13 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
                     }
                 }
 
-                userMessage ??= new UserChatMessage(message) { InlineCollection = { message } };
+                userMessage ??= new UserChatMessage(message, attachments.AsValueEnumerable().ToList()) { InlineCollection = { message } };
                 chatMessages.Add(userMessage);
+                attachments.Clear();
 
-                if (chatMessages.Count == 1) // new chat, add system prompt
-                {
-                    var elements = attachments
-                        .AsValueEnumerable()
-                        .OfType<AssistantVisualElementAttachment>()
-                        .Select(vea => vea.Element)
-                        .ToList();
-
-                    string builtSystemPrompt;
-                    if (elements.Count > 0)
-                    {
-                        systemPrompt ??=
-                            $$"""
-                              {{Prompts.DefaultSystemPromptWithVisualTree}}
-
-                              # Mission
-                              Based on context, answer the user's question or accomplish the user's request
-                              """;
-
-                        var analyzingContextMessage = new ActionChatMessage(
-                            ActionRole,
-                            LucideIconKind.TextSearch,
-                            "ActionChatMessage_Header_AnalyzingContext");
-                        chatMessages.Add(analyzingContextMessage);
-                        analyzingContextMessage.IsBusy = true;
-                        builtSystemPrompt = await Task.Run(() => BuildSystemPrompt(elements, systemPrompt, cancellationToken), cancellationToken);
-                        analyzingContextMessage.IsBusy = false;
-                    }
-                    else
-                    {
-                        builtSystemPrompt = systemPrompt ??
-                            $$"""
-                              {{Prompts.DefaultSystemPrompt}}
-
-                              # Mission
-                              Answer the user's question or accomplish the user's request
-                              """;
-                    }
-
-                    chatMessages.Insert(0, new SystemChatMessage(builtSystemPrompt));
-                }
-
-                await GenerateAsync(cancellationToken);
+                var kernelMixin = kernelMixinFactory.Create();
+                await ProcessUserChatMessageAsync(userMessage, kernelMixin, cancellationToken);
+                await GenerateAsync(kernelMixin, cancellationToken);
             }
             finally
             {
@@ -370,13 +340,12 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
             var index = chatMessages.IndexOf(chatMessage);
             if (index == -1) return Task.CompletedTask;
             chatMessages.RemoveRange(index, chatMessages.Count - index); // TODO: history tree
-            return GenerateAsync(cancellationToken);
+            return GenerateAsync(kernelMixinFactory.Create(), cancellationToken);
         },
         cancellationToken: cancellationTokenSource.Token);
 
     [RelayCommand]
-    private static Task CopyAsync(ChatMessage chatMessage) =>
-        ServiceLocator.Resolve<AssistantFloatingWindow>().Clipboard?.SetTextAsync(chatMessage.ToString()) ?? Task.CompletedTask;
+    private Task CopyAsync(ChatMessage chatMessage) => clipboard.SetTextAsync(chatMessage.ToString());
 
     public bool CanCancel
     {
@@ -409,35 +378,53 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
         AssistantCommands = [];
     }
 
-    private string BuildSystemPrompt(List<IVisualElement> elements, string systemPrompt, CancellationToken cancellationToken)
+    private async Task ProcessUserChatMessageAsync(
+        UserChatMessage userChatMessage,
+        IKernelMixin kernelMixin,
+        CancellationToken cancellationToken)
     {
-        var xmlBuilder = new VisualElementXmlBuilder(elements, TiktokenTokenizer.CreateForModel("gpt-4o"), 8192);
+        var elements = userChatMessage
+            .Attachments
+            .OfType<AssistantVisualElementAttachment>()
+            .Select(a => a.Element)
+            .ToList();
 
-        var renderedSystemPrompt = Prompts.RenderPrompt(
-            systemPrompt,
-            new Dictionary<string, Func<string>>
-            {
-                { "OS", () => Environment.OSVersion.ToString() },
-                { "Time", () => DateTime.Now.ToString("F") },
-                { "SystemLanguage", () => new CultureInfo(Settings.Common.Language).DisplayName },
-                { "VisualTree", () => xmlBuilder.BuildXml(cancellationToken) },
-                { "FocusedElementId", () => xmlBuilder.GetIdMap(cancellationToken)[elements[0].Id].ToString() },
-            });
+        if (elements.Count > 0)
+        {
+            var analyzingContextMessage = new ActionChatMessage(
+                new AuthorRole("action"),
+                LucideIconKind.TextSearch,
+                "ActionChatMessage_Header_AnalyzingContext");
+            chatMessages.Add(analyzingContextMessage);
+            analyzingContextMessage.IsBusy = true;
 
-        Console.WriteLine($"SystemPrompt\n{renderedSystemPrompt}"); // TODO: logging
+            var xmlBuilder = new VisualElementXmlBuilder(
+                elements,
+                kernelMixin,
+                kernelMixin.MaxTokenTotal / 20);
+            var renderedVisualTreePrompt = await Task.Run(
+                () =>
+                    Prompts.RenderPrompt(
+                        Prompts.VisualTreePrompt,
+                        new Dictionary<string, Func<string>>
+                        {
+                            { "VisualTree", () => xmlBuilder.BuildXml(cancellationToken) },
+                            { "FocusedElementId", () => xmlBuilder.GetIdMap(cancellationToken)[elements[0].Id].ToString() },
+                        }),
+                cancellationToken);
+            userChatMessage.ActualContent = renderedVisualTreePrompt + "\n\n" + userChatMessage.ActualContent;
 
-        return renderedSystemPrompt;
+            analyzingContextMessage.IsBusy = false;
+        }
     }
 
-    private async Task GenerateAsync(CancellationToken cancellationToken)
+    private async Task GenerateAsync(IKernelMixin kernelMixin, CancellationToken cancellationToken)
     {
         // todo: maybe I need to move this builder to a better place (using DI)
         var modelSettings = Settings.Model;
         var builder = Kernel.CreateBuilder();
-        builder.AddOpenAIChatCompletion(
-            modelId: modelSettings.ModelName,
-            endpoint: new Uri(modelSettings.Endpoint, UriKind.Absolute),
-            apiKey: modelSettings.ApiKey);
+        builder.Services.AddSingleton<IChatCompletionService>(kernelMixin);
+        builder.Services.AddSingleton<ITextGenerationService>(kernelMixin);
 
         if (modelSettings is { IsWebSearchEnabled: true, WebSearchApiKey: { } webSearchApiKey } && !string.IsNullOrWhiteSpace(webSearchApiKey))
         {

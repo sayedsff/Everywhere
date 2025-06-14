@@ -118,7 +118,7 @@ EXTERN_C __declspec(dllexport) HRESULT CreateComplexRoundedRectangleCompositionP
     init_apartment(apartment_type::single_threaded);
 
     const auto compositionPath = Windows::UI::Composition::CompositionPath(make<D2D1GeometrySource>(geometry));
-    *ppCompositionPath = (IInspectable*)winrt::get_abi(compositionPath);
+    *ppCompositionPath = static_cast<IInspectable *>(get_abi(compositionPath));
     (*ppCompositionPath)->AddRef(); // Ensure the returned object is reference counted
     return S_OK;
 }

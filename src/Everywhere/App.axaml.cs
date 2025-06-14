@@ -3,7 +3,6 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 using Everywhere.Views;
-
 #if DEBUG
 using Everywhere.Enums;
 using Everywhere.Models;
@@ -17,6 +16,8 @@ namespace Everywhere;
 
 public class App : Application
 {
+    public TopLevel TopLevel { get; } = new Window();
+
     private TransientWindow? mainWindow, debugWindow;
 
     public override void Initialize()
@@ -28,37 +29,39 @@ public class App : Application
         {
             ServiceLocator.Build(x => x
 
-                #region Basic
+                    #region Basic
 
-                .AddSingleton<IRuntimeConstantProvider, DesignTimeRuntimeConstantProvider>()
-                .AddSingleton<IVisualElementContext, DesignTimeVisualElementContext>()
-                .AddSingleton<IHotkeyListener, DesignTimeHotkeyListener>()
-                .AddSingleton<IWindowHelper, DesignTimeWindowHelper>()
-                .AddSingleton<Settings>()
+                    .AddSingleton<IRuntimeConstantProvider, DesignTimeRuntimeConstantProvider>()
+                    .AddSingleton<IVisualElementContext, DesignTimeVisualElementContext>()
+                    .AddSingleton<IHotkeyListener, DesignTimeHotkeyListener>()
+                    .AddSingleton<IWindowHelper, DesignTimeWindowHelper>()
+                    .AddSingleton<Settings>()
+
+                    #endregion
+
+                    #region Avalonia Basic
+
+                    .AddSingleton<DialogManager>()
+                    .AddSingleton<ToastManager>()
+
+                    #endregion
+
+                    #region View & ViewModel
+
+                    .AddSingleton<VisualTreeDebugger>()
+                    .AddSingleton<AssistantFloatingWindowViewModel>()
+                    .AddSingleton<AssistantFloatingWindow>()
+                    .AddSingleton<SettingsPageViewModel>()
+                    .AddSingleton<IMainViewPage, SettingsPage>()
+                    .AddSingleton<MainViewModel>()
+                    .AddSingleton<MainView>()
 
                 #endregion
 
-                #region Avalonia Basic
-
-                .AddSingleton<DialogManager>()
-                .AddSingleton<ToastManager>()
-
-                #endregion
-
-                #region View & ViewModel
-
-                .AddSingleton<VisualTreeDebugger>()
-                .AddSingleton<AssistantFloatingWindowViewModel>()
-                .AddSingleton<AssistantFloatingWindow>()
-                .AddSingleton<SettingsPageViewModel>()
-                .AddSingleton<IMainViewPage, SettingsPage>()
-                .AddSingleton<MainViewModel>()
-                .AddSingleton<MainView>()
-
-                #endregion
             );
         }
 #endif
+
         Task.WhenAll(ServiceLocator.Resolve<IEnumerable<IAsyncInitializer>>().Select(i => i.InitializeAsync()));
     }
 
@@ -151,7 +154,6 @@ file class DesignTimeVisualElementContext : IVisualElementContext
     public event IVisualElementContext.KeyboardFocusedElementChangedHandler? KeyboardFocusedElementChanged;
     public IVisualElement? KeyboardFocusedElement => null;
     public IVisualElement? PointerOverElement => null;
-    public IDisposable CreateCacheScope() => throw new NotSupportedException();
     public IVisualElement? ElementFromPoint(PixelPoint point) => null;
     public Task<IVisualElement?> PickElementAsync(PickElementMode mode) => Task.FromResult<IVisualElement?>(null);
 }

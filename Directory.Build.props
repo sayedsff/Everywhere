@@ -6,6 +6,8 @@
         <Nullable>enable</Nullable>
         <WarningsAsErrors>nullable</WarningsAsErrors>
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+        <NoWarn>$(NoWarn);SKEXP0001,SKEXP0010,SKEXP0050,KMEXP00</NoWarn>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <PropertyGroup Condition="$([System.String]::Copy($(RuntimeIdentifier)).StartsWith('win'))">

@@ -2,7 +2,7 @@
 using Avalonia.Data.Converters;
 using ShadUI.Controls;
 
-namespace Everywhere.Collections;
+namespace Everywhere.Views;
 
 public class BusyInlineCollection : InlineCollection
 {

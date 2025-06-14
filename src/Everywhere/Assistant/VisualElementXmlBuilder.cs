@@ -1,9 +1,12 @@
-﻿using System.Diagnostics;
+﻿#if DEBUG
+using System.Diagnostics;
+using JetBrains.Profiler.Api;
+#endif
+
 using System.Diagnostics.CodeAnalysis;
 using System.Security;
 using System.Text;
-using JetBrains.Profiler.Api;
-using Microsoft.ML.Tokenizers;
+using Microsoft.KernelMemory.AI;
 
 namespace Everywhere.Assistant;
 
@@ -13,7 +16,7 @@ namespace Everywhere.Assistant;
 /// <param name="coreElements"></param>
 /// <param name="tokenizer"></param>
 /// <param name="softTokenLimit"></param>
-public class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreElements, TiktokenTokenizer tokenizer, int softTokenLimit)
+public class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreElements, ITextTokenizer tokenizer, int softTokenLimit)
 {
     private enum QueueOrigin
     {
@@ -38,6 +41,7 @@ public class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreElements,
     }
 
     private readonly Dictionary<string, int> idMap = [];
+    private readonly HashSet<XmlVisualElement> rootElements = [];
     private StringBuilder? visualTreeXmlBuilder;
 
     public string BuildXml(CancellationToken cancellationToken)
@@ -50,6 +54,12 @@ public class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreElements,
     {
         EnsureBuilt(cancellationToken);
         return idMap;
+    }
+
+    public IEnumerable<IVisualElement> GetRootElements(CancellationToken cancellationToken)
+    {
+        EnsureBuilt(cancellationToken);
+        return rootElements.Select(e => e.Element);
     }
 
     [MemberNotNull(nameof(visualTreeXmlBuilder))]
@@ -105,7 +115,7 @@ public class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreElements,
             if (description != null) tokenCount += tokenizer.CountTokens(description) + 3;
             tokenCount += contents.Length switch
             {
-                1 => contents.Sum(line => tokenizer.CountTokens(line)),
+                1 => contents.Sum(tokenizer.CountTokens),
                 > 1 => contents.Sum(line => tokenizer.CountTokens(line) + 4) + 8, // > 1, +4 for the indentation, +8 for the end tag
                 _ => 0
             };
@@ -159,7 +169,6 @@ public class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreElements,
         }
 
         // build the XML representation of the visual tree
-        var rootElements = new HashSet<XmlVisualElement>();
         foreach (var visitedElement in visitedElements.Values)
         {
             var current = visitedElement;

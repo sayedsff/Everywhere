@@ -3,7 +3,6 @@
 public record AssistantCommand(
     string Command,
     DynamicResourceKey? DescriptionKey,
-    string SystemPrompt,
     string UserPrompt,
     Func<string>? DefaultValueFactory = null
 )

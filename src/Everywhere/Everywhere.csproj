@@ -16,12 +16,16 @@
         <PackageReference Include="Lucide.Avalonia"/>
         <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="JetBrains.Profiler.Api"/>
         <PackageReference Include="Microsoft.Extensions.Configuration" />
-        <PackageReference Include="Microsoft.ML.Tokenizers.Data.O200kBase" />
+        <PackageReference Include="Microsoft.KernelMemory.Core" />
+        <PackageReference Include="Microsoft.ML.OnnxRuntime" />
         <PackageReference Include="Microsoft.SemanticKernel"/>
         <PackageReference Include="Microsoft.SemanticKernel.Connectors.OpenAI"/>
         <PackageReference Include="Microsoft.SemanticKernel.Plugins.Web" />
         <PackageReference Include="ObservableCollections" />
         <PackageReference Include="System.Drawing.Common" />
+        <PackageReference Include="Tokenizers.DotNet" />
+        <PackageReference Include="Tokenizers.DotNet.runtime.win-x64" />
+        <PackageReference Include="Xaml.Behaviors.Avalonia" />
         <PackageReference Include="ZLinq" />
     </ItemGroup>
 
@@ -38,12 +42,26 @@
             <Link>Assets\Everywhere.ico</Link>
         </AvaloniaResource>
     </ItemGroup>
-    
-    <PropertyGroup>
-        <NoWarn>$(NoWarn);SKEXP0001,SKEXP0010,SKEXP0050</NoWarn>
-    </PropertyGroup>
+
+    <ItemGroup>
+      <None Update="Assets\text2vec-chinese-base\model.onnx">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Assets\text2vec-chinese-base\special_tokens_map.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Assets\text2vec-chinese-base\tokenizer.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Assets\text2vec-chinese-base\tokenizer_config.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Assets\text2vec-chinese-base\vocab.txt">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
 
     <Target Name="I18N" BeforeTargets="PreBuildEvent">
-      <Exec Command="dotnet run --project $(SolutionDir)src/Everywhere.I18N.Generator/Everywhere.I18N.Generator.csproj -- $(SolutionDir)src/Everywhere/I18N/i18n.tsv $(SolutionDir)src/Everywhere/I18N" />
+      <Exec Command="dotnet run --project ../Everywhere.I18N.Generator/Everywhere.I18N.Generator.csproj -- ../Everywhere/I18N/i18n.tsv ../Everywhere/I18N" />
     </Target>
 </Project>

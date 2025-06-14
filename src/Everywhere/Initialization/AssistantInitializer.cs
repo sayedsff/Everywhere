@@ -7,8 +7,7 @@ namespace Everywhere.Initialization;
 public class AssistantInitializer(
     Settings settings,
     IHotkeyListener hotkeyListener,
-    IVisualElementContext visualElementContext,
-    AssistantFloatingWindow assistantFloatingWindow) : IAsyncInitializer
+    IVisualElementContext visualElementContext) : IAsyncInitializer
 {
     public Task InitializeAsync()
     {
@@ -24,7 +23,9 @@ public class AssistantInitializer(
             {
                 element = null;
             }
-            assistantFloatingWindow.ViewModel.TryFloatToTargetElementAsync(element).Detach();
+
+            Dispatcher.UIThread.InvokeOnDemandAsync(
+                () => ServiceLocator.Resolve<AssistantFloatingWindow>().ViewModel.TryFloatToTargetElementAsync(element).Detach());
         };
 
         // initialize hotkey listener

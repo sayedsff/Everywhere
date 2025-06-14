@@ -1352,13 +1352,13 @@ internal partial interface IGraphicsCaptureItemInterop
     nint CreateForMonitor(nint monitor, in Guid iid);
 }
 
-[ComImport]
+[GeneratedComInterface]
 [Guid("A9B3D012-3DF2-4EE3-B8D1-8695F457D3C1")]
 [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 [ComVisible(true)]
-internal interface IDirect3DDxgiInterfaceAccess
+internal partial interface IDirect3DDxgiInterfaceAccess
 {
-    IntPtr GetInterface([In] ref Guid iid);
+    nint GetInterface(in Guid iid);
 };
 
 public static class AutomationExtension
