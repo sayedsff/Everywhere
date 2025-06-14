@@ -1,6 +1,6 @@
 ﻿<v:ReactiveWindow
     x:Class="Everywhere.Views.AssistantFloatingWindow" xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:c="clr-namespace:Everywhere.Collections"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:be="clr-namespace:Everywhere.Behaviors"
     xmlns:contents="clr-namespace:ShadUI.Contents;assembly=ShadUI" xmlns:i="clr-namespace:Everywhere.Interfaces"
     xmlns:m="clr-namespace:Everywhere.Models" xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI"
     xmlns:system="clr-namespace:System;assembly=System.Runtime" xmlns:themes="clr-namespace:ShadUI.Themes;assembly=ShadUI"
@@ -26,7 +26,7 @@
             x:Name="BackgroundBorder" Grid.Row="0"
             Grid.RowSpan="2"
             BorderBrush="{DynamicResource AcrylicBorderBrush}"
-            BorderThickness="2"
+            BorderThickness="1"
             Classes.IsExpanded="{Binding IsExpanded}">
             <Border.CornerRadius>
                 <MultiBinding Converter="{StaticResource PlacementToCornerRadiusConverter}">
@@ -37,7 +37,7 @@
                     </Binding>
                     <Binding>
                         <Binding.Source>
-                            <CornerRadius>14,26</CornerRadius>
+                            <CornerRadius>12,18</CornerRadius>
                         </Binding.Source>
                     </Binding>
                     <Binding Path="$self.Bounds.Width"/>
@@ -107,12 +107,6 @@
                 Text="{Binding Title^, FallbackValue={x:Null}}"/>
         </DockPanel>
 
-        <Border
-            Grid.Row="0" Height="1"
-            Margin="2,-4,2,4" VerticalAlignment="Bottom"
-            Background="{DynamicResource AcrylicLowSolidBorderBrush}"
-            IsVisible="{Binding IsExpanded}"/>
-
         <Panel
             Grid.Row="1"
             IsVisible="{Binding IsExpanded}">
@@ -123,12 +117,15 @@
             </Panel.Styles>
 
             <StackPanel
-                Width="400" Margin="8"
-                Orientation="Vertical" Spacing="4">
+                Width="400" Orientation="Vertical">
                 <ScrollViewer
-                    MinHeight="200" MaxHeight="400"
+                    MaxHeight="400" Padding="4"
                     HorizontalContentAlignment="Stretch" HorizontalScrollBarVisibility="Disabled"
                     VerticalScrollBarVisibility="Auto">
+                    <Interaction.Behaviors>
+                        <be:AutoScrollBehavior/>
+                    </Interaction.Behaviors>
+
                     <Panel>
                         <ItemsControl
                             IsVisible="{Binding !ChatMessages.Count}"
@@ -136,31 +133,37 @@
                             <ItemsControl.DataTemplates>
                                 <DataTemplate DataType="m:DynamicNamedCommand">
                                     <Button
-                                        Height="36" Padding="16,4"
+                                        Classes="Ghost" Padding="0"
                                         Background="{DynamicResource AcrylicBackgroundBrush}"
-                                        BorderBrush="{DynamicResource AcrylicLowBorderBrush}"
-                                        BorderThickness="1.6"
+                                        BorderBrush="{DynamicResource BorderColor}"
+                                        BorderThickness="1"
                                         Command="{Binding Command}"
                                         CommandParameter="{Binding CommandParameter}"
                                         CornerRadius="18">
-                                        <StackPanel
-                                            Orientation="Vertical" Spacing="4">
+                                        <Border
+                                            Height="36" Padding="16,4"
+                                            BoxShadow="{DynamicResource AcrylicBoxShadows}"
+                                            CornerRadius="18">
                                             <StackPanel
-                                                Orientation="Horizontal" Spacing="6">
-                                                <LucideIcon
-                                                    VerticalAlignment="Center"
-                                                    Kind="{Binding Icon}"
-                                                    Size="19"/>
-                                                <TextBlock
-                                                    VerticalAlignment="Center"
-                                                    Text="{Binding HeaderKey^}"/>
-                                            </StackPanel>
+                                                VerticalAlignment="Center" Orientation="Vertical"
+                                                Spacing="4">
+                                                <StackPanel
+                                                    Orientation="Horizontal" Spacing="6">
+                                                    <LucideIcon
+                                                        VerticalAlignment="Center"
+                                                        Kind="{Binding Icon}"
+                                                        Size="19"/>
+                                                    <TextBlock
+                                                        VerticalAlignment="Center"
+                                                        Text="{Binding HeaderKey^}"/>
+                                                </StackPanel>
 
-                                            <TextBlock
-                                                IsVisible="{Binding !!DescriptionKey}"
-                                                Text="{Binding DescriptionKey^, FallbackValue={x:Null}}"
-                                                TextWrapping="WrapWithOverflow"/>
-                                        </StackPanel>
+                                                <TextBlock
+                                                    IsVisible="{Binding !!DescriptionKey}"
+                                                    Text="{Binding DescriptionKey^, FallbackValue={x:Null}}"
+                                                    TextWrapping="WrapWithOverflow"/>
+                                            </StackPanel>
+                                        </Border>
                                     </Button>
                                 </DataTemplate>
                             </ItemsControl.DataTemplates>
@@ -175,6 +178,7 @@
                         </ItemsControl>
 
                         <ItemsControl
+                            Padding="4,0"
                             IsVisible="{Binding !!ChatMessages.Count}"
                             ItemsSource="{Binding ChatMessages}">
                             <ItemsControl.ItemsPanel>
@@ -191,6 +195,10 @@
                                     <Setter Property="BorderThickness" Value="1"/>
                                     <Setter Property="Background" Value="{DynamicResource CardBackgroundColor}"/>
                                     <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}"/>
+
+                                    <Style Selector="^ shadui|Loading">
+                                        <Setter Property="Foreground" Value="{DynamicResource PrimaryColor}"/>
+                                    </Style>
                                 </Style>
 
                                 <Style Selector="Button.Ghost">
@@ -244,9 +252,40 @@
                                         Classes="ChatMessage User" Margin="36,0,0,0"
                                         HorizontalAlignment="Right" Background="Transparent"
                                         Orientation="Vertical" Spacing="4">
-                                        <Border Classes="ChatBubble">
+                                        <Border
+                                            Classes="ChatBubble" HorizontalAlignment="Right">
                                             <SelectableTextBlock Inlines="{Binding InlineCollection}"/>
                                         </Border>
+
+                                        <ItemsControl ItemsSource="{Binding Attachments}">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <WrapPanel
+                                                        ItemSpacing="6" LineSpacing="4"/>
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate DataType="m:AssistantAttachment">
+                                                    <Border
+                                                        Height="24"
+                                                        Background="{DynamicResource CardBackgroundColor}"
+                                                        CornerRadius="12">
+                                                        <StackPanel
+                                                            Margin="6,0" Orientation="Horizontal"
+                                                            Spacing="4">
+                                                            <LucideIcon
+                                                                VerticalAlignment="Center"
+                                                                Kind="{Binding Icon}"
+                                                                Size="14"/>
+                                                            <TextBlock
+                                                                VerticalAlignment="Center" FontSize="12"
+                                                                Text="{Binding HeaderKey^}"/>
+                                                        </StackPanel>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
 
                                         <!--  TODO: Edit operations  -->
                                     </StackPanel>
@@ -272,7 +311,7 @@
 
                                         <Expander
                                             Background="Transparent" BorderThickness="0"
-                                            Classes.CanExpand="{Binding InlineCollection.Count, Converter={x:Static c:BusyInlineCollection.IsNotEmpty}}">
+                                            Classes.CanExpand="{Binding InlineCollection.Count, Converter={x:Static v:BusyInlineCollection.IsNotEmpty}}">
                                             <Expander.Template>
                                                 <ControlTemplate TargetType="Expander">
                                                     <StackPanel>
@@ -336,62 +375,67 @@
                     </Panel>
                 </ScrollViewer>
 
-                <v:AssistantInputBox
-                    Margin="0,0,0,1"
-                    AssistantCommandItemsSource="{Binding AssistantCommands}"
-                    AttachmentItemsSource="{Binding Attachments}"
-                    CancelCommand="{Binding CancelCommand}"
-                    Command="{Binding ProcessChatMessageSentCommand}"
-                    IsImageSupported="{Binding Settings.Model.IsImageEnabled}"
-                    IsSendButtonEnabled="{Binding !IsBusy}"
-                    IsToolCallSupported="{Binding Settings.Model.IsToolCallEnabled}"
-                    IsWebSearchSupported="{Binding Settings.Model.IsWebSearchEnabled}">
-                    <v:AssistantInputBox.AddAttachmentMenuItems>
-                        <MenuItem
-                            Command="{Binding AddElementCommand}"
-                            CommandParameter="{x:Static i:PickElementMode.Screen}"
-                            Header="{DynamicResource AssistantFloatingWindow_AssistantInputBox_AddAttachmentMenuItems_AddScreen}">
-                            <MenuItem.Icon>
-                                <LucideIcon
-                                    Kind="Monitor" Size="18"/>
-                            </MenuItem.Icon>
-                        </MenuItem>
-                        <MenuItem
-                            Command="{Binding AddElementCommand}"
-                            CommandParameter="{x:Static i:PickElementMode.Window}"
-                            Header="{DynamicResource AssistantFloatingWindow_AssistantInputBox_AddAttachmentMenuItems_AddWindow}">
-                            <MenuItem.Icon>
-                                <LucideIcon
-                                    Kind="AppWindow" Size="18"/>
-                            </MenuItem.Icon>
-                        </MenuItem>
-                        <MenuItem
-                            Command="{Binding AddElementCommand}"
-                            CommandParameter="{x:Static i:PickElementMode.Element}"
-                            Header="{DynamicResource AssistantFloatingWindow_AssistantInputBox_AddAttachmentMenuItems_AddElement}">
-                            <MenuItem.Icon>
-                                <LucideIcon
-                                    Kind="SquareMousePointer" Size="18"/>
-                            </MenuItem.Icon>
-                        </MenuItem>
-                        <MenuItem
-                            Command="{Binding AddClipboardCommand}"
-                            Header="{DynamicResource AssistantFloatingWindow_AssistantInputBox_AddAttachmentMenuItems_AddClipboard}">
-                            <MenuItem.Icon>
-                                <LucideIcon
-                                    Kind="ClipboardPaste" Size="18"/>
-                            </MenuItem.Icon>
-                        </MenuItem>
-                        <MenuItem
-                            Command="{Binding AddFileCommand}"
-                            Header="{DynamicResource AssistantFloatingWindow_AssistantInputBox_AddAttachmentMenuItems_AddFile}">
-                            <MenuItem.Icon>
-                                <LucideIcon
-                                    Kind="File" Size="18"/>
-                            </MenuItem.Icon>
-                        </MenuItem>
-                    </v:AssistantInputBox.AddAttachmentMenuItems>
-                </v:AssistantInputBox>
+                <shadui:Card
+                    Padding="8" BorderThickness="0,1,0,0"
+                    CornerRadius="0,0,18,18">
+                    <v:AssistantInputBox
+                        AcceptsReturn="True"
+                        AssistantCommandItemsSource="{Binding AssistantCommands}"
+                        AttachmentItemsSource="{Binding Attachments}"
+                        CancelCommand="{Binding CancelCommand}"
+                        Command="{Binding ProcessChatMessageSentCommand}"
+                        IsImageSupported="{Binding Settings.Model.IsImageEnabled}"
+                        IsSendButtonEnabled="{Binding !IsBusy}"
+                        IsToolCallSupported="{Binding Settings.Model.IsToolCallEnabled}"
+                        IsWebSearchSupported="{Binding Settings.Model.IsWebSearchEnabled}"
+                        TextWrapping="Wrap">
+                        <v:AssistantInputBox.AddAttachmentMenuItems>
+                            <MenuItem
+                                Command="{Binding AddElementCommand}"
+                                CommandParameter="{x:Static i:PickElementMode.Screen}"
+                                Header="{DynamicResource AssistantFloatingWindow_AssistantInputBox_AddAttachmentMenuItems_AddScreen}">
+                                <MenuItem.Icon>
+                                    <LucideIcon
+                                        Kind="Monitor" Size="18"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem
+                                Command="{Binding AddElementCommand}"
+                                CommandParameter="{x:Static i:PickElementMode.Window}"
+                                Header="{DynamicResource AssistantFloatingWindow_AssistantInputBox_AddAttachmentMenuItems_AddWindow}">
+                                <MenuItem.Icon>
+                                    <LucideIcon
+                                        Kind="AppWindow" Size="18"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem
+                                Command="{Binding AddElementCommand}"
+                                CommandParameter="{x:Static i:PickElementMode.Element}"
+                                Header="{DynamicResource AssistantFloatingWindow_AssistantInputBox_AddAttachmentMenuItems_AddElement}">
+                                <MenuItem.Icon>
+                                    <LucideIcon
+                                        Kind="SquareMousePointer" Size="18"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem
+                                Command="{Binding AddClipboardCommand}"
+                                Header="{DynamicResource AssistantFloatingWindow_AssistantInputBox_AddAttachmentMenuItems_AddClipboard}">
+                                <MenuItem.Icon>
+                                    <LucideIcon
+                                        Kind="ClipboardPaste" Size="18"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem
+                                Command="{Binding AddFileCommand}"
+                                Header="{DynamicResource AssistantFloatingWindow_AssistantInputBox_AddAttachmentMenuItems_AddFile}">
+                                <MenuItem.Icon>
+                                    <LucideIcon
+                                        Kind="File" Size="18"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                        </v:AssistantInputBox.AddAttachmentMenuItems>
+                    </v:AssistantInputBox>
+                </shadui:Card>
             </StackPanel>
         </Panel>
     </Grid>
