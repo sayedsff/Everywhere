@@ -166,7 +166,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
         catch (OperationCanceledException) { }
 
         await ExecuteBusyTaskAsync(
-            _ =>
+            async token =>
             {
                 if (attachments.Any(a => a is AssistantVisualElementAttachment vea && vea.Element.Equals(targetElement)))
                 {
@@ -184,7 +184,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
                 TargetBoundingRect = targetElement.BoundingRectangle;
                 Title = "AssistantFloatingWindow_Title";
                 attachments.Clear();
-                attachments.Add(CreateFromVisualElement(targetElement));
+                attachments.Add(await Task.Run(() => CreateFromVisualElement(targetElement), token));
                 IsVisible = true;
                 IsExpanded = showExpanded;
             },
@@ -196,8 +196,8 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
     private async Task AddElementAsync(PickElementMode mode)
     {
         if (await visualElementContext.PickElementAsync(mode) is not { } element) return;
-        if (Attachments.OfType<AssistantVisualElementAttachment>().Any(a => a.Element.Id == element.Id)) return;
-        Attachments.Add(await Task.Run(() => CreateFromVisualElement(element)));
+        if (attachments.OfType<AssistantVisualElementAttachment>().Any(a => a.Element.Id == element.Id)) return;
+        attachments.Add(await Task.Run(() => CreateFromVisualElement(element)));
     }
 
     [RelayCommand]

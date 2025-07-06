@@ -152,10 +152,13 @@ public abstract partial class BusyViewModelBase : ReactiveViewModelBase
         Action<CancellationToken> action,
         IExceptionHandler? exceptionHandler = null,
         ExecutionFlags flags = ExecutionFlags.None,
-        CancellationToken cancellationToken = default) =>
-        ExecuteBusyTaskAsync(
-            token => Task.Run(() => action(token), token),
-            exceptionHandler,
-            flags,
-            cancellationToken);
+        CancellationToken cancellationToken = default) => ExecuteBusyTaskAsync(
+        token =>
+        {
+            action(token);
+            return Task.CompletedTask;
+        },
+        exceptionHandler,
+        flags,
+        cancellationToken);
 }
