@@ -33,7 +33,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
     public Settings Settings { get; }
 
     [ObservableProperty]
-    public partial bool IsVisible { get; private set; }
+    public partial bool IsOpened { get; set; }
 
     [ObservableProperty]
     public partial PixelRect TargetBoundingRect { get; private set; }
@@ -170,7 +170,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
             {
                 if (attachments.Any(a => a is AssistantVisualElementAttachment vea && vea.Element.Equals(targetElement)))
                 {
-                    IsVisible = true;
+                    IsOpened = true;
                     return;
                 }
 
@@ -185,7 +185,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
                 Title = "AssistantFloatingWindow_Title";
                 attachments.Clear();
                 attachments.Add(await Task.Run(() => CreateFromVisualElement(targetElement), token));
-                IsVisible = true;
+                IsOpened = true;
                 IsExpanded = showExpanded;
             },
             flags: ExecutionFlags.EnqueueIfBusy,
@@ -365,7 +365,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
     [RelayCommand]
     private void Close()
     {
-        IsVisible = false;
+        IsOpened = false;
     }
 
     private void Reset()

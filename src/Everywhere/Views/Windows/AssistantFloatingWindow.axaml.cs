@@ -74,6 +74,10 @@ public partial class AssistantFloatingWindow : ReactiveWindow<AssistantFloatingW
             if (change.NewValue is true) Show();
             else Hide();
         }
+        else if (change.Property == IsVisibleProperty)
+        {
+            IsOpened = change.NewValue is true;
+        }
         else if (change.Property == TargetBoundingRectProperty) CalculatePositionAndPlacement();
     }
 

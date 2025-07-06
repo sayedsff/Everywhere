@@ -217,6 +217,11 @@ public class Win32WindowHelper : IWindowHelper
             //     SetWindowCornerRadiusInternal();
             // };
 
+            window.SizeChanged += delegate
+            {
+                SetWindowCornerRadiusInternal();
+            };
+
             window.Closed += delegate
             {
                 compositionContext.Clip?.Dispose();

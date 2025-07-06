@@ -1,7 +1,7 @@
 ﻿<ResourceDictionary
     xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:extensions="clr-namespace:ShadUI.Extensions;assembly=ShadUI" xmlns:m="clr-namespace:Everywhere.Models"
-    xmlns:v="clr-namespace:Everywhere.Views">
+    xmlns:be="clr-namespace:Everywhere.Behaviors" xmlns:extensions="clr-namespace:ShadUI.Extensions;assembly=ShadUI"
+    xmlns:m="clr-namespace:Everywhere.Models" xmlns:v="clr-namespace:Everywhere.Views">
 
     <ControlTheme
         x:Key="{x:Type v:AssistantInputBox}"
@@ -46,7 +46,7 @@
                     <Panel
                         Grid.Row="0" Grid.Column="0"
                         Grid.ColumnSpan="2" Margin="6,4,6,0"
-                        Background="Transparent">
+                        Background="Transparent" Cursor="IBeam">
                         <TextBlock
                             FontSize="{TemplateBinding FontSize}"
                             IsVisible="{TemplateBinding Text, Converter={x:Static StringConverters.IsNullOrEmpty}}"
@@ -92,48 +92,56 @@
                         </ListBox>
                     </Popup>
 
-                    <ItemsControl
-                        x:Name="PART_AttachmentItemsControl" Grid.Row="1"
-                        Grid.Column="0" Grid.ColumnSpan="2"
-                        Margin="0,2"
-                        ItemsSource="{TemplateBinding AttachmentItemsSource}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel
-                                    ItemSpacing="6" LineSpacing="4"/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
+                    <ScrollViewer
+                        Grid.Row="1" Grid.Column="0"
+                        Grid.ColumnSpan="2" MaxHeight="52"
+                        Margin="0,2" Padding="0"
+                        HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                        <Interaction.Behaviors>
+                            <be:AutoScrollBehavior/>
+                        </Interaction.Behaviors>
 
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate DataType="m:AssistantAttachment">
-                                <Border
-                                    Height="24"
-                                    Background="{DynamicResource CardBackgroundColor}"
-                                    CornerRadius="12">
-                                    <StackPanel
-                                        Margin="6,0,4,0" Orientation="Horizontal"
-                                        Spacing="4">
-                                        <LucideIcon
-                                            VerticalAlignment="Center"
-                                            Kind="{Binding Icon}"
-                                            Size="14"/>
-                                        <TextBlock
-                                            VerticalAlignment="Center" FontSize="12"
-                                            Text="{Binding HeaderKey^}"/>
-                                        <Button
-                                            Padding="1" VerticalAlignment="Center"
-                                            Background="Transparent" BorderThickness="0"
-                                            Command="{Binding $parent[v:AssistantInputBox].RemoveAttachmentCommand}"
-                                            CommandParameter="{Binding}">
+                        <ItemsControl
+                            x:Name="PART_AttachmentItemsControl"
+                            ItemsSource="{TemplateBinding AttachmentItemsSource}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel
+                                        ItemSpacing="6" LineSpacing="4"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="m:AssistantAttachment">
+                                    <Border
+                                        Height="24"
+                                        Background="{DynamicResource CardBackgroundColor}"
+                                        CornerRadius="12">
+                                        <StackPanel
+                                            Margin="6,0,4,0" Orientation="Horizontal"
+                                            Spacing="4">
                                             <LucideIcon
-                                                Foreground="{DynamicResource MutedColor}"
-                                                Kind="X" Size="12"/>
-                                        </Button>
-                                    </StackPanel>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                                                VerticalAlignment="Center"
+                                                Kind="{Binding Icon}"
+                                                Size="14"/>
+                                            <TextBlock
+                                                VerticalAlignment="Center" FontSize="12"
+                                                Text="{Binding HeaderKey^}"/>
+                                            <Button
+                                                Padding="1" VerticalAlignment="Center"
+                                                Background="Transparent" BorderThickness="0"
+                                                Command="{Binding $parent[v:AssistantInputBox].RemoveAttachmentCommand}"
+                                                CommandParameter="{Binding}">
+                                                <LucideIcon
+                                                    Foreground="{DynamicResource MutedColor}"
+                                                    Kind="X" Size="12"/>
+                                            </Button>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
 
                     <StackPanel
                         Grid.Row="2" Grid.Column="0"

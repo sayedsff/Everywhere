@@ -57,7 +57,7 @@ public class AssistantInitializer(
         //         {
         //             var window = ServiceLocator.Resolve<AssistantFloatingWindow>();
         //             window.Position = point;
-        //             window.IsVisible = true;
+        //             window.IsOpened = true;
         //         });
         // };
 

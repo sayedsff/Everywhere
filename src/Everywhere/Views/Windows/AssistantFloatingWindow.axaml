@@ -8,7 +8,7 @@
     xmlns:vm="clr-namespace:Everywhere.ViewModels" x:DataType="vm:AssistantFloatingWindowViewModel"
     x:TypeArguments="vm:AssistantFloatingWindowViewModel" Background="Transparent"
     CanResize="False"
-    IsOpened="{Binding IsVisible}"
+    IsOpened="{Binding IsOpened, Mode=TwoWay}"
     RequestedThemeVariant="{x:Static themes:ThemeVariants.Acrylic}"
     ShowActivated="False" ShowInTaskbar="False"
     SizeToContent="WidthAndHeight" SystemDecorations="None"
@@ -74,12 +74,14 @@
             Background="Transparent" LastChildFill="True"
             PointerPressed="HandleTitleBarPointerPressed">
             <ToggleButton
-                DockPanel.Dock="Left"
+                DockPanel.Dock="Left" MinHeight="32"
+                Padding="0"
                 IsChecked="{Binding IsExpanded, Mode=TwoWay}">
                 <ToggleButton.Template>
                     <ControlTemplate TargetType="ToggleButton">
                         <Viewbox
-                            Width="36" Height="36">
+                            Width="36" Height="36"
+                            Margin="0,0,0,-4">
                             <ContentPresenter Content="{StaticResource AssistantAvatar}"/>
                         </Viewbox>
                     </ControlTemplate>
@@ -89,8 +91,7 @@
             <Button
                 Classes="Ghost" DockPanel.Dock="Right"
                 Width="24" Height="24"
-                Margin="0,0,0,4" Padding="0"
-                VerticalAlignment="Center"
+                Padding="0" VerticalAlignment="Center"
                 Command="{Binding CloseCommand}"
                 CornerRadius="4"
                 IsVisible="{Binding IsExpanded}">
@@ -119,51 +120,44 @@
             <StackPanel
                 Width="400" Orientation="Vertical">
                 <ScrollViewer
-                    MaxHeight="400" Padding="4"
-                    HorizontalContentAlignment="Stretch" HorizontalScrollBarVisibility="Disabled"
-                    VerticalScrollBarVisibility="Auto">
+                    MaxHeight="400" HorizontalContentAlignment="Stretch"
+                    HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                     <Interaction.Behaviors>
                         <be:AutoScrollBehavior/>
                     </Interaction.Behaviors>
 
                     <Panel>
                         <ItemsControl
-                            IsVisible="{Binding !ChatMessages.Count}"
+                            Margin="0,0,0,8"
+                            IsVisible="{Binding !!$self.ItemCount}"
                             ItemsSource="{Binding QuickActions}">
                             <ItemsControl.DataTemplates>
                                 <DataTemplate DataType="m:DynamicNamedCommand">
                                     <Button
-                                        Classes="Ghost" Padding="0"
-                                        Background="{DynamicResource AcrylicBackgroundBrush}"
-                                        BorderBrush="{DynamicResource BorderColor}"
-                                        BorderThickness="1"
+                                        Classes="Secondary" Height="32"
+                                        Padding="12,4"
                                         Command="{Binding Command}"
                                         CommandParameter="{Binding CommandParameter}"
                                         CornerRadius="18">
-                                        <Border
-                                            Height="36" Padding="16,4"
-                                            BoxShadow="{DynamicResource AcrylicBoxShadows}"
-                                            CornerRadius="18">
+                                        <StackPanel
+                                            VerticalAlignment="Center" Orientation="Vertical"
+                                            Spacing="4">
                                             <StackPanel
-                                                VerticalAlignment="Center" Orientation="Vertical"
-                                                Spacing="4">
-                                                <StackPanel
-                                                    Orientation="Horizontal" Spacing="6">
-                                                    <LucideIcon
-                                                        VerticalAlignment="Center"
-                                                        Kind="{Binding Icon}"
-                                                        Size="19"/>
-                                                    <TextBlock
-                                                        VerticalAlignment="Center"
-                                                        Text="{Binding HeaderKey^}"/>
-                                                </StackPanel>
-
+                                                Orientation="Horizontal" Spacing="6">
+                                                <LucideIcon
+                                                    VerticalAlignment="Center"
+                                                    Kind="{Binding Icon}"
+                                                    Size="19"/>
                                                 <TextBlock
-                                                    IsVisible="{Binding !!DescriptionKey}"
-                                                    Text="{Binding DescriptionKey^, FallbackValue={x:Null}}"
-                                                    TextWrapping="WrapWithOverflow"/>
+                                                    VerticalAlignment="Center"
+                                                    Text="{Binding HeaderKey^}"/>
                                             </StackPanel>
-                                        </Border>
+
+                                            <TextBlock
+                                                IsVisible="{Binding !!DescriptionKey}"
+                                                Text="{Binding DescriptionKey^, FallbackValue={x:Null}}"
+                                                TextWrapping="WrapWithOverflow"/>
+                                        </StackPanel>
                                     </Button>
                                 </DataTemplate>
                             </ItemsControl.DataTemplates>
@@ -178,8 +172,8 @@
                         </ItemsControl>
 
                         <ItemsControl
-                            Padding="4,0"
-                            IsVisible="{Binding !!ChatMessages.Count}"
+                            Margin="0,0,0,8" Padding="4,0"
+                            IsVisible="{Binding !!$self.ItemCount}"
                             ItemsSource="{Binding ChatMessages}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
@@ -189,16 +183,16 @@
                             </ItemsControl.ItemsPanel>
 
                             <ItemsControl.Styles>
+                                <Style Selector="shadui|Loading">
+                                    <Setter Property="Foreground" Value="{DynamicResource ForegroundColor}"/>
+                                </Style>
+
                                 <Style Selector="Border.ChatBubble">
                                     <Setter Property="Padding" Value="8,4"/>
                                     <Setter Property="CornerRadius" Value="12"/>
                                     <Setter Property="BorderThickness" Value="1"/>
                                     <Setter Property="Background" Value="{DynamicResource CardBackgroundColor}"/>
                                     <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}"/>
-
-                                    <Style Selector="^ shadui|Loading">
-                                        <Setter Property="Foreground" Value="{DynamicResource PrimaryColor}"/>
-                                    </Style>
                                 </Style>
 
                                 <Style Selector="Button.Ghost">
