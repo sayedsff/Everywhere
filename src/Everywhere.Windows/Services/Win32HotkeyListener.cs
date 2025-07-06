@@ -87,7 +87,7 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
                 case WM_REGISTER_HOTKEY:
                 {
                     var value = new KeyboardHotkey((Key)msg.wParam.Value, (KeyModifiers)msg.lParam.Value);
-                    if (keyboardHotkey == value) return;
+                    if (keyboardHotkey == value) continue;
 
                     if (!keyboardHotkey.IsEmpty)
                     {
@@ -98,7 +98,7 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
                     {
                         // invalid hotkey, ignore
                         keyboardHotkey = default;
-                        return;
+                        continue;
                     }
 
                     keyboardHotkey = value;
@@ -130,7 +130,7 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
                     isXButtonEventTriggered = true;
                     PInvoke.KillTimer(hotkeyWindowHWnd, TimerId);
 
-                    if (pointerHotkeyActivated is not { } handler) return;
+                    if (pointerHotkeyActivated is not { } handler) continue;
                     PInvoke.GetCursorPos(out var point);
                     handler.Invoke(new PixelPoint(point.X, point.Y));
                     break;
