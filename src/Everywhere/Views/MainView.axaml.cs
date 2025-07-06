@@ -1,8 +1,6 @@
-﻿using System.Globalization;
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
-using Everywhere.I18N;
 using Everywhere.Models;
 using ShadUI.Themes;
 
@@ -17,8 +15,6 @@ public partial class MainView : ReactiveUserControl<MainViewModel>
         this.settings = settings;
 
         InitializeComponent();
-
-        LocaleManager.CurrentLocale = CultureInfo.CurrentUICulture.Name;
 
         settings.Common.PropertyChanged += (_, e) =>
         {

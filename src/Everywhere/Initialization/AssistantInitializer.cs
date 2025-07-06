@@ -1,4 +1,6 @@
-﻿using Avalonia.Threading;
+﻿using System.Globalization;
+using Avalonia.Threading;
+using Everywhere.I18N;
 using Everywhere.Models;
 using Everywhere.Views;
 
@@ -11,6 +13,8 @@ public class AssistantInitializer(
 {
     public Task InitializeAsync()
     {
+        LocaleManager.CurrentLocale = CultureInfo.CurrentUICulture.Name;
+
         visualElementContext.KeyboardFocusedElementChanged += element =>
         {
             if (!settings.Behavior.ShowAssistantFloatingWindowWhenInput) return;
@@ -25,7 +29,7 @@ public class AssistantInitializer(
             }
 
             Dispatcher.UIThread.InvokeOnDemandAsync(
-                () => ServiceLocator.Resolve<AssistantFloatingWindow>().ViewModel.TryFloatToTargetElementAsync(element).Detach());
+                () => ServiceLocator.Resolve<AssistantFloatingWindow>().ViewModel.TryFloatToTargetElementAsync(element).Detach()).Detach();
         };
 
         // initialize hotkey listener
@@ -44,7 +48,7 @@ public class AssistantInitializer(
                 visualElementContext.PointerOverElement?.GetAncestors(true).LastOrDefault();
             if (element == null) return;
             Dispatcher.UIThread.InvokeOnDemandAsync(
-                () => ServiceLocator.Resolve<AssistantFloatingWindow>().ViewModel.TryFloatToTargetElementAsync(element, true).Detach());
+                () => ServiceLocator.Resolve<AssistantFloatingWindow>().ViewModel.TryFloatToTargetElementAsync(element, true).Detach()).Detach();
         };
         // hotkeyListener.PointerHotkeyActivated += point =>
         // {
