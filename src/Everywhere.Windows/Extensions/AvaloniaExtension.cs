@@ -135,7 +135,7 @@ internal static class AvaloniaExtension
         VIRTUAL_KEY.VK_DBE_DBCSCHAR => Key.DbeDbcsChar,
         VIRTUAL_KEY.VK_DBE_ROMAN => Key.DbeRoman,
 
-        _ => throw new ArgumentOutOfRangeException(nameof(key), key, "Unsupported VIRTUAL_KEY for conversion to Avalonia Key.")
+        _ => 0
     };
 
     public static VIRTUAL_KEY ToVirtualKey(this Key key) => key switch
@@ -265,6 +265,7 @@ internal static class AvaloniaExtension
         Key.DbeDbcsChar => VIRTUAL_KEY.VK_DBE_DBCSCHAR,
         Key.DbeRoman => VIRTUAL_KEY.VK_DBE_ROMAN,
 
-        _ => throw new ArgumentOutOfRangeException(nameof(key), key, "Unsupported key for conversion to VIRTUAL_KEY.")
+        // Return 0 for unsupported keys
+        _ => 0
     };
 }
