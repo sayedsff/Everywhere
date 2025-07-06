@@ -379,7 +379,7 @@
                     Padding="8" BorderThickness="0,1,0,0"
                     CornerRadius="0,0,18,18">
                     <v:AssistantInputBox
-                        AcceptsReturn="True"
+                        x:Name="AssistantInputBox" AcceptsReturn="True"
                         AssistantCommandItemsSource="{Binding AssistantCommands}"
                         AttachmentItemsSource="{Binding Attachments}"
                         CancelCommand="{Binding CancelCommand}"

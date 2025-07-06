@@ -56,12 +56,13 @@ public partial class AssistantFloatingWindow : ReactiveWindow<AssistantFloatingW
         base.OnLoaded(e);
 
         windowHelper.SetWindowCornerRadius(this, BackgroundBorder.CornerRadius);
+        CalculatePositionAndPlacement();
 
         // Make the window topmost
         Topmost = false;
         Topmost = true;
 
-        CalculatePositionAndPlacement();
+        AssistantInputBox.Focus();
     }
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
