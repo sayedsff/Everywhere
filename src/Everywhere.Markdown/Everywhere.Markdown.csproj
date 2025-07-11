@@ -1,0 +1,10 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+        <PackageReference Include="Avalonia"/>
+        <PackageReference Include="ColorCode.Core"/>
+        <PackageReference Include="Lucide.Avalonia"/>
+        <PackageReference Include="Markdig"/>
+    </ItemGroup>
+
+</Project>
