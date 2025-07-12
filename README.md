@@ -92,6 +92,7 @@ Distributed under the Apache 2.0 License. See [LICENSE](LICENSE) for more inform
 * [Kibnet/WritableJsonConfiguration](https://github.com/Kibnet/WritableJsonConfiguration) Settings storage
 * [microsoft/semantic-kernel](https://github.com/microsoft/semantic-kernel) LLMs, RAG, Tool call, etc.
 * [nietras/Sep](https://github.com/nietras/Sep) tsv Reader for i18n
+* [xoofx/markdig](https://github.com/xoofx/markdig) Markdown parser for [Everywhere.Markdown](https://github.com/DearVa/Everywhere/tree/main/src/Everywhere.Markdown) rendering
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
