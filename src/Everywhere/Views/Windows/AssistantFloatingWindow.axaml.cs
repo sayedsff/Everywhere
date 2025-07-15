@@ -62,7 +62,7 @@ public partial class AssistantFloatingWindow : ReactiveWindow<AssistantFloatingW
         Topmost = false;
         Topmost = true;
 
-        AssistantInputBox.Focus();
+        ChatInputBox.Focus();
     }
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)

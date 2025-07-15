@@ -2,15 +2,15 @@
     x:Class="Everywhere.Views.AssistantFloatingWindow" xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:be="clr-namespace:Everywhere.Behaviors"
     xmlns:contents="clr-namespace:ShadUI.Contents;assembly=ShadUI" xmlns:i="clr-namespace:Everywhere.Interfaces"
-    xmlns:m="clr-namespace:Everywhere.Models" xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI"
-    xmlns:system="clr-namespace:System;assembly=System.Runtime" xmlns:themes="clr-namespace:ShadUI.Themes;assembly=ShadUI"
-    xmlns:v="clr-namespace:Everywhere.Views" xmlns:vc="clr-namespace:Everywhere.ValueConverters"
-    xmlns:vm="clr-namespace:Everywhere.ViewModels" x:DataType="vm:AssistantFloatingWindowViewModel"
-    x:TypeArguments="vm:AssistantFloatingWindowViewModel" Background="Transparent"
-    CanResize="False"
+    xmlns:m="clr-namespace:Everywhere.Models" xmlns:markdown="clr-namespace:Everywhere.Markdown;assembly=Everywhere.Markdown"
+    xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI" xmlns:system="clr-namespace:System;assembly=System.Runtime"
+    xmlns:themes="clr-namespace:ShadUI.Themes;assembly=ShadUI" xmlns:v="clr-namespace:Everywhere.Views"
+    xmlns:vc="clr-namespace:Everywhere.ValueConverters" xmlns:vm="clr-namespace:Everywhere.ViewModels"
+    x:DataType="vm:AssistantFloatingWindowViewModel" x:TypeArguments="vm:AssistantFloatingWindowViewModel"
+    Background="Transparent" CanResize="False"
     IsOpened="{Binding IsOpened, Mode=TwoWay}"
     RequestedThemeVariant="{x:Static themes:ThemeVariants.Acrylic}"
-    ShowActivated="False" ShowInTaskbar="False"
+    ShowActivated="True" ShowInTaskbar="False"
     SizeToContent="WidthAndHeight" SystemDecorations="None"
     TargetBoundingRect="{Binding TargetBoundingRect}"
     Topmost="True" TransparencyLevelHint="AcrylicBlur"
@@ -174,7 +174,7 @@
                         <ItemsControl
                             Margin="0,0,0,8" Padding="4,0"
                             IsVisible="{Binding !!$self.ItemCount}"
-                            ItemsSource="{Binding ChatMessages}">
+                            ItemsSource="{Binding ChatMessageNodes}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <StackPanel
@@ -209,162 +209,233 @@
                                 <Style Selector="SelectableTextBlock">
                                     <Setter Property="TextWrapping" Value="WrapWithOverflow"/>
                                 </Style>
+
+                                <Style Selector="NumericUpDown">
+                                    <Setter Property="Background" Value="{x:Null}"/>
+                                    <Setter Property="BorderBrush" Value="{x:Null}"/>
+                                    <Setter Property="BorderThickness" Value="0"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource ForegroundColor}"/>
+                                    <Setter Property="Template">
+                                        <ControlTemplate>
+                                            <ButtonSpinner
+                                                Name="PART_Spinner" HorizontalContentAlignment="Stretch"
+                                                VerticalContentAlignment="Stretch">
+                                                <Panel>
+                                                    <TextBox
+                                                        x:Name="PART_TextBox" IsVisible="False"/>
+                                                    <TextBlock
+                                                        Margin="0,0,0,1" FontSize="12"
+                                                        Foreground="{TemplateBinding Foreground}"
+                                                        TextAlignment="Center" TextWrapping="NoWrap">
+                                                        <Run Text="{Binding Value, StringFormat={}{0:F0}, RelativeSource={RelativeSource TemplatedParent}}"/>
+                                                        <Run Text="/"/>
+                                                        <Run Text="{Binding Maximum, StringFormat={}{0:F0}, RelativeSource={RelativeSource TemplatedParent}}"/>
+                                                    </TextBlock>
+                                                </Panel>
+                                            </ButtonSpinner>
+                                        </ControlTemplate>
+                                    </Setter>
+
+                                    <Style Selector="^ ButtonSpinner">
+                                        <Setter Property="Template">
+                                            <ControlTemplate>
+                                                <Grid ColumnDefinitions="Auto,*,Auto">
+                                                    <RepeatButton
+                                                        Name="PART_DecreaseButton" Grid.Column="0"
+                                                        Padding="2" Background="Transparent"
+                                                        BorderBrush="{x:Null}"
+                                                        BorderThickness="0"
+                                                        Foreground="{TemplateBinding Foreground}">
+                                                        <LucideIcon
+                                                            Kind="ChevronLeft" Size="18"/>
+                                                    </RepeatButton>
+                                                    <ContentPresenter
+                                                        Name="PART_ContentPresenter" Grid.Column="1"
+                                                        HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                                                        Content="{TemplateBinding Content}"
+                                                        TabIndex="1"/>
+                                                    <RepeatButton
+                                                        Name="PART_IncreaseButton" Grid.Column="2"
+                                                        Padding="2" Background="Transparent"
+                                                        BorderBrush="{x:Null}"
+                                                        BorderThickness="0"
+                                                        Foreground="{TemplateBinding Foreground}">
+                                                        <LucideIcon
+                                                            Kind="ChevronRight" Size="18"/>
+                                                    </RepeatButton>
+                                                </Grid>
+                                            </ControlTemplate>
+                                        </Setter>
+                                    </Style>
+                                </Style>
                             </ItemsControl.Styles>
 
-                            <ItemsControl.DataTemplates>
-                                <DataTemplate DataType="m:AssistantChatMessage">
-                                    <StackPanel
-                                        Classes="ChatMessage Assistant" Margin="4,0"
-                                        Background="Transparent" Orientation="Vertical"
-                                        Spacing="4">
-                                        <SelectableTextBlock Inlines="{Binding InlineCollection}"/>
-
-                                        <StackPanel
-                                            x:Name="ChatMessageOperationPanel"
-                                            IsVisible="{Binding !IsBusy}"
-                                            Orientation="Horizontal">
-                                            <Button
-                                                Classes="Ghost"
-                                                Command="{Binding $parent[v:AssistantFloatingWindow].ViewModel.RetryCommand}"
-                                                CommandParameter="{Binding}"
-                                                ToolTip.Tip="{DynamicResource AssistantFloatingWindow_ChatMessage_Assistant_Regenerate}">
-                                                <LucideIcon Kind="RefreshCcw"/>
-                                            </Button>
-                                            <Button
-                                                Classes="Ghost"
-                                                Command="{Binding $parent[v:AssistantFloatingWindow].ViewModel.CopyCommand}"
-                                                CommandParameter="{Binding}"
-                                                ToolTip.Tip="{DynamicResource AssistantFloatingWindow_ChatMessage_Assistant_Copy}">
-                                                <LucideIcon Kind="Copy"/>
-                                            </Button>
-                                        </StackPanel>
-                                    </StackPanel>
-                                </DataTemplate>
-
-                                <DataTemplate DataType="m:UserChatMessage">
-                                    <StackPanel
-                                        Classes="ChatMessage User" Margin="36,0,0,0"
-                                        HorizontalAlignment="Right" Background="Transparent"
-                                        Orientation="Vertical" Spacing="4">
-                                        <Border
-                                            Classes="ChatBubble" HorizontalAlignment="Right">
-                                            <SelectableTextBlock Inlines="{Binding InlineCollection}"/>
-                                        </Border>
-
-                                        <ItemsControl ItemsSource="{Binding Attachments}">
-                                            <ItemsControl.ItemsPanel>
-                                                <ItemsPanelTemplate>
-                                                    <WrapPanel
-                                                        ItemSpacing="6" LineSpacing="4"/>
-                                                </ItemsPanelTemplate>
-                                            </ItemsControl.ItemsPanel>
-
-                                            <ItemsControl.ItemTemplate>
-                                                <DataTemplate DataType="m:AssistantAttachment">
-                                                    <Border
-                                                        Height="24"
-                                                        Background="{DynamicResource CardBackgroundColor}"
-                                                        CornerRadius="12">
-                                                        <StackPanel
-                                                            Margin="6,0" Orientation="Horizontal"
-                                                            Spacing="4">
-                                                            <LucideIcon
-                                                                VerticalAlignment="Center"
-                                                                Kind="{Binding Icon}"
-                                                                Size="14"/>
-                                                            <TextBlock
-                                                                VerticalAlignment="Center" FontSize="12"
-                                                                Text="{Binding HeaderKey^}"/>
-                                                        </StackPanel>
-                                                    </Border>
-                                                </DataTemplate>
-                                            </ItemsControl.ItemTemplate>
-                                        </ItemsControl>
-
-                                        <!--  TODO: Edit operations  -->
-                                    </StackPanel>
-                                </DataTemplate>
-
-                                <DataTemplate DataType="m:ActionChatMessage">
-                                    <Border
-                                        Classes="ChatMessage Action ChatBubble" Margin="0,0,36,0"
-                                        HorizontalAlignment="Left">
-                                        <Border.Styles>
-                                            <Style Selector="Expander:not(.CanExpand)">
-                                                <Style Selector="^ ToggleButton#PART_ToggleButton">
-                                                    <Setter Property="IsEnabled" Value="False"/>
-                                                </Style>
-                                                <Style Selector="^ LucideIcon#PART_Icon">
-                                                    <Setter Property="IsVisible" Value="False"/>
-                                                </Style>
-                                                <Style Selector="^ ContentControl#ContentExpandControlContainer">
-                                                    <Setter Property="IsVisible" Value="False"/>
-                                                </Style>
-                                            </Style>
-                                        </Border.Styles>
-
-                                        <Expander
-                                            Background="Transparent" BorderThickness="0"
-                                            Classes.CanExpand="{Binding InlineCollection.Count, Converter={x:Static v:BusyInlineCollection.IsNotEmpty}}">
-                                            <Expander.Template>
-                                                <ControlTemplate TargetType="Expander">
-                                                    <StackPanel>
-                                                        <LayoutTransformControl Name="PART_ToggleTransform">
-                                                            <Panel>
-                                                                <ToggleButton
-                                                                    x:Name="PART_ToggleButton" DockPanel.Dock="Right"
-                                                                    MinHeight="0" Background="Transparent"
-                                                                    BorderThickness="0"
-                                                                    IsChecked="{TemplateBinding IsExpanded, Mode=TwoWay}"/>
-                                                                <StackPanel
-                                                                    Orientation="Horizontal" Spacing="4">
-                                                                    <ContentPresenter
-                                                                        VerticalAlignment="Center"
-                                                                        Content="{TemplateBinding Header}"/>
-                                                                    <LucideIcon
-                                                                        x:Name="PART_Icon" VerticalAlignment="Center"
-                                                                        IsHitTestVisible="False" Kind="Maximize2"
-                                                                        Size="20"/>
-                                                                </StackPanel>
-                                                            </Panel>
-                                                        </LayoutTransformControl>
-
-                                                        <ContentControl
-                                                            x:Name="ContentExpandControlContainer" Padding="0,8,0,0"
-                                                            IsVisible="{Binding ElementName=PART_ToggleButton, Path=IsChecked}">
-                                                            <shadui:ContentExpandControl
-                                                                x:Name="PART_ContentExpand"
-                                                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                                Content="{TemplateBinding Content}"
-                                                                ContentTemplate="{TemplateBinding ContentTemplate}"/>
-                                                        </ContentControl>
-                                                    </StackPanel>
-                                                </ControlTemplate>
-                                            </Expander.Template>
-
-                                            <Expander.Header>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="m:ChatMessageNode">
+                                    <ContentControl Content="{Binding Message}">
+                                        <ContentControl.DataTemplates>
+                                            <DataTemplate DataType="m:AssistantChatMessage">
                                                 <StackPanel
-                                                    Orientation="Horizontal" Spacing="4">
-                                                    <LucideIcon
-                                                        VerticalAlignment="Center"
-                                                        Kind="{Binding Icon}"
-                                                        Size="18"/>
-                                                    <SelectableTextBlock
-                                                        VerticalAlignment="Center"
-                                                        Text="{Binding HeaderKey^, FallbackValue={x:Null}}"/>
-                                                    <shadui:Loading
-                                                        Width="14" Height="14"
-                                                        VerticalAlignment="Center" IsHitTestVisible="False"
-                                                        IsVisible="{Binding IsBusy}"/>
-                                                </StackPanel>
-                                            </Expander.Header>
+                                                    Classes="ChatMessage Assistant" Margin="4,0"
+                                                    Background="Transparent" Orientation="Vertical"
+                                                    Spacing="4">
+                                                    <markdown:MarkdownRenderer MarkdownBuilder="{Binding MarkdownBuilder}"/>
 
-                                            <SelectableTextBlock Inlines="{Binding InlineCollection}"/>
-                                        </Expander>
-                                    </Border>
+                                                    <StackPanel
+                                                        x:Name="ChatMessageOperationPanel"
+                                                        IsVisible="{Binding !IsBusy}"
+                                                        Orientation="Horizontal">
+                                                        <NumericUpDown
+                                                            x:Name="ChoiceSelector" Margin="0,0,4,0"
+                                                            Maximum="{Binding $parent[ContentControl].((m:ChatMessageNode)DataContext).Parent.ChoiceCount, FallbackValue=1}"
+                                                            Minimum="1"
+                                                            Value="{Binding $parent[ContentControl].((m:ChatMessageNode)DataContext).Parent.ChoiceIndex, FallbackValue=1, Converter={x:Static vc:NumberConverters.PlusOne}}"/>
+
+                                                        <Button
+                                                            Classes="Ghost"
+                                                            Command="{Binding $parent[v:AssistantFloatingWindow].ViewModel.RetryCommand}"
+                                                            CommandParameter="{Binding $parent[ContentControl].DataContext}"
+                                                            ToolTip.Tip="{DynamicResource AssistantFloatingWindow_ChatMessage_Assistant_Regenerate}">
+                                                            <LucideIcon Kind="RefreshCcw"/>
+                                                        </Button>
+                                                        <Button
+                                                            Classes="Ghost"
+                                                            Command="{Binding $parent[v:AssistantFloatingWindow].ViewModel.CopyCommand}"
+                                                            CommandParameter="{Binding}"
+                                                            ToolTip.Tip="{DynamicResource AssistantFloatingWindow_ChatMessage_Assistant_Copy}">
+                                                            <LucideIcon Kind="Copy"/>
+                                                        </Button>
+                                                    </StackPanel>
+                                                </StackPanel>
+                                            </DataTemplate>
+
+                                            <DataTemplate DataType="m:UserChatMessage">
+                                                <StackPanel
+                                                    Classes="ChatMessage User" Margin="36,0,0,0"
+                                                    HorizontalAlignment="Right" Background="Transparent"
+                                                    Orientation="Vertical" Spacing="4">
+                                                    <Border
+                                                        Classes="ChatBubble" HorizontalAlignment="Right">
+                                                        <SelectableTextBlock Inlines="{Binding Inlines}"/>
+                                                    </Border>
+
+                                                    <ItemsControl ItemsSource="{Binding Attachments}">
+                                                        <ItemsControl.ItemsPanel>
+                                                            <ItemsPanelTemplate>
+                                                                <WrapPanel
+                                                                    ItemSpacing="6" LineSpacing="4"/>
+                                                            </ItemsPanelTemplate>
+                                                        </ItemsControl.ItemsPanel>
+
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate DataType="m:ChatAttachment">
+                                                                <Border
+                                                                    Height="24"
+                                                                    Background="{DynamicResource CardBackgroundColor}"
+                                                                    CornerRadius="12">
+                                                                    <StackPanel
+                                                                        Margin="6,0" Orientation="Horizontal"
+                                                                        Spacing="4">
+                                                                        <LucideIcon
+                                                                            VerticalAlignment="Center"
+                                                                            Kind="{Binding Icon}"
+                                                                            Size="14"/>
+                                                                        <TextBlock
+                                                                            VerticalAlignment="Center" FontSize="12"
+                                                                            Text="{Binding HeaderKey^}"/>
+                                                                    </StackPanel>
+                                                                </Border>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+
+                                                    <!--  TODO: Edit operations  -->
+                                                </StackPanel>
+                                            </DataTemplate>
+
+                                            <DataTemplate DataType="m:ActionChatMessage">
+                                                <Border
+                                                    Classes="ChatMessage Action ChatBubble" Margin="0,0,36,0"
+                                                    HorizontalAlignment="Left">
+                                                    <Border.Styles>
+                                                        <Style Selector="Expander:not(.CanExpand)">
+                                                            <Style Selector="^ ToggleButton#PART_ToggleButton">
+                                                                <Setter Property="IsEnabled" Value="False"/>
+                                                            </Style>
+                                                            <Style Selector="^ LucideIcon#PART_Icon">
+                                                                <Setter Property="IsVisible" Value="False"/>
+                                                            </Style>
+                                                            <Style Selector="^ ContentControl#ContentExpandControlContainer">
+                                                                <Setter Property="IsVisible" Value="False"/>
+                                                            </Style>
+                                                        </Style>
+                                                    </Border.Styles>
+
+                                                    <Expander
+                                                        Background="Transparent" BorderThickness="0"
+                                                        Classes.CanExpand="False">
+                                                        <Expander.Template>
+                                                            <ControlTemplate TargetType="Expander">
+                                                                <StackPanel>
+                                                                    <LayoutTransformControl Name="PART_ToggleTransform">
+                                                                        <Panel>
+                                                                            <ToggleButton
+                                                                                x:Name="PART_ToggleButton" DockPanel.Dock="Right"
+                                                                                MinHeight="0" Background="Transparent"
+                                                                                BorderThickness="0"
+                                                                                IsChecked="{TemplateBinding IsExpanded, Mode=TwoWay}"/>
+                                                                            <StackPanel
+                                                                                Orientation="Horizontal" Spacing="4">
+                                                                                <ContentPresenter
+                                                                                    VerticalAlignment="Center"
+                                                                                    Content="{TemplateBinding Header}"/>
+                                                                                <LucideIcon
+                                                                                    x:Name="PART_Icon" VerticalAlignment="Center"
+                                                                                    IsHitTestVisible="False" Kind="Maximize2"
+                                                                                    Size="20"/>
+                                                                            </StackPanel>
+                                                                        </Panel>
+                                                                    </LayoutTransformControl>
+
+                                                                    <ContentControl
+                                                                        x:Name="ContentExpandControlContainer" Padding="0,8,0,0"
+                                                                        IsVisible="{Binding ElementName=PART_ToggleButton, Path=IsChecked}">
+                                                                        <shadui:ContentExpandControl
+                                                                            x:Name="PART_ContentExpand"
+                                                                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                                            Content="{TemplateBinding Content}"
+                                                                            ContentTemplate="{TemplateBinding ContentTemplate}"/>
+                                                                    </ContentControl>
+                                                                </StackPanel>
+                                                            </ControlTemplate>
+                                                        </Expander.Template>
+
+                                                        <Expander.Header>
+                                                            <StackPanel
+                                                                Orientation="Horizontal" Spacing="4">
+                                                                <LucideIcon
+                                                                    VerticalAlignment="Center"
+                                                                    Kind="{Binding Icon}"
+                                                                    Size="14"/>
+                                                                <SelectableTextBlock
+                                                                    VerticalAlignment="Center" FontSize="12"
+                                                                    Text="{Binding HeaderKey^, FallbackValue={x:Null}}"/>
+                                                                <shadui:Loading
+                                                                    Width="12" Height="12"
+                                                                    VerticalAlignment="Center" IsHitTestVisible="False"
+                                                                    IsVisible="{Binding IsBusy}"/>
+                                                            </StackPanel>
+                                                        </Expander.Header>
+
+                                                        <!-- <SelectableTextBlock Inlines="{Binding InlineCollection}"/> -->
+                                                    </Expander>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ContentControl.DataTemplates>
+                                    </ContentControl>
                                 </DataTemplate>
-                            </ItemsControl.DataTemplates>
+                            </ItemsControl.ItemTemplate>
                         </ItemsControl>
                     </Panel>
                 </ScrollViewer>
@@ -372,18 +443,18 @@
                 <shadui:Card
                     Padding="8" BorderThickness="0,1,0,0"
                     CornerRadius="0,0,18,18">
-                    <v:AssistantInputBox
-                        x:Name="AssistantInputBox" AcceptsReturn="True"
-                        AssistantCommandItemsSource="{Binding AssistantCommands}"
-                        AttachmentItemsSource="{Binding Attachments}"
+                    <v:ChatInputBox
+                        x:Name="ChatInputBox" AcceptsReturn="True"
                         CancelCommand="{Binding CancelCommand}"
+                        ChatAttachmentItemsSource="{Binding ChatAttachments}"
+                        ChatCommandItemsSource="{Binding ChatCommands}"
                         Command="{Binding ProcessChatMessageSentCommand}"
                         IsImageSupported="{Binding Settings.Model.IsImageEnabled}"
                         IsSendButtonEnabled="{Binding !IsBusy}"
                         IsToolCallSupported="{Binding Settings.Model.IsToolCallEnabled}"
                         IsWebSearchSupported="{Binding Settings.Model.IsWebSearchEnabled}"
                         TextWrapping="Wrap">
-                        <v:AssistantInputBox.AddAttachmentMenuItems>
+                        <v:ChatInputBox.AddChatAttachmentMenuItems>
                             <MenuItem
                                 Command="{Binding AddElementCommand}"
                                 CommandParameter="{x:Static i:PickElementMode.Screen}"
@@ -427,8 +498,8 @@
                                         Kind="File" Size="18"/>
                                 </MenuItem.Icon>
                             </MenuItem>
-                        </v:AssistantInputBox.AddAttachmentMenuItems>
-                    </v:AssistantInputBox>
+                        </v:ChatInputBox.AddChatAttachmentMenuItems>
+                    </v:ChatInputBox>
                 </shadui:Card>
             </StackPanel>
         </Panel>

@@ -1,74 +1,69 @@
 <Project>
-    <PropertyGroup>
-        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-        <MicrosoftPackageVersion>9.0.5</MicrosoftPackageVersion>
-        <SemanticKernelVersion>1.54.0</SemanticKernelVersion>
-        <AvaloniaVersion>11.3.0</AvaloniaVersion>
-        <TokenizersVersion>1.2.0</TokenizersVersion>
-    </PropertyGroup>
-    <ItemGroup>
-        <!-- Base packages -->
-        <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.0"/>
-        <PackageVersion Include="Google.Protobuf" Version="3.30.2"/>
-        <PackageVersion Include="Grpc.Core.Api" Version="2.71.0"/>
-        <PackageVersion Include="Grpc.Tools" Version="2.71.0"/>
-        <PackageVersion Include="IconPacks.Avalonia.Material" Version="1.0.0"/>
-        <PackageVersion Include="JetBrains.Profiler.Api" Version="1.4.9"/>
-        <PackageVersion Include="Microsoft.Extensions.Configuration" Version="$(MicrosoftPackageVersion)"/>
-        <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="$(MicrosoftPackageVersion)"/>
-        <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="$(MicrosoftPackageVersion)"/>
-        <PackageVersion Include="System.Drawing.Common" Version="$(MicrosoftPackageVersion)"/>
-        <PackageVersion Include="System.Text.Json" Version="$(MicrosoftPackageVersion)"/>
-        <PackageVersion Include="ObservableCollections" Version="3.3.3"/>
-        <PackageVersion Include="Sep" Version="0.10.2"/>
-        <PackageVersion Include="ZLinq" Version="1.4.9"/>
-
-        <!-- LLM packages -->
-        <PackageVersion Include="Microsoft.KernelMemory.Core" Version="0.98.250508.3"/>
-        <PackageVersion Include="Microsoft.ML.OnnxRuntime" Version="1.22.0"/>
-        <PackageVersion Include="Microsoft.SemanticKernel" Version="$(SemanticKernelVersion)"/>
-        <PackageVersion Include="Microsoft.SemanticKernel.Connectors.OpenAI" Version="$(SemanticKernelVersion)"/>
-        <PackageVersion Include="Microsoft.SemanticKernel.Plugins.Web" Version="$(SemanticKernelVersion)-alpha"/>
-        <PackageVersion Include="Tokenizers.DotNet" Version="$(TokenizersVersion)"/>
-        <PackageVersion Include="Tokenizers.DotNet.runtime.win-x64" Version="$(TokenizersVersion)"/>
-
-        <!-- Avalonia packages -->
-        <PackageVersion Include="Avalonia" Version="$(AvaloniaVersion)"/>
-        <PackageVersion Include="Avalonia.Skia" Version="$(AvaloniaVersion)"/>
-        <PackageVersion Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)"/>
-        <PackageVersion Include="Avalonia.Themes.Simple" Version="$(AvaloniaVersion)"/>
-        <PackageVersion Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)"/>
-        <PackageVersion Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)"/>
-        <PackageVersion Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)"/>
-        <PackageVersion Include="Avalonia.Desktop" Version="$(AvaloniaVersion)"/>
-        <PackageVersion Include="Avalonia.ReactiveUI" Version="$(AvaloniaVersion)"/>
-        <PackageVersion Include="MinVer" Version="6.0.0">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageVersion>
-        <PackageVersion Include="HotAvalonia" Version="3.0.0"/>
-        <PackageVersion Include="Lucide.Avalonia" Version="0.1.30"/>
-        <PackageVersion Include="Xaml.Behaviors.Avalonia" Version="11.3.0.10"/>
-
-        <!-- Markdown packages -->
-        <PackageVersion Include="ColorCode.Core" Version="2.0.15"/>
-        <PackageVersion Include="Markdig" Version="0.41.3"/>
-
-        <!-- Windows packages -->
-        <PackageVersion Include="Microsoft.Windows.CsWin32" Version="0.3.183">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageVersion>
-        <PackageVersion Include="FlaUI.UIA3" Version="4.0.0"/>
-        <PackageVersion Include="Vortice.Direct3D11" Version="3.6.2"/>
-        <PackageVersion Include="Vortice.DirectComposition" Version="3.6.2"/>
-
-        <!-- NUnit packages -->
-        <PackageVersion Include="BenchmarkDotNet" Version="0.15.1"/>
-        <PackageVersion Include="coverlet.collector" Version="6.0.3"/>
-        <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.12.0"/>
-        <PackageVersion Include="NUnit" Version="4.3.2"/>
-        <PackageVersion Include="NUnit.Analyzers" Version="4.5.0"/>
-        <PackageVersion Include="NUnit3TestAdapter" Version="4.6.0"/>
-    </ItemGroup>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <MicrosoftPackageVersion>9.0.5</MicrosoftPackageVersion>
+    <SemanticKernelVersion>1.54.0</SemanticKernelVersion>
+    <AvaloniaVersion>11.3.0</AvaloniaVersion>
+    <TokenizersVersion>1.2.0</TokenizersVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Base packages -->
+    <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageVersion Include="Google.Protobuf" Version="3.30.2" />
+    <PackageVersion Include="Grpc.Core.Api" Version="2.71.0" />
+    <PackageVersion Include="Grpc.Tools" Version="2.71.0" />
+    <PackageVersion Include="IconPacks.Avalonia.Material" Version="1.0.0" />
+    <PackageVersion Include="JetBrains.Profiler.Api" Version="1.4.9" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration" Version="$(MicrosoftPackageVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="$(MicrosoftPackageVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="$(MicrosoftPackageVersion)" />
+    <PackageVersion Include="System.Drawing.Common" Version="$(MicrosoftPackageVersion)" />
+    <PackageVersion Include="System.Text.Json" Version="$(MicrosoftPackageVersion)" />
+    <PackageVersion Include="ObservableCollections" Version="3.3.3" />
+    <PackageVersion Include="Sep" Version="0.10.2" />
+    <PackageVersion Include="ZLinq" Version="1.5.0" />
+    <!-- LLM packages -->
+    <PackageVersion Include="Microsoft.KernelMemory.Core" Version="0.98.250508.3" />
+    <PackageVersion Include="Microsoft.ML.OnnxRuntime" Version="1.22.0" />
+    <PackageVersion Include="Microsoft.SemanticKernel" Version="$(SemanticKernelVersion)" />
+    <PackageVersion Include="Microsoft.SemanticKernel.Connectors.OpenAI" Version="$(SemanticKernelVersion)" />
+    <PackageVersion Include="Microsoft.SemanticKernel.Plugins.Web" Version="$(SemanticKernelVersion)-alpha" />
+    <PackageVersion Include="Tokenizers.DotNet" Version="$(TokenizersVersion)" />
+    <PackageVersion Include="Tokenizers.DotNet.runtime.win-x64" Version="$(TokenizersVersion)" />
+    <!-- Avalonia packages -->
+    <PackageVersion Include="Avalonia" Version="$(AvaloniaVersion)" />
+    <PackageVersion Include="Avalonia.Skia" Version="$(AvaloniaVersion)" />
+    <PackageVersion Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)" />
+    <PackageVersion Include="Avalonia.Themes.Simple" Version="$(AvaloniaVersion)" />
+    <PackageVersion Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
+    <PackageVersion Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
+    <PackageVersion Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)" />
+    <PackageVersion Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
+    <PackageVersion Include="Avalonia.ReactiveUI" Version="$(AvaloniaVersion)" />
+    <PackageVersion Include="MinVer" Version="6.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageVersion>
+    <PackageVersion Include="HotAvalonia" Version="3.0.0" />
+    <PackageVersion Include="Lucide.Avalonia" Version="0.1.30" />
+    <PackageVersion Include="Xaml.Behaviors.Avalonia" Version="11.3.0.10" />
+    <!-- Markdown packages -->
+    <PackageVersion Include="ColorCode.Core" Version="2.0.15" />
+    <PackageVersion Include="Markdig" Version="0.41.3" />
+    <!-- Windows packages -->
+    <PackageVersion Include="Microsoft.Windows.CsWin32" Version="0.3.183">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageVersion>
+    <PackageVersion Include="FlaUI.UIA3" Version="4.0.0" />
+    <PackageVersion Include="Vortice.Direct3D11" Version="3.6.2" />
+    <PackageVersion Include="Vortice.DirectComposition" Version="3.6.2" />
+    <!-- NUnit packages -->
+    <PackageVersion Include="BenchmarkDotNet" Version="0.15.1" />
+    <PackageVersion Include="coverlet.collector" Version="6.0.3" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageVersion Include="NUnit" Version="4.3.2" />
+    <PackageVersion Include="NUnit.Analyzers" Version="4.5.0" />
+    <PackageVersion Include="NUnit3TestAdapter" Version="4.6.0" />
+  </ItemGroup>
 </Project>

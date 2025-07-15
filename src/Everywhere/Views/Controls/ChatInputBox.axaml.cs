@@ -16,58 +16,58 @@ using Everywhere.Models;
 namespace Everywhere.Views;
 
 [TemplatePart("PART_SendButton", typeof(Button))]
-[TemplatePart("PART_AttachmentItemsControl", typeof(ItemsControl))]
-public partial class AssistantInputBox : TextBox
+[TemplatePart("PART_ChatAttachmentItemsControl", typeof(ItemsControl))]
+public partial class ChatInputBox : TextBox
 {
     public static readonly StyledProperty<bool> PressCtrlEnterToSendProperty =
-        AvaloniaProperty.Register<AssistantInputBox, bool>(nameof(PressCtrlEnterToSend));
+        AvaloniaProperty.Register<ChatInputBox, bool>(nameof(PressCtrlEnterToSend));
 
     public static readonly StyledProperty<IRelayCommand<string>?> CommandProperty =
-        AvaloniaProperty.Register<AssistantInputBox, IRelayCommand<string>?>(nameof(Command));
+        AvaloniaProperty.Register<ChatInputBox, IRelayCommand<string>?>(nameof(Command));
 
     public static readonly StyledProperty<IRelayCommand?> CancelCommandProperty =
-        AvaloniaProperty.Register<AssistantInputBox, IRelayCommand?>(nameof(CancelCommand));
+        AvaloniaProperty.Register<ChatInputBox, IRelayCommand?>(nameof(CancelCommand));
 
-    public static readonly StyledProperty<IList<AssistantAttachment>?> AttachmentItemsSourceProperty =
-        AvaloniaProperty.Register<AssistantInputBox, IList<AssistantAttachment>?>(nameof(AttachmentItemsSource));
+    public static readonly StyledProperty<IList<ChatAttachment>?> ChatAttachmentItemsSourceProperty =
+        AvaloniaProperty.Register<ChatInputBox, IList<ChatAttachment>?>(nameof(ChatAttachmentItemsSource));
 
-    public static readonly DirectProperty<AssistantInputBox, ObservableCollection<MenuItem>> AddAttachmentMenuItemsProperty =
-        AvaloniaProperty.RegisterDirect<AssistantInputBox, ObservableCollection<MenuItem>>(
-            nameof(AddAttachmentMenuItems),
-            o => o.AddAttachmentMenuItems);
+    public static readonly DirectProperty<ChatInputBox, ObservableCollection<MenuItem>> AddChatAttachmentMenuItemsProperty =
+        AvaloniaProperty.RegisterDirect<ChatInputBox, ObservableCollection<MenuItem>>(
+            nameof(AddChatAttachmentMenuItems),
+            o => o.AddChatAttachmentMenuItems);
 
-    public static readonly StyledProperty<IEnumerable<AssistantCommand>?> AssistantCommandItemsSourceProperty =
-        AvaloniaProperty.Register<AssistantInputBox, IEnumerable<AssistantCommand>?>(nameof(AssistantCommandItemsSource));
+    public static readonly StyledProperty<IEnumerable<ChatCommand>?> ChatCommandItemsSourceProperty =
+        AvaloniaProperty.Register<ChatInputBox, IEnumerable<ChatCommand>?>(nameof(ChatCommandItemsSource));
 
-    public static readonly StyledProperty<AssistantCommand?> SelectedAssistantCommandProperty =
-        AvaloniaProperty.Register<AssistantInputBox, AssistantCommand?>(nameof(SelectedAssistantCommand));
+    public static readonly StyledProperty<ChatCommand?> SelectedChatCommandProperty =
+        AvaloniaProperty.Register<ChatInputBox, ChatCommand?>(nameof(SelectedChatCommand));
 
-    public static readonly DirectProperty<AssistantInputBox, bool> IsAssistantCommandFlyoutOpenProperty =
-        AvaloniaProperty.RegisterDirect<AssistantInputBox, bool>(
-            nameof(IsAssistantCommandFlyoutOpen),
-            o => o.IsAssistantCommandFlyoutOpen,
-            (o, v) => o.IsAssistantCommandFlyoutOpen = v);
+    public static readonly DirectProperty<ChatInputBox, bool> IsChatCommandFlyoutOpenProperty =
+        AvaloniaProperty.RegisterDirect<ChatInputBox, bool>(
+            nameof(IsChatCommandFlyoutOpen),
+            o => o.IsChatCommandFlyoutOpen,
+            (o, v) => o.IsChatCommandFlyoutOpen = v);
 
     public static readonly StyledProperty<bool> IsImageSupportedProperty =
-        AvaloniaProperty.Register<AssistantInputBox, bool>(nameof(IsImageSupported));
+        AvaloniaProperty.Register<ChatInputBox, bool>(nameof(IsImageSupported));
 
     public static readonly StyledProperty<bool> IsImageEnabledProperty =
-        AvaloniaProperty.Register<AssistantInputBox, bool>(nameof(IsImageEnabled));
+        AvaloniaProperty.Register<ChatInputBox, bool>(nameof(IsImageEnabled));
 
     public static readonly StyledProperty<bool> IsWebSearchSupportedProperty =
-        AvaloniaProperty.Register<AssistantInputBox, bool>(nameof(IsWebSearchSupported));
+        AvaloniaProperty.Register<ChatInputBox, bool>(nameof(IsWebSearchSupported));
 
     public static readonly StyledProperty<bool> IsWebSearchEnabledProperty =
-        AvaloniaProperty.Register<AssistantInputBox, bool>(nameof(IsWebSearchEnabled));
+        AvaloniaProperty.Register<ChatInputBox, bool>(nameof(IsWebSearchEnabled));
 
     public static readonly StyledProperty<bool> IsToolCallSupportedProperty =
-        AvaloniaProperty.Register<AssistantInputBox, bool>(nameof(IsToolCallSupported));
+        AvaloniaProperty.Register<ChatInputBox, bool>(nameof(IsToolCallSupported));
 
     public static readonly StyledProperty<bool> IsToolCallEnabledProperty =
-        AvaloniaProperty.Register<AssistantInputBox, bool>(nameof(IsToolCallEnabled));
+        AvaloniaProperty.Register<ChatInputBox, bool>(nameof(IsToolCallEnabled));
 
     public static readonly StyledProperty<bool> IsSendButtonEnabledProperty =
-        AvaloniaProperty.Register<AssistantInputBox, bool>(nameof(IsSendButtonEnabled), true);
+        AvaloniaProperty.Register<ChatInputBox, bool>(nameof(IsSendButtonEnabled), true);
 
     /// <summary>
     /// If true, pressing Ctrl+Enter will send the message, Enter will break the line.
@@ -93,34 +93,34 @@ public partial class AssistantInputBox : TextBox
         set => SetValue(CancelCommandProperty, value);
     }
 
-    public IList<AssistantAttachment>? AttachmentItemsSource
+    public IList<ChatAttachment>? ChatAttachmentItemsSource
     {
-        get => GetValue(AttachmentItemsSourceProperty);
-        set => SetValue(AttachmentItemsSourceProperty, value);
+        get => GetValue(ChatAttachmentItemsSourceProperty);
+        set => SetValue(ChatAttachmentItemsSourceProperty, value);
     }
 
-    public ObservableCollection<MenuItem> AddAttachmentMenuItems
+    public ObservableCollection<MenuItem> AddChatAttachmentMenuItems
     {
         get;
-        set => SetAndRaise(AddAttachmentMenuItemsProperty, ref field, value);
+        set => SetAndRaise(AddChatAttachmentMenuItemsProperty, ref field, value);
     } = [];
 
-    public IEnumerable<AssistantCommand>? AssistantCommandItemsSource
+    public IEnumerable<ChatCommand>? ChatCommandItemsSource
     {
-        get => GetValue(AssistantCommandItemsSourceProperty);
-        set => SetValue(AssistantCommandItemsSourceProperty, value);
+        get => GetValue(ChatCommandItemsSourceProperty);
+        set => SetValue(ChatCommandItemsSourceProperty, value);
     }
 
-    public AssistantCommand? SelectedAssistantCommand
+    public ChatCommand? SelectedChatCommand
     {
-        get => GetValue(SelectedAssistantCommandProperty);
-        set => SetValue(SelectedAssistantCommandProperty, value);
+        get => GetValue(SelectedChatCommandProperty);
+        set => SetValue(SelectedChatCommandProperty, value);
     }
 
-    public bool IsAssistantCommandFlyoutOpen
+    public bool IsChatCommandFlyoutOpen
     {
         get;
-        private set => SetAndRaise(IsAssistantCommandFlyoutOpenProperty, ref field, value);
+        private set => SetAndRaise(IsChatCommandFlyoutOpenProperty, ref field, value);
     }
 
     public bool IsImageSupported
@@ -178,15 +178,15 @@ public partial class AssistantInputBox : TextBox
         },
     };
 
-    static AssistantInputBox()
+    static ChatInputBox()
     {
-        TextProperty.OverrideDefaultValue<AssistantInputBox>(string.Empty);
+        TextProperty.OverrideDefaultValue<ChatInputBox>(string.Empty);
     }
 
-    public AssistantInputBox()
+    public ChatInputBox()
     {
-        SelectedAssistantCommandProperty.Changed.Subscribe(
-            new AnonymousObserver<AvaloniaPropertyChangedEventArgs<AssistantCommand?>>(HandleSelectedAssistantCommandPropertyChanged));
+        SelectedChatCommandProperty.Changed.Subscribe(
+            new AnonymousObserver<AvaloniaPropertyChangedEventArgs<ChatCommand?>>(HandleSelectedChatCommandPropertyChanged));
         this.AddDisposableHandler(KeyDownEvent, HandleTextBoxKeyDown, RoutingStrategies.Tunnel);
         this.AddDisposableHandler(TextChangedEvent, HandleTextBoxTextChanged, RoutingStrategies.Bubble);
     }
@@ -223,7 +223,7 @@ public partial class AssistantInputBox : TextBox
                     while (element != null)
                     {
                         element = element.Parent;
-                        if (element is not { DataContext: AssistantVisualElementAttachment attachment }) continue;
+                        if (element is not { DataContext: ChatVisualElementAttachment attachment }) continue;
                         visualElementAttachmentOverlayWindow.UpdateForVisualElement(attachment.Element);
                         return;
                     }
@@ -250,9 +250,9 @@ public partial class AssistantInputBox : TextBox
     }
 
     [RelayCommand]
-    private void RemoveAttachment(AssistantAttachment attachment)
+    private void RemoveAttachment(ChatAttachment attachment)
     {
-        AttachmentItemsSource?.Remove(attachment);
+        ChatAttachmentItemsSource?.Remove(attachment);
     }
 
     private void HandleTextBoxKeyDown(object? sender, KeyEventArgs e)
@@ -272,7 +272,7 @@ public partial class AssistantInputBox : TextBox
         }
     }
 
-    private void HandleSelectedAssistantCommandPropertyChanged(AvaloniaPropertyChangedEventArgs<AssistantCommand?> e)
+    private void HandleSelectedChatCommandPropertyChanged(AvaloniaPropertyChangedEventArgs<ChatCommand?> e)
     {
         if (e.NewValue.Value is not { } command) return;
         var text = Text;
@@ -289,36 +289,36 @@ public partial class AssistantInputBox : TextBox
         var text = Text;
         if (text == null) return;
 
-        if (SelectedAssistantCommand != null && text.StartsWith(SelectedAssistantCommand.Command + ' ') is not true)
+        if (SelectedChatCommand != null && text.StartsWith(SelectedChatCommand.Command + ' ') is not true)
         {
-            SelectedAssistantCommand = null;
+            SelectedChatCommand = null;
             if (text.StartsWith('/'))
             {
                 Text = text = text.IndexOf(' ') is var i and >= 0 ? text[i..] : string.Empty;
             }
         }
 
-        IsAssistantCommandFlyoutOpen = text.StartsWith('/') && SelectedAssistantCommand == null;
+        IsChatCommandFlyoutOpen = text.StartsWith('/') && SelectedChatCommand == null;
     }
 }
 
-public class AssistantInputTextPresenter : TextPresenter
+public class ChatInputTextPresenter : TextPresenter
 {
-    public static readonly StyledProperty<AssistantCommand?> SelectedAssistantCommandProperty =
-        AssistantInputBox.SelectedAssistantCommandProperty.AddOwner<AssistantInputTextPresenter>();
+    public static readonly StyledProperty<ChatCommand?> SelectedChatCommandProperty =
+        ChatInputBox.SelectedChatCommandProperty.AddOwner<ChatInputTextPresenter>();
 
-    public AssistantCommand? SelectedAssistantCommand
+    public ChatCommand? SelectedChatCommand
     {
-        get => GetValue(SelectedAssistantCommandProperty);
-        set => SetValue(SelectedAssistantCommandProperty, value);
+        get => GetValue(SelectedChatCommandProperty);
+        set => SetValue(SelectedChatCommandProperty, value);
     }
 
     private Size constraint;
 
-    public AssistantInputTextPresenter()
+    public ChatInputTextPresenter()
     {
-        SelectedAssistantCommandProperty.Changed.Subscribe(
-            new AnonymousObserver<AvaloniaPropertyChangedEventArgs<AssistantCommand?>>(_ => InvalidateTextLayout()));
+        SelectedChatCommandProperty.Changed.Subscribe(
+            new AnonymousObserver<AvaloniaPropertyChangedEventArgs<ChatCommand?>>(_ => InvalidateTextLayout()));
     }
 
     protected override Size MeasureOverride(Size availableSize)
@@ -341,7 +341,7 @@ public class AssistantInputTextPresenter : TextPresenter
     protected override TextLayout CreateTextLayout()
     {
         var text = Text;
-        var command = SelectedAssistantCommand?.Command;
+        var command = SelectedChatCommand?.Command;
         var selectionStart = SelectionStart;
         var selectionEnd = SelectionEnd;
         var foreground = Foreground;

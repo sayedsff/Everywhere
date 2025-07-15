@@ -4,8 +4,8 @@
     xmlns:m="clr-namespace:Everywhere.Models" xmlns:v="clr-namespace:Everywhere.Views">
 
     <ControlTheme
-        x:Key="{x:Type v:AssistantInputBox}"
-        TargetType="v:AssistantInputBox">
+        x:Key="{x:Type v:ChatInputBox}"
+        TargetType="v:ChatInputBox">
 
         <Style Selector="^ /template/ ToggleButton.Rounded">
             <Setter Property="Height" Value="30"/>
@@ -54,11 +54,11 @@
                             Text="{TemplateBinding Watermark}"
                             TextAlignment="{TemplateBinding TextAlignment}"
                             TextWrapping="{TemplateBinding TextWrapping}"/>
-                        <v:AssistantInputTextPresenter
+                        <v:ChatInputTextPresenter
                             x:Name="PART_TextPresenter"
                             CaretBrush="{TemplateBinding CaretBrush}"
                             CaretIndex="{TemplateBinding CaretIndex}"
-                            SelectedAssistantCommand="{Binding $parent[v:AssistantInputBox].SelectedAssistantCommand}"
+                            SelectedChatCommand="{Binding $parent[v:ChatInputBox].SelectedChatCommand}"
                             SelectionBrush="{TemplateBinding SelectionBrush}"
                             SelectionEnd="{TemplateBinding SelectionEnd}"
                             SelectionForegroundBrush="{TemplateBinding SelectionForegroundBrush}"
@@ -72,15 +72,15 @@
 
                     <Popup
                         Grid.Row="0" Grid.Column="0"
-                        IsOpen="{Binding IsAssistantCommandFlyoutOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                        IsOpen="{Binding IsChatCommandFlyoutOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
                         Placement="TopEdgeAlignedLeft" PlacementTarget="PART_TextPresenter">
                         <ListBox
                             Background="{DynamicResource CardBackgroundColor}"
                             CornerRadius="6" Grid.IsSharedSizeScope="True"
-                            ItemsSource="{TemplateBinding AssistantCommandItemsSource}"
-                            SelectedItem="{Binding SelectedAssistantCommand, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
+                            ItemsSource="{TemplateBinding ChatCommandItemsSource}"
+                            SelectedItem="{Binding SelectedChatCommand, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
                             <ListBox.DataTemplates>
-                                <DataTemplate DataType="m:AssistantCommand">
+                                <DataTemplate DataType="m:ChatCommand">
                                     <TextBlock>
                                         <Run
                                             FontWeight="Black"
@@ -102,8 +102,8 @@
                         </Interaction.Behaviors>
 
                         <ItemsControl
-                            x:Name="PART_AttachmentItemsControl"
-                            ItemsSource="{TemplateBinding AttachmentItemsSource}">
+                            x:Name="PART_ChatAttachmentItemsControl"
+                            ItemsSource="{TemplateBinding ChatAttachmentItemsSource}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <WrapPanel
@@ -112,7 +112,7 @@
                             </ItemsControl.ItemsPanel>
 
                             <ItemsControl.ItemTemplate>
-                                <DataTemplate DataType="m:AssistantAttachment">
+                                <DataTemplate DataType="m:ChatAttachment">
                                     <Border
                                         Height="24"
                                         Background="{DynamicResource CardBackgroundColor}"
@@ -130,7 +130,7 @@
                                             <Button
                                                 Padding="1" VerticalAlignment="Center"
                                                 Background="Transparent" BorderThickness="0"
-                                                Command="{Binding $parent[v:AssistantInputBox].RemoveAttachmentCommand}"
+                                                Command="{Binding $parent[v:ChatInputBox].RemoveAttachmentCommand}"
                                                 CommandParameter="{Binding}">
                                                 <LucideIcon
                                                     Foreground="{DynamicResource MutedColor}"
@@ -151,7 +151,7 @@
                                 Classes="Outline Rounded"
                                 extensions:MenuItemAssist.Label="{DynamicResource AssistantInputBox_AddAttachmentMenuItem_Header}"
                                 extensions:MenuItemAssist.PopupPlacement="TopEdgeAlignedLeft" extensions:MenuItemAssist.PopupVerticalOffset="-4"
-                                ItemsSource="{TemplateBinding AddAttachmentMenuItems}"
+                                ItemsSource="{TemplateBinding AddChatAttachmentMenuItems}"
                                 ToolTip.Tip="{DynamicResource AssistantInputBox_AddAttachmentButton_ToolTip}">
                                 <MenuItem.Header>
                                     <LucideIcon

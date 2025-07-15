@@ -42,30 +42,33 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
     public partial DynamicResourceKey? Title { get; private set; }
 
     [field: AllowNull, MaybeNull]
-    public NotifyCollectionChangedSynchronizedViewList<AssistantAttachment> Attachments =>
-        field ??= attachments.ToNotifyCollectionChangedSlim(SynchronizationContextCollectionEventDispatcher.Current);
+    public NotifyCollectionChangedSynchronizedViewList<ChatAttachment> ChatAttachments =>
+        field ??= chatAttachments.ToNotifyCollectionChangedSlim(SynchronizationContextCollectionEventDispatcher.Current);
 
     [ObservableProperty]
     public partial IReadOnlyList<DynamicNamedCommand>? QuickActions { get; private set; }
 
     [ObservableProperty]
-    public partial IReadOnlyList<AssistantCommand>? AssistantCommands { get; private set; }
+    public partial IReadOnlyList<ChatCommand>? ChatCommands { get; private set; }
 
     [ObservableProperty]
     public partial bool IsExpanded { get; set; }
 
-    [field: AllowNull, MaybeNull]
-    public NotifyCollectionChangedSynchronizedViewList<ChatMessage> ChatMessages =>
-        field ??= chatMessages.CreateView(x => x).With(v => v.AttachFilter(m => m.Role != AuthorRole.System))
-            .ToNotifyCollectionChanged(SynchronizationContextCollectionEventDispatcher.Current);
+    public NotifyCollectionChangedSynchronizedViewList<ChatMessageNode>? ChatMessageNodes =>
+        ChatContext?.ToNotifyCollectionChanged(
+            v => v.AttachFilter(m => m.Message.Role != AuthorRole.System),
+            SynchronizationContextCollectionEventDispatcher.Current);
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ChatMessageNodes))]
+    public partial ChatContext? ChatContext { get; private set; }
 
     private readonly IVisualElementContext visualElementContext;
     private readonly IClipboard clipboard;
     private readonly IStorageProvider storageProvider;
     private readonly IKernelMixinFactory kernelMixinFactory;
 
-    private readonly ObservableList<AssistantAttachment> attachments = [];
-    private readonly ObservableList<ChatMessage> chatMessages = [];
+    private readonly ObservableList<ChatAttachment> chatAttachments = [];
     private readonly ReusableCancellationTokenSource cancellationTokenSource = new();
 
     public AssistantFloatingWindowViewModel(
@@ -117,7 +120,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
             )
         ];
 
-        AssistantCommand[] textEditCommands =
+        ChatCommand[] textEditCommands =
         [
             new(
                 "/translate",
@@ -130,25 +133,25 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
                 "Based on context, rewrite the content of focused element"),
         ];
 
-        void HandleAttachmentsCollectionChanged(in NotifyCollectionChangedEventArgs<AssistantAttachment> x)
+        void HandleChatAttachmentsCollectionChanged(in NotifyCollectionChangedEventArgs<ChatAttachment> x)
         {
             QuickActions = null;
-            AssistantCommands = null;
+            ChatCommands = null;
 
-            if (attachments.Count <= 0) return;
+            if (chatAttachments.Count <= 0) return;
 
-            switch (attachments[0])
+            switch (chatAttachments[0])
             {
-                case AssistantVisualElementAttachment { Element.Type: VisualElementType.TextEdit }:
+                case ChatVisualElementAttachment { Element.Type: VisualElementType.TextEdit }:
                 {
                     QuickActions = textEditActions;
-                    AssistantCommands = textEditCommands;
+                    ChatCommands = textEditCommands;
                     break;
                 }
             }
         }
 
-        attachments.CollectionChanged += HandleAttachmentsCollectionChanged;
+        chatAttachments.CollectionChanged += HandleChatAttachmentsCollectionChanged;
     }
 
     private CancellationTokenSource? targetElementChangedTokenSource;
@@ -168,7 +171,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
         await ExecuteBusyTaskAsync(
             async token =>
             {
-                if (attachments.Any(a => a is AssistantVisualElementAttachment vea && vea.Element.Equals(targetElement)))
+                if (chatAttachments.Any(a => a is ChatVisualElementAttachment vea && vea.Element.Equals(targetElement)))
                 {
                     IsOpened = true;
                     return;
@@ -183,8 +186,8 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
 
                 TargetBoundingRect = targetElement.BoundingRectangle;
                 Title = "AssistantFloatingWindow_Title";
-                attachments.Clear();
-                attachments.Add(await Task.Run(() => CreateFromVisualElement(targetElement), token));
+                chatAttachments.Clear();
+                chatAttachments.Add(await Task.Run(() => CreateFromVisualElement(targetElement), token));
                 IsOpened = true;
                 IsExpanded = showExpanded;
             },
@@ -196,8 +199,8 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
     private async Task AddElementAsync(PickElementMode mode)
     {
         if (await visualElementContext.PickElementAsync(mode) is not { } element) return;
-        if (attachments.OfType<AssistantVisualElementAttachment>().Any(a => a.Element.Id == element.Id)) return;
-        attachments.Add(await Task.Run(() => CreateFromVisualElement(element)));
+        if (chatAttachments.OfType<ChatVisualElementAttachment>().Any(a => a.Element.Id == element.Id)) return;
+        chatAttachments.Add(await Task.Run(() => CreateFromVisualElement(element)));
     }
 
     [RelayCommand]
@@ -239,10 +242,10 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
             return;
         }
 
-        Attachments.Add(new AssistantFileAttachment(filePath, new DirectResourceKey(Path.GetFileName(filePath))));
+        ChatAttachments.Add(new ChatFileAttachment(new DirectResourceKey(Path.GetFileName(filePath)), filePath));
     }
 
-    private static AssistantVisualElementAttachment CreateFromVisualElement(IVisualElement element)
+    private static ChatVisualElementAttachment CreateFromVisualElement(IVisualElement element)
     {
         DynamicResourceKey headerKey;
 
@@ -256,8 +259,8 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
             headerKey = new DynamicResourceKey($"AssistantVisualElementAttachment_Header_{element.Type}");
         }
 
-        return new AssistantVisualElementAttachment(
-            element,
+        return new ChatVisualElementAttachment(
+            headerKey,
             element.Type switch
             {
                 VisualElementType.Label => LucideIconKind.Type,
@@ -268,7 +271,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
                 VisualElementType.TopLevel => LucideIconKind.AppWindow,
                 _ => LucideIconKind.Component
             },
-            headerKey);
+            element);
     }
 
     [RelayCommand]
@@ -281,7 +284,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
             CanCancel = true;
             try
             {
-                if (chatMessages.Count == 0) // new chat, add system prompt
+                if (ChatContext is not { } chatContext) // new chat, add system prompt
                 {
                     var renderedSystemPrompt = Prompts.RenderPrompt(
                         Prompts.DefaultSystemPrompt,
@@ -292,14 +295,14 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
                             { "SystemLanguage", () => new CultureInfo(Settings.Common.Language).DisplayName },
                         });
 
-                    chatMessages.Add(new SystemChatMessage(renderedSystemPrompt));
+                    ChatContext = chatContext = new ChatContext(renderedSystemPrompt);
                 }
 
                 UserChatMessage? userMessage = null;
                 if (message[0] == '/')
                 {
                     var commandString = message.IndexOf(' ') is var index and > 0 ? message[..index] : message;
-                    if (AssistantCommands?.FirstOrDefault(c => c.Command.Equals(commandString, StringComparison.OrdinalIgnoreCase)) is { } command)
+                    if (ChatCommands?.FirstOrDefault(c => c.Command.Equals(commandString, StringComparison.OrdinalIgnoreCase)) is { } command)
                     {
                         var commandArgument = message[commandString.Length..].Trim();
                         if (commandArgument.Length == 0)
@@ -307,9 +310,9 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
                             commandArgument = command.DefaultValueFactory?.Invoke() ?? string.Empty;
                         }
                         var userPrompt = string.Format(command.UserPrompt, commandArgument);
-                        userMessage = new UserChatMessage(userPrompt, attachments.AsValueEnumerable().ToList())
+                        userMessage = new UserChatMessage(userPrompt, chatAttachments.AsValueEnumerable().ToList())
                         {
-                            InlineCollection =
+                            Inlines =
                             {
                                 new Run(commandString) { TextDecorations = TextDecorations.Underline },
                                 new Run(' ' + commandArgument)
@@ -318,13 +321,18 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
                     }
                 }
 
-                userMessage ??= new UserChatMessage(message, attachments.AsValueEnumerable().ToList()) { InlineCollection = { message } };
-                chatMessages.Add(userMessage);
-                attachments.Clear();
+                userMessage ??= new UserChatMessage(message, chatAttachments.AsValueEnumerable().ToList())
+                {
+                    Inlines = { message }
+                };
+                chatContext.Add(userMessage);
+                chatAttachments.Clear();
 
                 var kernelMixin = kernelMixinFactory.Create();
                 await ProcessUserChatMessageAsync(userMessage, kernelMixin, cancellationToken);
-                await GenerateAsync(kernelMixin, cancellationToken);
+                var assistantChatMessage = new AssistantChatMessage { IsBusy = true };
+                chatContext.Add(assistantChatMessage);
+                await GenerateAsync(kernelMixin, chatContext, assistantChatMessage, cancellationToken);
             }
             finally
             {
@@ -334,15 +342,26 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
         cancellationToken: cancellationTokenSource.Token);
 
     [RelayCommand]
-    private Task RetryAsync(ChatMessage chatMessage) => ExecuteBusyTaskAsync(
-        cancellationToken =>
+    private Task RetryAsync(ChatMessageNode chatMessageNode)
+    {
+        if (chatMessageNode.Message.Role != AuthorRole.Assistant)
         {
-            var index = chatMessages.IndexOf(chatMessage);
-            if (index == -1) return Task.CompletedTask;
-            chatMessages.RemoveRange(index, chatMessages.Count - index); // TODO: history tree
-            return GenerateAsync(kernelMixinFactory.Create(), cancellationToken);
-        },
-        cancellationToken: cancellationTokenSource.Token);
+            return Task.FromException(new InvalidOperationException("Only assistant messages can be retried."));
+        }
+        if (ChatContext is not { } chatContext)
+        {
+            return Task.FromException(new InvalidOperationException("ChatContext is not initialized."));
+        }
+
+        return ExecuteBusyTaskAsync(
+            cancellationToken =>
+            {
+                var assistantChatMessage = new AssistantChatMessage { IsBusy = true };
+                chatContext.CreateBranchOn(chatMessageNode, assistantChatMessage);
+                return GenerateAsync(kernelMixinFactory.Create(), chatContext, assistantChatMessage, cancellationToken);
+            },
+            cancellationToken: cancellationTokenSource.Token);
+    }
 
     [RelayCommand]
     private Task CopyAsync(ChatMessage chatMessage) => clipboard.SetTextAsync(chatMessage.ToString());
@@ -359,7 +378,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
     [RelayCommand(CanExecute = nameof(CanCancel))]
     private void Cancel()
     {
-        Reset();
+        cancellationTokenSource.Cancel();
     }
 
     [RelayCommand]
@@ -373,9 +392,8 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
         cancellationTokenSource.Cancel();
         TargetBoundingRect = default;
         IsExpanded = false;
-        chatMessages.Clear();
         QuickActions = [];
-        AssistantCommands = [];
+        ChatCommands = [];
     }
 
     private async Task ProcessUserChatMessageAsync(
@@ -383,20 +401,27 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
         IKernelMixin kernelMixin,
         CancellationToken cancellationToken)
     {
+        if (ChatContext is not { } chatContext) throw new InvalidOperationException("ChatContext is not initialized.");
+
         var elements = userChatMessage
             .Attachments
-            .OfType<AssistantVisualElementAttachment>()
+            .OfType<ChatVisualElementAttachment>()
             .Select(a => a.Element)
-            .ToList();
+            .ToArray();
 
-        if (elements.Count > 0)
+        if (elements.Length <= 0) return;
+
+        var analyzingContextMessage = new ActionChatMessage(
+            new AuthorRole("action"),
+            LucideIconKind.TextSearch,
+            "ActionChatMessage_Header_AnalyzingContext")
         {
-            var analyzingContextMessage = new ActionChatMessage(
-                new AuthorRole("action"),
-                LucideIconKind.TextSearch,
-                "ActionChatMessage_Header_AnalyzingContext");
-            chatMessages.Add(analyzingContextMessage);
-            analyzingContextMessage.IsBusy = true;
+            IsBusy = true
+        };
+
+        try
+        {
+            chatContext.Add(analyzingContextMessage);
 
             var xmlBuilder = new VisualElementXmlBuilder(
                 elements,
@@ -412,13 +437,15 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
                             { "FocusedElementId", () => xmlBuilder.GetIdMap(cancellationToken)[elements[0].Id].ToString() },
                         }),
                 cancellationToken);
-            userChatMessage.ActualContent = renderedVisualTreePrompt + "\n\n" + userChatMessage.ActualContent;
-
+            userChatMessage.UserPrompt = renderedVisualTreePrompt + "\n\n" + userChatMessage.UserPrompt;
+        }
+        finally
+        {
             analyzingContextMessage.IsBusy = false;
         }
     }
 
-    private async Task GenerateAsync(IKernelMixin kernelMixin, CancellationToken cancellationToken)
+    private async Task GenerateAsync(IKernelMixin kernelMixin, ChatContext chatContext, AssistantChatMessage assistantChatMessage, CancellationToken cancellationToken)
     {
         // todo: maybe I need to move this builder to a better place (using DI)
         var modelSettings = Settings.Model;
@@ -452,11 +479,11 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
         var chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
 
         var chatHistory = new ChatHistory(
-            chatMessages
+            chatContext
+                .Select(n => n.Message)
+                .Where(m => !Equals(m, assistantChatMessage)) // exclude the current assistant message
                 .Where(m => m.Role.Label is "system" or "assistant" or "user" or "tool")
                 .Select(m => new ChatMessageContent(m.Role, m.ToString())));
-        var assistantMessage = new AssistantChatMessage();
-        chatMessages.Add(assistantMessage);
 
         try
         {
@@ -475,7 +502,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
                     if (streamingContent.Content is not null)
                     {
                         assistantContentBuilder.Append(streamingContent.Content);
-                        assistantMessage.InlineCollection.Add(streamingContent.Content);
+                        assistantChatMessage.MarkdownBuilder.Append(streamingContent.Content);
                     }
 
                     authorRole ??= streamingContent.Role;
@@ -487,6 +514,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
                 var functionCalls = functionCallContentBuilder.Build();
                 if (functionCalls.Count == 0) break;
 
+                // TODO: tool calling
                 var functionCallContent = new ChatMessageContent(authorRole ?? default, content: null);
                 chatHistory.Add(functionCallContent);
 
@@ -502,17 +530,20 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
                             "ActionChatMessage_Header_WebSearching"),
                         _ => throw new NotImplementedException()
                     };
-                    chatMessages.Insert(chatMessages.Count - 1, actionChatMessage);
+                    actionChatMessage.IsBusy = true;
+                    chatContext.Insert(chatContext.MessageCount - 1, actionChatMessage);
 
                     try
                     {
                         var resultContent = await functionCall.InvokeAsync(kernel, cancellationToken);
-                        chatHistory.Add(resultContent.ToChatMessage());
+                        var resultChatMessage = resultContent.ToChatMessage();
+                        chatHistory.Add(resultChatMessage);
+                        actionChatMessage.Content = resultChatMessage.Content;
                     }
                     catch (Exception ex)
                     {
-                        chatHistory.Add(new FunctionResultContent(functionCall, ex.Message).ToChatMessage());
-                        actionChatMessage.InlineCollection.Add($"Failed: {ex.Message}");
+                        chatHistory.Add(new FunctionResultContent(functionCall, $"Error: {ex.Message}").ToChatMessage());
+                        // actionChatMessage.InlineCollection.Add($"Failed: {ex.Message}");
                     }
                     finally
                     {
@@ -523,7 +554,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
         }
         finally
         {
-            assistantMessage.IsBusy = false;
+            assistantChatMessage.IsBusy = false;
         }
     }
 }

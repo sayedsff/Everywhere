@@ -4,6 +4,7 @@
 
     <Application.Styles>
         <themes:ShadTheme/>
+        <StyleInclude Source="avares://Everywhere.Markdown/MarkdownRenderer.axaml"/>
     </Application.Styles>
 
     <Application.Resources>
@@ -11,7 +12,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceInclude Source="avares://Everywhere/Assets/Resources.axaml"/>
                 <ResourceInclude Source="avares://Everywhere/I18N/Key.axaml"/>
-                <ResourceInclude Source="avares://Everywhere/Views/Controls/AssistantInputBox.axaml"/>
+                <ResourceInclude Source="avares://Everywhere/Views/Controls/ChatInputBox.axaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
