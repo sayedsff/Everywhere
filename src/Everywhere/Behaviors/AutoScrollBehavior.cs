@@ -37,16 +37,18 @@ public class AutoScrollBehavior : Behavior<ScrollViewer>
     {
         if (AssociatedObject is not { } scrollViewer) return;
 
+        if (e.Property != ScrollViewer.OffsetProperty &&
+            e.Property != ScrollViewer.ViewportProperty &&
+            e.Property != ScrollViewer.ExtentProperty) return;
+
         if (e.Property == ScrollViewer.OffsetProperty)
         {
             isAtEnd = e.NewValue.To<Vector>().Y >= scrollViewer.Extent.Height - scrollViewer.Viewport.Height;
         }
-        else if (e.Property == ScrollViewer.ViewportProperty)
+
+        if (Mode == AutoScrollBehaviorMode.Always || Mode == AutoScrollBehaviorMode.WhenAtEnd && isAtEnd)
         {
-            if (Mode == AutoScrollBehaviorMode.Always || Mode == AutoScrollBehaviorMode.WhenAtEnd && isAtEnd)
-            {
-                scrollViewer.Offset = new Vector(scrollViewer.Offset.X, double.PositiveInfinity);
-            }
+            scrollViewer.Offset = new Vector(scrollViewer.Offset.X, double.PositiveInfinity);
         }
     }
 }

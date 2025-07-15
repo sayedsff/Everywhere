@@ -9,7 +9,8 @@ namespace Everywhere.Initialization;
 public class AssistantInitializer(
     Settings settings,
     IHotkeyListener hotkeyListener,
-    IVisualElementContext visualElementContext) : IAsyncInitializer
+    IVisualElementContext visualElementContext
+) : IAsyncInitializer
 {
     public Task InitializeAsync()
     {
@@ -28,8 +29,8 @@ public class AssistantInitializer(
                 element = null;
             }
 
-            Dispatcher.UIThread.InvokeOnDemandAsync(
-                () => ServiceLocator.Resolve<AssistantFloatingWindow>().ViewModel.TryFloatToTargetElementAsync(element).Detach()).Detach();
+            Dispatcher.UIThread.InvokeOnDemandAsync(() =>
+                ServiceLocator.Resolve<AssistantFloatingWindow>().ViewModel.TryFloatToTargetElementAsync(element).Detach()).Detach();
         };
 
         // initialize hotkey listener
@@ -43,12 +44,16 @@ public class AssistantInitializer(
         hotkeyListener.KeyboardHotkey = settings.Behavior.AssistantHotkey;
         hotkeyListener.KeyboardHotkeyActivated += () =>
         {
-            var element = visualElementContext.KeyboardFocusedElement?.GetAncestors(true)
-                .CurrentAndNext().FirstOrDefault(t => t.Current.ProcessId != t.Next.ProcessId).Current ??
-                visualElementContext.PointerOverElement?.GetAncestors(true).LastOrDefault();
+            var element = visualElementContext.KeyboardFocusedElement?
+                    .GetAncestors(true)
+                    .CurrentAndNext()
+                    .FirstOrDefault(t => t.Current.Type == VisualElementType.TextEdit || t.Current.ProcessId != t.Next.ProcessId).Current ??
+                visualElementContext.PointerOverElement?
+                    .GetAncestors(true)
+                    .LastOrDefault();
             if (element == null) return;
-            Dispatcher.UIThread.InvokeOnDemandAsync(
-                () => ServiceLocator.Resolve<AssistantFloatingWindow>().ViewModel.TryFloatToTargetElementAsync(element, true).Detach()).Detach();
+            Dispatcher.UIThread.InvokeOnDemandAsync(() =>
+                ServiceLocator.Resolve<AssistantFloatingWindow>().ViewModel.TryFloatToTargetElementAsync(element, true).Detach()).Detach();
         };
         // hotkeyListener.PointerHotkeyActivated += point =>
         // {
