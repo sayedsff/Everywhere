@@ -2,7 +2,7 @@
 
 namespace Everywhere.Markdown;
 
-public readonly record struct ObservableStringBuilderChangedEventArgs(string NewString, int StartIndex, int Length );
+public readonly record struct ObservableStringBuilderChangedEventArgs(string NewString, int StartIndex, int Length);
 
 public delegate void ObservableStringBuilderChangedEventHandler(in ObservableStringBuilderChangedEventArgs e);
 

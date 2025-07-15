@@ -39,7 +39,7 @@
             <Style Selector="^ TextBlock.ListBlockNumber">
                 <Setter Property="Margin" Value="4,0"/>
                 <Setter Property="HorizontalAlignment" Value="Right"/>
-                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="VerticalAlignment" Value="Top"/>
             </Style>
 
             <Style Selector="^ Border.ListBlockBullet">
@@ -80,6 +80,8 @@
 
             <Style Selector="^ SelectableTextBlock">
                 <Setter Property="Foreground" Value="#D7BA7D"/>
+                <Setter Property="FontSize" Value="15"/>
+                <Setter Property="FontFamily" Value="Consolas, 'Courier New', monospace"/>
             </Style>
         </Style>
 

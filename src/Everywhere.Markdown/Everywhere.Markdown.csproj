@@ -5,6 +5,7 @@
         <PackageReference Include="ColorCode.Core"/>
         <PackageReference Include="Lucide.Avalonia"/>
         <PackageReference Include="Markdig"/>
+        <PackageReference Include="ZLinq" />
     </ItemGroup>
 
 </Project>

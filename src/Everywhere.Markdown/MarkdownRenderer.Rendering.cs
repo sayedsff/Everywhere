@@ -1,17 +1,18 @@
 ﻿// @author https://github.com/DearVa
 
 using System.Runtime.CompilerServices;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Layout;
 using Avalonia.Media;
 using ColorCode;
 using ColorCode.Styling;
-using Lucide.Avalonia;
 using Markdig.Extensions.Tables;
 using Markdig.Extensions.TaskLists;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
+using ZLinq;
 using AvaloniaDocs = Avalonia.Controls.Documents;
 
 namespace Everywhere.Markdown;
@@ -20,6 +21,12 @@ public partial class MarkdownRenderer
 {
     private abstract class MarkdownNode
     {
+        protected delegate void SelectedTextBlockUpdatedHandler(SelectableTextBlock selectableTextBlock, bool deleted);
+
+        protected static event SelectedTextBlockUpdatedHandler? SelectedTextBlockUpdated;
+
+        protected virtual SelectableTextBlock? SelectableTextBlock => null;
+
         /// <summary>
         /// records the source span of the block in the Markdown document.
         /// </summary>
@@ -41,6 +48,7 @@ public partial class MarkdownRenderer
             var result = IsCompatible(markdownObject) && UpdateCore(markdownObject, change, cancellationToken);
             PrintMetrics(markdownObject.GetType().Name);
             span = markdownObject.Span;
+            if (SelectableTextBlock is { } selectableTextBlock) SelectedTextBlockUpdated?.Invoke(selectableTextBlock, !result);
             return result;
         }
 
@@ -81,17 +89,6 @@ public partial class MarkdownRenderer
                     Classes = { "Literal" }
                 },
                 LineBreakInline => new FuncInlineNode<LineBreakInline, AvaloniaDocs.LineBreak>((_, _) => true),
-                CodeInline => new FuncInlineNode<CodeInline, AvaloniaDocs.InlineUIContainer>((code, avaloniaInline) =>
-                {
-                    if (avaloniaInline.Child is not Border border) avaloniaInline.Child = border = new Border { Classes = { "Code" } };
-                    if (border.Child is not SelectableTextBlock textBlock)
-                        border.Child = textBlock = new SelectableTextBlock { Classes = { "Code" } };
-                    textBlock.Text = code.Content;
-                    return true;
-                })
-                {
-                    Classes = { "Code" }
-                },
                 AutolinkInline => new FuncInlineNode<AutolinkInline, InlineHyperlink>((autolink, avaloniaInline) =>
                 {
                     Uri.TryCreate(autolink.Url, UriKind.RelativeOrAbsolute, out var uri);
@@ -135,6 +132,7 @@ public partial class MarkdownRenderer
                     Classes = { "HtmlEntity" }
                 },
                 HtmlInline => new FuncInlineNode<HtmlInline, AvaloniaDocs.Run>((_, _) => true), // TODO: Implement HTML rendering
+                CodeInline => new CodeInlineNode(),
                 LinkInline => new LinkInlineNode(),
                 EmphasisInline => new EmphasisInlineNode(),
                 ContainerInline => new ContainerInlineNode(),
@@ -242,6 +240,44 @@ public partial class MarkdownRenderer
         protected override bool IsCompatible(MarkdownObject markdownObject)
         {
             return markdownObject is ContainerInline;
+        }
+    }
+
+    private class CodeInlineNode : InlineNode
+    {
+        protected override SelectableTextBlock SelectableTextBlock => selectableTextBlock;
+
+        public override AvaloniaDocs.Inline Inline => inlineUIContainer;
+
+        private readonly AvaloniaDocs.InlineUIContainer inlineUIContainer;
+        private readonly SelectableTextBlock selectableTextBlock;
+
+        public CodeInlineNode()
+        {
+            inlineUIContainer = new AvaloniaDocs.InlineUIContainer
+            {
+                Classes = { "Code" },
+                Child = new Border
+                {
+                    Classes = { "Code" },
+                    Child = selectableTextBlock = new SelectableTextBlock
+                    {
+                        Classes = { "Code" }
+                    }
+                }
+            };
+        }
+
+        protected override bool IsCompatible(MarkdownObject markdownObject)
+        {
+            return markdownObject is CodeInline;
+        }
+
+        protected override bool UpdateCore(MarkdownObject markdownObject, in ObservableStringBuilderChangedEventArgs change, CancellationToken cancellationToken)
+        {
+            var code = Unsafe.As<CodeInline>(markdownObject);
+            selectableTextBlock.Text = code.Content;
+            return true;
         }
     }
 
@@ -399,6 +435,8 @@ public partial class MarkdownRenderer
     /// </summary>
     private class InlineCollectionNode : BlockNode
     {
+        protected override SelectableTextBlock SelectableTextBlock => selectableTextBlock;
+
         public override Control Control => selectableTextBlock;
 
         private readonly InlinesNode inlinesNode;
@@ -480,7 +518,7 @@ public partial class MarkdownRenderer
             }
 
             var rowIndex = 0;
-            foreach (var row in table.OfType<TableRow>())
+            foreach (var row in table.AsValueEnumerable().OfType<TableRow>())
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
@@ -489,7 +527,7 @@ public partial class MarkdownRenderer
                     container.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
                 }
 
-                foreach (var (cell, columnIndex) in row.OfType<TableCell>().Select((c, i) => (c, i)))
+                foreach (var (cell, columnIndex) in row.AsValueEnumerable().OfType<TableCell>().Select((c, i) => (c, i)))
                 {
                     cancellationToken.ThrowIfCancellationRequested();
 
@@ -736,6 +774,8 @@ public partial class MarkdownRenderer
 
     private class CodeBlockNode : BlockNode
     {
+        protected override SelectableTextBlock SelectableTextBlock => codeTextBlock;
+
         public override Control Control { get; }
 
         private SyntaxHighlighting? syntaxHighlighting;
@@ -796,7 +836,7 @@ public partial class MarkdownRenderer
             if (codeBlock.Lines.Lines is null) return false;
 
             var inlines = codeTextBlock.Inlines ?? throw new InvalidOperationException("This should never happen");
-            foreach (var (slice, i) in codeBlock.Lines.Lines.Take(codeBlock.Lines.Count).Select((l, i) => (l.Slice, i * 2)))
+            foreach (var (slice, i) in codeBlock.Lines.Lines.AsValueEnumerable().Take(codeBlock.Lines.Count).Select((l, i) => (l.Slice, i * 2)))
             {
                 // Skip if the slice is completely outside the change range
                 if (inlines.Count > i &&
@@ -877,10 +917,7 @@ public partial class MarkdownRenderer
 
         public HeadingBlockNode()
         {
-            headingText = new InlineCollectionNode
-            {
-                Classes = { "Heading3" }
-            };
+            headingText = new InlineCollectionNode();
             Control = new Border
             {
                 Classes = { "HeadingBlock" },
@@ -962,7 +999,8 @@ public partial class MarkdownRenderer
             var containerBlock = Unsafe.As<ContainerBlock>(markdownObject);
             if (containerBlock.Count == 0) return false;
 
-            for (var i = 0; i < containerBlock.Count; i++)
+            var i = 0;
+            for (; i < containerBlock.Count; i++)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 var block = containerBlock[i];
@@ -983,6 +1021,12 @@ public partial class MarkdownRenderer
                     var newNode = CreateBlockNode(block, change, cancellationToken);
                     if (newNode is not null) proxy.Add(newNode);
                 }
+            }
+
+            for (var j = proxy.Count - 1; j >= i; j--)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                proxy.RemoveAt(j);
             }
 
             return true;
@@ -1009,9 +1053,30 @@ public partial class MarkdownRenderer
 
     private class DocumentNode : ContainerBlockNode
     {
+        public IReadOnlyDictionary<SelectableTextBlock, Rect> SelectableTextBlockBounds => selectableTextBlockBounds;
+
+        private readonly Dictionary<SelectableTextBlock, Rect> selectableTextBlockBounds = new();
+
         public DocumentNode()
         {
             Classes[0] = "MarkdownDocument";
+            SelectedTextBlockUpdated += HandleSelectedTextBlockUpdated;
+        }
+
+        ~DocumentNode()
+        {
+            SelectedTextBlockUpdated -= HandleSelectedTextBlockUpdated;
+        }
+
+        private void HandleSelectedTextBlockUpdated(SelectableTextBlock selectableTextBlock, bool deleted)
+        {
+            if (deleted) selectableTextBlockBounds.Remove(selectableTextBlock);
+            else
+            {
+                var bounds = selectableTextBlock.Bounds;
+                var position = selectableTextBlock.TranslatePoint(new Point(bounds.X, bounds.Y), Control) ?? new Point();
+                selectableTextBlockBounds[selectableTextBlock] = new Rect(position, bounds.Size);
+            }
         }
 
         protected override bool IsCompatible(MarkdownObject markdownObject)

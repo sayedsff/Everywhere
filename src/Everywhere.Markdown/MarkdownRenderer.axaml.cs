@@ -3,18 +3,39 @@
 // @author https://github.com/SlimeNull
 
 using System.Diagnostics;
-using System.Threading.Channels;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Threading;
 using Markdig;
 
 namespace Everywhere.Markdown;
 
 public partial class MarkdownRenderer : Control
 {
-    public ObservableStringBuilder MarkdownBuilder { get; } = new();
+    public static readonly DirectProperty<MarkdownRenderer, ObservableStringBuilder?> MarkdownBuilderProperty =
+        AvaloniaProperty.RegisterDirect<MarkdownRenderer, ObservableStringBuilder?>(
+            nameof(MarkdownBuilder),
+            o => o.MarkdownBuilder,
+            (o, v) => o.MarkdownBuilder = v);
 
-    private Channel<ObservableStringBuilderChangedEventArgs>? renderChannel;
+    public ObservableStringBuilder? MarkdownBuilder
+    {
+        get;
+        set
+        {
+            var oldValue = field;
+            if (!SetAndRaise(MarkdownBuilderProperty, ref field, value)) return;
+
+            if (oldValue is not null) oldValue.Changed -= CommitChange;
+            if (value is not null)
+            {
+                value.Changed += CommitChange;
+                CommitChange(new ObservableStringBuilderChangedEventArgs(value.ToString(), 0, value.Length));
+            }
+        }
+    }
+
+    private ObservableStringBuilderChangedEventArgs? pendingChange;
 
     private readonly DocumentNode documentNode = new();
     private readonly MarkdownPipeline pipeline = new MarkdownPipelineBuilder()
@@ -26,85 +47,52 @@ public partial class MarkdownRenderer : Control
     {
         LogicalChildren.Add(documentNode.Control);
         VisualChildren.Add(documentNode.Control);
-        MarkdownBuilder.Changed += HandleMarkdownBuilderChanged;
+
+        //AddHandler(PointerPressedEvent, HandlePointerPressed, RoutingStrategies.Tunnel);
+        //AddHandler(PointerMovedEvent, HandlePointerMoved, RoutingStrategies.Tunnel);
+        //AddHandler(PointerReleasedEvent, HandlePointerReleased, RoutingStrategies.Tunnel);
     }
 
-    private async void RenderProcessAsync(ChannelReader<ObservableStringBuilderChangedEventArgs> reader)
+    protected override async void ArrangeCore(Rect finalRect)
     {
-        try
+        if (pendingChange is { } e)
         {
-            while (await reader.WaitToReadAsync())
+            pendingChange = null;
+
+            try
             {
-                while (reader.TryRead(out var e))
-                {
-                    var markdown = e.NewString;
-                    var timer = Stopwatch.StartNew();
-                    var document = await Task.Run(() => Markdig.Markdown.Parse(markdown, pipeline));
-                    PrintMetrics($"Parse markdown in {timer.Elapsed.TotalMicroseconds} micro sec.");
-                    timer.Restart();
-                    documentNode.Update(document, e, CancellationToken.None);
-                    PrintMetrics($"Render markdown in {timer.Elapsed.TotalMicroseconds} micro sec.");
-                }
+                var markdown = e.NewString;
+                var timer = Stopwatch.StartNew();
+                var document = await Task.Run(() => Markdig.Markdown.Parse(markdown, pipeline));
+                PrintMetrics($"Parse markdown in {timer.Elapsed.TotalMicroseconds} micro sec.");
+
+                timer.Restart();
+                documentNode.Update(document, e, CancellationToken.None);
+                PrintMetrics($"Render markdown in {timer.Elapsed.TotalMicroseconds} micro sec.");
+            }
+            catch (OperationCanceledException) { }
+            catch (Exception ex)
+            {
+                await Console.Error.WriteAsync($"Error while rendering markdown: {ex.Message}");
             }
         }
-        catch (OperationCanceledException) { }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error rendering markdown\n{ex}");
-        }
+
+        base.ArrangeCore(finalRect);
     }
 
-    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    private void CommitChange(in ObservableStringBuilderChangedEventArgs e)
     {
-        base.OnPropertyChanged(change);
+        Dispatcher.UIThread.VerifyAccess();
 
-        if (change.Property != IsVisibleProperty) return;
-        if (change.NewValue is true)
-        {
-            BeginRender();
-        }
+        if (pendingChange is null) pendingChange = e;
         else
         {
-            EndRender();
+            pendingChange = new ObservableStringBuilderChangedEventArgs(
+                e.NewString,
+                Math.Min(pendingChange.Value.StartIndex, e.StartIndex),
+                Math.Max(pendingChange.Value.Length, e.Length));
         }
-    }
 
-    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
-    {
-        base.OnAttachedToVisualTree(e);
-        if (IsVisible)
-        {
-            BeginRender();
-        }
-    }
-
-    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
-    {
-        base.OnDetachedFromVisualTree(e);
-        EndRender();
-    }
-
-    private void BeginRender()
-    {
-        if (renderChannel is not null) return;
-        renderChannel = Channel.CreateUnbounded<ObservableStringBuilderChangedEventArgs>();
-        RenderProcessAsync(renderChannel);
-        renderChannel.Writer.TryWrite(
-            new ObservableStringBuilderChangedEventArgs(
-                MarkdownBuilder.ToString(),
-                0,
-                MarkdownBuilder.Length));
-    }
-
-    private void EndRender()
-    {
-        if (renderChannel is null) return;
-        renderChannel.Writer.Complete();
-        renderChannel = null;
-    }
-
-    private void HandleMarkdownBuilderChanged(in ObservableStringBuilderChangedEventArgs e)
-    {
-        renderChannel?.Writer.WriteAsync(e).AsTask().Wait();
+        InvalidateArrange();
     }
 }
