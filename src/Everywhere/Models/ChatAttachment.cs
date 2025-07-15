@@ -1,5 +1,5 @@
-﻿using Avalonia.Media.Imaging;
-using Everywhere.Serialization;
+﻿using System.Diagnostics.CodeAnalysis;
+using Avalonia.Media.Imaging;
 using Lucide.Avalonia;
 using MessagePack;
 
@@ -19,15 +19,30 @@ public abstract partial class ChatAttachment(DynamicResourceKey headerKey)
 }
 
 [MessagePackObject(AllowPrivate = true, OnlyIncludeKeyedMembers = true)]
-public partial class ChatVisualElementAttachment(DynamicResourceKey headerKey, LucideIconKind icon, IVisualElement element)
-    : ChatAttachment(headerKey)
+public partial class ChatVisualElementAttachment : ChatAttachment
 {
     [Key(1)]
-    public override LucideIconKind Icon => icon;
+    public override LucideIconKind Icon { get; }
 
-    [Key(2)]
-    [MessagePackFormatter(typeof(VisualElementMessagePackFormatter))]
-    public IVisualElement Element => element;
+    /// <summary>
+    /// Ignore this property during serialization because it should already be converted into prompts and shouldn't appear in history.
+    /// </summary>
+    [IgnoreMember]
+    [field: AllowNull, MaybeNull]
+    public IVisualElement Element =>
+        field ?? throw new InvalidOperationException("Element is not set. This attachment should not be serialized without an element.");
+
+    [SerializationConstructor]
+    private ChatVisualElementAttachment(DynamicResourceKey headerKey, LucideIconKind icon) : base(headerKey)
+    {
+        Icon = icon;
+    }
+
+    public ChatVisualElementAttachment(DynamicResourceKey headerKey, LucideIconKind icon, IVisualElement element) : base(headerKey)
+    {
+        Icon = icon;
+        Element = element;
+    }
 }
 
 [MessagePackObject(AllowPrivate = true, OnlyIncludeKeyedMembers = true)]
