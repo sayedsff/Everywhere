@@ -2,6 +2,8 @@
 using System.Reflection;
 using Everywhere.Attributes;
 using Everywhere.Models;
+using MessagePack;
+using ZLinq;
 
 namespace Everywhere.ViewModels;
 
@@ -14,6 +16,8 @@ public class SettingsPageViewModel : ReactiveViewModelBase
         var itemMap = new Dictionary<string, SettingsItemBase>();
         Groups = typeof(Settings)
             .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+            .AsValueEnumerable()
+            .Where(p => p.GetCustomAttribute<IgnoreMemberAttribute>() is null)
             .Where(p => p.PropertyType.IsAssignableTo(typeof(SettingsBase)))
             .Select(
                 p =>
@@ -23,7 +27,9 @@ public class SettingsPageViewModel : ReactiveViewModelBase
                         p.Name,
                         p.PropertyType
                             .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                            .AsValueEnumerable()
                             .Where(pp => pp is { CanRead: true, CanWrite: true })
+                            .Where(pp => pp.GetCustomAttribute<IgnoreMemberAttribute>() is null)
                             .Select(
                                 pp =>
                                 {
@@ -165,8 +171,8 @@ public class SettingsPageViewModel : ReactiveViewModelBase
                                     return null;
                                 })
                             .OfType<SettingsItemBase>()
-                            .ToReadOnlyList());
-                }).ToReadOnlyList();
+                            .ToImmutableArray());
+                }).ToImmutableArray();
     }
 
     private class SettingsValueProxy<T> : IValueProxy<T>, INotifyPropertyChanged

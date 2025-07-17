@@ -68,3 +68,9 @@ public partial class FormattedDynamicResourceKey(object key, params object?[] ar
                 observer.OnNext(string.Format(o?.ToString() ?? string.Empty, args));
             }));
 }
+
+[AttributeUsage(AttributeTargets.All)]
+public class DynamicResourceKeyAttribute(string key) : Attribute
+{
+    public string Key { get; } = key;
+}

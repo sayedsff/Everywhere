@@ -1,8 +1,10 @@
 ﻿using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Everywhere.Attributes;
 using Everywhere.I18N;
+using MessagePack;
 using Microsoft.Extensions.Configuration;
 
 namespace Everywhere.Models;
@@ -15,12 +17,13 @@ public class SettingsBase(string section) : ObservableObject
     {
         base.OnPropertyChanged(e);
         if (Configuration == null) return;
-        if (section.Length == 0) Configuration.Set(this);
+        if (section.Length == 0) Configuration.Set(this); // TODO: throttle
         else Configuration.Set(section, this);
     }
 }
 
 [Serializable]
+[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
 public class Settings
 {
     public CommonSettings Common { get; init; } = new();
@@ -28,6 +31,9 @@ public class Settings
     public BehaviorSettings Behavior { get; init; } = new();
 
     public ModelSettings Model { get; init; } = new();
+
+    [IgnoreMember]
+    public InternalSettings Internal { get; init; } = new();
 }
 
 public partial class CommonSettings() : SettingsBase("Common")
@@ -86,21 +92,16 @@ public partial class ModelSettings() : SettingsBase("Model")
     public partial double TopP { get; set; } = 1.0;
 
     [ObservableProperty]
-    public partial bool IsImageEnabled { get; set; }
+    public partial bool IsImageSupported { get; set; }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsWebSearchEnabled))]
-    public partial bool IsToolCallEnabled { get; set; }
-
-    [SettingsGroup(nameof(IsToolCallEnabled))]
-    public bool IsWebSearchEnabled
-    {
-        get => IsToolCallEnabled && field;
-        set => SetProperty(ref field, value);
-    }
+    public partial bool IsToolCallSupported { get; set; }
 
     [ObservableProperty]
-    [SettingsGroup(nameof(IsWebSearchEnabled))]
+    public partial bool IsWebSearchSupported { get; set; }
+
+    [ObservableProperty]
+    [SettingsGroup(nameof(IsWebSearchSupported))]
     [SettingsSelectionItem(ItemsSource = nameof(WebSearchProviders))]
     public partial string WebSearchProvider { get; set; } = "bing";
 
@@ -108,11 +109,25 @@ public partial class ModelSettings() : SettingsBase("Model")
     public static IEnumerable<string> WebSearchProviders => ["bing", "brave", "bocha"]; // TODO: google
 
     [ObservableProperty]
-    [SettingsGroup(nameof(IsWebSearchEnabled))]
+    [SettingsGroup(nameof(IsWebSearchSupported))]
     [SettingsStringItem(IsPassword = true)]
     public partial string WebSearchApiKey { get; set; } = string.Empty;
 
     [ObservableProperty]
-    [SettingsGroup(nameof(IsWebSearchEnabled))]
+    [SettingsGroup(nameof(IsWebSearchSupported))]
     public partial string WebSearchEndpoint { get; set; } = string.Empty;
+}
+
+public partial class InternalSettings() : SettingsBase("Internal")
+{
+    [ObservableProperty]
+    public partial bool IsImageEnabled { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsToolCallEnabled { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsWebSearchEnabled { get; set; }
+
+    public int MaxChatAttachmentCount { get; set; } = 10;
 }

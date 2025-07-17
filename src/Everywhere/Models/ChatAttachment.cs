@@ -55,12 +55,34 @@ public partial class ChatTextAttachment(DynamicResourceKey headerKey, string tex
 }
 
 [MessagePackObject(AllowPrivate = true, OnlyIncludeKeyedMembers = true)]
-public partial class ChatImageAttachment(DynamicResourceKey headerKey, Bitmap image) : ChatAttachment(headerKey)
+public partial class ChatImageAttachment : ChatAttachment
 {
     public override LucideIconKind Icon => LucideIconKind.Image;
 
+    public WriteableBitmap Image { get; }
+
     [Key(1)]
-    public Bitmap Image => image;
+    private byte[] ImageData
+    {
+        get
+        {
+            var stream = new MemoryStream();
+            Image.Save(stream, 100);
+            return stream.ToArray();
+        }
+    }
+
+    [SerializationConstructor]
+    private ChatImageAttachment(DynamicResourceKey headerKey, byte[] imageData) : base(headerKey)
+    {
+        using var stream = new MemoryStream(imageData);
+        Image = WriteableBitmap.Decode(stream);
+    }
+
+    public ChatImageAttachment(DynamicResourceKey headerKey, WriteableBitmap image) : base(headerKey)
+    {
+        Image = image;
+    }
 }
 
 [MessagePackObject(AllowPrivate = true, OnlyIncludeKeyedMembers = true)]

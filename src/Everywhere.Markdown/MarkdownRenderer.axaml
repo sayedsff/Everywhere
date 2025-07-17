@@ -40,6 +40,7 @@
                 <Setter Property="Margin" Value="4,0"/>
                 <Setter Property="HorizontalAlignment" Value="Right"/>
                 <Setter Property="VerticalAlignment" Value="Top"/>
+                <Setter Property="FontFamily" Value="Consolas, 'Courier New', monospace"/>
             </Style>
 
             <Style Selector="^ Border.ListBlockBullet">
@@ -73,7 +74,7 @@
         <Style Selector="^ InlineUIContainer.Code">
             <Style Selector="^ Border">
                 <Setter Property="Padding" Value="2,1"/>
-                <Setter Property="Margin" Value="0,1,0,-1"/>
+                <Setter Property="Margin" Value="2,5,2,-1"/>
                 <Setter Property="CornerRadius" Value="3"/>
                 <Setter Property="Background" Value="{DynamicResource SecondaryCardBackgroundColor}"/>
             </Style>
@@ -100,17 +101,20 @@
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="CornerRadius" Value="4"/>
             <Setter Property="Margin" Value="0,8"/>
-            <Setter Property="Padding" Value="8,6"/>
+
+            <Style Selector="^ SelectableTextBlock">
+                <Setter Property="Margin" Value="8,6"/>
+            </Style>
 
             <Style Selector="^ Button.CodeBlock">
                 <Setter Property="Grid.Column" Value="1"/>
-                <Setter Property="Margin" Value="8,0,0,0"/>
-                <Setter Property="VerticalAlignment" Value="Top"/>
+                <Setter Property="Margin" Value="4,6"/>
+                <Setter Property="VerticalAlignment" Value="Bottom"/>
 
                 <Setter Property="Template">
                     <ControlTemplate>
                         <Border
-                            Name="RootBorder" Padding="4,0"
+                            Name="RootBorder"
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"

@@ -20,7 +20,8 @@ public abstract partial class ChatMessage : ObservableObject
 
     [IgnoreMember]
     [JsonIgnore]
-    public bool IsBusy { get; set; }
+    [ObservableProperty]
+    public partial bool IsBusy { get; set; }
 }
 
 [MessagePackObject(OnlyIncludeKeyedMembers = true)]

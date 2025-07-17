@@ -1,7 +1,7 @@
-﻿using System.Diagnostics;
+﻿using System.ComponentModel;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Text;
 using Avalonia.Controls.Documents;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
@@ -9,22 +9,12 @@ using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Everywhere.Assistant;
 using Everywhere.Models;
 using Everywhere.Utils;
 using Lucide.Avalonia;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.ChatCompletion;
-using Microsoft.SemanticKernel.Connectors.OpenAI;
-using Microsoft.SemanticKernel.Plugins.Web;
-using Microsoft.SemanticKernel.Plugins.Web.Bing;
-using Microsoft.SemanticKernel.Plugins.Web.Brave;
-using Microsoft.SemanticKernel.TextGeneration;
 using ObservableCollections;
 using ZLinq;
 using ChatMessage = Everywhere.Models.ChatMessage;
-using Prompts = Everywhere.Assistant.Prompts;
 
 namespace Everywhere.ViewModels;
 
@@ -54,36 +44,32 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
     [ObservableProperty]
     public partial bool IsExpanded { get; set; }
 
-    public NotifyCollectionChangedSynchronizedViewList<ChatMessageNode>? ChatMessageNodes =>
-        ChatContext?.ToNotifyCollectionChanged(
-            v => v.AttachFilter(m => m.Message.Role != AuthorRole.System),
-            SynchronizationContextCollectionEventDispatcher.Current);
+    public IChatContextManager ChatContextManager { get; }
 
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(ChatMessageNodes))]
-    public partial ChatContext? ChatContext { get; private set; }
+    public IChatService ChatService { get; }
 
     private readonly IVisualElementContext visualElementContext;
     private readonly IClipboard clipboard;
     private readonly IStorageProvider storageProvider;
-    private readonly IKernelMixinFactory kernelMixinFactory;
 
     private readonly ObservableList<ChatAttachment> chatAttachments = [];
     private readonly ReusableCancellationTokenSource cancellationTokenSource = new();
 
     public AssistantFloatingWindowViewModel(
+        IChatContextManager chatContextManager,
+        IChatService chatService,
+        Settings settings,
         IVisualElementContext visualElementContext,
         IClipboard clipboard,
-        IStorageProvider storageProvider,
-        IKernelMixinFactory kernelMixinFactory,
-        Settings settings)
+        IStorageProvider storageProvider)
     {
+        ChatContextManager = chatContextManager;
+        ChatService = chatService;
+        Settings = settings;
+
         this.visualElementContext = visualElementContext;
         this.clipboard = clipboard;
         this.storageProvider = storageProvider;
-        this.kernelMixinFactory = kernelMixinFactory;
-
-        Settings = settings;
 
         InitializeCommands();
     }
@@ -96,7 +82,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
                 LucideIconKind.Languages,
                 "AssistantFloatingWindowViewModel_TextEditActions_Translate",
                 null,
-                ProcessChatMessageSentCommand,
+                SendMessageCommand,
                 $"Translate the content in focused element to {new CultureInfo(Settings.Common.Language).Name}. " +
                 $"If it's already in target language, translate it to English. " +
                 $"You MUST only reply with the translated content, without any other text or explanation"
@@ -105,7 +91,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
                 LucideIconKind.StepForward,
                 "AssistantFloatingWindowViewModel_TextEditActions_ContinueWriting",
                 null,
-                ProcessChatMessageSentCommand,
+                SendMessageCommand,
                 "I have already written a beginning as the content of the focused element. " +
                 "You MUST imitate my writing style and tone, then continue writing in my perspective. " +
                 "You MUST only reply with the continue written content, without any other text or explanation"
@@ -114,7 +100,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
                 LucideIconKind.ScrollText,
                 "AssistantFloatingWindowViewModel_TextEditActions_Summarize",
                 null,
-                ProcessChatMessageSentCommand,
+                SendMessageCommand,
                 "Please summarize the content in focused element. " +
                 "You MUST only reply with the summarize content, without any other text or explanation"
             )
@@ -195,17 +181,22 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
             cancellationToken: cancellationToken);
     }
 
-    [RelayCommand]
+
+    [RelayCommand(CanExecute = nameof(IsNotBusy))]
     private async Task AddElementAsync(PickElementMode mode)
     {
+        if (chatAttachments.Count >= Settings.Internal.MaxChatAttachmentCount) return;
+
         if (await visualElementContext.PickElementAsync(mode) is not { } element) return;
         if (chatAttachments.OfType<ChatVisualElementAttachment>().Any(a => a.Element.Id == element.Id)) return;
         chatAttachments.Add(await Task.Run(() => CreateFromVisualElement(element)));
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsNotBusy))]
     private async Task AddClipboardAsync()
     {
+        if (chatAttachments.Count >= Settings.Internal.MaxChatAttachmentCount) return;
+
         var formats = await clipboard.GetFormatsAsync();
         if (formats.Length == 0)
         {
@@ -213,15 +204,33 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
             return;
         }
 
-        if (formats[0] == DataFormats.Text)
+        if (formats.Contains(DataFormats.Files))
         {
-
+            var files = await clipboard.GetDataAsync(DataFormats.Files);
+            if (files is IEnumerable enumerable)
+            {
+                foreach (var storageItem in enumerable.OfType<IStorageItem>())
+                {
+                    var uri = storageItem.Path;
+                    if (!uri.IsFile) break;
+                    AddFile(uri.AbsolutePath);
+                    if (chatAttachments.Count >= Settings.Internal.MaxChatAttachmentCount) break;
+                }
+            }
+        }
+        else if (formats.Contains(DataFormats.Text))
+        {
+            var text = await clipboard.GetTextAsync();
+            if (text.IsNullOrEmpty()) return;
+            chatAttachments.Add(new ChatTextAttachment(new DirectResourceKey(text.SafeSubstring(0, 10)), text));
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsNotBusy))]
     private async Task AddFileAsync()
     {
+        if (chatAttachments.Count >= Settings.Internal.MaxChatAttachmentCount) return;
+
         var files = await storageProvider.OpenFilePickerAsync(new FilePickerOpenOptions());
         if (files.Count <= 0) return;
         if (files[0].TryGetLocalPath() is not { } filePath)
@@ -242,7 +251,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
             return;
         }
 
-        ChatAttachments.Add(new ChatFileAttachment(new DirectResourceKey(Path.GetFileName(filePath)), filePath));
+        chatAttachments.Add(new ChatFileAttachment(new DirectResourceKey(Path.GetFileName(filePath)), filePath));
     }
 
     private static ChatVisualElementAttachment CreateFromVisualElement(IVisualElement element)
@@ -274,112 +283,59 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
             element);
     }
 
-    [RelayCommand]
-    private Task ProcessChatMessageSentAsync(string message) => ExecuteBusyTaskAsync(
+    [RelayCommand(CanExecute = nameof(IsNotBusy))]
+    private Task SendMessage(string message) => ExecuteBusyTaskAsync(
         async cancellationToken =>
         {
             message = message.Trim();
             if (message.Length == 0) return;
 
-            CanCancel = true;
-            try
+            UserChatMessage? userMessage = null;
+            if (message[0] == '/')
             {
-                if (ChatContext is not { } chatContext) // new chat, add system prompt
+                var commandString = message.IndexOf(' ') is var index and > 0 ? message[..index] : message;
+                if (ChatCommands?.FirstOrDefault(c => c.Command.Equals(commandString, StringComparison.OrdinalIgnoreCase)) is { } command)
                 {
-                    var renderedSystemPrompt = Prompts.RenderPrompt(
-                        Prompts.DefaultSystemPrompt,
-                        new Dictionary<string, Func<string>>
-                        {
-                            { "OS", () => Environment.OSVersion.ToString() },
-                            { "Time", () => DateTime.Now.ToString("F") },
-                            { "SystemLanguage", () => new CultureInfo(Settings.Common.Language).DisplayName },
-                        });
-
-                    ChatContext = chatContext = new ChatContext(renderedSystemPrompt);
-                }
-
-                UserChatMessage? userMessage = null;
-                if (message[0] == '/')
-                {
-                    var commandString = message.IndexOf(' ') is var index and > 0 ? message[..index] : message;
-                    if (ChatCommands?.FirstOrDefault(c => c.Command.Equals(commandString, StringComparison.OrdinalIgnoreCase)) is { } command)
+                    var commandArgument = message[commandString.Length..].Trim();
+                    if (commandArgument.Length == 0)
                     {
-                        var commandArgument = message[commandString.Length..].Trim();
-                        if (commandArgument.Length == 0)
-                        {
-                            commandArgument = command.DefaultValueFactory?.Invoke() ?? string.Empty;
-                        }
-                        var userPrompt = string.Format(command.UserPrompt, commandArgument);
-                        userMessage = new UserChatMessage(userPrompt, chatAttachments.AsValueEnumerable().ToList())
-                        {
-                            Inlines =
-                            {
-                                new Run(commandString) { TextDecorations = TextDecorations.Underline },
-                                new Run(' ' + commandArgument)
-                            }
-                        };
+                        commandArgument = command.DefaultValueFactory?.Invoke() ?? string.Empty;
                     }
+                    var userPrompt = string.Format(command.UserPrompt, commandArgument);
+                    userMessage = new UserChatMessage(userPrompt, chatAttachments.AsValueEnumerable().ToList())
+                    {
+                        Inlines =
+                        {
+                            new Run(commandString) { TextDecorations = TextDecorations.Underline },
+                            new Run(' ' + commandArgument)
+                        }
+                    };
                 }
-
-                userMessage ??= new UserChatMessage(message, chatAttachments.AsValueEnumerable().ToList())
-                {
-                    Inlines = { message }
-                };
-                chatContext.Add(userMessage);
-                chatAttachments.Clear();
-
-                var kernelMixin = kernelMixinFactory.Create();
-                await ProcessUserChatMessageAsync(userMessage, kernelMixin, cancellationToken);
-                var assistantChatMessage = new AssistantChatMessage { IsBusy = true };
-                chatContext.Add(assistantChatMessage);
-                await GenerateAsync(kernelMixin, chatContext, assistantChatMessage, cancellationToken);
             }
-            finally
+
+            userMessage ??= new UserChatMessage(message, chatAttachments.AsValueEnumerable().ToImmutableArray())
             {
-                CanCancel = false;
-            }
+                Inlines = { message }
+            };
+            chatAttachments.Clear();
+
+            await ChatService.SendMessageAsync(userMessage, cancellationToken);
         },
         cancellationToken: cancellationTokenSource.Token);
 
-    [RelayCommand]
-    private Task RetryAsync(ChatMessageNode chatMessageNode)
-    {
-        if (chatMessageNode.Message.Role != AuthorRole.Assistant)
-        {
-            return Task.FromException(new InvalidOperationException("Only assistant messages can be retried."));
-        }
-        if (ChatContext is not { } chatContext)
-        {
-            return Task.FromException(new InvalidOperationException("ChatContext is not initialized."));
-        }
+    [RelayCommand(CanExecute = nameof(IsNotBusy))]
+    private Task RetryAsync(ChatMessageNode chatMessageNode) => ExecuteBusyTaskAsync(
+        cancellationToken => ChatService.RetryAsync(chatMessageNode, cancellationToken),
+        cancellationToken: cancellationTokenSource.Token);
 
-        return ExecuteBusyTaskAsync(
-            cancellationToken =>
-            {
-                var assistantChatMessage = new AssistantChatMessage { IsBusy = true };
-                chatContext.CreateBranchOn(chatMessageNode, assistantChatMessage);
-                return GenerateAsync(kernelMixinFactory.Create(), chatContext, assistantChatMessage, cancellationToken);
-            },
-            cancellationToken: cancellationTokenSource.Token);
-    }
-
-    [RelayCommand]
-    private Task CopyAsync(ChatMessage chatMessage) => clipboard.SetTextAsync(chatMessage.ToString());
-
-    public bool CanCancel
-    {
-        get;
-        private set
-        {
-            if (SetProperty(ref field, value)) CancelCommand.NotifyCanExecuteChanged();
-        }
-    }
-
-    [RelayCommand(CanExecute = nameof(CanCancel))]
+    [RelayCommand(CanExecute = nameof(IsBusy))]
     private void Cancel()
     {
         cancellationTokenSource.Cancel();
     }
+
+    [RelayCommand]
+    private Task CopyAsync(ChatMessage chatMessage) => clipboard.SetTextAsync(chatMessage.ToString());
 
     [RelayCommand]
     private void Close()
@@ -396,165 +352,18 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
         ChatCommands = [];
     }
 
-    private async Task ProcessUserChatMessageAsync(
-        UserChatMessage userChatMessage,
-        IKernelMixin kernelMixin,
-        CancellationToken cancellationToken)
+    protected override void OnPropertyChanged(PropertyChangedEventArgs e)
     {
-        if (ChatContext is not { } chatContext) throw new InvalidOperationException("ChatContext is not initialized.");
+        base.OnPropertyChanged(e);
 
-        var elements = userChatMessage
-            .Attachments
-            .OfType<ChatVisualElementAttachment>()
-            .Select(a => a.Element)
-            .ToArray();
-
-        if (elements.Length <= 0) return;
-
-        var analyzingContextMessage = new ActionChatMessage(
-            new AuthorRole("action"),
-            LucideIconKind.TextSearch,
-            "ActionChatMessage_Header_AnalyzingContext")
+        if (e.PropertyName == nameof(IsNotBusy))
         {
-            IsBusy = true
-        };
-
-        try
-        {
-            chatContext.Add(analyzingContextMessage);
-
-            var xmlBuilder = new VisualElementXmlBuilder(
-                elements,
-                kernelMixin,
-                kernelMixin.MaxTokenTotal / 20);
-            var renderedVisualTreePrompt = await Task.Run(
-                () =>
-                    Prompts.RenderPrompt(
-                        Prompts.VisualTreePrompt,
-                        new Dictionary<string, Func<string>>
-                        {
-                            { "VisualTree", () => xmlBuilder.BuildXml(cancellationToken) },
-                            { "FocusedElementId", () => xmlBuilder.GetIdMap(cancellationToken)[elements[0].Id].ToString() },
-                        }),
-                cancellationToken);
-            userChatMessage.UserPrompt = renderedVisualTreePrompt + "\n\n" + userChatMessage.UserPrompt;
-        }
-        finally
-        {
-            analyzingContextMessage.IsBusy = false;
-        }
-    }
-
-    private async Task GenerateAsync(IKernelMixin kernelMixin, ChatContext chatContext, AssistantChatMessage assistantChatMessage, CancellationToken cancellationToken)
-    {
-        // todo: maybe I need to move this builder to a better place (using DI)
-        var modelSettings = Settings.Model;
-        var builder = Kernel.CreateBuilder();
-        builder.Services.AddSingleton<IChatCompletionService>(kernelMixin);
-        builder.Services.AddSingleton<ITextGenerationService>(kernelMixin);
-
-        if (modelSettings is { IsWebSearchEnabled: true, WebSearchApiKey: { } webSearchApiKey } && !string.IsNullOrWhiteSpace(webSearchApiKey))
-        {
-            Uri.TryCreate(modelSettings.WebSearchEndpoint, UriKind.Absolute, out var webSearchEndPoint);
-            builder.Plugins.AddFromObject(
-                new WebSearchEnginePlugin(
-                    modelSettings.WebSearchProvider switch
-                    {
-                        // TODO: "google" => new GoogleConnector(webSearchApiKey, webSearchEndPoint),
-                        "brave" => new BraveConnector(webSearchApiKey, webSearchEndPoint),
-                        "bocha" => new BoChaConnector(webSearchApiKey, webSearchEndPoint),
-                        _ => new BingConnector(webSearchApiKey, webSearchEndPoint)
-                    }),
-                "web_search");
-        }
-
-        var kernel = builder.Build();
-
-        var openAIPromptExecutionSettings = new OpenAIPromptExecutionSettings
-        {
-            Temperature = modelSettings.Temperature,
-            TopP = modelSettings.TopP,
-            FunctionChoiceBehavior = FunctionChoiceBehavior.Auto(autoInvoke: false)
-        };
-        var chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
-
-        var chatHistory = new ChatHistory(
-            chatContext
-                .Select(n => n.Message)
-                .Where(m => !Equals(m, assistantChatMessage)) // exclude the current assistant message
-                .Where(m => m.Role.Label is "system" or "assistant" or "user" or "tool")
-                .Select(m => new ChatMessageContent(m.Role, m.ToString())));
-
-        try
-        {
-            while (true)
-            {
-                AuthorRole? authorRole = null;
-                var assistantContentBuilder = new StringBuilder();
-                var functionCallContentBuilder = new FunctionCallContentBuilder();
-
-                await foreach (var streamingContent in chatCompletionService.GetStreamingChatMessageContentsAsync(
-                                   chatHistory,
-                                   openAIPromptExecutionSettings,
-                                   kernel,
-                                   cancellationToken))
-                {
-                    if (streamingContent.Content is not null)
-                    {
-                        assistantContentBuilder.Append(streamingContent.Content);
-                        assistantChatMessage.MarkdownBuilder.Append(streamingContent.Content);
-                    }
-
-                    authorRole ??= streamingContent.Role;
-                    functionCallContentBuilder.Append(streamingContent);
-                }
-
-                chatHistory.AddAssistantMessage(assistantContentBuilder.ToString());
-
-                var functionCalls = functionCallContentBuilder.Build();
-                if (functionCalls.Count == 0) break;
-
-                // TODO: tool calling
-                var functionCallContent = new ChatMessageContent(authorRole ?? default, content: null);
-                chatHistory.Add(functionCallContent);
-
-                foreach (var functionCall in functionCalls)
-                {
-                    functionCallContent.Items.Add(functionCall);
-
-                    var actionChatMessage = functionCall.PluginName switch
-                    {
-                        "web_search" => new ActionChatMessage(
-                            AuthorRole.Tool,
-                            LucideIconKind.Globe,
-                            "ActionChatMessage_Header_WebSearching"),
-                        _ => throw new NotImplementedException()
-                    };
-                    actionChatMessage.IsBusy = true;
-                    chatContext.Insert(chatContext.MessageCount - 1, actionChatMessage);
-
-                    try
-                    {
-                        var resultContent = await functionCall.InvokeAsync(kernel, cancellationToken);
-                        var resultChatMessage = resultContent.ToChatMessage();
-                        chatHistory.Add(resultChatMessage);
-                        actionChatMessage.Content = resultChatMessage.Content;
-                    }
-                    catch (Exception ex)
-                    {
-                        chatHistory.Add(new FunctionResultContent(functionCall, $"Error: {ex.Message}").ToChatMessage());
-                        // actionChatMessage.InlineCollection.Add($"Failed: {ex.Message}");
-                    }
-                    finally
-                    {
-                        actionChatMessage.IsBusy = false;
-                    }
-                }
-            }
-        }
-        finally
-        {
-            assistantChatMessage.IsBusy = false;
+            AddElementCommand.NotifyCanExecuteChanged();
+            AddClipboardCommand.NotifyCanExecuteChanged();
+            AddFileCommand.NotifyCanExecuteChanged();
+            SendMessageCommand.NotifyCanExecuteChanged();
+            RetryCommand.NotifyCanExecuteChanged();
+            CancelCommand.NotifyCanExecuteChanged();
         }
     }
 }

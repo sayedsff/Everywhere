@@ -1,13 +1,13 @@
 ﻿<v:ReactiveWindow
     x:Class="Everywhere.Views.AssistantFloatingWindow" xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:be="clr-namespace:Everywhere.Behaviors"
-    xmlns:contents="clr-namespace:ShadUI.Contents;assembly=ShadUI" xmlns:i="clr-namespace:Everywhere.Interfaces"
-    xmlns:m="clr-namespace:Everywhere.Models" xmlns:markdown="clr-namespace:Everywhere.Markdown;assembly=Everywhere.Markdown"
-    xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI" xmlns:system="clr-namespace:System;assembly=System.Runtime"
-    xmlns:themes="clr-namespace:ShadUI.Themes;assembly=ShadUI" xmlns:v="clr-namespace:Everywhere.Views"
-    xmlns:vc="clr-namespace:Everywhere.ValueConverters" xmlns:vm="clr-namespace:Everywhere.ViewModels"
-    x:DataType="vm:AssistantFloatingWindowViewModel" x:TypeArguments="vm:AssistantFloatingWindowViewModel"
-    Background="Transparent" CanResize="False"
+    xmlns:i="clr-namespace:Everywhere.Interfaces" xmlns:m="clr-namespace:Everywhere.Models"
+    xmlns:markdown="clr-namespace:Everywhere.Markdown;assembly=Everywhere.Markdown" xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI"
+    xmlns:system="clr-namespace:System;assembly=System.Runtime" xmlns:themes="clr-namespace:ShadUI.Themes;assembly=ShadUI"
+    xmlns:v="clr-namespace:Everywhere.Views" xmlns:vc="clr-namespace:Everywhere.ValueConverters"
+    xmlns:vm="clr-namespace:Everywhere.ViewModels" x:DataType="vm:AssistantFloatingWindowViewModel"
+    x:TypeArguments="vm:AssistantFloatingWindowViewModel" Background="Transparent"
+    CanResize="False"
     IsOpened="{Binding IsOpened, Mode=TwoWay}"
     RequestedThemeVariant="{x:Static themes:ThemeVariants.Acrylic}"
     ShowActivated="True" ShowInTaskbar="False"
@@ -88,18 +88,94 @@
                 </ToggleButton.Template>
             </ToggleButton>
 
-            <Button
-                Classes="Ghost" DockPanel.Dock="Right"
-                Width="24" Height="24"
-                Padding="0" VerticalAlignment="Center"
-                Command="{Binding CloseCommand}"
-                CornerRadius="4"
-                IsVisible="{Binding IsExpanded}">
-                <PathIcon
-                    Width="12" Height="12"
-                    HorizontalAlignment="Center" VerticalAlignment="Center"
-                    Data="{x:Static contents:Icons.WindowClose}"/>
-            </Button>
+            <StackPanel
+                DockPanel.Dock="Right" VerticalAlignment="Center"
+                IsVisible="{Binding IsExpanded}"
+                Orientation="Horizontal" Spacing="4">
+                <StackPanel.Styles>
+                    <Style Selector=":is(Button).TitleBar">
+                        <Setter Property="Width" Value="32"/>
+                        <Setter Property="Height" Value="32"/>
+                        <Setter Property="Padding" Value="0"/>
+                        <Setter Property="CornerRadius" Value="4"/>
+                        <Setter Property="Background" Value="Transparent"/>
+
+                        <Style Selector="^:pointerover.Close /template/ Border#RootBorder">
+                            <Setter Property="Background" Value="#C42B1C"/>
+                        </Style>
+
+                        <Style Selector="^ LucideIcon">
+                            <Setter Property="Size" Value="20"/>
+                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                        </Style>
+                    </Style>
+
+                    <Style Selector="FlyoutPresenter">
+                        <Setter Property="Background" Value="{DynamicResource SecondaryColor}"/>
+                        <Setter Property="BorderBrush" Value="{DynamicResource AcrylicBorderBrush}"/>
+                        <Setter Property="BorderThickness" Value="1"/>
+                        <Setter Property="CornerRadius" Value="8.5"/>
+                        <Setter Property="Padding" Value="0"/>
+                    </Style>
+                </StackPanel.Styles>
+
+                <Button
+                    x:Name="HistoryToggleButton" Classes="Ghost TitleBar"
+                    Command="{Binding ChatContextManager.UpdateHistory}"
+                    ToolTip.Tip="{DynamicResource AssistantFloatingWindow_History_ToolTip}">
+                    <Button.Flyout>
+                        <Flyout ShowMode="Transient">
+                            <ScrollViewer
+                                MinWidth="160" MaxHeight="400"
+                                HorizontalContentAlignment="Stretch" HorizontalScrollBarVisibility="Disabled"
+                                VerticalScrollBarVisibility="Auto">
+                                <ItemsControl
+                                    Margin="8" Padding="0"
+                                    ItemsSource="{Binding ChatContextManager.History}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate DataType="m:ChatContextHistory">
+                                            <StackPanel
+                                                Orientation="Vertical" Spacing="4">
+                                                <TextBlock
+                                                    HorizontalAlignment="Left" FontSize="16"
+                                                    Text="{Binding Date}"/>
+                                                <ListBox
+                                                    Padding="0" Background="Transparent"
+                                                    BorderThickness="0"
+                                                    ItemsSource="{Binding Contexts}"
+                                                    SelectedItem="{Binding $parent[v:AssistantFloatingWindow].((vm:AssistantFloatingWindowViewModel)DataContext).ChatContextManager.Current, FallbackValue={x:Null}}">
+                                                    <ListBox.DataTemplates>
+                                                        <DataTemplate DataType="m:ChatContext">
+                                                            <TextBlock Text="{Binding Metadata.Topic, TargetNullValue={StaticResource ChatContext_Metadata_Title_Default}}"/>
+                                                        </DataTemplate>
+                                                    </ListBox.DataTemplates>
+                                                </ListBox>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Flyout>
+                    </Button.Flyout>
+
+                    <LucideIcon Kind="History"/>
+                </Button>
+
+                <Button
+                    Classes="Ghost TitleBar" Margin="0,0,4,0"
+                    Command="{Binding ChatContextManager.CreateNew}"
+                    ToolTip.Tip="{DynamicResource AssistantFloatingWindow_CreateNew_ToolTip}">
+                    <LucideIcon Kind="Plus"/>
+                </Button>
+
+                <Button
+                    Classes="Ghost TitleBar Close"
+                    Command="{Binding CloseCommand}"
+                    ToolTip.Tip="{DynamicResource AssistantFloatingWindow_Close_ToolTip}">
+                    <LucideIcon Kind="X"/>
+                </Button>
+            </StackPanel>
 
             <TextBlock
                 Classes="Large" Margin="8,0,0,0"
@@ -172,9 +248,9 @@
                         </ItemsControl>
 
                         <ItemsControl
-                            Margin="0,0,0,8" Padding="4,0"
+                            Margin="0,0,0,8" Padding="8,0"
                             IsVisible="{Binding !!$self.ItemCount}"
-                            ItemsSource="{Binding ChatMessageNodes}">
+                            ItemsSource="{Binding ChatContextManager.ChatMessageNodes}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <StackPanel
@@ -276,9 +352,8 @@
                                         <ContentControl.DataTemplates>
                                             <DataTemplate DataType="m:AssistantChatMessage">
                                                 <StackPanel
-                                                    Classes="ChatMessage Assistant" Margin="4,0"
-                                                    Background="Transparent" Orientation="Vertical"
-                                                    Spacing="4">
+                                                    Classes="ChatMessage Assistant" Background="Transparent"
+                                                    Orientation="Vertical" Spacing="4">
                                                     <markdown:MarkdownRenderer MarkdownBuilder="{Binding MarkdownBuilder}"/>
 
                                                     <StackPanel
@@ -448,11 +523,15 @@
                         CancelCommand="{Binding CancelCommand}"
                         ChatAttachmentItemsSource="{Binding ChatAttachments}"
                         ChatCommandItemsSource="{Binding ChatCommands}"
-                        Command="{Binding ProcessChatMessageSentCommand}"
-                        IsImageSupported="{Binding Settings.Model.IsImageEnabled}"
+                        Command="{Binding SendMessageCommand}"
+                        IsImageEnabled="{Binding Settings.Internal.IsImageEnabled}"
+                        IsImageSupported="{Binding Settings.Model.IsImageSupported}"
                         IsSendButtonEnabled="{Binding !IsBusy}"
-                        IsToolCallSupported="{Binding Settings.Model.IsToolCallEnabled}"
-                        IsWebSearchSupported="{Binding Settings.Model.IsWebSearchEnabled}"
+                        IsToolCallEnabled="{Binding Settings.Internal.IsToolCallEnabled}"
+                        IsToolCallSupported="{Binding Settings.Model.IsToolCallSupported}"
+                        IsWebSearchEnabled="{Binding Settings.Internal.IsWebSearchEnabled}"
+                        IsWebSearchSupported="{Binding Settings.Model.IsWebSearchSupported}"
+                        MaxChatAttachmentCount="{Binding Settings.Internal.MaxChatAttachmentCount}"
                         TextWrapping="Wrap">
                         <v:ChatInputBox.AddChatAttachmentMenuItems>
                             <MenuItem

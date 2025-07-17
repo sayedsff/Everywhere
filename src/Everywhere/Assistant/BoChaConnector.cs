@@ -5,10 +5,11 @@ using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.SemanticKernel.Plugins.Web;
+using ZLinq;
 
 namespace Everywhere.Assistant;
 
-public class BoChaConnector : IWebSearchEngineConnector
+public partial class BoChaConnector : IWebSearchEngineConnector
 {
     private readonly ILogger logger;
     private readonly HttpClient httpClient;
@@ -68,36 +69,46 @@ public class BoChaConnector : IWebSearchEngineConnector
         // Sensitive data, logging as trace, disabled by default
         logger.LogTrace("Response content received: {Data}", json);
 
-        var response = JsonSerializer.Deserialize<Response>(json);
+        var response = JsonSerializer.Deserialize(json, ResponseJsonSerializationContext.Default.Response);
         if (response is not { Data: { } data })
         {
             throw new HttpRequestException(response?.Message);
         }
 
-        List<T>? returnValues = null;
-        if (data?.WebPages?.Value is not null)
+        if (data?.WebPages?.Value is null) return [];
+
+        List<T>? returnValues;
+        if (typeof(T) == typeof(string))
         {
-            if (typeof(T) == typeof(string))
-            {
-                var results = data.WebPages?.Value;
-                returnValues = results?.Select(x => x.Snippet).ToList() as List<T>;
-            }
-            else if (typeof(T) == typeof(WebPage))
-            {
-                List<WebPage> webPages = [.. data.WebPages.Value];
-                returnValues = webPages.Take(count).ToList() as List<T>;
-            }
-            else
-            {
-                throw new NotSupportedException($"Type {typeof(T)} is not supported.");
-            }
+            returnValues = data.WebPages.Value
+                .AsValueEnumerable()
+                .Take(count)
+                .Select(x => x.Summary)
+                .ToList() as List<T>;
+        }
+        else if (typeof(T) == typeof(WebPage))
+        {
+            returnValues = data.WebPages.Value
+                .AsValueEnumerable()
+                .Take(count)
+                .Select(x => new WebPage
+                {
+                    Name = x.Name,
+                    Url = x.Url,
+                    Snippet = x.Summary ?? x.Snippet
+                })
+                .ToList() as List<T>;
+        }
+        else
+        {
+            throw new NotSupportedException($"Type {typeof(T)} is not supported.");
         }
 
-        return
-            returnValues is null ? [] :
-            returnValues.Count <= count ? returnValues :
-            returnValues.Take(count);
+        return returnValues ?? [];
     }
+
+    [JsonSerializable(typeof(Response))]
+    private partial class ResponseJsonSerializationContext : JsonSerializerContext;
 
     private class Response
     {
@@ -108,6 +119,45 @@ public class BoChaConnector : IWebSearchEngineConnector
         public string? Message { get; init; }
 
         [JsonPropertyName("data")]
-        public WebSearchResponse? Data { get; init; }
+        public BoChaWebSearchResponse? Data { get; init; }
+    }
+
+    private sealed class BoChaWebSearchResponse
+    {
+        [JsonPropertyName("webPages")]
+        public BoChaWebPages? WebPages { get; set; }
+    }
+
+    private sealed class BoChaWebPages
+    {
+        /// <summary>
+        /// a nullable WebPage array object containing the Web Search API response data.
+        /// </summary>
+        [JsonPropertyName("value")]
+        public BoChaWebPage[]? Value { get; set; }
+    }
+
+    private sealed class BoChaWebPage
+    {
+        /// <summary>
+        /// The name of the result.
+        /// </summary>
+        [JsonPropertyName("name")]
+        public string Name { get; set; } = string.Empty;
+        /// <summary>
+        /// The URL of the result.
+        /// </summary>
+        [JsonPropertyName("url")]
+        public string Url { get; set; } = string.Empty;
+        /// <summary>
+        /// The result snippet.
+        /// </summary>
+        [JsonPropertyName("snippet")]
+        public string Snippet { get; set; } = string.Empty;
+        /// <summary>
+        /// The result snippet.
+        /// </summary>
+        [JsonPropertyName("summary")]
+        public string? Summary { get; set; }
     }
 }

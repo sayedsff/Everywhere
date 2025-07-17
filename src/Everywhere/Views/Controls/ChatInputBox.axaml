@@ -148,11 +148,21 @@
                         Orientation="Horizontal" Spacing="4">
                         <Menu>
                             <MenuItem
-                                Classes="Outline Rounded"
-                                extensions:MenuItemAssist.Label="{DynamicResource AssistantInputBox_AddAttachmentMenuItem_Header}"
-                                extensions:MenuItemAssist.PopupPlacement="TopEdgeAlignedLeft" extensions:MenuItemAssist.PopupVerticalOffset="-4"
+                                Classes="Outline Rounded" extensions:MenuItemAssist.PopupPlacement="TopEdgeAlignedLeft"
+                                extensions:MenuItemAssist.PopupVerticalOffset="-4"
                                 ItemsSource="{TemplateBinding AddChatAttachmentMenuItems}"
                                 ToolTip.Tip="{DynamicResource AssistantInputBox_AddAttachmentButton_ToolTip}">
+                                <extensions:MenuItemAssist.Label>
+                                    <TextBlock>
+                                        <Run Text="{DynamicResource AssistantInputBox_AddAttachmentMenuItem_Header}"/>
+                                        <Run Text=" ("/>
+                                        <Run Text="{Binding $parent[v:ChatInputBox].ChatAttachmentItemsSource.Count, FallbackValue=0}"/>
+                                        <Run Text="/"/>
+                                        <Run Text="{Binding $parent[v:ChatInputBox].MaxChatAttachmentCount}"/>
+                                        <Run Text=")"/>
+                                    </TextBlock>
+                                </extensions:MenuItemAssist.Label>
+
                                 <MenuItem.Header>
                                     <LucideIcon
                                         HorizontalAlignment="Center" VerticalAlignment="Center"
@@ -207,6 +217,8 @@
                         Spacing="4">
                         <Button
                             x:Name="PART_SendButton" Classes="Primary Rounded"
+                            Command="{TemplateBinding Command}"
+                            CommandParameter="{TemplateBinding Text}"
                             IsVisible="{Binding !IsVisible, ElementName=PART_CancelButton}"
                             ToolTip.Tip="{DynamicResource AssistantInputBox_SendButton_ToolTip}">
                             <Button.IsEnabled>

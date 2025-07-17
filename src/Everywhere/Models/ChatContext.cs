@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using CommunityToolkit.Mvvm.ComponentModel;
 using MessagePack;
 using ObservableCollections;
@@ -39,11 +40,13 @@ public partial class ChatContext : IEnumerable<ChatMessageNode>
         Metadata = metadata;
         messageNodeMap.AddRange(messageNodes.Select(v => new KeyValuePair<Guid, ChatMessageNode>(v.Id, v)));
         this.rootNode = rootNode;
+        rootNode.Context = this;
         rootNode.PropertyChanged += OnNodePropertyChanged;
         branchNodes.Add(rootNode);
 
         foreach (var node in messageNodes.Append(rootNode))
         {
+            node.Context = this;
             node.PropertyChanged += OnNodePropertyChanged;
             foreach (var childId in node.Children) messageNodeMap[childId].Parent = node;
         }
@@ -87,7 +90,10 @@ public partial class ChatContext : IEnumerable<ChatMessageNode>
         Insert(index, chatMessage);
     }
 
-    public void Insert(int index, ChatMessage chatMessage) => Insert(index, new ChatMessageNode(chatMessage));
+    public void Insert(int index, ChatMessage chatMessage) => Insert(index, new ChatMessageNode(chatMessage)
+    {
+        Context = this
+    });
 
     /// <summary>
     /// Add a message to the end of the current branch.
@@ -95,7 +101,10 @@ public partial class ChatContext : IEnumerable<ChatMessageNode>
     /// <param name="message"></param>
     public void Add(ChatMessage message)
     {
-        Insert(branchNodes.Count, new ChatMessageNode(message));
+        Insert(branchNodes.Count, new ChatMessageNode(message)
+        {
+            Context = this
+        });
     }
 
     public IEnumerator<ChatMessageNode> GetEnumerator()
@@ -139,6 +148,8 @@ public partial class ChatContext : IEnumerable<ChatMessageNode>
             if (node.ChoiceIndex < 0 || node.ChoiceIndex >= node.Children.Count) break;
             branchNodes.Add(node = messageNodeMap[node.Children[node.ChoiceIndex]]);
         }
+
+        Metadata.DateModified = DateTimeOffset.UtcNow;
     }
 
     private void Insert(int index, ChatMessageNode newNode)
@@ -153,7 +164,7 @@ public partial class ChatContext : IEnumerable<ChatMessageNode>
         messageNodeMap[newNode.Id] = newNode;
         newNode.PropertyChanged += OnNodePropertyChanged;
         afterNode.ChoiceIndex = afterNode.Children.Count - 1;
-        UpdateBranchAfter(index, afterNode);
+        UpdateBranchAfter(index - 1, afterNode);
     }
 }
 
@@ -168,7 +179,7 @@ public partial class ChatContextMetadata : ObservableObject
 
     [Key(2)]
     [ObservableProperty]
-    public partial string? Title { get; set; }
+    public partial string? Topic { get; set; }
 }
 
 /// <summary>
@@ -195,6 +206,14 @@ public partial class ChatMessageNode : ObservableObject
 
     [IgnoreMember]
     public ChatMessageNode? Parent { get; internal set; }
+
+    [IgnoreMember]
+    [field: AllowNull, MaybeNull]
+    public ChatContext Context
+    {
+        get => field ?? throw new InvalidOperationException("This node is not attached to a ChatContext.");
+        internal set;
+    }
 
     /// <summary>
     /// Constructor for MessagePack deserialization.

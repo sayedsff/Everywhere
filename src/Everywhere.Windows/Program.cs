@@ -102,7 +102,7 @@ public static class Program
 
                 #endregion
 
-                #region Senmantic Kernel & Kernel Memory
+                #region Assistant Chat
 
                 .AddSingleton<IKernelMixinFactory, KernelMixinFactory>()
                 .AddTransient<IKernelMixin>(xx => xx.GetRequiredService<IKernelMixinFactory>().Create())
@@ -110,6 +110,8 @@ public static class Program
                 .AddTransient<IChatCompletionService>(xx => xx.GetRequiredService<IKernelMixin>())
                 .AddTransient<ITextGenerator>(xx => xx.GetRequiredService<IKernelMixin>())
                 .AddTransient<ITextTokenizer>(xx => xx.GetRequiredService<IKernelMixin>())
+                .AddSingleton<IChatContextManager, ChatContextManager>()
+                .AddSingleton<IChatService, ChatService>()
                 .AddSingleton<IKernelMemory>(xx => new KernelMemoryBuilder()
                     .Configure(builder =>
                     {

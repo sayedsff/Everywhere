@@ -31,6 +31,9 @@ public partial class ChatInputBox : TextBox
     public static readonly StyledProperty<IList<ChatAttachment>?> ChatAttachmentItemsSourceProperty =
         AvaloniaProperty.Register<ChatInputBox, IList<ChatAttachment>?>(nameof(ChatAttachmentItemsSource));
 
+    public static readonly StyledProperty<int> MaxChatAttachmentCountProperty =
+        AvaloniaProperty.Register<ChatInputBox, int>(nameof(MaxChatAttachmentCount));
+
     public static readonly DirectProperty<ChatInputBox, ObservableCollection<MenuItem>> AddChatAttachmentMenuItemsProperty =
         AvaloniaProperty.RegisterDirect<ChatInputBox, ObservableCollection<MenuItem>>(
             nameof(AddChatAttachmentMenuItems),
@@ -97,6 +100,12 @@ public partial class ChatInputBox : TextBox
     {
         get => GetValue(ChatAttachmentItemsSourceProperty);
         set => SetValue(ChatAttachmentItemsSourceProperty, value);
+    }
+
+    public int MaxChatAttachmentCount
+    {
+        get => GetValue(MaxChatAttachmentCountProperty);
+        set => SetValue(MaxChatAttachmentCountProperty, value);
     }
 
     public ObservableCollection<MenuItem> AddChatAttachmentMenuItems
@@ -205,9 +214,6 @@ public partial class ChatInputBox : TextBox
                 Button.ClickEvent,
                 (_, args) =>
                 {
-                    if (Command?.CanExecute(Text) is not true) return;
-
-                    Command.Execute(Text);
                     Text = string.Empty;
                     args.Handled = true;
                 },
@@ -264,7 +270,9 @@ public partial class ChatInputBox : TextBox
                 if ((!PressCtrlEnterToSend || e.KeyModifiers != KeyModifiers.Control) &&
                     (PressCtrlEnterToSend || e.KeyModifiers != KeyModifiers.None)) return;
 
-                if (Command?.CanExecute(Text) is true) Command.Execute(Text);
+                if (Command?.CanExecute(Text) is not true) break;
+
+                Command.Execute(Text);
                 Text = string.Empty;
                 e.Handled = true;
                 break;
