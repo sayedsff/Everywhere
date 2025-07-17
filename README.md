@@ -27,6 +27,8 @@
   </p>
 </div>
 
+---
+
 ## About Everywhere
 
 **Everywhere** is a cross‑platform AI assistant built with .NET and Avalonia. It delivers contextual, multimodal AI support directly inside any desktop application—whether you’re browsing, writing, designing, or coding.
@@ -52,20 +54,26 @@
 | Windows  | 10.0.19041.0    |
 | macOS    | *Planned*       |
 
+---
+
 ## 🚀 Getting Started
 
 ### Installation
 
 > **Note**: Pre‑built installers are not yet available; build from source for now.
 
+---
+
 ## ✈️ Roadmap
 
-- [ ] Edit assistant (WIP)
-- [ ] Screen-based assistant
-- [ ] Web searching & thinking
+- [x] Screen-based assistant
+- [x] Web searching
+- [ ] Reasoning
 - [ ] MCP Tools
 - [ ] Voice input
 - [ ] RAG & Knowledge base
+
+---
 
 ## 🤝 Contributing
 
@@ -77,22 +85,52 @@ We welcome issues, feature ideas, and PRs! See [CONTRIBUTING.md](CONTRIBUTING.md
   <img src="https://contrib.rocks/image?repo=DearVa/Everywhere" alt="contrib.rocks image" />
 </a>
 
+---
+
 ## 📄 License
 
 Distributed under the Apache 2.0 License. See [LICENSE](LICENSE) for more information.
 
-## 🙏 Acknowledgments
+### Third-Party Licenses
 
-* [accntech/shad-ui](https://github.com/accntech/shad-ui) UI Styles and Components
-* [dme-compunet/Lucide.Avalonia](https://github.com/dme-compunet/Lucide.Avalonia) Icons
-* [Kira-NT/HotAvalonia](https://github.com/Kira-NT/HotAvalonia) Avalonia hot reload
-* [microsoft/CommunityToolkit.Mvvm](https://github.com/CommunityToolkit/dotnet) & [Cysharp/ObservableCollections](https://github.com/Cysharp/ObservableCollections) MVVM
-* [FlaUI/FlaUI](https://github.com/FlaUI/FlaUI) Screen Aware & UI Automation
-* [microsoft/CsWin32](https://github.com/microsoft/CsWin32) Win32 API Autogen
-* [Kibnet/WritableJsonConfiguration](https://github.com/Kibnet/WritableJsonConfiguration) Settings storage
-* [microsoft/semantic-kernel](https://github.com/microsoft/semantic-kernel) LLMs, RAG, Tool call, etc.
-* [nietras/Sep](https://github.com/nietras/Sep) tsv Reader for i18n
-* [xoofx/markdig](https://github.com/xoofx/markdig) Markdown parser for [Everywhere.Markdown](https://github.com/DearVa/Everywhere/tree/main/src/Everywhere.Markdown) rendering
+- **accntech/shad-ui** - [MIT License](https://github.com/accntech/shad-ui/blob/main/LICENSE)
+    - UI Styles and Components
+    - Source repo: https://github.com/accntech/shad-ui
+- **dme-compunet/Lucide.Avalonia** - [MIT License](https://github.com/dme-compunet/Lucide.Avalonia/blob/master/LICENSE)
+    - Icons
+    - Source repo: https://github.com/dme-compunet/Lucide.Avalonia
+- **Kira-NT/HotAvalonia** - [MIT License](https://github.com/Kira-NT/HotAvalonia/blob/master/LICENSE.md)
+    - Avalonia hot reload
+    - Source repo: https://github.com/Kira-NT/HotAvalonia
+- **microsoft/CommunityToolkit.Mvvm** - [MIT License](https://github.com/CommunityToolkit/dotnet/blob/main/License.md)
+    - MVVM framework
+    - Source repo: https://github.com/CommunityToolkit/dotnet
+- **Cysharp/ObservableCollections** - [MIT License](https://github.com/Cysharp/ObservableCollections/blob/master/LICENSE)
+    - Observable collections for MVVM
+    - Source repo: https://github.com/Cysharp/ObservableCollections
+- **Cysharp/Zlinq** - [MIT License](https://github.com/Cysharp/ZLinq/blob/master/LICENSE)
+    - Zero allocation LINQ
+    - Source repo: https://github.com/Cysharp/ZLinq
+- **FlaUI/FlaUI** - [MIT License](https://github.com/FlaUI/FlaUI/blob/master/LICENSE.txt)
+    - Screen Aware & UI Automation
+    - Source repo: https://github.com/FlaUI/FlaUI
+- **microsoft/CsWin32** - [MIT License](https://github.com/microsoft/CsWin32/blob/main/LICENSE)
+    - Win32 API Autogen
+    - Source repo: https://github.com/microsoft/CsWin32
+- **Kibnet/WritableJsonConfiguration** - [MIT License](https://github.com/Kibnet/WritableJsonConfiguration/blob/master/LICENSE)
+    - Settings storage
+    - Source repo: https://github.com/Kibnet/WritableJsonConfiguration
+- **microsoft/semantic-kernel** - [MIT License](https://github.com/microsoft/semantic-kernel/blob/main/LICENSE)
+    - LLMs, RAG, Tool call, etc.
+    - Source repo: https://github.com/microsoft/semantic-kernel
+- **nietras/Sep** - [MIT License](https://github.com/nietras/Sep/blob/main/LICENSE)
+    - TSV Reader for i18n
+    - Source repo: https://github.com/nietras/Sep
+- **xoofx/markdig** - [BSD-2-Clause License](https://github.com/xoofx/markdig/blob/master/license.txt)
+    - Markdown parser for Everywhere.Markdown rendering
+    - Source repo: https://github.com/xoofx/markdig
+
+---
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

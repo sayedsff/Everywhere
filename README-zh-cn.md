@@ -64,6 +64,17 @@
 
 ---
 
+## ✈️ 路线图
+
+- [x] 基于屏幕的助手
+- [x] 网页搜索
+- [ ] 推理能力
+- [ ] MCP 工具集成
+- [ ] 语音输入
+- [ ] RAG 和知识库
+
+---
+
 ## 🤝 贡献方式
 
 欢迎提交 Issue、提出功能建议或贡献代码！请参考 [CONTRIBUTING.md](CONTRIBUTING.md) 查看具体指南。
@@ -80,19 +91,46 @@
 
 本项目基于 Apache 2.0 许可证发布，详情请查阅 [`LICENSE`](LICENSE)。
 
+### 第三方许可证
+
+- **accntech/shad-ui** - [MIT License](https://github.com/accntech/shad-ui/blob/main/LICENSE)
+    - UI 样式和组件
+    - Source repo: https://github.com/accntech/shad-ui
+- **dme-compunet/Lucide.Avalonia** - [MIT License](https://github.com/dme-compunet/Lucide.Avalonia/blob/master/LICENSE)
+    - 图标
+    - Source repo: https://github.com/dme-compunet/Lucide.Avalonia
+- **Kira-NT/HotAvalonia** - [MIT License](https://github.com/Kira-NT/HotAvalonia/blob/master/LICENSE.md)
+    - 热重载支持
+    - Source repo: https://github.com/Kira-NT/HotAvalonia
+- **microsoft/CommunityToolkit.Mvvm** - [MIT License](https://github.com/CommunityToolkit/dotnet/blob/main/License.md)
+    - MVVM 框架
+    - Source repo: https://github.com/CommunityToolkit/dotnet
+- **Cysharp/ObservableCollections** - [MIT License](https://github.com/Cysharp/ObservableCollections/blob/master/LICENSE)
+    - Observable collections for MVVM
+    - Source repo: https://github.com/Cysharp/ObservableCollections
+- **Cysharp/Zlinq** - [MIT License](https://github.com/Cysharp/ZLinq/blob/master/LICENSE)
+    - 零分配 LINQ
+    - Source repo: https://github.com/Cysharp/ZLinq
+- **FlaUI/FlaUI** - [MIT License](https://github.com/FlaUI/FlaUI/blob/master/LICENSE.txt)
+    - 屏幕感知和 UI 自动化
+    - Source repo: https://github.com/FlaUI/FlaUI
+- **microsoft/CsWin32** - [MIT License](https://github.com/microsoft/CsWin32/blob/main/LICENSE)
+    - Win32 API 自动生成
+    - Source repo: https://github.com/microsoft/CsWin32
+- **Kibnet/WritableJsonConfiguration** - [MIT License](https://github.com/Kibnet/WritableJsonConfiguration/blob/master/LICENSE)
+    - 设置存储
+    - Source repo: https://github.com/Kibnet/WritableJsonConfiguration
+- **microsoft/semantic-kernel** - [MIT License](https://github.com/microsoft/semantic-kernel/blob/main/LICENSE)
+    - 语义内核和插件系统
+    - Source repo: https://github.com/microsoft/semantic-kernel
+- **nietras/Sep** - [MIT License](https://github.com/nietras/Sep/blob/main/LICENSE)
+    - TSV 读取器，用于国际化
+    - Source repo: https://github.com/nietras/Sep
+- **xoofx/markdig** - [BSD-2-Clause License](https://github.com/xoofx/markdig/blob/master/license.txt)
+    - Markdown 解析器，用于 Everywhere.Markdown 渲染
+    - Source repo: https://github.com/xoofx/markdig
+
 ---
-
-## 🙏 致谢
-
-* [accntech/shad-ui](https://github.com/accntech/shad-ui) UI 样式和组件
-* [dme-compunet/Lucide.Avalonia](https://github.com/dme-compunet/Lucide.Avalonia) 图标
-* [Kira-NT/HotAvalonia](https://github.com/Kira-NT/HotAvalonia) Avalonia 热重载
-* [microsoft/CommunityToolkit.Mvvm](https://github.com/CommunityToolkit/dotnet) & [Cysharp/ObservableCollections](https://github.com/Cysharp/ObservableCollections) MVVM
-* [FlaUI/FlaUI](https://github.com/FlaUI/FlaUI) 屏幕感知和 UI 自动化
-* [microsoft/CsWin32](https://github.com/microsoft/CsWin32) 自动生成 Win32 API
-* [Kibnet/WritableJsonConfiguration](https://github.com/Kibnet/WritableJsonConfiguration) 设置存储
-* [microsoft/semantic-kernel](https://github.com/microsoft/semantic-kernel) 大模型、RAG 和工具调用等
-* [nietras/Sep](https://github.com/nietras/Sep) tsv 读取器，用于国际化
 
 <p align="right">(<a href="#readme-top">返回顶部</a>)</p>
 
