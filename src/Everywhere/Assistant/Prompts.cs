@@ -23,24 +23,22 @@ public static partial class Prompts
 
     public const string VisualTreePrompt =
         """
-        # Visual Tree
-        For better understanding of the user's environment, you are provided with a visual tree.
-        It is an XML representation of the user's screen, which includes a part of visible elements and their properties.
-        The user can only see the content of the focused element, but you can see the entire visual tree.
-        So You MUST NOT include any information that is not visible to the user in your response.
+        For better understanding of the my environment, you are provided with a visual tree.
+        It is an XML representation of the my screen, which includes a part of visible elements and their properties.
 
-        You MUST analyze the visual tree and provide a response based on it, including the following:
-        1. Identify what software is being used
-        2. Inferring user intent, e.g.
-           If the user is using an web browser, what is the user trying to do?
-           If the user is using an instant messaging application, who is the user trying to communicate with?
-        3. Prepare a response that directly addresses only the mission requirements
-           
+        Please analyze the visual tree first, thinking about the following, but DO NOT include in your reply:
+        1. Think about what software I am using
+        2. Guess my intentions
+        
+        After analyzing the visual tree, prepare a reply that addresses my mission after <mission-start> tag.
+        
         ```xml
         {VisualTree}
         ```
 
         Focused element id: {FocusedElementId}
+        
+        <mission-start>
         """;
 
     // from: https://github.com/lobehub/lobe-chat/blob/main/src/chains/summaryTitle.ts#L4
