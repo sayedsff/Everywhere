@@ -1,8 +1,11 @@
 ﻿using System.ComponentModel;
 using System.Reflection;
+using Avalonia.Threading;
 using Everywhere.Attributes;
 using Everywhere.Models;
+using Everywhere.Utils;
 using MessagePack;
+using ShadUI.Toasts;
 using ZLinq;
 
 namespace Everywhere.ViewModels;
@@ -10,6 +13,8 @@ namespace Everywhere.ViewModels;
 public class SettingsPageViewModel : ReactiveViewModelBase
 {
     public IReadOnlyList<SettingsItemGroup> Groups { get; }
+
+    private readonly DebounceHelper debounceHelper = new(TimeSpan.FromSeconds(1));
 
     public SettingsPageViewModel(Settings settings)
     {
@@ -19,160 +24,167 @@ public class SettingsPageViewModel : ReactiveViewModelBase
             .AsValueEnumerable()
             .Where(p => p.GetCustomAttribute<IgnoreMemberAttribute>() is null)
             .Where(p => p.PropertyType.IsAssignableTo(typeof(SettingsBase)))
-            .Select(
-                p =>
-                {
-                    var group = p.GetValue(settings);
-                    return new SettingsItemGroup(
-                        p.Name,
-                        p.PropertyType
-                            .GetProperties(BindingFlags.Instance | BindingFlags.Public)
-                            .AsValueEnumerable()
-                            .Where(pp => pp is { CanRead: true, CanWrite: true })
-                            .Where(pp => pp.GetCustomAttribute<IgnoreMemberAttribute>() is null)
-                            .Select(
-                                pp =>
+            .Select(p =>
+            {
+                var group = p.GetValue(settings);
+                return new SettingsItemGroup(
+                    p.Name,
+                    p.PropertyType
+                        .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                        .AsValueEnumerable()
+                        .Where(pp => pp is { CanRead: true, CanWrite: true })
+                        .Where(pp => pp.GetCustomAttribute<IgnoreMemberAttribute>() is null)
+                        .Select(pp =>
+                        {
+                            var name = $"{p.Name}_{pp.Name}";
+                            if (itemMap.ContainsKey(name))
+                            {
+                                throw new NotSupportedException(
+                                    $"Property {name} is already registered");
+                            }
+
+                            SettingsItemBase? result = null;
+                            SettingsItemBase? groupItem = null;
+
+                            IValueProxy<bool>? isEnabledProxy = null;
+                            if (pp.GetCustomAttribute<SettingsGroupAttribute>() is { } groupAttribute)
+                            {
+                                var groupProperty = p.PropertyType
+                                    .GetProperty(
+                                        groupAttribute.PropertyName,
+                                        BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public)
+                                    .NotNull($"{groupAttribute.PropertyName} Property for Group is not found");
+
+                                if (groupProperty.PropertyType != typeof(bool))
                                 {
-                                    var name = $"{p.Name}_{pp.Name}";
-                                    if (itemMap.ContainsKey(name))
+                                    throw new NotSupportedException(
+                                        $"{groupAttribute.PropertyName} Property for Group has an invalid type");
+                                }
+
+                                if (!groupProperty.CanRead)
+                                {
+                                    throw new NotSupportedException(
+                                        $"{groupAttribute.PropertyName} Property for Group is not readable");
+                                }
+
+                                itemMap.TryGetValue($"{p.Name}_{groupProperty.Name}", out groupItem);
+                                isEnabledProxy = new SettingsValueProxy<bool>(group, groupProperty);
+                            }
+
+                            if (pp.GetCustomAttribute<SettingsSelectionItemAttribute>() is { } selectionAttribute)
+                            {
+                                var itemsSourceProperty = p.PropertyType
+                                    .GetProperty(
+                                        selectionAttribute.ItemsSource,
+                                        BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public)
+                                    .NotNull($"{selectionAttribute.ItemsSource} Property for ItemsSource is not found");
+
+                                if (!itemsSourceProperty.PropertyType.IsGenericType ||
+                                    !itemsSourceProperty.PropertyType.GetGenericTypeDefinition().IsAssignableTo(typeof(IEnumerable<>)) ||
+                                    itemsSourceProperty.PropertyType.GenericTypeArguments.Length != 1 ||
+                                    itemsSourceProperty.PropertyType.GenericTypeArguments[0] != pp.PropertyType)
+                                {
+                                    throw new NotSupportedException(
+                                        $"{selectionAttribute.ItemsSource} Property for ItemsSource has an invalid type");
+                                }
+
+                                if (itemsSourceProperty.GetMethod is not { } itemsSourceGetter)
+                                {
+                                    throw new NotSupportedException(
+                                        $"{selectionAttribute.ItemsSource} Property for ItemsSource is not readable");
+                                }
+
+                                result = new SettingsSelectionItem(
+                                    name,
+                                    new SettingsValueProxy<object?>(group, pp),
+                                    () =>
                                     {
-                                        throw new NotSupportedException(
-                                            $"Property {name} is already registered");
-                                    }
+                                        var itemsSource = itemsSourceGetter.IsStatic ?
+                                            itemsSourceProperty.GetValue(null) :
+                                            itemsSourceProperty.GetValue(group);
+                                        return itemsSource.NotNull<IEnumerable>().Cast<object?>().Select(x =>
+                                            new DynamicResourceKeyWrapper<object?>($"SettingsSelectionItem_{p.Name}_{pp.Name}_{x}", x));
+                                    });
+                            }
+                            else
+                            {
+                                if (pp.PropertyType == typeof(bool))
+                                {
+                                    result = new SettingsBooleanItem(
+                                        name,
+                                        new SettingsValueProxy<bool?>(group, pp),
+                                        false);
+                                }
 
-                                    SettingsItemBase? result = null;
-                                    SettingsItemBase? groupItem = null;
+                                if (pp.PropertyType == typeof(bool?))
+                                {
+                                    result = new SettingsBooleanItem(
+                                        name,
+                                        new SettingsValueProxy<bool?>(group, pp),
+                                        true);
+                                }
 
-                                    IValueProxy<bool>? isEnabledProxy = null;
-                                    if (pp.GetCustomAttribute<SettingsGroupAttribute>() is { } groupAttribute)
-                                    {
-                                        var groupProperty = p.PropertyType
-                                            .GetProperty(
-                                                groupAttribute.PropertyName,
-                                                BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public)
-                                            .NotNull($"{groupAttribute.PropertyName} Property for Group is not found");
+                                if (pp.PropertyType == typeof(string))
+                                {
+                                    var attribute = pp.GetCustomAttribute<SettingsStringItemAttribute>();
+                                    result = new SettingsStringItem(
+                                        name,
+                                        new SettingsValueProxy<string>(group, pp),
+                                        attribute?.Watermark,
+                                        attribute?.MaxLength ?? int.MaxValue,
+                                        attribute?.IsMultiline ?? false,
+                                        attribute?.IsPassword ?? false);
+                                }
 
-                                        if (groupProperty.PropertyType != typeof(bool))
-                                        {
-                                            throw new NotSupportedException(
-                                                $"{groupAttribute.PropertyName} Property for Group has an invalid type");
-                                        }
+                                if (pp.PropertyType == typeof(int))
+                                {
+                                    var attribute = pp.GetCustomAttribute<SettingsIntegerItemAttribute>();
+                                    result = new SettingsIntegerItem(
+                                        name,
+                                        new SettingsValueProxy<int>(group, pp),
+                                        attribute?.Min ?? int.MinValue,
+                                        attribute?.Max ?? int.MaxValue);
+                                }
 
-                                        if (!groupProperty.CanRead)
-                                        {
-                                            throw new NotSupportedException(
-                                                $"{groupAttribute.PropertyName} Property for Group is not readable");
-                                        }
+                                if (pp.PropertyType == typeof(double))
+                                {
+                                    var attribute = pp.GetCustomAttribute<SettingsDoubleItemAttribute>();
+                                    result = new SettingsDoubleItem(
+                                        name,
+                                        new SettingsValueProxy<double>(group, pp),
+                                        attribute?.Min ?? double.NegativeInfinity,
+                                        attribute?.Max ?? double.PositiveInfinity,
+                                        attribute?.Step ?? 0.1d);
+                                }
 
-                                        itemMap.TryGetValue($"{p.Name}_{groupProperty.Name}", out groupItem);
-                                        isEnabledProxy = new SettingsValueProxy<bool>(group, groupProperty);
-                                    }
+                                if (pp.PropertyType == typeof(KeyboardHotkey))
+                                {
+                                    result = new SettingsKeyboardHotkeyItem(name, new SettingsValueProxy<KeyboardHotkey>(group, pp));
+                                }
+                            }
 
-                                    if (pp.GetCustomAttribute<SettingsSelectionItemAttribute>() is { } selectionAttribute)
-                                    {
-                                        var itemsSourceProperty = p.PropertyType
-                                            .GetProperty(
-                                                selectionAttribute.ItemsSource,
-                                                BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public)
-                                            .NotNull($"{selectionAttribute.ItemsSource} Property for ItemsSource is not found");
+                            if (result == null) return null;
 
-                                        if (!itemsSourceProperty.PropertyType.IsGenericType ||
-                                            !itemsSourceProperty.PropertyType.GetGenericTypeDefinition().IsAssignableTo(typeof(IEnumerable<>)) ||
-                                            itemsSourceProperty.PropertyType.GenericTypeArguments.Length != 1 ||
-                                            itemsSourceProperty.PropertyType.GenericTypeArguments[0] != pp.PropertyType)
-                                        {
-                                            throw new NotSupportedException(
-                                                $"{selectionAttribute.ItemsSource} Property for ItemsSource has an invalid type");
-                                        }
+                            result.IsEnabledProxy = isEnabledProxy;
+                            itemMap[name] = result;
 
-                                        if (itemsSourceProperty.GetMethod is not { } itemsSourceGetter)
-                                        {
-                                            throw new NotSupportedException(
-                                                $"{selectionAttribute.ItemsSource} Property for ItemsSource is not readable");
-                                        }
+                            if (groupItem == null) return result;
 
-                                        result = new SettingsSelectionItem(
-                                            name,
-                                            new SettingsValueProxy<object?>(group, pp),
-                                            () =>
-                                            {
-                                                var itemsSource = itemsSourceGetter.IsStatic ?
-                                                    itemsSourceProperty.GetValue(null) :
-                                                    itemsSourceProperty.GetValue(group);
-                                                return itemsSource.NotNull<IEnumerable>().Cast<object?>().Select(
-                                                    x => new DynamicResourceKeyWrapper<object?>($"SettingsSelectionItem_{p.Name}_{pp.Name}_{x}", x));
-                                            });
-                                    }
-                                    else
-                                    {
-                                        if (pp.PropertyType == typeof(bool))
-                                        {
-                                            result = new SettingsBooleanItem(
-                                                name,
-                                                new SettingsValueProxy<bool?>(group, pp),
-                                                false);
-                                        }
+                            groupItem.Items.Add(result);
+                            return null;
+                        })
+                        .OfType<SettingsItemBase>()
+                        .ToImmutableArray());
+            }).ToImmutableArray();
 
-                                        if (pp.PropertyType == typeof(bool?))
-                                        {
-                                            result = new SettingsBooleanItem(
-                                                name,
-                                                new SettingsValueProxy<bool?>(group, pp),
-                                                true);
-                                        }
-
-                                        if (pp.PropertyType == typeof(string))
-                                        {
-                                            var attribute = pp.GetCustomAttribute<SettingsStringItemAttribute>();
-                                            result = new SettingsStringItem(
-                                                name,
-                                                new SettingsValueProxy<string>(group, pp),
-                                                attribute?.Watermark,
-                                                attribute?.MaxLength ?? int.MaxValue,
-                                                attribute?.IsMultiline ?? false,
-                                                attribute?.IsPassword ?? false);
-                                        }
-
-                                        if (pp.PropertyType == typeof(int))
-                                        {
-                                            var attribute = pp.GetCustomAttribute<SettingsIntegerItemAttribute>();
-                                            result = new SettingsIntegerItem(
-                                                name,
-                                                new SettingsValueProxy<int>(group, pp),
-                                                attribute?.Min ?? int.MinValue,
-                                                attribute?.Max ?? int.MaxValue);
-                                        }
-
-                                        if (pp.PropertyType == typeof(double))
-                                        {
-                                            var attribute = pp.GetCustomAttribute<SettingsDoubleItemAttribute>();
-                                            result = new SettingsDoubleItem(
-                                                name,
-                                                new SettingsValueProxy<double>(group, pp),
-                                                attribute?.Min ?? double.NegativeInfinity,
-                                                attribute?.Max ?? double.PositiveInfinity,
-                                                attribute?.Step ?? 0.1d);
-                                        }
-
-                                        if (pp.PropertyType == typeof(KeyboardHotkey))
-                                        {
-                                            result = new SettingsKeyboardHotkeyItem(name, new SettingsValueProxy<KeyboardHotkey>(group, pp));
-                                        }
-                                    }
-
-                                    if (result == null) return null;
-
-                                    result.IsEnabledProxy = isEnabledProxy;
-                                    itemMap[name] = result;
-
-                                    if (groupItem == null) return result;
-
-                                    groupItem.Items.Add(result);
-                                    return null;
-                                })
-                            .OfType<SettingsItemBase>()
-                            .ToImmutableArray());
-                }).ToImmutableArray();
+        TrackableObject.AddPropertyChangedEventHandler(
+            nameof(Settings),
+            (_, _) => debounceHelper.Execute(() => Dispatcher.UIThread.Invoke(() => ToastManager
+                .CreateToast(new DynamicResourceKey("SettingsPage_Saved_Toast_Title").ToString() ?? "")
+                .OnTopRight()
+                .DismissOnClick()
+                .WithDelay(1)
+                .ShowSuccess())));
     }
 
     private class SettingsValueProxy<T> : IValueProxy<T>, INotifyPropertyChanged

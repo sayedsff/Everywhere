@@ -1,5 +1,6 @@
 ﻿Key	zh-CN	en-US
 SettingsPage_Title	设置	Settings
+SettingsPage_Saved_Toast_Title	设置已保存	Settings Saved
 SettingsGroup_Common_Header	基础	Common
 Settings_Common_Language_Header	语言	Language
 Settings_Common_Language_Description	选择软件界面语言。	Select the display language for the software.
