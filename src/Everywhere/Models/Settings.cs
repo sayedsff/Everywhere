@@ -1,24 +1,21 @@
-﻿using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Everywhere.Attributes;
 using Everywhere.I18N;
+using Everywhere.Utils;
 using MessagePack;
-using Microsoft.Extensions.Configuration;
 
 namespace Everywhere.Models;
 
-public class SettingsBase(string section) : ObservableObject
+public class SettingsBase : TrackableObject
 {
-    public static IConfiguration? Configuration { get; set; }
+    public string Section { get; }
 
-    protected override void OnPropertyChanged(PropertyChangedEventArgs e)
+    protected SettingsBase(string section) : base(nameof(Settings))
     {
-        base.OnPropertyChanged(e);
-        if (Configuration == null) return;
-        if (section.Length == 0) Configuration.Set(this); // TODO: throttle
-        else Configuration.Set(section, this);
+        Section = section;
+        isTrackingEnabled = true;
     }
 }
 

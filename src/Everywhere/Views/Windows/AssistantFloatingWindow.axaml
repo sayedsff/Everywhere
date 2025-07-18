@@ -362,6 +362,7 @@
                             Orientation="Horizontal">
                             <NumericUpDown
                               x:Name="ChoiceSelector" Margin="0,0,4,0"
+                              IsVisible="{Binding $parent[ContentControl].((m:ChatMessageNode)DataContext).Parent.ChoiceCount, FallbackValue=False, Converter={x:Static vc:NumberConverters.GreaterThanOne}}"
                               Maximum="{Binding $parent[ContentControl].((m:ChatMessageNode)DataContext).Parent.ChoiceCount, FallbackValue=1}"
                               Minimum="1"
                               Value="{Binding $parent[ContentControl].((m:ChatMessageNode)DataContext).Parent.ChoiceIndex, FallbackValue=1, Converter={x:Static vc:NumberConverters.PlusOne}}"/>
@@ -502,7 +503,7 @@
                                   IsVisible="{Binding IsBusy}"/>
                                 <LucideIcon
                                   VerticalAlignment="Center"
-                                  Foreground="{DynamicResource SuccessColor60}"
+                                  Foreground="{DynamicResource SuccessColor}"
                                   IsVisible="{Binding !IsBusy}"
                                   Kind="Check" Size="14"/>
                               </StackPanel>

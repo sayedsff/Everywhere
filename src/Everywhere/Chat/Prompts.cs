@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace Everywhere.Assistant;
+namespace Everywhere.Chat;
 
 public static partial class Prompts
 {

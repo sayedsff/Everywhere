@@ -10,12 +10,12 @@ namespace Everywhere.Models;
 [Union(1, typeof(ChatTextAttachment))]
 [Union(2, typeof(ChatImageAttachment))]
 [Union(3, typeof(ChatFileAttachment))]
-public abstract partial class ChatAttachment(DynamicResourceKey headerKey)
+public abstract partial class ChatAttachment(DynamicResourceKeyBase headerKey)
 {
     public abstract LucideIconKind Icon { get; }
 
     [Key(0)]
-    public DynamicResourceKey HeaderKey => headerKey;
+    public DynamicResourceKeyBase HeaderKey => headerKey;
 }
 
 [MessagePackObject(AllowPrivate = true, OnlyIncludeKeyedMembers = true)]
@@ -33,12 +33,12 @@ public partial class ChatVisualElementAttachment : ChatAttachment
         field ?? throw new InvalidOperationException("Element is not set. This attachment should not be serialized without an element.");
 
     [SerializationConstructor]
-    private ChatVisualElementAttachment(DynamicResourceKey headerKey, LucideIconKind icon) : base(headerKey)
+    private ChatVisualElementAttachment(DynamicResourceKeyBase headerKey, LucideIconKind icon) : base(headerKey)
     {
         Icon = icon;
     }
 
-    public ChatVisualElementAttachment(DynamicResourceKey headerKey, LucideIconKind icon, IVisualElement element) : base(headerKey)
+    public ChatVisualElementAttachment(DynamicResourceKeyBase headerKey, LucideIconKind icon, IVisualElement element) : base(headerKey)
     {
         Icon = icon;
         Element = element;
@@ -46,7 +46,7 @@ public partial class ChatVisualElementAttachment : ChatAttachment
 }
 
 [MessagePackObject(AllowPrivate = true, OnlyIncludeKeyedMembers = true)]
-public partial class ChatTextAttachment(DynamicResourceKey headerKey, string text) : ChatAttachment(headerKey)
+public partial class ChatTextAttachment(DynamicResourceKeyBase headerKey, string text) : ChatAttachment(headerKey)
 {
     public override LucideIconKind Icon => LucideIconKind.Text;
 
@@ -73,20 +73,20 @@ public partial class ChatImageAttachment : ChatAttachment
     }
 
     [SerializationConstructor]
-    private ChatImageAttachment(DynamicResourceKey headerKey, byte[] imageData) : base(headerKey)
+    private ChatImageAttachment(DynamicResourceKeyBase headerKey, byte[] imageData) : base(headerKey)
     {
         using var stream = new MemoryStream(imageData);
         Image = WriteableBitmap.Decode(stream);
     }
 
-    public ChatImageAttachment(DynamicResourceKey headerKey, WriteableBitmap image) : base(headerKey)
+    public ChatImageAttachment(DynamicResourceKeyBase headerKey, WriteableBitmap image) : base(headerKey)
     {
         Image = image;
     }
 }
 
 [MessagePackObject(AllowPrivate = true, OnlyIncludeKeyedMembers = true)]
-public partial class ChatFileAttachment(DynamicResourceKey headerKey, string filePath) : ChatAttachment(headerKey)
+public partial class ChatFileAttachment(DynamicResourceKeyBase headerKey, string filePath) : ChatAttachment(headerKey)
 {
     public override LucideIconKind Icon => LucideIconKind.File;
 

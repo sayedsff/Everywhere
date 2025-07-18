@@ -118,4 +118,70 @@ public static class AvaloniaExtension
     {
         return dispatcher.CheckAccess() ? Task.FromResult(func()) : dispatcher.InvokeAsync(func, priority, cancellationToken).GetTask();
     }
+
+    /// <summary>
+    /// Run and wait for a Task on the DispatcherFrame, allowing the UI thread to remain responsive
+    /// </summary>
+    /// <param name="task"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    /// <exception cref="AggregateException"></exception>
+    public static void WaitOnDispatcherFrame(this Task task, CancellationToken cancellationToken = default)
+    {
+        var frame = new DispatcherFrame();
+        AggregateException? capturedException = null;
+
+        if (cancellationToken != CancellationToken.None)
+        {
+            cancellationToken.Register(() => frame.Continue = false);
+        }
+        task.ContinueWith(
+            t =>
+            {
+                capturedException = t.Exception;
+                frame.Continue = false; // 结束消息循环
+            },
+            TaskContinuationOptions.AttachedToParent);
+
+        Dispatcher.UIThread.PushFrame(frame);
+
+        if (capturedException != null)
+        {
+            throw capturedException;
+        }
+    }
+
+    /// <summary>
+    /// Run and wait for a Task on the DispatcherFrame, allowing the UI thread to remain responsive
+    /// </summary>
+    /// <param name="task"></param>
+    /// <typeparam name="TResult"></typeparam>
+    /// <returns></returns>
+    /// <exception cref="AggregateException"></exception>
+    public static TResult WaitOnDispatcherFrame<TResult>(this Task<TResult> task)
+    {
+        var frame = new DispatcherFrame();
+
+        TResult? result = default;
+
+        AggregateException? capturedException = null;
+
+        task.ContinueWith(
+            t =>
+            {
+                capturedException = t.Exception;
+                result = t.Result;
+                frame.Continue = false; // 结束消息循环
+            },
+            TaskContinuationOptions.AttachedToParent);
+
+        Dispatcher.UIThread.PushFrame(frame);
+
+        if (capturedException != null)
+        {
+            throw capturedException;
+        }
+
+        return result ?? throw new InvalidOperationException("Task result is null");
+    }
 }

@@ -11,6 +11,12 @@ public class BidirectionalFuncValueConverter<TInput, TOutput>(Func<TInput, TOutp
         {
             return convert(input);
         }
+
+        if (System.Convert.ChangeType(value, typeof(TInput)) is TInput converted)
+        {
+            return convert(converted);
+        }
+
         return null;
     }
 
@@ -20,6 +26,12 @@ public class BidirectionalFuncValueConverter<TInput, TOutput>(Func<TInput, TOutp
         {
             return convertBack(output);
         }
+
+        if (System.Convert.ChangeType(value, targetType) is TOutput converted)
+        {
+            return convertBack(converted);
+        }
+
         return null;
     }
 }

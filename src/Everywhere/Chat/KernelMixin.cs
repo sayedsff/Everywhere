@@ -5,7 +5,7 @@ using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 
-namespace Everywhere.Assistant;
+namespace Everywhere.Chat;
 
 public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
 {

@@ -6,8 +6,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.SemanticKernel.Plugins.Web;
 using ZLinq;
+using ZLinq.Linq;
 
-namespace Everywhere.Assistant;
+namespace Everywhere.Chat;
 
 public partial class BoChaConnector : IWebSearchEngineConnector
 {

@@ -5,7 +5,7 @@ using Microsoft.ML.OnnxRuntime.Tensors;
 using Tokenizers.DotNet;
 using ZLinq;
 
-namespace Everywhere.Assistant;
+namespace Everywhere.Chat;
 
 public class Text2VecTextEmbeddingGenerator(string vocabPath, string embeddingModelPath) : ITextEmbeddingGenerator, ITextEmbeddingBatchGenerator
 {

@@ -1,4 +1,4 @@
-﻿using Everywhere.Assistant;
+﻿using Everywhere.Chat;
 using Everywhere.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

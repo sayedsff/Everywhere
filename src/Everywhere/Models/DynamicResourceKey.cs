@@ -7,14 +7,23 @@ using MessagePack;
 namespace Everywhere.Models;
 
 /// <summary>
-/// This class is used to create a dynamic resource key for axaml Binding.
+/// MessagePack serializable base class for dynamic resource keys. Make them happy.
 /// </summary>
-/// <param name="key"></param>
 [MessagePackObject(OnlyIncludeKeyedMembers = true, AllowPrivate = true)]
 [Union(0, typeof(DynamicResourceKey))]
 [Union(1, typeof(DirectResourceKey))]
 [Union(2, typeof(FormattedDynamicResourceKey))]
-public partial class DynamicResourceKey(object key) : IObservable<object?>
+public abstract partial class DynamicResourceKeyBase : IObservable<object?>
+{
+    public abstract IDisposable Subscribe(IObserver<object?> observer);
+}
+
+/// <summary>
+/// This class is used to create a dynamic resource key for axaml Binding.
+/// </summary>
+/// <param name="key"></param>
+[MessagePackObject(OnlyIncludeKeyedMembers = true, AllowPrivate = true)]
+public partial class DynamicResourceKey(object key) : DynamicResourceKeyBase
 {
     /// <summary>
     /// so why axaml DOES NOT SUPPORT {Binding .^} ???????
@@ -24,13 +33,19 @@ public partial class DynamicResourceKey(object key) : IObservable<object?>
     [Key(0)]
     protected object Key => key;
 
-    public virtual IDisposable Subscribe(IObserver<object?> observer) =>
+    public override IDisposable Subscribe(IObserver<object?> observer) =>
         Application.Current!.Resources.GetResourceObservable(key).Subscribe(observer);
 
     [return: NotNullIfNotNull(nameof(key))]
     public static implicit operator DynamicResourceKey?(string? key) => key == null ? null : new DynamicResourceKey(key);
 }
 
+/// <summary>
+/// Wrapper for dynamic resource keys that also holds a value.
+/// </summary>
+/// <param name="key"></param>
+/// <param name="value"></param>
+/// <typeparam name="T"></typeparam>
 public class DynamicResourceKeyWrapper<T>(object key, T value) : DynamicResourceKey(key)
 {
     public T Value => value;

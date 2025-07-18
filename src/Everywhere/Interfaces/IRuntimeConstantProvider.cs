@@ -13,4 +13,11 @@ public static class RuntimeConstantProviderExtensions
     {
         return provider[type].NotNull<T>();
     }
+
+    public static string GetDatabasePath(this IRuntimeConstantProvider provider, string dbName)
+    {
+        var folderPath = Path.Combine(provider.Get<string>(RuntimeConstantType.WritableDataPath), "db");
+        Directory.CreateDirectory(folderPath);
+        return Path.Combine(folderPath, dbName);
+    }
 }

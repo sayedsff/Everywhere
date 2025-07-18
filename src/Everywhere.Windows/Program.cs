@@ -3,7 +3,8 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input.Platform;
 using Avalonia.Platform.Storage;
-using Everywhere.Assistant;
+using Everywhere.Chat;
+using Everywhere.Database;
 using Everywhere.Enums;
 using Everywhere.Extensions;
 using Everywhere.Initialization;
@@ -41,31 +42,30 @@ public static class Program
                 .AddSingleton<IVisualElementContext, Win32VisualElementContext>()
                 .AddSingleton<IHotkeyListener, Win32HotkeyListener>()
                 .AddSingleton<IWindowHelper, Win32WindowHelper>()
+                .AddKeyedSingleton<IConfiguration>(nameof(Settings),
+                    (xx, _) =>
+                    {
+                        IConfiguration configuration;
+                        var settingsJsonPath = Path.Combine(
+                            xx.GetRequiredService<IRuntimeConstantProvider>().Get<string>(RuntimeConstantType.WritableDataPath),
+                            "settings.json");
+                        try
+                        {
+                            configuration = WritableJsonConfigurationFabric.Create(settingsJsonPath);
+                        }
+                        catch (Exception ex) when (ex is JsonException or InvalidDataException)
+                        {
+                            File.Delete(settingsJsonPath);
+                            configuration = WritableJsonConfigurationFabric.Create(settingsJsonPath);
+                        }
+                        return configuration;
+                    })
                 .AddSingleton<Settings>(xx =>
                 {
-                    IConfiguration configuration;
-
-                    var settingsJsonPath = Path.Combine(
-                        xx.GetRequiredService<IRuntimeConstantProvider>().Get<string>(RuntimeConstantType.WritableDataPath),
-                        "settings.json");
-                    try
-                    {
-                        configuration = WritableJsonConfigurationFabric.Create(settingsJsonPath);
-                    }
-                    catch (Exception ex) when (ex is JsonException or InvalidDataException)
-                    {
-                        File.Delete(settingsJsonPath);
-                        configuration = WritableJsonConfigurationFabric.Create(settingsJsonPath);
-                    }
-
-                    if (configuration.Get<Settings>() is not { } settings)
-                    {
-                        settings = new Settings();
-                        configuration.Bind(settings);
-                    }
-
-                    // set Configuration after binding, or it will save json when init and the values will be incorrect
-                    SettingsBase.Configuration = configuration;
+                    var configuration = xx.GetRequiredKeyedService<IConfiguration>(nameof(Settings));
+                    if (configuration.Get<Settings>() is { } settings) return settings;
+                    settings = new Settings();
+                    configuration.Bind(settings);
                     return settings;
                 })
 
@@ -96,9 +96,18 @@ public static class Program
 
                 #endregion
 
+                #region Database
+
+                .AddDbContext<ChatDbContext>(ServiceLifetime.Singleton)
+
+                #endregion
+
                 #region Initialize
 
                 .AddSingleton<IAsyncInitializer, AssistantInitializer>()
+                .AddSingleton<IAsyncInitializer, SettingsInitializer>()
+                .AddSingleton<IAsyncInitializer>(xx => xx.GetRequiredService<ChatContextManager>())
+                .AddSingleton<IAsyncInitializer>(xx => xx.GetRequiredService<ChatDbContext>())
 
                 #endregion
 
@@ -110,7 +119,8 @@ public static class Program
                 .AddTransient<IChatCompletionService>(xx => xx.GetRequiredService<IKernelMixin>())
                 .AddTransient<ITextGenerator>(xx => xx.GetRequiredService<IKernelMixin>())
                 .AddTransient<ITextTokenizer>(xx => xx.GetRequiredService<IKernelMixin>())
-                .AddSingleton<IChatContextManager, ChatContextManager>()
+                .AddSingleton<ChatContextManager>()
+                .AddSingleton<IChatContextManager>(xx => xx.GetRequiredService<ChatContextManager>())
                 .AddSingleton<IChatService, ChatService>()
                 .AddSingleton<IKernelMemory>(xx => new KernelMemoryBuilder()
                     .Configure(builder =>

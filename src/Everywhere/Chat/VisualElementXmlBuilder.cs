@@ -1,14 +1,12 @@
-﻿#if DEBUG
+﻿
 using System.Diagnostics;
-using JetBrains.Profiler.Api;
-#endif
-
 using System.Diagnostics.CodeAnalysis;
 using System.Security;
 using System.Text;
+using JetBrains.Profiler.Api;
 using Microsoft.KernelMemory.AI;
 
-namespace Everywhere.Assistant;
+namespace Everywhere.Chat;
 
 /// <summary>
 ///     This class builds an XML representation of the core elements, which is limited by the soft token limit and finally used by a LLM.

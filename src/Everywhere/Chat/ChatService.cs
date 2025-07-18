@@ -10,7 +10,7 @@ using Microsoft.SemanticKernel.Plugins.Web.Bing;
 using Microsoft.SemanticKernel.Plugins.Web.Brave;
 using Microsoft.SemanticKernel.TextGeneration;
 
-namespace Everywhere.Assistant;
+namespace Everywhere.Chat;
 
 public class ChatService(
     IChatContextManager chatContextManager,
@@ -218,9 +218,10 @@ public class ChatService(
             assistantChatMessage.IsBusy = false;
         }
 
-        if (chatHistory.Count(c => c.Role == AuthorRole.User) == 1 &&
+        if (chatContext.Metadata.Topic.IsNullOrEmpty() &&
+            chatHistory.Any(c => c.Role == AuthorRole.User) &&
+            chatHistory.Any(c => c.Role == AuthorRole.Assistant) &&
             chatHistory.First(c => c.Role == AuthorRole.User).Content is { Length: > 0 } userMessage &&
-            chatHistory.Count(c => c.Role == AuthorRole.Assistant) == 1 &&
             chatHistory.First(c => c.Role == AuthorRole.Assistant).Content is { Length: > 0 } assistantMessage)
         {
             // If the chat history only contains one user message and one assistant message,

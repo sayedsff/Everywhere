@@ -9,7 +9,7 @@ public static class NumberConverters
         convertBack: x => x - 1
     );
 
-    public static IValueConverter BiggerThanOne { get; } = new FuncValueConverter<int, bool>(
+    public static IValueConverter GreaterThanOne { get; } = new FuncValueConverter<int, bool>(
         convert: x => x > 1
     );
 }

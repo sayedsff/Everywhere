@@ -12,6 +12,8 @@ public class AssistantInitializer(
     IVisualElementContext visualElementContext
 ) : IAsyncInitializer
 {
+    public int Priority => 0;
+
     public Task InitializeAsync()
     {
         LocaleManager.CurrentLocale = CultureInfo.CurrentUICulture.Name;

@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
+using Everywhere.Utils;
 using Everywhere.Views;
 #if DEBUG
 using Everywhere.Enums;
@@ -62,7 +63,21 @@ public class App : Application
         }
 #endif
 
-        Task.WhenAll(ServiceLocator.Resolve<IEnumerable<IAsyncInitializer>>().Select(i => i.InitializeAsync()));
+        try
+        {
+            foreach (var group in ServiceLocator.Resolve<IEnumerable<IAsyncInitializer>>().GroupBy(i => i.Priority).OrderByDescending(g => g.Key))
+            {
+                Task.WhenAll(group.Select(i => i.InitializeAsync())).WaitOnDispatcherFrame();
+            }
+        }
+        catch (Exception ex)
+        {
+            NativeMessageBox.Show(
+                "Initialization Error",
+                $"An error occurred during application initialization:\n{ex.Message}\n\nPlease check the logs for more details.",
+                NativeMessageBoxButtons.Ok,
+                NativeMessageBoxIcon.Error);
+        }
     }
 
     public override void OnFrameworkInitializationCompleted()

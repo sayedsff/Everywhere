@@ -1,5 +1,7 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Collections.Immutable;
+using System.Text.Json.Serialization;
 using Avalonia.Controls.Documents;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Everywhere.Markdown;
 using Everywhere.Serialization;
@@ -40,7 +42,7 @@ public partial class AssistantChatMessage : ChatMessage
 {
     public override AuthorRole Role => AuthorRole.Assistant;
 
-    public ObservableStringBuilder MarkdownBuilder { get; } = new();
+    public ObservableStringBuilder MarkdownBuilder { get; }
 
     [Key(0)]
     private string Content
@@ -49,10 +51,19 @@ public partial class AssistantChatMessage : ChatMessage
         init => MarkdownBuilder.Append(value);
     }
 
+    public AssistantChatMessage()
+    {
+        MarkdownBuilder = new ObservableStringBuilder();
+        MarkdownBuilder.Changed += delegate
+        {
+            OnPropertyChanged(nameof(Content));
+        };
+    }
+
     public override string ToString() => Content;
 }
 
-[MessagePackObject(OnlyIncludeKeyedMembers = true)]
+[MessagePackObject(OnlyIncludeKeyedMembers = true, AllowPrivate = true)]
 public partial class UserChatMessage(string userPrompt, IReadOnlyList<ChatAttachment> attachments) : ChatMessage
 {
     public override AuthorRole Role => AuthorRole.User;
@@ -70,6 +81,13 @@ public partial class UserChatMessage(string userPrompt, IReadOnlyList<ChatAttach
     /// The inlines that display in the chat message.
     /// </summary>
     public InlineCollection Inlines { get; } = new();
+
+    [Key(2)]
+    private IEnumerable<MessagePackInline> MessagePackInlines
+    {
+        get => Dispatcher.UIThread.InvokeOnDemand(() => Inlines.Select(MessagePackInline.FromInline).ToImmutableArray());
+        set => Dispatcher.UIThread.InvokeOnDemand(() => Inlines.Reset(value.Select(i => i.ToInline())));
+    }
 
     public override string ToString() => UserPrompt;
 }
