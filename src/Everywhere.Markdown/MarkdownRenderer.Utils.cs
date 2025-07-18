@@ -404,7 +404,7 @@ public partial class MarkdownRenderer
         }
     }
 
-    [Conditional("DEBUG")]
+    [Conditional("EnablePrintMetrics")]
     private static void PrintMetrics(string metrics, [CallerMemberName] string memberName = "")
     {
         var message = $"[{DateTime.Now:G}] ({memberName}) {metrics}";

@@ -1,114 +1,114 @@
 ﻿<UserControl
-    x:Class="Everywhere.Views.VisualTreeDebugger" xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:i="clr-namespace:Everywhere.Interfaces" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:v="clr-namespace:Everywhere.Views" d:DesignHeight="450"
-    d:DesignWidth="800" mc:Ignorable="d">
+  x:Class="Everywhere.Views.VisualTreeDebugger" xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:i="clr-namespace:Everywhere.Interfaces" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:v="clr-namespace:Everywhere.Views" d:DesignHeight="450"
+  d:DesignWidth="800" mc:Ignorable="d">
 
-    <Design.PreviewWith>
-        <v:VisualTreeDebugger/>
-    </Design.PreviewWith>
+  <Design.PreviewWith>
+    <v:VisualTreeDebugger/>
+  </Design.PreviewWith>
+
+  <Grid
+    Margin="8,4,8,8" ColumnDefinitions="3*,1,1*"
+    RowDefinitions="Auto,*">
+
+    <Border
+      Grid.Row="0" Grid.Column="0"
+      Grid.ColumnSpan="3" Padding="0,4"
+      BorderBrush="{DynamicResource BorderColor}"
+      BorderThickness="0,0,0,1">
+      <StackPanel
+        Orientation="Horizontal" Spacing="8">
+        <Button
+          Classes="Ghost" Width="24"
+          Height="24" Padding="0"
+          Click="HandlePickElementButtonClicked">
+          <LucideIcon
+            HorizontalAlignment="Center" VerticalAlignment="Center"
+            Kind="SquareMousePointer" Size="18"/>
+        </Button>
+        <CheckBox
+          x:Name="ShowKeyboardFocusedElementCheckBox" VerticalAlignment="Center"
+          Content="Show keyboard focused element"/>
+      </StackPanel>
+    </Border>
+
+    <TreeView
+      x:Name="VisualTreeView" Grid.Row="1"
+      Grid.Column="0" PointerMoved="HandleVisualTreeViewPointerMoved"
+      SelectionChanged="HandleVisualTreeViewSelectionChanged">
+      <TreeView.ItemTemplate>
+        <TreeDataTemplate
+          DataType="i:IVisualElement"
+          ItemsSource="{Binding Children}">
+          <TextBlock>
+            <Run Text="{Binding Id}"/>
+            <Run
+              FontWeight="Bold"
+              Text="{Binding Type, StringFormat={}[{0}]}"/>
+            <Run Text="{Binding Name}"/>
+          </TextBlock>
+        </TreeDataTemplate>
+      </TreeView.ItemTemplate>
+    </TreeView>
 
     <Grid
-        Margin="8,4,8,8" ColumnDefinitions="3*,1,1*"
-        RowDefinitions="Auto,*">
+      Grid.Row="1" Grid.Column="2"
+      Margin="4,0" RowDefinitions="4*,1,*">
+      <ScrollViewer
+        Grid.Row="0" HorizontalScrollBarVisibility="Disabled"
+        VerticalScrollBarVisibility="Auto">
+        <ItemsControl x:Name="PropertyItemsControl">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate DataType="v:VisualElementProperty">
+              <StackPanel
+                Margin="0,0,0,8" Orientation="Vertical"
+                Spacing="4">
+                <TextBlock
+                  FontSize="16"
+                  Text="{Binding Name}"
+                  TextWrapping="WrapWithOverflow"/>
 
-        <Border
-            Grid.Row="0" Grid.Column="0"
-            Grid.ColumnSpan="3" Padding="0,4"
-            BorderBrush="{DynamicResource BorderColor}"
-            BorderThickness="0,0,0,1">
-            <StackPanel
-                Orientation="Horizontal" Spacing="8">
-                <Button
-                    Classes="Ghost" Width="24"
-                    Height="24" Padding="0"
-                    Click="HandlePickElementButtonClicked">
-                    <LucideIcon
-                        HorizontalAlignment="Center" VerticalAlignment="Center"
-                        Kind="SquareMousePointer" Size="18"/>
-                </Button>
-                <CheckBox
-                    x:Name="ShowKeyboardFocusedElementCheckBox" VerticalAlignment="Center"
-                    Content="Show keyboard focused element"/>
-            </StackPanel>
-        </Border>
+                <TextBox
+                  AcceptsReturn="True"
+                  IsReadOnly="{Binding IsReadOnly}"
+                  MaxLines="5"
+                  Text="{Binding Value, Mode=TwoWay}"
+                  TextWrapping="WrapWithOverflow"/>
+              </StackPanel>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
 
-        <TreeView
-            x:Name="VisualTreeView" Grid.Row="1"
-            Grid.Column="0" PointerMoved="HandleVisualTreeViewPointerMoved"
-            SelectionChanged="HandleVisualTreeViewSelectionChanged">
-            <TreeView.ItemTemplate>
-                <TreeDataTemplate
-                    DataType="i:IVisualElement"
-                    ItemsSource="{Binding Children}">
-                    <TextBlock>
-                        <Run Text="{Binding Id}"/>
-                        <Run
-                            FontWeight="Bold"
-                            Text="{Binding Type, StringFormat={}[{0}]}"/>
-                        <Run Text="{Binding Name}"/>
-                    </TextBlock>
-                </TreeDataTemplate>
-            </TreeView.ItemTemplate>
-        </TreeView>
+      <GridSplitter
+        Grid.Row="1" Height="3"
+        Background="Transparent"/>
+      <Border
+        Grid.Row="1" Height="1"
+        Background="{DynamicResource BorderColor}"
+        IsHitTestVisible="False"/>
 
-        <Grid
-            Grid.Row="1" Grid.Column="2"
-            Margin="4,0" RowDefinitions="4*,1,*">
-            <ScrollViewer
-                Grid.Row="0" HorizontalScrollBarVisibility="Disabled"
-                VerticalScrollBarVisibility="Auto">
-                <ItemsControl x:Name="PropertyItemsControl">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate DataType="v:VisualElementProperty">
-                            <StackPanel
-                                Margin="0,0,0,8" Orientation="Vertical"
-                                Spacing="4">
-                                <TextBlock
-                                    FontSize="16"
-                                    Text="{Binding Name}"
-                                    TextWrapping="WrapWithOverflow"/>
-
-                                <TextBox
-                                    AcceptsReturn="True"
-                                    IsReadOnly="{Binding IsReadOnly}"
-                                    MaxLines="5"
-                                    Text="{Binding Value, Mode=TwoWay}"
-                                    TextWrapping="WrapWithOverflow"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
-
-            <GridSplitter
-                Grid.Row="1" Height="3"
-                Background="Transparent"/>
-            <Border
-                Grid.Row="1" Height="1"
-                Background="{DynamicResource BorderColor}"
-                IsHitTestVisible="False"/>
-
-            <Button
-                Classes="Basic" Grid.Row="2"
-                Click="HandleCaptureButtonClicked" Cursor="Hand">
-                <Panel>
-                    <TextBlock
-                        HorizontalAlignment="Center" VerticalAlignment="Center"
-                        Text="Click to Capture"/>
-                    <Image x:Name="CaptureImage"/>
-                </Panel>
-            </Button>
-        </Grid>
-
-        <GridSplitter
-            Grid.Row="1" Grid.Column="1"
-            Width="3" Background="Transparent"/>
-        <Border
-            Grid.Row="1" Grid.Column="1"
-            Width="1"
-            Background="{DynamicResource BorderColor}"
-            IsHitTestVisible="False"/>
+      <Button
+        Classes="Basic" Grid.Row="2"
+        Click="HandleCaptureButtonClicked" Cursor="Hand">
+        <Panel>
+          <TextBlock
+            HorizontalAlignment="Center" VerticalAlignment="Center"
+            Text="Click to Capture"/>
+          <Image x:Name="CaptureImage"/>
+        </Panel>
+      </Button>
     </Grid>
+
+    <GridSplitter
+      Grid.Row="1" Grid.Column="1"
+      Width="3" Background="Transparent"/>
+    <Border
+      Grid.Row="1" Grid.Column="1"
+      Width="1"
+      Background="{DynamicResource BorderColor}"
+      IsHitTestVisible="False"/>
+  </Grid>
 </UserControl>

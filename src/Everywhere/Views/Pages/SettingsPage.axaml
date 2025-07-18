@@ -1,211 +1,211 @@
 ﻿<UserControl
-    x:Class="Everywhere.Views.Pages.SettingsPage" xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:contents="clr-namespace:ShadUI.Contents;assembly=ShadUI"
-    xmlns:m="clr-namespace:Everywhere.Models" xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI"
-    xmlns:v="clr-namespace:Everywhere.Views" xmlns:vm="clr-namespace:Everywhere.ViewModels"
-    x:DataType="vm:SettingsPageViewModel">
-    <ScrollViewer
-        HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-        <ScrollViewer.Styles>
-            <Style Selector="Expander.SettingsItemContainer">
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="Expander">
-                            <shadui:Card>
-                                <StackPanel>
-                                    <LayoutTransformControl Name="PART_ToggleTransform">
-                                        <Panel>
-                                            <Panel.Styles>
-                                                <Style Selector="ToggleButton#PART_ToggleButton:checked /template/ Border#RootBorder">
-                                                    <Setter Property="Background" Value="Transparent"/>
-                                                </Style>
-                                            </Panel.Styles>
-                                            <ToggleButton
-                                                x:Name="PART_ToggleButton" Classes="Basic"
-                                                DockPanel.Dock="Right" HorizontalAlignment="Stretch"
-                                                HorizontalContentAlignment="Stretch" BorderThickness="0"
-                                                CornerRadius="8"
-                                                IsChecked="{TemplateBinding IsExpanded, Mode=TwoWay}"
-                                                IsEnabled="True">
-                                            </ToggleButton>
-                                            <Grid ColumnDefinitions="*, Auto">
-                                                <ContentPresenter
-                                                    Grid.Column="0" HorizontalAlignment="Left"
-                                                    VerticalAlignment="Center"
-                                                    Content="{TemplateBinding Header}"/>
-                                                <PathIcon
-                                                    x:Name="PART_Icon" Grid.Column="1"
-                                                    Width="20" Height="20"
-                                                    Margin="20,0" HorizontalAlignment="Left"
-                                                    Data="{x:Static contents:Icons.ChevronDown}"
-                                                    IsHitTestVisible="False"/>
-                                            </Grid>
-                                        </Panel>
-                                    </LayoutTransformControl>
+  x:Class="Everywhere.Views.Pages.SettingsPage" xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:contents="clr-namespace:ShadUI.Contents;assembly=ShadUI"
+  xmlns:m="clr-namespace:Everywhere.Models" xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI"
+  xmlns:v="clr-namespace:Everywhere.Views" xmlns:vm="clr-namespace:Everywhere.ViewModels"
+  x:DataType="vm:SettingsPageViewModel">
+  <ScrollViewer
+    HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+    <ScrollViewer.Styles>
+      <Style Selector="Expander.SettingsItemContainer">
+        <Setter Property="Template">
+          <Setter.Value>
+            <ControlTemplate TargetType="Expander">
+              <shadui:Card>
+                <StackPanel>
+                  <LayoutTransformControl Name="PART_ToggleTransform">
+                    <Panel>
+                      <Panel.Styles>
+                        <Style Selector="ToggleButton#PART_ToggleButton:checked /template/ Border#RootBorder">
+                          <Setter Property="Background" Value="Transparent"/>
+                        </Style>
+                      </Panel.Styles>
+                      <ToggleButton
+                        x:Name="PART_ToggleButton" Classes="Basic"
+                        DockPanel.Dock="Right" HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Stretch" BorderThickness="0"
+                        CornerRadius="8"
+                        IsChecked="{TemplateBinding IsExpanded, Mode=TwoWay}"
+                        IsEnabled="True">
+                      </ToggleButton>
+                      <Grid ColumnDefinitions="*, Auto">
+                        <ContentPresenter
+                          Grid.Column="0" HorizontalAlignment="Left"
+                          VerticalAlignment="Center"
+                          Content="{TemplateBinding Header}"/>
+                        <PathIcon
+                          x:Name="PART_Icon" Grid.Column="1"
+                          Width="20" Height="20"
+                          Margin="20,0" HorizontalAlignment="Left"
+                          Data="{x:Static contents:Icons.ChevronDown}"
+                          IsHitTestVisible="False"/>
+                      </Grid>
+                    </Panel>
+                  </LayoutTransformControl>
 
-                                    <ContentControl
-                                        x:Name="ContentExpandControlContainer" Padding="0,8,0,0"
-                                        IsVisible="{Binding ElementName=PART_ToggleButton, Path=IsChecked}">
-                                        <shadui:ContentExpandControl
-                                            x:Name="PART_ContentExpand"
-                                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                                            Content="{TemplateBinding Content}"
-                                            ContentTemplate="{TemplateBinding ContentTemplate}"/>
-                                    </ContentControl>
-                                </StackPanel>
-                            </shadui:Card>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
+                  <ContentControl
+                    x:Name="ContentExpandControlContainer" Padding="0,8,0,0"
+                    IsVisible="{Binding ElementName=PART_ToggleButton, Path=IsChecked}">
+                    <shadui:ContentExpandControl
+                      x:Name="PART_ContentExpand"
+                      HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                      VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                      Content="{TemplateBinding Content}"
+                      ContentTemplate="{TemplateBinding ContentTemplate}"/>
+                  </ContentControl>
+                </StackPanel>
+              </shadui:Card>
+            </ControlTemplate>
+          </Setter.Value>
+        </Setter>
+      </Style>
 
-            <Style Selector="Expander.SettingsItemContainer:down">
-                <Style Selector="^ /template/ ContentPresenter#PART_ContentExpand">
-                    <Setter Property="Margin" Value="0, 12"/>
-                </Style>
-            </Style>
+      <Style Selector="Expander.SettingsItemContainer:down">
+        <Style Selector="^ /template/ ContentPresenter#PART_ContentExpand">
+          <Setter Property="Margin" Value="0, 12"/>
+        </Style>
+      </Style>
 
-            <Style Selector="Expander.SettingsItemContainer.NotExpandable">
-                <Style Selector="^ PathIcon#PART_Icon">
-                    <Setter Property="IsVisible" Value="False"/>
-                </Style>
-                <Style Selector="^ ToggleButton#PART_ToggleButton">
-                    <Setter Property="IsHitTestVisible" Value="False"/>
-                </Style>
-                <Style Selector="^ ContentControl#ContentExpandControlContainer">
-                    <Setter Property="IsVisible" Value="False"/>
-                </Style>
-            </Style>
+      <Style Selector="Expander.SettingsItemContainer.NotExpandable">
+        <Style Selector="^ PathIcon#PART_Icon">
+          <Setter Property="IsVisible" Value="False"/>
+        </Style>
+        <Style Selector="^ ToggleButton#PART_ToggleButton">
+          <Setter Property="IsHitTestVisible" Value="False"/>
+        </Style>
+        <Style Selector="^ ContentControl#ContentExpandControlContainer">
+          <Setter Property="IsVisible" Value="False"/>
+        </Style>
+      </Style>
 
-            <Style Selector="ItemsControl.SettingsItemItemsControl">
-                <Setter Property="ItemTemplate">
-                    <DataTemplate DataType="m:SettingsItemBase">
-                        <Expander
-                            Classes="SettingsItemContainer" Background="Transparent"
-                            Classes.NotExpandable="{Binding !Items.Count}"
-                            CornerRadius="4"
-                            IsEnabled="{Binding IsEnabledProxy.Value, FallbackValue=True}">
-                            <Expander.Header>
-                                <StackPanel>
-                                    <TextBlock
-                                        Classes="Large" IsHitTestVisible="False"
-                                        Text="{Binding HeaderKey^}"
-                                        TextWrapping="WrapWithOverflow"/>
-                                    <TextBlock
-                                        Classes="Small" Margin="0,8"
-                                        IsHitTestVisible="False"
-                                        Text="{Binding DescriptionKey^}"
-                                        TextWrapping="WrapWithOverflow"/>
-                                    <ContentPresenter Content="{Binding}">
-                                        <ContentPresenter.DataTemplates>
-                                            <DataTemplate DataType="m:SettingsBooleanItem">
-                                                <ToggleSwitch
-                                                    IsChecked="{Binding ValueProxy.Value, Mode=TwoWay}"
-                                                    IsThreeState="{Binding CanBeNull}"/>
-                                            </DataTemplate>
+      <Style Selector="ItemsControl.SettingsItemItemsControl">
+        <Setter Property="ItemTemplate">
+          <DataTemplate DataType="m:SettingsItemBase">
+            <Expander
+              Classes="SettingsItemContainer" Background="Transparent"
+              Classes.NotExpandable="{Binding !Items.Count}"
+              CornerRadius="4"
+              IsEnabled="{Binding IsEnabledProxy.Value, FallbackValue=True}">
+              <Expander.Header>
+                <StackPanel>
+                  <TextBlock
+                    Classes="Large" IsHitTestVisible="False"
+                    Text="{Binding HeaderKey^}"
+                    TextWrapping="WrapWithOverflow"/>
+                  <TextBlock
+                    Classes="Small" Margin="0,8"
+                    IsHitTestVisible="False"
+                    Text="{Binding DescriptionKey^}"
+                    TextWrapping="WrapWithOverflow"/>
+                  <ContentPresenter Content="{Binding}">
+                    <ContentPresenter.DataTemplates>
+                      <DataTemplate DataType="m:SettingsBooleanItem">
+                        <ToggleSwitch
+                          IsChecked="{Binding ValueProxy.Value, Mode=TwoWay}"
+                          IsThreeState="{Binding CanBeNull}"/>
+                      </DataTemplate>
 
-                                            <DataTemplate DataType="m:SettingsStringItem">
-                                                <TextBox
-                                                    MinWidth="320" MinHeight="32"
-                                                    HorizontalAlignment="Left"
-                                                    AcceptsReturn="{Binding IsMultiline}"
-                                                    MaxLength="{Binding MaxLength}"
-                                                    PasswordChar="{Binding PasswordChar}"
-                                                    Text="{Binding ValueProxy.Value, Mode=TwoWay}"
-                                                    Watermark="{Binding Watermark}"/>
-                                            </DataTemplate>
+                      <DataTemplate DataType="m:SettingsStringItem">
+                        <TextBox
+                          MinWidth="320" MinHeight="32"
+                          HorizontalAlignment="Left"
+                          AcceptsReturn="{Binding IsMultiline}"
+                          MaxLength="{Binding MaxLength}"
+                          PasswordChar="{Binding PasswordChar}"
+                          Text="{Binding ValueProxy.Value, Mode=TwoWay}"
+                          Watermark="{Binding Watermark}"/>
+                      </DataTemplate>
 
-                                            <DataTemplate DataType="m:SettingsIntegerItem">
-                                                <StackPanel
-                                                    HorizontalAlignment="Left" Orientation="Horizontal"
-                                                    Spacing="8">
-                                                    <Slider
-                                                        Width="320" IsSnapToTickEnabled="True"
-                                                        Maximum="{Binding MaxValue}"
-                                                        Minimum="{Binding MinValue}"
-                                                        Value="{Binding ValueProxy.Value, Mode=TwoWay}"/>
-                                                    <TextBox
-                                                        MinHeight="32" VerticalAlignment="Center"
-                                                        Text="{Binding ValueProxy.Value, Mode=TwoWay}"/>
-                                                </StackPanel>
-                                            </DataTemplate>
+                      <DataTemplate DataType="m:SettingsIntegerItem">
+                        <StackPanel
+                          HorizontalAlignment="Left" Orientation="Horizontal"
+                          Spacing="8">
+                          <Slider
+                            Width="320" IsSnapToTickEnabled="True"
+                            Maximum="{Binding MaxValue}"
+                            Minimum="{Binding MinValue}"
+                            Value="{Binding ValueProxy.Value, Mode=TwoWay}"/>
+                          <TextBox
+                            MinHeight="32" VerticalAlignment="Center"
+                            Text="{Binding ValueProxy.Value, Mode=TwoWay}"/>
+                        </StackPanel>
+                      </DataTemplate>
 
-                                            <DataTemplate DataType="m:SettingsDoubleItem">
-                                                <StackPanel
-                                                    HorizontalAlignment="Left" Orientation="Horizontal"
-                                                    Spacing="8">
-                                                    <Slider
-                                                        Width="320" IsSnapToTickEnabled="True"
-                                                        Maximum="{Binding MaxValue}"
-                                                        Minimum="{Binding MinValue}"
-                                                        TickFrequency="{Binding Step}"
-                                                        Value="{Binding ValueProxy.Value, Mode=TwoWay}"/>
-                                                    <TextBox
-                                                        MinHeight="32" VerticalAlignment="Center"
-                                                        Text="{Binding ValueProxy.Value, Mode=TwoWay, StringFormat={}{0:F1}}"/>
-                                                </StackPanel>
-                                            </DataTemplate>
+                      <DataTemplate DataType="m:SettingsDoubleItem">
+                        <StackPanel
+                          HorizontalAlignment="Left" Orientation="Horizontal"
+                          Spacing="8">
+                          <Slider
+                            Width="320" IsSnapToTickEnabled="True"
+                            Maximum="{Binding MaxValue}"
+                            Minimum="{Binding MinValue}"
+                            TickFrequency="{Binding Step}"
+                            Value="{Binding ValueProxy.Value, Mode=TwoWay}"/>
+                          <TextBox
+                            MinHeight="32" VerticalAlignment="Center"
+                            Text="{Binding ValueProxy.Value, Mode=TwoWay, StringFormat={}{0:F1}}"/>
+                        </StackPanel>
+                      </DataTemplate>
 
-                                            <DataTemplate DataType="m:SettingsSelectionItem">
-                                                <ComboBox
-                                                    MinWidth="320" MinHeight="32"
-                                                    HorizontalAlignment="Left"
-                                                    DisplayMemberBinding="{Binding Self^}"
-                                                    ItemsSource="{Binding ItemsSource}"
-                                                    SelectedItem="{Binding SelectedItem, Mode=TwoWay}"/>
-                                            </DataTemplate>
+                      <DataTemplate DataType="m:SettingsSelectionItem">
+                        <ComboBox
+                          MinWidth="320" MinHeight="32"
+                          HorizontalAlignment="Left"
+                          DisplayMemberBinding="{Binding Self^}"
+                          ItemsSource="{Binding ItemsSource}"
+                          SelectedItem="{Binding SelectedItem, Mode=TwoWay}"/>
+                      </DataTemplate>
 
-                                            <DataTemplate DataType="m:SettingsKeyboardHotkeyItem">
-                                                <v:KeyboardHotkeyInputBox
-                                                    MinWidth="320" MinHeight="32"
-                                                    HorizontalAlignment="Left"
-                                                    Hotkey="{Binding ValueProxy.Value, Mode=TwoWay}"/>
-                                            </DataTemplate>
-                                        </ContentPresenter.DataTemplates>
-                                    </ContentPresenter>
-                                </StackPanel>
-                            </Expander.Header>
+                      <DataTemplate DataType="m:SettingsKeyboardHotkeyItem">
+                        <v:KeyboardHotkeyInputBox
+                          MinWidth="320" MinHeight="32"
+                          HorizontalAlignment="Left"
+                          Hotkey="{Binding ValueProxy.Value, Mode=TwoWay}"/>
+                      </DataTemplate>
+                    </ContentPresenter.DataTemplates>
+                  </ContentPresenter>
+                </StackPanel>
+              </Expander.Header>
 
-                            <ItemsControl
-                                Classes="SettingsItemItemsControl" HorizontalAlignment="Stretch"
-                                ItemsSource="{Binding Items}">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <StackPanel Spacing="10"/>
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                            </ItemsControl>
-                        </Expander>
-                    </DataTemplate>
-                </Setter>
-            </Style>
-        </ScrollViewer.Styles>
+              <ItemsControl
+                Classes="SettingsItemItemsControl" HorizontalAlignment="Stretch"
+                ItemsSource="{Binding Items}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <StackPanel Spacing="10"/>
+                  </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+              </ItemsControl>
+            </Expander>
+          </DataTemplate>
+        </Setter>
+      </Style>
+    </ScrollViewer.Styles>
 
-        <ItemsControl
-            Padding="64,32"
-            ItemsSource="{Binding Groups}">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate DataType="m:SettingsItemGroup">
-                    <StackPanel
-                        Margin="0,16" Spacing="16">
-                        <TextBlock
-                            Classes="h3"
-                            Text="{Binding HeaderKey^}"
-                            TextWrapping="WrapWithOverflow"/>
+    <ItemsControl
+      Padding="64,32"
+      ItemsSource="{Binding Groups}">
+      <ItemsControl.ItemTemplate>
+        <DataTemplate DataType="m:SettingsItemGroup">
+          <StackPanel
+            Margin="0,16" Spacing="16">
+            <TextBlock
+              Classes="h3"
+              Text="{Binding HeaderKey^}"
+              TextWrapping="WrapWithOverflow"/>
 
-                        <ItemsControl
-                            Classes="SettingsItemItemsControl" HorizontalAlignment="Stretch"
-                            ItemsSource="{Binding Items}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel Spacing="8"/>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                        </ItemsControl>
-                    </StackPanel>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
-    </ScrollViewer>
+            <ItemsControl
+              Classes="SettingsItemItemsControl" HorizontalAlignment="Stretch"
+              ItemsSource="{Binding Items}">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <StackPanel Spacing="8"/>
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+            </ItemsControl>
+          </StackPanel>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+  </ScrollViewer>
 </UserControl>
