@@ -13,7 +13,9 @@
   <img src="https://raw.githubusercontent.com/DearVa/Everywhere/refs/heads/main/img/banner.png" alt="Banner"/>
 
   <h1>
+
   随时随地，智能相伴 - `Everywhere`
+
   </h1>
 
   <p align="center">

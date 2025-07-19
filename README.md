@@ -13,7 +13,9 @@
   <img src="https://raw.githubusercontent.com/DearVa/Everywhere/refs/heads/main/img/banner.png" alt="Banner"/>
 
   <h1>
+
   Every moment, Every place. Your AI - `Everywhere`
+
   </h1>
 
   <p align="center">
