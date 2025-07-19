@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Text.Json.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Everywhere.Attributes;
@@ -38,7 +39,7 @@ public partial class CommonSettings() : SettingsBase("Common")
     [SettingsSelectionItem(ItemsSource = nameof(LanguageSource))]
     public string Language
     {
-        get => LocaleManager.CurrentLocale;
+        get => LocaleManager.CurrentLocale ?? CultureInfo.CurrentUICulture.Name;
         set
         {
             if (LocaleManager.CurrentLocale == value) return;

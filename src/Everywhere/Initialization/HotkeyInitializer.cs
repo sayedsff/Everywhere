@@ -1,12 +1,10 @@
-﻿using System.Globalization;
-using Avalonia.Threading;
-using Everywhere.I18N;
+﻿using Avalonia.Threading;
 using Everywhere.Models;
 using Everywhere.Views;
 
 namespace Everywhere.Initialization;
 
-public class AssistantInitializer(
+public class HotkeyInitializer(
     Settings settings,
     IHotkeyListener hotkeyListener,
     IVisualElementContext visualElementContext
@@ -16,8 +14,6 @@ public class AssistantInitializer(
 
     public Task InitializeAsync()
     {
-        LocaleManager.CurrentLocale = CultureInfo.CurrentUICulture.Name;
-
         visualElementContext.KeyboardFocusedElementChanged += element =>
         {
             if (!settings.Behavior.ShowAssistantFloatingWindowWhenInput) return;

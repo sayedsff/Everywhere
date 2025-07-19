@@ -181,7 +181,7 @@ public class SettingsPageViewModel : ReactiveViewModelBase
             nameof(Settings),
             (_, _) => debounceHelper.Execute(() => Dispatcher.UIThread.Invoke(() => ToastManager
                 .CreateToast(new DynamicResourceKey("SettingsPage_Saved_Toast_Title").ToString() ?? "")
-                .OnTopRight()
+                .OnBottomRight()
                 .DismissOnClick()
                 .WithDelay(1)
                 .ShowSuccess())));

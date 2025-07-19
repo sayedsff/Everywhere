@@ -79,8 +79,7 @@ await localeManagerWriter.WriteLineAsync(
     """
         }
 
-        [field: AllowNull, MaybeNull]
-        public static string CurrentLocale
+        public static string? CurrentLocale
         {
             get;
             set
@@ -94,9 +93,9 @@ await localeManagerWriter.WriteLineAsync(
                 }
                 
                 field = value;
-                if (!Locales.TryGetValue(value, out var newLocale))
+                if (value is null || !Locales.TryGetValue(value, out var newLocale))
                 {
-                    newLocale = Locales.Values.First();
+                    (field, newLocale) = Locales.First();
                 }
                 app.Resources.MergedDictionaries.Add(newLocale);
             }

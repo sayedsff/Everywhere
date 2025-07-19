@@ -104,7 +104,7 @@ public static class Program
 
                 #region Initialize
 
-                .AddSingleton<IAsyncInitializer, AssistantInitializer>()
+                .AddSingleton<IAsyncInitializer, HotkeyInitializer>()
                 .AddSingleton<IAsyncInitializer, SettingsInitializer>()
                 .AddSingleton<IAsyncInitializer>(xx => xx.GetRequiredService<ChatContextManager>())
                 .AddSingleton<IAsyncInitializer>(xx => xx.GetRequiredService<ChatDbContext>())

@@ -1,4 +1,6 @@
-﻿using Everywhere.Models;
+﻿using System.Globalization;
+using Everywhere.I18N;
+using Everywhere.Models;
 using Everywhere.Utils;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,6 +19,8 @@ public class SettingsInitializer([FromKeyedServices(nameof(Settings))] IConfigur
 
     public Task InitializeAsync()
     {
+        LocaleManager.CurrentLocale ??= CultureInfo.CurrentUICulture.Name;
+
         TrackableObject.AddPropertyChangedEventHandler(
             nameof(Settings),
             (sender, _) =>
