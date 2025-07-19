@@ -1,14 +1,5 @@
 <a id="readme-top"></a>
 
-<a href="https://github.com/DearVa/Everywhere/blob/main/README-zh-cn.md">前往中文版本 »</a>
-
-[![Contributors][contributors-shield]][contributors-url]
-[![Forks][forks-shield]][forks-url]
-[![Stargazers][stars-shield]][stars-url]
-[![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
-
-<br />
 <div align="center">
   <img src="https://raw.githubusercontent.com/DearVa/Everywhere/refs/heads/main/img/banner.png" alt="Banner"/>
 
@@ -34,6 +25,14 @@
 </div>
 
 ---
+
+<a href="https://github.com/DearVa/Everywhere/blob/main/README-zh-cn.md">前往中文版本 »</a>
+
+[![Contributors][contributors-shield]][contributors-url]
+[![Forks][forks-shield]][forks-url]
+[![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url]
+[![MIT License][license-shield]][license-url]
 
 ## About Everywhere
 
@@ -105,44 +104,45 @@ Distributed under the Apache 2.0 License. See [LICENSE](LICENSE) for more inform
 
 ### Third-Party Licenses
 
-- **accntech/shad-ui** - [MIT License](https://github.com/accntech/shad-ui/blob/main/LICENSE)
+- **shad-ui** - [MIT License](https://github.com/accntech/shad-ui/blob/main/LICENSE)
     - UI Styles and Components
     - Source repo: https://github.com/accntech/shad-ui
-- **dme-compunet/Lucide.Avalonia** - [MIT License](https://github.com/dme-compunet/Lucide.Avalonia/blob/master/LICENSE)
+- **Lucide.Avalonia** - [MIT License](https://github.com/dme-compunet/Lucide.Avalonia/blob/master/LICENSE)
     - Icons
     - Source repo: https://github.com/dme-compunet/Lucide.Avalonia
-- **Kira-NT/HotAvalonia** - [MIT License](https://github.com/Kira-NT/HotAvalonia/blob/master/LICENSE.md)
+- **HotAvalonia** - [MIT License](https://github.com/Kira-NT/HotAvalonia/blob/master/LICENSE.md)
     - Avalonia hot reload
     - Source repo: https://github.com/Kira-NT/HotAvalonia
-- **microsoft/CommunityToolkit.Mvvm** - [MIT License](https://github.com/CommunityToolkit/dotnet/blob/main/License.md)
+- **CommunityToolkit.Mvvm** - [MIT License](https://github.com/CommunityToolkit/dotnet/blob/main/License.md)
     - MVVM framework
     - Source repo: https://github.com/CommunityToolkit/dotnet
-- **Cysharp/ObservableCollections
-  ** - [MIT License](https://github.com/Cysharp/ObservableCollections/blob/master/LICENSE)
+- **ObservableCollections** - [MIT License](https://github.com/Cysharp/ObservableCollections/blob/master/LICENSE)
     - Observable collections for MVVM
     - Source repo: https://github.com/Cysharp/ObservableCollections
-- **Cysharp/Zlinq** - [MIT License](https://github.com/Cysharp/ZLinq/blob/master/LICENSE)
+- **Zlinq** - [MIT License](https://github.com/Cysharp/ZLinq/blob/master/LICENSE)
     - Zero allocation LINQ
     - Source repo: https://github.com/Cysharp/ZLinq
-- **FlaUI/FlaUI** - [MIT License](https://github.com/FlaUI/FlaUI/blob/master/LICENSE.txt)
+- **FlaUI** - [MIT License](https://github.com/FlaUI/FlaUI/blob/master/LICENSE.txt)
     - Screen Aware & UI Automation
     - Source repo: https://github.com/FlaUI/FlaUI
-- **microsoft/CsWin32** - [MIT License](https://github.com/microsoft/CsWin32/blob/main/LICENSE)
+- **CsWin32** - [MIT License](https://github.com/microsoft/CsWin32/blob/main/LICENSE)
     - Win32 API Autogen
     - Source repo: https://github.com/microsoft/CsWin32
-- **Kibnet/WritableJsonConfiguration
-  ** - [MIT License](https://github.com/Kibnet/WritableJsonConfiguration/blob/master/LICENSE)
+- **WritableJsonConfiguration** - [MIT License](https://github.com/Kibnet/WritableJsonConfiguration/blob/master/LICENSE)
     - Settings storage
     - Source repo: https://github.com/Kibnet/WritableJsonConfiguration
-- **microsoft/semantic-kernel** - [MIT License](https://github.com/microsoft/semantic-kernel/blob/main/LICENSE)
+- **semantic-kernel** - [MIT License](https://github.com/microsoft/semantic-kernel/blob/main/LICENSE)
     - LLMs, RAG, Tool call, etc.
     - Source repo: https://github.com/microsoft/semantic-kernel
-- **nietras/Sep** - [MIT License](https://github.com/nietras/Sep/blob/main/LICENSE)
+- **Sep** - [MIT License](https://github.com/nietras/Sep/blob/main/LICENSE)
     - TSV Reader for i18n
     - Source repo: https://github.com/nietras/Sep
-- **xoofx/markdig** - [BSD-2-Clause License](https://github.com/xoofx/markdig/blob/master/license.txt)
+- **markdig** - [BSD-2-Clause License](https://github.com/xoofx/markdig/blob/master/license.txt)
     - Markdown parser for Everywhere.Markdown rendering
     - Source repo: https://github.com/xoofx/markdig
+- **AsyncImageLoader.Avalonia** - [MIT License](https://github.com/AvaloniaUtils/AsyncImageLoader.Avalonia/blob/master/LICENSE)
+    - Asynchronous image loading for Avalonia
+    - Source repo: https://github.com/AvaloniaUtils/AsyncImageLoader.Avalonia
 
 ---
 

@@ -1,14 +1,5 @@
 <a id="readme-top"></a>
 
-<a href="https://github.com/DearVa/Everywhere">Go to English Version »</a>
-
-[![贡献者][contributors-shield]][contributors-url]
-[![Fork 数][forks-shield]][forks-url]
-[![Star 数][stars-shield]][stars-url]
-[![问题数][issues-shield]][issues-url]
-[![MIT 许可证][license-shield]][license-url]
-
-<br />
 <div align="center">
   <img src="https://raw.githubusercontent.com/DearVa/Everywhere/refs/heads/main/img/banner.png" alt="Banner"/>
 
@@ -34,6 +25,14 @@
 </div>
 
 ---
+
+<a href="https://github.com/DearVa/Everywhere">Go to English Version »</a>
+
+[![贡献者][contributors-shield]][contributors-url]
+[![Fork 数][forks-shield]][forks-url]
+[![Star 数][stars-shield]][stars-url]
+[![问题数][issues-shield]][issues-url]
+[![MIT 许可证][license-shield]][license-url]
 
 ## 关于 Everywhere
 
@@ -99,42 +98,45 @@
 
 ### 第三方许可证
 
-- **accntech/shad-ui** - [MIT License](https://github.com/accntech/shad-ui/blob/main/LICENSE)
+- **shad-ui** - [MIT License](https://github.com/accntech/shad-ui/blob/main/LICENSE)
     - UI 样式和组件
     - Source repo: https://github.com/accntech/shad-ui
-- **dme-compunet/Lucide.Avalonia** - [MIT License](https://github.com/dme-compunet/Lucide.Avalonia/blob/master/LICENSE)
+- **Lucide.Avalonia** - [MIT License](https://github.com/dme-compunet/Lucide.Avalonia/blob/master/LICENSE)
     - 图标
     - Source repo: https://github.com/dme-compunet/Lucide.Avalonia
-- **Kira-NT/HotAvalonia** - [MIT License](https://github.com/Kira-NT/HotAvalonia/blob/master/LICENSE.md)
+- **HotAvalonia** - [MIT License](https://github.com/Kira-NT/HotAvalonia/blob/master/LICENSE.md)
     - 热重载支持
     - Source repo: https://github.com/Kira-NT/HotAvalonia
-- **microsoft/CommunityToolkit.Mvvm** - [MIT License](https://github.com/CommunityToolkit/dotnet/blob/main/License.md)
+- **CommunityToolkit.Mvvm** - [MIT License](https://github.com/CommunityToolkit/dotnet/blob/main/License.md)
     - MVVM 框架
     - Source repo: https://github.com/CommunityToolkit/dotnet
-- **Cysharp/ObservableCollections** - [MIT License](https://github.com/Cysharp/ObservableCollections/blob/master/LICENSE)
+- **ObservableCollections** - [MIT License](https://github.com/Cysharp/ObservableCollections/blob/master/LICENSE)
     - Observable collections for MVVM
     - Source repo: https://github.com/Cysharp/ObservableCollections
-- **Cysharp/Zlinq** - [MIT License](https://github.com/Cysharp/ZLinq/blob/master/LICENSE)
+- **Zlinq** - [MIT License](https://github.com/Cysharp/ZLinq/blob/master/LICENSE)
     - 零分配 LINQ
     - Source repo: https://github.com/Cysharp/ZLinq
-- **FlaUI/FlaUI** - [MIT License](https://github.com/FlaUI/FlaUI/blob/master/LICENSE.txt)
+- **FlaUI** - [MIT License](https://github.com/FlaUI/FlaUI/blob/master/LICENSE.txt)
     - 屏幕感知和 UI 自动化
     - Source repo: https://github.com/FlaUI/FlaUI
-- **microsoft/CsWin32** - [MIT License](https://github.com/microsoft/CsWin32/blob/main/LICENSE)
+- **CsWin32** - [MIT License](https://github.com/microsoft/CsWin32/blob/main/LICENSE)
     - Win32 API 自动生成
     - Source repo: https://github.com/microsoft/CsWin32
-- **Kibnet/WritableJsonConfiguration** - [MIT License](https://github.com/Kibnet/WritableJsonConfiguration/blob/master/LICENSE)
+- **WritableJsonConfiguration** - [MIT License](https://github.com/Kibnet/WritableJsonConfiguration/blob/master/LICENSE)
     - 设置存储
     - Source repo: https://github.com/Kibnet/WritableJsonConfiguration
-- **microsoft/semantic-kernel** - [MIT License](https://github.com/microsoft/semantic-kernel/blob/main/LICENSE)
+- **semantic-kernel** - [MIT License](https://github.com/microsoft/semantic-kernel/blob/main/LICENSE)
     - 语义内核和插件系统
     - Source repo: https://github.com/microsoft/semantic-kernel
-- **nietras/Sep** - [MIT License](https://github.com/nietras/Sep/blob/main/LICENSE)
+- **Sep** - [MIT License](https://github.com/nietras/Sep/blob/main/LICENSE)
     - TSV 读取器，用于国际化
     - Source repo: https://github.com/nietras/Sep
-- **xoofx/markdig** - [BSD-2-Clause License](https://github.com/xoofx/markdig/blob/master/license.txt)
+- **markdig** - [BSD-2-Clause License](https://github.com/xoofx/markdig/blob/master/license.txt)
     - Markdown 解析器，用于 Everywhere.Markdown 渲染
     - Source repo: https://github.com/xoofx/markdig
+- **AsyncImageLoader.Avalonia** - [MIT License](https://github.com/AvaloniaUtils/AsyncImageLoader.Avalonia/blob/master/LICENSE)
+    - 异步图像加载器
+    - Source repo: https://github.com/AvaloniaUtils/AsyncImageLoader.Avalonia
 
 ---
 
