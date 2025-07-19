@@ -217,8 +217,6 @@
             Spacing="4">
             <Button
               x:Name="PART_SendButton" Classes="Primary Rounded"
-              Command="{TemplateBinding Command}"
-              CommandParameter="{TemplateBinding Text}"
               IsVisible="{Binding !IsVisible, ElementName=PART_CancelButton}"
               ToolTip.Tip="{DynamicResource AssistantInputBox_SendButton_ToolTip}">
               <Button.IsEnabled>

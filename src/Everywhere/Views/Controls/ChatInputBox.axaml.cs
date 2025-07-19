@@ -208,17 +208,22 @@ public partial class ChatInputBox : TextBox
         attachmentItemsControlPointerMovedSubscription?.Dispose();
         attachmentItemsControlPointerExitedSubscription?.Dispose();
 
+        // We handle the click event of the SendButton here instead of using Command binding,
+        // because we need to clear the text after sending the message.
         if (e.NameScope.Find<Button>("PART_SendButton") is { } sendButton)
         {
             sendButtonClickSubscription = sendButton.AddDisposableHandler(
                 Button.ClickEvent,
                 (_, args) =>
                 {
+                    if (Command?.CanExecute(Text) is not true) return;
+                    Command.Execute(Text);
                     Text = string.Empty;
                     args.Handled = true;
                 },
                 handledEventsToo: true);
         }
+
         if (e.NameScope.Find<ItemsControl>("PART_AttachmentItemsControl") is { } attachmentItemsControl)
         {
             attachmentItemsControlPointerMovedSubscription = attachmentItemsControl.AddDisposableHandler(
