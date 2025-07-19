@@ -1,6 +1,7 @@
 ﻿// @author https://github.com/DearVa
 
 using System.Runtime.CompilerServices;
+using AsyncImageLoader;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
@@ -46,7 +47,12 @@ public partial class MarkdownRenderer
             }
 
             var result = IsCompatible(markdownObject) && UpdateCore(markdownObject, change, cancellationToken);
-            PrintMetrics(markdownObject.GetType().Name);
+            VerboseLogger?.Log(
+                this,
+                "Update {NodeName} {Result} {Span}",
+                markdownObject.GetType().Name,
+                result,
+                markdownObject.Span);
             span = markdownObject.Span;
             if (SelectableTextBlock is { } selectableTextBlock) SelectedTextBlockUpdated?.Invoke(selectableTextBlock, !result);
             return result;
@@ -273,7 +279,10 @@ public partial class MarkdownRenderer
             return markdownObject is CodeInline;
         }
 
-        protected override bool UpdateCore(MarkdownObject markdownObject, in ObservableStringBuilderChangedEventArgs change, CancellationToken cancellationToken)
+        protected override bool UpdateCore(
+            MarkdownObject markdownObject,
+            in ObservableStringBuilderChangedEventArgs change,
+            CancellationToken cancellationToken)
         {
             var code = Unsafe.As<CodeInline>(markdownObject);
             selectableTextBlock.Text = code.Content;
@@ -322,7 +331,7 @@ public partial class MarkdownRenderer
                     Inlines.Clear();
                     Inlines.Add(new AvaloniaDocs.InlineUIContainer(img = CreateImage()));
                 }
-                // ImageLoader.SetSource(img, linkInline.Url);
+                ImageLoader.SetSource(img, linkInline.Url);
 
                 return true;
 
@@ -568,8 +577,17 @@ public partial class MarkdownRenderer
                     Grid.SetRow(cellControl, rowIndex);
                     Grid.SetColumn(cellControl, columnIndex);
 
-                    if (row.IsHeader && cellControl.Classes.Count < 2) cellControl.Classes.Add("Header");
-                    else if (!row.IsHeader && cellControl.Classes.Count > 1) cellControl.Classes.Remove("Header");
+                    if (row.IsHeader)
+                    {
+                        if (!cellControl.Classes.Contains("Header"))
+                        {
+                            cellControl.Classes.Add("Header");
+                        }
+                    }
+                    else
+                    {
+                        cellControl.Classes.Remove("Header");
+                    }
 
                     if (columnIndex >= table.ColumnDefinitions.Count) continue;
                     if (cellControl is not Border { Child: { } child }) continue;
@@ -672,24 +690,25 @@ public partial class MarkdownRenderer
                 }
 
                 var itemBlock = listBlock[i];
+                var numberIndex = i * 2;
 
                 // number part
-                var numberIndex = i * 2;
                 if (listBlock.IsOrdered)
                 {
+                    TextBlock numberControl;
                     if (proxy.Count > numberIndex && proxy[numberIndex].Control is TextBlock existingNumberControl)
                     {
                         // existing number block node, update it
-                        existingNumberControl.Text = $"{number++}.";
+                        numberControl = existingNumberControl;
                     }
                     else
                     {
                         // create a new number block node
-                        var numberControl = new TextBlock
+                        numberControl = new TextBlock
                         {
                             Classes = { "ListBlockNumber" },
-                            Text = $"{number++}."
                         };
+
                         if (proxy.Count > numberIndex)
                         {
                             // replace the existing number block node
@@ -699,33 +718,52 @@ public partial class MarkdownRenderer
                         {
                             // add a new number block node
                             proxy.Add(numberControl);
-                            Grid.SetRow(numberControl, i);
                         }
                     }
+
+                    Grid.SetRow(numberControl, i);
+                    Grid.SetColumn(numberControl, 0);
+                    numberControl.Text = $"{number++}.";
                 }
                 else
                 {
-                    if (proxy.Count > numberIndex)
+                    Border bulletIcon;
+                    if (proxy.Count > numberIndex && proxy[numberIndex].Control is Border existingBulletIcon)
                     {
                         // existing bullet block node, update it
-                        proxy[numberIndex].Control.Classes[1] = GetBulletClass();
+                        bulletIcon = existingBulletIcon;
                     }
                     else
                     {
                         // create a new bullet block node
-                        var bulletIcon = new Border
+                        bulletIcon = new Border
                         {
-                            Classes =
-                            {
-                                "ListBlockBullet",
-                                GetBulletClass()
-                            }
+                            Classes = { "ListBlockBullet" }
                         };
-                        proxy.Add(bulletIcon);
-                        Grid.SetRow(bulletIcon, i);
+
+                        if (proxy.Count > numberIndex)
+                        {
+                            proxy.SetControlAt(numberIndex, bulletIcon);
+                        }
+                        else
+                        {
+                            proxy.Add(bulletIcon);
+                        }
                     }
 
-                    string GetBulletClass() => "Level" + (listBlock.Column / 2) % 4;
+                    Grid.SetRow(bulletIcon, i);
+                    Grid.SetColumn(bulletIcon, 0);
+                    var bulletClass = "Level" + (listBlock.Column / 2) % 4;
+                    if (bulletIcon.Classes.Count > 1)
+                    {
+                        // Update existing bullet class
+                        bulletIcon.Classes[1] = bulletClass;
+                    }
+                    else
+                    {
+                        // Add new bullet class
+                        bulletIcon.Classes.Add(bulletClass);
+                    }
                 }
 
                 // item part
@@ -746,6 +784,8 @@ public partial class MarkdownRenderer
                     }
 
                     proxy[itemIndex] = newItemBlockNode;
+                    Grid.SetRow(newItemBlockNode.Control, i);
+                    Grid.SetColumn(newItemBlockNode.Control, 1);
                 }
                 else
                 {
@@ -836,17 +876,19 @@ public partial class MarkdownRenderer
             if (codeBlock.Lines.Lines is null) return false;
 
             var inlines = codeTextBlock.Inlines ?? throw new InvalidOperationException("This should never happen");
-            foreach (var (slice, i) in codeBlock.Lines.Lines.AsValueEnumerable().Take(codeBlock.Lines.Count).Select((l, i) => (l.Slice, i * 2)))
+            foreach (var (slice, lineIndex) in codeBlock.Lines.Lines.AsValueEnumerable().Take(codeBlock.Lines.Count).Select((l, i) => (l.Slice, i)))
             {
+                var inlineIndex = lineIndex * 2;
+
                 // Skip if the slice is completely outside the change range
-                if (inlines.Count > i &&
+                if (inlines.Count > inlineIndex &&
                     (slice.End < change.StartIndex || change.StartIndex + change.Length <= slice.Start)) continue;
 
-                if (inlines.Count <= i)
+                if (inlines.Count <= inlineIndex)
                 {
                     inlines.Add(new AvaloniaDocs.Run(slice.ToString()));
                 }
-                else if (inlines[i] is AvaloniaDocs.Run run)
+                else if (inlines[inlineIndex] is AvaloniaDocs.Run run)
                 {
                     // Update existing run
                     run.Text = slice.ToString();
@@ -854,23 +896,24 @@ public partial class MarkdownRenderer
                 else
                 {
                     // Replace it with a new run if it's not a Run
-                    inlines[i] = new AvaloniaDocs.Run(slice.ToString());
+                    inlines[inlineIndex] = new AvaloniaDocs.Run(slice.ToString());
                 }
 
-                if (i / 2 < codeBlock.Lines.Count - 1)
+                if (lineIndex < codeBlock.Lines.Count - 1)
                 {
                     // Add a line break after each line except the last one
-                    if (inlines.Count <= i + 1)
+                    if (inlines.Count <= inlineIndex + 1)
                     {
                         inlines.Add(new AvaloniaDocs.LineBreak());
                     }
-                    else if (inlines[i + 1] is not AvaloniaDocs.LineBreak)
+                    else if (inlines[inlineIndex + 1] is not AvaloniaDocs.LineBreak)
                     {
                         // Replace it with a LineBreak if it's not a LineBreak
-                        inlines[i + 1] = new AvaloniaDocs.LineBreak();
+                        inlines[inlineIndex + 1] = new AvaloniaDocs.LineBreak();
                     }
                 }
             }
+
             while (inlines.Count > codeBlock.Lines.Count * 2 - 1)
             {
                 // Remove excess inlines

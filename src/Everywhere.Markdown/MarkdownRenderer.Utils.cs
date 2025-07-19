@@ -403,12 +403,4 @@ public partial class MarkdownRenderer
             return cursor;
         }
     }
-
-    [Conditional("EnablePrintMetrics")]
-    private static void PrintMetrics(string metrics, [CallerMemberName] string memberName = "")
-    {
-        var message = $"[{DateTime.Now:G}] ({memberName}) {metrics}";
-        if (Debugger.IsAttached) Debug.WriteLine(message);
-        else Console.WriteLine(message);
-    }
 }

@@ -2,9 +2,9 @@
 // @author https://github.com/AuroraZiling
 // @author https://github.com/SlimeNull
 
-using System.Diagnostics;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Logging;
 using Avalonia.Threading;
 using Markdig;
 
@@ -43,6 +43,13 @@ public partial class MarkdownRenderer : Control
         .UseCodeBlockSpanFixer()
         .Build();
 
+    private static readonly ParametrizedLogger? VerboseLogger;
+
+    static MarkdownRenderer()
+    {
+        VerboseLogger = Logger.TryGet(LogEventLevel.Verbose, $"{nameof(MarkdownRenderer)}");
+    }
+
     public MarkdownRenderer()
     {
         LogicalChildren.Add(documentNode.Control);
@@ -62,13 +69,13 @@ public partial class MarkdownRenderer : Control
             try
             {
                 var markdown = e.NewString;
-                var timer = Stopwatch.StartNew();
+                var time = DateTimeOffset.UtcNow;
                 var document = await Task.Run(() => Markdig.Markdown.Parse(markdown, pipeline));
-                PrintMetrics($"Parse markdown in {timer.Elapsed.TotalMicroseconds} micro sec.");
+                VerboseLogger?.Log(this, "Parse markdown in {TotalMicroseconds} micro sec.", (DateTimeOffset.UtcNow - time).TotalMicroseconds);
 
-                timer.Restart();
+                time = DateTimeOffset.UtcNow;
                 documentNode.Update(document, e, CancellationToken.None);
-                PrintMetrics($"Render markdown in {timer.Elapsed.TotalMicroseconds} micro sec.");
+                VerboseLogger?.Log(this, "Render markdown in {TotalMicroseconds} micro sec.", (DateTimeOffset.UtcNow - time).TotalMicroseconds);
             }
             catch (OperationCanceledException) { }
             catch (Exception ex)
