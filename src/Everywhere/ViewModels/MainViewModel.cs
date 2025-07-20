@@ -1,30 +1,38 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Avalonia.Controls;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Lucide.Avalonia;
 using Microsoft.Extensions.DependencyInjection;
 using ObservableCollections;
-using ShadUI.Controls;
+using ShadUI;
 
 namespace Everywhere.ViewModels;
 
-public class MainViewModel(IServiceProvider serviceProvider) : ReactiveViewModelBase
+public partial class MainViewModel(IServiceProvider serviceProvider) : ReactiveViewModelBase
 {
     [field: AllowNull, MaybeNull]
-    public NotifyCollectionChangedSynchronizedViewList<SidebarMenuItem> Pages =>
+    public NotifyCollectionChangedSynchronizedViewList<SidebarItem> Pages =>
         field ??= pages.ToNotifyCollectionChangedSlim(SynchronizationContextCollectionEventDispatcher.Current);
 
-    private readonly ObservableList<SidebarMenuItem> pages = [];
+    [ObservableProperty] public partial SidebarItem? SelectedPage { get; set; }
+
+    private readonly ObservableList<SidebarItem> pages = [];
 
     protected internal override Task ViewLoaded(CancellationToken cancellationToken)
     {
         pages.Reset(
             serviceProvider.GetServices<IMainViewPage>().Select(
-                p => new SidebarMenuItem
+                p => new SidebarItem
                 {
-                    [!SidebarMenuItem.HeaderProperty] = Application.Current!.Resources.GetResourceObservable(p.Title).ToBinding(),
-                    Content = p,
-                    Icon = new LucideIcon { Kind = p.Icon, Size = 16}
+                    [ContentControl.ContentProperty] = new TextBlock
+                    {
+                        Classes = { "p" },
+                        [!TextBlock.TextProperty] = p.Title.ToBinding()
+                    },
+                    [SidebarItem.RouteProperty] = p,
+                    Icon = new LucideIcon { Kind = p.Icon, Size = 20 }
                 }));
+        SelectedPage = pages.FirstOrDefault();
         return base.ViewLoaded(cancellationToken);
     }
 }

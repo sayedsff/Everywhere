@@ -1,7 +1,6 @@
 ﻿using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
-using ShadUI.Dialogs;
-using ShadUI.Toasts;
+using ShadUI;
 
 namespace Everywhere.ViewModels;
 

@@ -1,7 +1,7 @@
 ﻿<ResourceDictionary
   xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-  xmlns:be="clr-namespace:Everywhere.Behaviors" xmlns:extensions="clr-namespace:ShadUI.Extensions;assembly=ShadUI"
-  xmlns:m="clr-namespace:Everywhere.Models" xmlns:v="clr-namespace:Everywhere.Views">
+  xmlns:be="clr-namespace:Everywhere.Behaviors" xmlns:m="clr-namespace:Everywhere.Models"
+  xmlns:shadui="clr-namespace:ShadUI;assembly=ShadUI" xmlns:v="clr-namespace:Everywhere.Views">
 
   <ControlTheme
     x:Key="{x:Type v:ChatInputBox}"
@@ -148,11 +148,11 @@
             Orientation="Horizontal" Spacing="4">
             <Menu>
               <MenuItem
-                Classes="Outline Rounded" extensions:MenuItemAssist.PopupPlacement="TopEdgeAlignedLeft"
-                extensions:MenuItemAssist.PopupVerticalOffset="-4"
+                Classes="Outline Rounded" shadui:MenuItemAssist.PopupPlacement="TopEdgeAlignedLeft"
+                shadui:MenuItemAssist.PopupVerticalOffset="-4"
                 ItemsSource="{TemplateBinding AddChatAttachmentMenuItems}"
                 ToolTip.Tip="{DynamicResource AssistantInputBox_AddAttachmentButton_ToolTip}">
-                <extensions:MenuItemAssist.Label>
+                <shadui:MenuItemAssist.Label>
                   <TextBlock>
                     <Run Text="{DynamicResource AssistantInputBox_AddAttachmentMenuItem_Header}"/>
                     <Run Text=" ("/>
@@ -161,7 +161,7 @@
                     <Run Text="{Binding $parent[v:ChatInputBox].MaxChatAttachmentCount}"/>
                     <Run Text=")"/>
                   </TextBlock>
-                </extensions:MenuItemAssist.Label>
+                </shadui:MenuItemAssist.Label>
 
                 <MenuItem.Header>
                   <LucideIcon

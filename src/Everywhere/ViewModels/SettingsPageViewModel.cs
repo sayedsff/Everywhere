@@ -5,7 +5,7 @@ using Everywhere.Attributes;
 using Everywhere.Models;
 using Everywhere.Utils;
 using MessagePack;
-using ShadUI.Toasts;
+using ShadUI;
 using ZLinq;
 
 namespace Everywhere.ViewModels;

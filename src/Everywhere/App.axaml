@@ -1,9 +1,9 @@
 <Application
   x:Class="Everywhere.App" xmlns="https://github.com/avaloniaui"
-  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:themes="clr-namespace:ShadUI.Themes;assembly=ShadUI">
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI">
 
   <Application.Styles>
-    <themes:ShadTheme/>
+    <shadui:ShadTheme/>
     <StyleInclude Source="avares://Everywhere.Markdown/MarkdownRenderer.axaml"/>
   </Application.Styles>
 

@@ -4,13 +4,13 @@ using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 using Everywhere.Utils;
 using Everywhere.Views;
+using Window = Avalonia.Controls.Window;
 #if DEBUG
 using Everywhere.Enums;
 using Everywhere.Models;
 using Everywhere.Views.Pages;
 using Microsoft.Extensions.DependencyInjection;
-using ShadUI.Dialogs;
-using ShadUI.Toasts;
+using ShadUI;
 #endif
 
 namespace Everywhere;

@@ -1,10 +1,11 @@
-﻿using Lucide.Avalonia;
+﻿using Everywhere.Models;
+using Lucide.Avalonia;
 
 namespace Everywhere.Views.Pages;
 
 public partial class SettingsPage : ReactiveUserControl<SettingsPageViewModel>, IMainViewPage
 {
-    public string Title => "SettingsPage_Title";
+    public DynamicResourceKey Title => new("SettingsPage_Title");
 
     public LucideIconKind Icon => LucideIconKind.Cog;
 

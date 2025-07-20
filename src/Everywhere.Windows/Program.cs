@@ -22,8 +22,7 @@ using Microsoft.KernelMemory.AI;
 using Microsoft.KernelMemory.Configuration;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.TextGeneration;
-using ShadUI.Dialogs;
-using ShadUI.Toasts;
+using ShadUI;
 using WritableJsonConfiguration;
 
 namespace Everywhere.Windows;

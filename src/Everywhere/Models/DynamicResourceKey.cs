@@ -33,8 +33,11 @@ public partial class DynamicResourceKey(object key) : DynamicResourceKeyBase
     [Key(0)]
     protected object Key => key;
 
+    public IObservable<object?> GetObservable() =>
+        Application.Current!.Resources.GetResourceObservable(key);
+
     public override IDisposable Subscribe(IObserver<object?> observer) =>
-        Application.Current!.Resources.GetResourceObservable(key).Subscribe(observer);
+        GetObservable().Subscribe(observer);
 
     [return: NotNullIfNotNull(nameof(key))]
     public static implicit operator DynamicResourceKey?(string? key) => key == null ? null : new DynamicResourceKey(key);

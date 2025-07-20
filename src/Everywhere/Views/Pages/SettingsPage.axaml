@@ -1,9 +1,8 @@
 ﻿<UserControl
   x:Class="Everywhere.Views.Pages.SettingsPage" xmlns="https://github.com/avaloniaui"
-  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:contents="clr-namespace:ShadUI.Contents;assembly=ShadUI"
-  xmlns:m="clr-namespace:Everywhere.Models" xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI"
-  xmlns:v="clr-namespace:Everywhere.Views" xmlns:vm="clr-namespace:Everywhere.ViewModels"
-  x:DataType="vm:SettingsPageViewModel">
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:m="clr-namespace:Everywhere.Models"
+  xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI" xmlns:v="clr-namespace:Everywhere.Views"
+  xmlns:vm="clr-namespace:Everywhere.ViewModels" x:DataType="vm:SettingsPageViewModel">
   <ScrollViewer
     HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
     <ScrollViewer.Styles>
@@ -33,12 +32,19 @@
                           Grid.Column="0" HorizontalAlignment="Left"
                           VerticalAlignment="Center"
                           Content="{TemplateBinding Header}"/>
-                        <PathIcon
+                        <LucideIcon
                           x:Name="PART_Icon" Grid.Column="1"
-                          Width="20" Height="20"
-                          Margin="20,0" HorizontalAlignment="Left"
-                          Data="{x:Static contents:Icons.ChevronDown}"
-                          IsHitTestVisible="False"/>
+                          Margin="20,0,0,0" HorizontalAlignment="Left"
+                          IsHitTestVisible="False" Kind="ChevronDown"
+                          Size="24">
+                          <LucideIcon.Transitions>
+                            <Transitions>
+                              <TransformOperationsTransition
+                                Easing="CubicEaseInOut" Property="RenderTransform"
+                                Duration="0:0:0.3"/>
+                            </Transitions>
+                          </LucideIcon.Transitions>
+                        </LucideIcon>
                       </Grid>
                     </Panel>
                   </LayoutTransformControl>
@@ -67,7 +73,7 @@
       </Style>
 
       <Style Selector="Expander.SettingsItemContainer.NotExpandable">
-        <Style Selector="^ PathIcon#PART_Icon">
+        <Style Selector="^ LucideIcon#PART_Icon">
           <Setter Property="IsVisible" Value="False"/>
         </Style>
         <Style Selector="^ ToggleButton#PART_ToggleButton">
@@ -75,6 +81,12 @@
         </Style>
         <Style Selector="^ ContentControl#ContentExpandControlContainer">
           <Setter Property="IsVisible" Value="False"/>
+        </Style>
+      </Style>
+
+      <Style Selector="Expander:expanded">
+        <Style Selector="^ LucideIcon#PART_Icon">
+          <Setter Property="RenderTransform" Value="Rotate(180deg)"/>
         </Style>
       </Style>
 

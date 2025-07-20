@@ -36,6 +36,7 @@
     <!-- Avalonia packages -->
     <PackageVersion Include="Avalonia" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Skia" Version="$(AvaloniaVersion)" />
+    <PackageVersion Include="Avalonia.Controls.ColorPicker" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Themes.Simple" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
