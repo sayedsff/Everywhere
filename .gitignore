@@ -457,3 +457,8 @@ $RECYCLE.BIN/
 
 /src/Everywhere/I18N/*.axaml
 /src/Everywhere/I18N/*.cs
+
+# VitePress
+/docs/.vitepress/cache
+/docs/.vitepress/dist
+/docs/node_modules
