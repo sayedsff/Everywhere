@@ -27,7 +27,7 @@ public class Win32WindowHelper : IWindowHelper
     // ReSharper restore InconsistentNaming
     // ReSharper restore IdentifierTypo
 
-    public unsafe void SetWindowNoFocus(Window window)
+    public void SetWindowNoFocus(Window window)
     {
         Win32Properties.AddWindowStylesCallback(window, WindowStylesCallback);
 
@@ -62,35 +62,6 @@ public class Win32WindowHelper : IWindowHelper
                     return IntPtr.Zero;
             }
         }
-
-        // TODO: Following is broken
-        uint tid = 0, targetTid = 0;
-
-        window.GotFocus += (_, e) =>
-        {
-            if (e.Source is not TextBox) return;
-            tid = PInvoke.GetCurrentThreadId();
-            var targetHWnd = PInvoke.GetForegroundWindow();
-            targetTid = PInvoke.GetWindowThreadProcessId(targetHWnd, null);
-            PInvoke.AttachThreadInput(targetTid, tid, true);
-        };
-
-        window.LostFocus += (_, e) =>
-        {
-            if (e.Source is not TextBox) return;
-            PInvoke.AttachThreadInput(targetTid, tid, false);
-            tid = targetTid = 0;
-        };
-
-        window.PropertyChanged += (_, e) =>
-        {
-            if (e.Property != Avalonia.Visual.IsVisibleProperty || e.NewValue is not false) return;
-#pragma warning disable CS0618 // 类型或成员已过时
-            window.FocusManager?.ClearFocus(); // why, avalonia, why!!!!!!!!!!!!!!!!!!
-#pragma warning restore CS0618 // 类型或成员已过时
-            PInvoke.AttachThreadInput(targetTid, tid, false);
-            tid = targetTid = 0;
-        };
     }
 
     public void SetWindowAutoHide(Window window)
