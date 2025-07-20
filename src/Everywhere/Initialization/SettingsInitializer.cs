@@ -21,16 +21,13 @@ public class SettingsInitializer([FromKeyedServices(nameof(Settings))] IConfigur
     {
         LocaleManager.CurrentLocale ??= CultureInfo.CurrentUICulture.Name;
 
-        TrackableObject.AddPropertyChangedEventHandler(
-            nameof(Settings),
+        TrackableObject<SettingsBase>.AddPropertyChangedEventHandler(
             (sender, _) =>
             {
-                if (sender is not SettingsBase settingsBase) return;
-
                 debounceHelper.Execute(() =>
                 {
-                    if (settingsBase.Section.Length == 0) configuration.Set(settingsBase);
-                    else configuration.Set(settingsBase.Section, settingsBase);
+                    if (sender.Section.Length == 0) configuration.Set(sender);
+                    else configuration.Set(sender.Section, sender);
                 });
             });
 

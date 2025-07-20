@@ -98,7 +98,7 @@ public static class Program
 
                 #region Database
 
-                .AddDbContext<ChatDbContext>(ServiceLifetime.Singleton)
+                .AddDbContext<IChatDatabase, ChatDbContext>(ServiceLifetime.Singleton)
 
                 #endregion
 

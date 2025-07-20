@@ -164,7 +164,7 @@
 
         <Button
           Classes="Ghost TitleBar" Margin="0,0,4,0"
-          Command="{Binding ChatContextManager.CreateNew}"
+          Command="{Binding ChatContextManager.CreateNewCommand}"
           ToolTip.Tip="{DynamicResource AssistantFloatingWindow_CreateNew_ToolTip}">
           <LucideIcon Kind="Plus"/>
         </Button>

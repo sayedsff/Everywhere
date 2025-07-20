@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Everywhere.Models;
 using ObservableCollections;
 
@@ -12,7 +13,9 @@ public interface IChatContextManager : INotifyPropertyChanged
 
     IEnumerable<ChatContextHistory> History { get; }
 
-    void CreateNew();
+    IRelayCommand CreateNewCommand { get; }
 
     void UpdateHistory();
+
+    void Remove(ChatContext chatContext);
 }

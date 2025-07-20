@@ -1,13 +1,32 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Everywhere.Models;
 using Everywhere.Utils;
+using MessagePack;
 using Microsoft.EntityFrameworkCore;
 
 namespace Everywhere.Database;
 
-public class ChatDbContext(IRuntimeConstantProvider runtimeConstantProvider) : DbContext, IAsyncInitializer
+public interface IChatDatabase
+{
+    /// <summary>
+    /// Adds a new chat context to the database and tracks it for changes.
+    /// </summary>
+    /// <param name="chatContext"></param>
+    void AddChatContext(ChatContextDbItem chatContext);
+
+    /// <summary>
+    /// Removes a chat context from the database. This will also remove the context from tracking.
+    /// </summary>
+    /// <param name="chatContext"></param>
+    void RemoveChatContext(ChatContextDbItem chatContext);
+
+    IEnumerable<ChatContextDbItem> QueryChatContexts(Func<IQueryable<ChatContextDbItem>, IQueryable<ChatContextDbItem>> queryBuilder);
+}
+
+public class ChatDbContext(IRuntimeConstantProvider runtimeConstantProvider) : DbContext, IChatDatabase, IAsyncInitializer
 {
     public required DbSet<ChatContextDbItem> ChatContextDbSet { get; init; }
 
@@ -24,10 +43,27 @@ public class ChatDbContext(IRuntimeConstantProvider runtimeConstantProvider) : D
         modelBuilder.Entity<ChatContextDbItem>(entity =>
         {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.SerializedData).IsRequired();
+            entity.Property(e => e.SerializedData).HasColumnType("BLOB").IsRequired();
             entity.Property(e => e.DateModified).HasConversion<long>().IsRequired();
             entity.HasIndex(e => e.DateModified);
         });
+    }
+
+    public void AddChatContext(ChatContextDbItem chatContext)
+    {
+        ChatContextDbSet.Add(chatContext);
+        SaveChanges();
+    }
+
+    public void RemoveChatContext(ChatContextDbItem chatContext)
+    {
+        ChatContextDbSet.Remove(chatContext);
+        SaveChanges();
+    }
+
+    public IEnumerable<ChatContextDbItem> QueryChatContexts(Func<IQueryable<ChatContextDbItem>, IQueryable<ChatContextDbItem>> queryBuilder)
+    {
+        return [..queryBuilder(ChatContextDbSet)];
     }
 
     public int Priority => 100;
@@ -36,43 +72,48 @@ public class ChatDbContext(IRuntimeConstantProvider runtimeConstantProvider) : D
     {
         await Database.EnsureCreatedAsync();
 
-        TrackableObject.AddPropertyChangedEventHandler(
-            nameof(ChatContext),
+        TrackableObject<ChatContextDbItem>.AddPropertyChangedEventHandler(
             (sender, _) => debounceHelper.Execute(() => Task.Run(() =>
             {
-                Debug.Assert(sender is ChatContext, "Sender must be of type ChatContext");
-                if (sender is not ChatContext chatContext) return;
-
-                var dbItem = ChatContextDbSet.FirstOrDefault(c => c.Id == chatContext.DbId);
-                if (dbItem is null)
-                {
-                    dbItem = new ChatContextDbItem(chatContext);
-                    ChatContextDbSet.Add(dbItem);
-                }
-                else
-                {
-                    dbItem.Item = chatContext;
-                }
+                sender.Value = sender.Value; // re-serialize the value to update the database
                 SaveChanges();
             })));
     });
 }
 
-public class ChatContextDbItem : MessagePackDbItem<ChatContext>
+public class ChatContextDbItem : TrackableObject<ChatContextDbItem>
 {
+    [System.ComponentModel.DataAnnotations.Key]
+    public int Id { get; init; }
+
+    public byte[] SerializedData { get; set; }
+
     [NotMapped]
-    public sealed override ChatContext Item
+    [field: AllowNull, MaybeNull]
+    public required ChatContext Value
     {
         get
         {
-            var result = base.Item;
-            result.DbId = Id;
-            return result;
+            if (field is not null) return field;
+
+            Subscribe(field = MessagePackSerializer.Deserialize<ChatContext>(SerializedData));
+            return field;
         }
+
+        [MemberNotNull(nameof(SerializedData))]
         set
         {
-            base.Item = value;
+            if (field is null)
+            {
+                Subscribe(field = value);
+            }
+            else if (!ReferenceEquals(value, field))
+            {
+                throw new InvalidOperationException("Cannot change the value of an already initialized ChatContextDbItem.");
+            }
+
             DateModified = value.Metadata.DateModified;
+            SerializedData = MessagePackSerializer.Serialize(value);
         }
     }
 
@@ -81,5 +122,25 @@ public class ChatContextDbItem : MessagePackDbItem<ChatContext>
     public ChatContextDbItem() { }
 
     [SetsRequiredMembers]
-    public ChatContextDbItem(ChatContext item) : base(item) { }
+    public ChatContextDbItem(ChatContext value) : this()
+    {
+        Value = value;
+    }
+
+    private void Subscribe(ChatContext value)
+    {
+        Debug.Assert(
+            isTrackingEnabled == false,
+            "Tracking should not be enabled when subscribing. This indicates a duplicate subscription.");
+
+        value.PropertyChanged += HandleValueChanged;
+        value.Metadata.PropertyChanged += HandleValueChanged;
+        isTrackingEnabled = true;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void HandleValueChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        NotifyHandlers(e);
+    }
 }

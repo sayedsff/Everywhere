@@ -181,7 +181,6 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
             cancellationToken: cancellationToken);
     }
 
-
     [RelayCommand(CanExecute = nameof(IsNotBusy))]
     private async Task AddElementAsync(PickElementMode mode)
     {

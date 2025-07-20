@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Everywhere.Utils;
 using MessagePack;
 using ObservableCollections;
 
@@ -12,11 +11,8 @@ namespace Everywhere.Models;
 /// Maintains the context of the chat, including the list of <see cref="ChatMessage"/> and other relevant information.
 /// </summary>
 [MessagePackObject(AllowPrivate = true)]
-public partial class ChatContext : TrackableObject, IEnumerable<ChatMessageNode>
+public partial class ChatContext : ObservableObject, IEnumerable<ChatMessageNode>
 {
-    [IgnoreMember]
-    public int DbId { get; set; }
-
     [Key(0)]
     public ChatContextMetadata Metadata { get; }
 
@@ -39,10 +35,9 @@ public partial class ChatContext : TrackableObject, IEnumerable<ChatMessageNode>
     /// </summary>
     [IgnoreMember] private readonly ObservableList<ChatMessageNode> branchNodes = [];
 
-    private ChatContext(ChatContextMetadata metadata, ICollection<ChatMessageNode> messageNodes, ChatMessageNode rootNode) : base(nameof(ChatContext))
+    private ChatContext(ChatContextMetadata metadata, ICollection<ChatMessageNode> messageNodes, ChatMessageNode rootNode)
     {
         Metadata = metadata;
-        metadata.PropertyChanged += OnMetadataPropertyChanged;
         messageNodeMap.AddRange(messageNodes.Select(v => new KeyValuePair<Guid, ChatMessageNode>(v.Id, v)));
         this.rootNode = rootNode;
         rootNode.Context = this;
@@ -57,23 +52,18 @@ public partial class ChatContext : TrackableObject, IEnumerable<ChatMessageNode>
         }
 
         UpdateBranchAfter(0, rootNode);
-
-        isTrackingEnabled = true;
     }
 
-    public ChatContext(string systemPrompt) : base(nameof(ChatContext))
+    public ChatContext(string systemPrompt)
     {
         Metadata = new ChatContextMetadata
         {
             DateCreated = DateTimeOffset.UtcNow,
             DateModified = DateTimeOffset.UtcNow,
         };
-        Metadata.PropertyChanged += OnMetadataPropertyChanged;
         rootNode = ChatMessageNode.CreateRootNode(systemPrompt);
         rootNode.PropertyChanged += OnNodePropertyChanged;
         branchNodes.Add(rootNode);
-
-        isTrackingEnabled = true;
     }
 
     public NotifyCollectionChangedSynchronizedViewList<ChatMessageNode> ToNotifyCollectionChanged(
@@ -127,15 +117,9 @@ public partial class ChatContext : TrackableObject, IEnumerable<ChatMessageNode>
         return ((IEnumerable)branchNodes).GetEnumerator();
     }
 
-    private void OnMetadataPropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        NotifyHandlers(nameof(Metadata));
-    }
-
     private void OnNodePropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         Metadata.DateModified = DateTimeOffset.UtcNow;
-        NotifyHandlers(nameof(MessageNodes));
 
         if (e.PropertyName != nameof(ChatMessageNode.ChoiceIndex)) return;
         UpdateBranchAfterNode(sender.NotNull<ChatMessageNode>());

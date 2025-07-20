@@ -1,41 +1,31 @@
 ﻿using System.ComponentModel;
-using System.Collections.Concurrent;
 using System.Text.Json.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using MessagePack;
 
 namespace Everywhere.Utils;
 
-public delegate void TrackableObjectPropertyChangedEventHandler(TrackableObject sender, PropertyChangedEventArgs e);
+public delegate void TrackableObjectPropertyChangedEventHandler<in TScope>(TScope sender, PropertyChangedEventArgs e);
 
-public class TrackableObject(string scope) : ObservableObject
+public class TrackableObject<TScope> : ObservableObject where TScope : TrackableObject<TScope>
 {
-    private static readonly ConcurrentDictionary<string, HashSet<TrackableObjectPropertyChangedEventHandler>> ScopeHandlers = new();
+    private static readonly HashSet<TrackableObjectPropertyChangedEventHandler<TScope>> ScopeHandlers = [];
 
-    public static IDisposable AddPropertyChangedEventHandler(string scope, TrackableObjectPropertyChangedEventHandler handler)
+    public static IDisposable AddPropertyChangedEventHandler(TrackableObjectPropertyChangedEventHandler<TScope> handler)
     {
-        if (string.IsNullOrEmpty(scope)) throw new ArgumentException("Scope cannot be null or empty.", nameof(scope));
-
-        var handlers = ScopeHandlers.GetOrAdd(scope, _ => []);
-        lock (handlers)
+        lock (ScopeHandlers)
         {
-            handlers.Add(handler);
+            ScopeHandlers.Add(handler);
         }
 
         return new AnonymousDisposable(() =>
         {
-            if (!ScopeHandlers.TryGetValue(scope, out var currentHandlers)) return;
-
-            lock (currentHandlers)
+            lock (ScopeHandlers)
             {
-                currentHandlers.Remove(handler);
+                ScopeHandlers.Remove(handler);
             }
         });
     }
-
-    [JsonIgnore]
-    [IgnoreMember]
-    public string Scope { get; } = scope;
 
     [JsonIgnore]
     [IgnoreMember]
@@ -56,13 +46,12 @@ public class TrackableObject(string scope) : ObservableObject
     protected void NotifyHandlers(PropertyChangedEventArgs e)
     {
         if (!isTrackingEnabled) return;
-        if (!ScopeHandlers.TryGetValue(Scope, out var handlers)) return;
-        Console.WriteLine($"Property changed in scope '{Scope}': {e.PropertyName}");
-        lock (handlers)
+
+        lock (ScopeHandlers)
         {
-            foreach (var handler in handlers)
+            foreach (var handler in ScopeHandlers)
             {
-                handler(this, e);
+                handler((TScope)this, e);
             }
         }
     }

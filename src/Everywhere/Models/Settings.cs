@@ -9,11 +9,11 @@ using MessagePack;
 
 namespace Everywhere.Models;
 
-public class SettingsBase : TrackableObject
+public class SettingsBase : TrackableObject<SettingsBase>
 {
     public string Section { get; }
 
-    protected SettingsBase(string section) : base(nameof(Settings))
+    protected SettingsBase(string section)
     {
         Section = section;
         isTrackingEnabled = true;

@@ -177,8 +177,7 @@ public class SettingsPageViewModel : ReactiveViewModelBase
                         .ToImmutableArray());
             }).ToImmutableArray();
 
-        TrackableObject.AddPropertyChangedEventHandler(
-            nameof(Settings),
+        TrackableObject<SettingsBase>.AddPropertyChangedEventHandler(
             (_, _) => debounceHelper.Execute(() => Dispatcher.UIThread.Invoke(() => ToastManager
                 .CreateToast(new DynamicResourceKey("SettingsPage_Saved_Toast_Title").ToString() ?? "")
                 .OnBottomRight()

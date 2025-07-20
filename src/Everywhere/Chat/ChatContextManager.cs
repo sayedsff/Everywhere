@@ -1,17 +1,17 @@
-﻿using System.Collections.Immutable;
+﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Everywhere.Database;
 using Everywhere.Enums;
 using Everywhere.Models;
-using MessagePack;
 using Microsoft.SemanticKernel.ChatCompletion;
 using ObservableCollections;
 using ZLinq;
 
 namespace Everywhere.Chat;
 
-public class ChatContextManager(Settings settings, ChatDbContext dbContext) : ObservableObject, IChatContextManager, IAsyncInitializer
+public class ChatContextManager(Settings settings, IChatDatabase chatDatabase) : ObservableObject, IChatContextManager, IAsyncInitializer
 {
     public INotifyCollectionChangedSynchronizedViewList<ChatMessageNode> ChatMessageNodes =>
         Current.ToNotifyCollectionChanged(
@@ -28,8 +28,13 @@ public class ChatContextManager(Settings settings, ChatDbContext dbContext) : Ob
         }
         set
         {
+            Debug.Assert(history.ContainsKey(value), "The value must be part of the history.");
+
+            var previous = current;
             if (!SetProperty(ref current, value)) return;
-            history.Add(value);
+            if (IsEmptyContext(previous)) Remove(previous);
+
+            OnPropertyChanged();
             OnPropertyChanged(nameof(ChatMessageNodes));
         }
     }
@@ -39,7 +44,7 @@ public class ChatContextManager(Settings settings, ChatDbContext dbContext) : Ob
         get
         {
             var currentDate = DateTimeOffset.UtcNow;
-            return history.GroupBy(c => (currentDate - c.Metadata.DateModified).TotalDays switch
+            return history.Keys.GroupBy(c => (currentDate - c.Metadata.DateModified).TotalDays switch
             {
                 < 1 => HumanizedDate.Today,
                 < 2 => HumanizedDate.Yesterday,
@@ -47,22 +52,25 @@ public class ChatContextManager(Settings settings, ChatDbContext dbContext) : Ob
                 < 30 => HumanizedDate.LastMonth,
                 < 365 => HumanizedDate.LastYear,
                 _ => HumanizedDate.Earlier
-            }).Select(
-                g => new ChatContextHistory(
-                    g.Key,
-                    g.AsValueEnumerable().OrderByDescending(c => c.Metadata.DateModified).ToImmutableArray())
+            }).Select(g => new ChatContextHistory(
+                g.Key,
+                g.AsValueEnumerable().OrderByDescending(c => c.Metadata.DateModified).ToImmutableArray())
             );
         }
     }
 
-    private readonly HashSet<ChatContext> history = [];
+    [field: AllowNull, MaybeNull]
+    public IRelayCommand CreateNewCommand =>
+        field ??= new RelayCommand(CreateNew, () => !IsEmptyContext(current));
+
+    private readonly Dictionary<ChatContext, ChatContextDbItem> history = [];
 
     private ChatContext? current;
 
     [MemberNotNull(nameof(current))]
-    public void CreateNew()
+    private void CreateNew()
     {
-        if (current is { MessageCount: 1 }) return;
+        if (IsEmptyContext(current)) return;
 
         var renderedSystemPrompt = Prompts.RenderPrompt(
             Prompts.DefaultSystemPrompt,
@@ -74,14 +82,13 @@ public class ChatContextManager(Settings settings, ChatDbContext dbContext) : Ob
             });
 
         current = new ChatContext(renderedSystemPrompt);
-        history.Add(current);
-        OnPropertyChanged(nameof(ChatMessageNodes));
+        var dbItem = new ChatContextDbItem(current);
+        history.Add(current, dbItem);
+        Task.Run(() => chatDatabase.AddChatContext(dbItem)).Detach();
 
-        Task.Run(() =>
-        {
-            dbContext.ChatContextDbSet.Add(new ChatContextDbItem(current));
-            dbContext.SaveChanges();
-        }).Detach();
+        OnPropertyChanged(nameof(History));
+        OnPropertyChanged(nameof(Current));
+        OnPropertyChanged(nameof(ChatMessageNodes));
     }
 
     public void UpdateHistory()
@@ -89,24 +96,39 @@ public class ChatContextManager(Settings settings, ChatDbContext dbContext) : Ob
         OnPropertyChanged(nameof(History));
     }
 
+    public void Remove(ChatContext chatContext)
+    {
+        if (!history.Remove(chatContext, out var dbItem)) return;
+
+        Task.Run(() => chatDatabase.RemoveChatContext(dbItem)).Detach();
+
+        // If the current chat context is being removed, we need to set a new current context
+        if (ReferenceEquals(chatContext, current))
+        {
+            if (history.Keys.OrderByDescending(c => c.Metadata.DateModified).FirstOrDefault() is { } historyItem)
+            {
+                Current = historyItem;
+            }
+            else
+            {
+                // If no other chat context exists, create a new one
+                CreateNew();
+            }
+        }
+
+        OnPropertyChanged(nameof(History));
+    }
+
     public int Priority => 10;
 
     public Task InitializeAsync() => Task.Run(() =>
     {
-        foreach (var chatContextDbItem in dbContext.ChatContextDbSet.OrderByDescending(c => c.DateModified).ToImmutableArray())
+        foreach (var chatContext in chatDatabase.QueryChatContexts(q => q.OrderByDescending(c => c.DateModified)))
         {
-            try
-            {
-                var item = chatContextDbItem.Item;
-                current ??= item;
-                history.Add(item);
-            }
-            catch (MessagePackSerializationException)
-            {
-                dbContext.ChatContextDbSet.Remove(chatContextDbItem);
-            }
+            current ??= chatContext.Value;
+            history.Add(chatContext.Value, chatContext);
         }
-
-        dbContext.SaveChanges();
     });
+
+    private static bool IsEmptyContext([NotNullWhen(true)] ChatContext? chatContext) => chatContext is { MessageCount: 1 };
 }
