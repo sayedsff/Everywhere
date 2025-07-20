@@ -3,7 +3,7 @@
 	url = https://github.com/DearVa/WritableJsonConfiguration
 [submodule "3rd/shad-ui"]
 	path = 3rd/shad-ui
-	url = https://github.com/AuroraZiling/shad-ui
+	url = https://github.com/DearVa/shad-ui
 [submodule "3rd/MessagePack-CSharp"]
 	path = 3rd/MessagePack-CSharp
 	url = https://github.com/NodisAI/MessagePack-CSharp
