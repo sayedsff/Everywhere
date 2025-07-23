@@ -1,7 +1,7 @@
 <a id="readme-top"></a>
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/DearVa/Everywhere/refs/heads/main/img/banner.png" alt="Banner"/>
+  <img src="https://raw.githubusercontent.com/DearVa/Everywhere/refs/heads/main/img/banner.webp" alt="Banner"/>
 
   <h1>
 
