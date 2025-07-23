@@ -355,10 +355,6 @@
                           Classes="ChatMessage Assistant" Background="Transparent"
                           Orientation="Vertical" Spacing="4">
                           <markdown:MarkdownRenderer MarkdownBuilder="{Binding MarkdownBuilder}"/>
-                          <shadui:Skeleton
-                            Width="200" Height="20"
-                            HorizontalAlignment="Left"
-                            IsVisible="{Binding IsBusy}"/>
 
                           <StackPanel
                             x:Name="ChatMessageOperationPanel"
@@ -551,6 +547,7 @@
                 Header="{DynamicResource AssistantFloatingWindow_AssistantInputBox_AddAttachmentMenuItems_AddScreen}">
                 <MenuItem.Icon>
                   <LucideIcon
+                    Width="18" Height="18"
                     Kind="Monitor" Size="18"/>
                 </MenuItem.Icon>
               </MenuItem>
@@ -560,6 +557,7 @@
                 Header="{DynamicResource AssistantFloatingWindow_AssistantInputBox_AddAttachmentMenuItems_AddWindow}">
                 <MenuItem.Icon>
                   <LucideIcon
+                    Width="18" Height="18"
                     Kind="AppWindow" Size="18"/>
                 </MenuItem.Icon>
               </MenuItem>
@@ -569,6 +567,7 @@
                 Header="{DynamicResource AssistantFloatingWindow_AssistantInputBox_AddAttachmentMenuItems_AddElement}">
                 <MenuItem.Icon>
                   <LucideIcon
+                    Width="18" Height="18"
                     Kind="SquareMousePointer" Size="18"/>
                 </MenuItem.Icon>
               </MenuItem>
@@ -577,6 +576,7 @@
                 Header="{DynamicResource AssistantFloatingWindow_AssistantInputBox_AddAttachmentMenuItems_AddClipboard}">
                 <MenuItem.Icon>
                   <LucideIcon
+                    Width="18" Height="18"
                     Kind="ClipboardPaste" Size="18"/>
                 </MenuItem.Icon>
               </MenuItem>
@@ -585,6 +585,7 @@
                 Header="{DynamicResource AssistantFloatingWindow_AssistantInputBox_AddAttachmentMenuItems_AddFile}">
                 <MenuItem.Icon>
                   <LucideIcon
+                    Width="18" Height="18"
                     Kind="File" Size="18"/>
                 </MenuItem.Icon>
               </MenuItem>
