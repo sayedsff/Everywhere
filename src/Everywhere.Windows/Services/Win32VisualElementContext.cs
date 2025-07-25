@@ -2,51 +2,33 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.Marshalling;
-using Windows.Graphics.Capture;
-using Windows.Graphics.DirectX;
-using Windows.Graphics.DirectX.Direct3D11;
 using Windows.Win32;
 using Windows.Win32.Foundation;
-using Windows.Win32.Graphics.Dwm;
 using Windows.Win32.Graphics.Gdi;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Windows.Win32.UI.WindowsAndMessaging;
 using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Layout;
-using Avalonia.Media;
 using Avalonia.Platform;
 using Everywhere.Extensions;
 using Everywhere.Interfaces;
-using Everywhere.Windows.Interop;
+using Everywhere.Windows.Utils;
 using FlaUI.Core;
 using FlaUI.Core.AutomationElements;
 using FlaUI.Core.Definitions;
 using FlaUI.Core.Patterns.Infrastructure;
 using FlaUI.Core.Tools;
 using FlaUI.UIA3;
-using Vortice.Direct3D;
-using Vortice.Direct3D11;
-using Vortice.DirectComposition;
-using Vortice.DXGI;
-using Vortice.Mathematics;
-using WinRT;
 using ZLinq;
 using Application = Avalonia.Application;
 using Bitmap = Avalonia.Media.Imaging.Bitmap;
-using Brushes = Avalonia.Media.Brushes;
-using Image = Avalonia.Controls.Image;
 using PixelFormat = System.Drawing.Imaging.PixelFormat;
 using Point = System.Drawing.Point;
-using Rect = Avalonia.Rect;
 using Size = System.Drawing.Size;
-using Window = Avalonia.Controls.Window;
 
 namespace Everywhere.Windows.Services;
 
-public class Win32VisualElementContext : IVisualElementContext
+public partial class Win32VisualElementContext : IVisualElementContext
 {
     // private const string PipeName = "everywhere_text_service";
 
@@ -95,7 +77,7 @@ public class Win32VisualElementContext : IVisualElementContext
 
         var windows = desktopLifetime.Windows.AsValueEnumerable().Where(w => w.IsVisible).ToList();
         foreach (var window in windows) windowHelper.HideWindowWithoutAnimation(window);
-        var result = await new ElementPickerWindow(this, windowHelper).PickElementAsync(mode);
+        var result = await ElementPicker.PickAsync(this, windowHelper, mode);
         foreach (var window in windows) window.IsVisible = true;
         return result;
     }
@@ -150,7 +132,8 @@ public class Win32VisualElementContext : IVisualElementContext
     private class AutomationVisualElementImpl(
         Win32VisualElementContext context,
         AutomationElement element,
-        bool windowBarrier) : IVisualElement
+        bool windowBarrier
+    ) : IVisualElement
     {
         public IVisualElementContext Context => context;
 
@@ -481,25 +464,6 @@ public class Win32VisualElementContext : IVisualElementContext
                     rect.Height));
         }
 
-        #region Events
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        private void ConfigurationEvents()
-        {
-            // element.FrameworkAutomationElement.RegisterPropertyChangedEvent(
-            //     TreeScope.Element,
-            //     RegisterPropertyChangedHandler,
-            //     element.FrameworkAutomationElement.PropertyIdLibrary.BoundingRectangle);
-            //
-            // void RegisterPropertyChangedHandler(AutomationElement e, PropertyId propertyId, object value)
-            // {
-            //     throw new NotImplementedException();
-            // }
-        }
-
-        #endregion
-
         #region Interop
 
         private static bool TryGetWindow(AutomationElement? element, out nint hWnd)
@@ -733,8 +697,6 @@ public class Win32VisualElementContext : IVisualElementContext
         {
             return Task.FromResult(CaptureScreen(BoundingRectangle));
         }
-
-        public event PropertyChangedEventHandler? PropertyChanged;
     }
 
     // private class TextServiceImpl : IDisposable
@@ -915,178 +877,6 @@ public class Win32VisualElementContext : IVisualElementContext
     //         cancellationTokenSource.Cancel();
     //     }
     // }
-
-    private class ElementPickerWindow : Window
-    {
-        private readonly Win32VisualElementContext context;
-
-        public ElementPickerWindow(Win32VisualElementContext context, IWindowHelper windowHelper)
-        {
-            this.context = context;
-
-            CanResize = false;
-            ShowInTaskbar = false;
-            ShowActivated = false;
-            Topmost = true;
-            SystemDecorations = SystemDecorations.None;
-            WindowStartupLocation = WindowStartupLocation.Manual;
-
-            windowHelper.SetWindowHitTestInvisible(this);
-        }
-
-        public async Task<IVisualElement?> PickElementAsync(PickElementMode mode)
-        {
-            var allScreens = Screens.All;
-            var screenBounds = allScreens.Aggregate(default(PixelRect), (current, screen) => current.Union(screen.Bounds));
-            if (screenBounds.Width <= 0 || screenBounds.Height <= 0) return null;
-
-            using var bitmap = CaptureScreen(screenBounds);
-            Rect? previousMaskRect = null;
-            Image image;
-            var clipBorder = new Border
-            {
-                ClipToBounds = false,
-                BorderThickness = new Thickness(2),
-                BorderBrush = Brushes.White,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Top
-            };
-            Content = new Panel
-            {
-                IsHitTestVisible = false,
-                Children =
-                {
-                    new Image { Source = bitmap },
-                    new Border
-                    {
-                        Background = Brushes.Black,
-                        Opacity = 0.4
-                    },
-                    (image = new Image { Source = bitmap }),
-                    clipBorder
-                }
-            };
-
-            Position = screenBounds.Position;
-            var scale = DesktopScaling; // we must set Position first to get the correct scaling factor
-            Width = screenBounds.Width / scale;
-            Height = screenBounds.Height / scale;
-
-            IVisualElement? selectedElement = null;
-
-            var taskCompletionSource = new TaskCompletionSource<IVisualElement?>();
-            var mouseHook = new LowLevelMouseHook((w, ref _, ref blockNext) =>
-            {
-                switch (w)
-                {
-                    case (uint)WINDOW_MESSAGE.WM_MOUSEMOVE when PInvoke.GetCursorPos(out var point):
-                    {
-                        Pick(point);
-                        blockNext = false;
-                        return;
-                    }
-                    case (uint)WINDOW_MESSAGE.WM_LBUTTONUP:
-                    {
-                        taskCompletionSource.TrySetResult(selectedElement);
-                        Close();
-                        break;
-                    }
-                    case (uint)WINDOW_MESSAGE.WM_RBUTTONUP:
-                    {
-                        selectedElement = null;
-                        Close();
-                        break;
-                    }
-                }
-
-                blockNext = true;
-            });
-
-            var keyboardHook = new LowLevelKeyboardHook((w, ref k, ref blockNext) =>
-            {
-                switch (w)
-                {
-                    case (uint)WINDOW_MESSAGE.WM_KEYDOWN:
-                    {
-                        if ((VIRTUAL_KEY)k.vkCode == VIRTUAL_KEY.VK_ESCAPE)
-                        {
-                            taskCompletionSource.TrySetResult(null);
-                            Close();
-                        }
-                        break;
-                    }
-                }
-
-                blockNext = true;
-            });
-
-            Closed += delegate
-            {
-                mouseHook.Dispose();
-                keyboardHook.Dispose();
-                taskCompletionSource.TrySetResult(null);
-            };
-
-            if (PInvoke.GetCursorPos(out var p)) Pick(p); // Update once
-
-            Show();
-            return await taskCompletionSource.Task;
-
-            void Pick(Point point)
-            {
-                var maskRect = new Rect();
-                var pixelPoint = new PixelPoint(point.X, point.Y);
-                switch (mode)
-                {
-                    case PickElementMode.Screen:
-                    {
-                        allScreens = Screens.All;
-                        var screen = allScreens.FirstOrDefault(s => s.Bounds.Contains(pixelPoint));
-                        if (screen == null) break;
-
-                        maskRect = screen.Bounds.Translate(-(PixelVector)screenBounds.Position).ToRect(scale);
-                        break;
-                    }
-                    case PickElementMode.Window:
-                    {
-                        var hWnd = PInvoke.WindowFromPoint(point);
-                        if (hWnd == HWND.Null) break;
-
-                        var topLevel = PInvoke.GetAncestor(hWnd, GET_ANCESTOR_FLAGS.GA_ROOTOWNER);
-                        if (topLevel == HWND.Null) break;
-
-                        selectedElement = context.TryFrom(() => Automation.FromHandle(topLevel));
-                        if (selectedElement == null) break;
-
-                        maskRect = selectedElement.BoundingRectangle.Translate(-(PixelVector)screenBounds.Position).ToRect(scale);
-                        break;
-                    }
-                    case PickElementMode.Element:
-                    {
-                        selectedElement = context.TryFrom(() => Automation.FromPoint(point));
-                        if (selectedElement == null) break;
-
-                        maskRect = selectedElement.BoundingRectangle.Translate(-(PixelVector)screenBounds.Position).ToRect(scale);
-                        break;
-                    }
-                }
-
-                SetMask(maskRect);
-            }
-
-            void SetMask(Rect rect)
-            {
-                if (previousMaskRect == rect) return;
-
-                image.Clip = new RectangleGeometry(rect);
-                clipBorder.Margin = new Thickness(rect.X, rect.Y, 0, 0);
-                clipBorder.Width = rect.Width;
-                clipBorder.Height = rect.Height;
-
-                previousMaskRect = rect;
-            }
-        }
-    }
 }
 
 // internal unsafe class DwmScreenCaptureHelper : IDisposable
@@ -1246,120 +1036,6 @@ public class Win32VisualElementContext : IVisualElementContext
 //         [In] BOOL fSourceClientAreaOnly,
 //         [Out] out SIZE pSize);
 // }
-
-internal class Direct3D11ScreenCaptureHelper
-{
-    private readonly StrategyBasedComWrappers comWrappers = new();
-    private readonly IGraphicsCaptureItemInterop interop;
-
-    public Direct3D11ScreenCaptureHelper()
-    {
-        var factory = ActivationFactory.Get("Windows.Graphics.Capture.GraphicsCaptureItem");
-        Marshal.QueryInterface(factory.ThisPtr, typeof(IGraphicsCaptureItemInterop).GUID, out var pInterop);
-        interop = (IGraphicsCaptureItemInterop)comWrappers.GetOrCreateObjectForComInstance(pInterop, CreateObjectFlags.None);
-    }
-
-    public async Task<Bitmap> CaptureAsync(nint hWnd, PixelRect relativeRect)
-    {
-        using var device = D3D11.D3D11CreateDevice(DriverType.Hardware, DeviceCreationFlags.BgraSupport);
-        using var dxgiDevice = device.QueryInterface<IDXGIDevice>();
-        CreateDirect3D11DeviceFromDXGIDevice(dxgiDevice.NativePointer, out var pD3d11Device).ThrowOnFailure();
-        using var direct3dDevice = MarshalInterface<IDirect3DDevice>.FromAbi(pD3d11Device);
-
-        var pItem = interop.CreateForWindow(hWnd, new Guid("79C3F95B-31F7-4EC2-A464-632EF5D30760"));
-        var item = GraphicsCaptureItem.FromAbi(pItem);
-        var size = item.Size;
-
-        using var framePool = Direct3D11CaptureFramePool.CreateFreeThreaded(
-            direct3dDevice,
-            DirectXPixelFormat.B8G8R8A8UIntNormalized,
-            1,
-            size);
-        var tcs = new TaskCompletionSource<Bitmap>();
-        framePool.FrameArrived += (f, _) => tcs.TrySetResult(ToBitmap(f.TryGetNextFrame(), relativeRect));
-
-        using var session = framePool.CreateCaptureSession(item);
-        session.IsCursorCaptureEnabled = false;
-        session.StartCapture();
-        return await tcs.Task.WaitAsync(TimeSpan.FromMilliseconds(500));
-    }
-
-    private static Bitmap ToBitmap(Direct3D11CaptureFrame frame, PixelRect relativeRect)
-    {
-        using var capturedTexture = CreateTexture2D(frame.Surface);
-
-        var device = capturedTexture.Device;
-        var description = capturedTexture.Description;
-        description.Width = (uint)relativeRect.Width;
-        description.Height = (uint)relativeRect.Height;
-        description.CPUAccessFlags = CpuAccessFlags.Read;
-        description.BindFlags = BindFlags.None;
-        description.Usage = ResourceUsage.Staging;
-        description.MiscFlags = ResourceOptionFlags.None;
-        using var stagingTexture = device.CreateTexture2D(description);
-
-        device.ImmediateContext.CopySubresourceRegion(
-            stagingTexture,
-            0,
-            0,
-            0,
-            0,
-            capturedTexture,
-            0,
-            new Box(relativeRect.X, relativeRect.Y, 0, relativeRect.Right, relativeRect.Bottom, 1));
-
-        var mappedSource = device.ImmediateContext.Map(stagingTexture, 0);
-        try
-        {
-            var stagingDescription = stagingTexture.Description;
-            return new Bitmap(
-                Avalonia.Platform.PixelFormat.Bgra8888,
-                AlphaFormat.Premul,
-                mappedSource.DataPointer,
-                new PixelSize((int)stagingDescription.Width, (int)stagingDescription.Height),
-                new Vector(96d, 96d),
-                (int)mappedSource.RowPitch
-            );
-        }
-        finally
-        {
-            device.ImmediateContext.Unmap(stagingTexture, 0);
-        }
-    }
-
-    private static ID3D11Texture2D CreateTexture2D(IDirect3DSurface surface)
-    {
-        var access = CastExtensions.As<IDirect3DDxgiInterfaceAccess>(surface);
-        var d3dPtr = access.GetInterface(typeof(ID3D11Texture2D).GUID);
-        return new ID3D11Texture2D(d3dPtr);
-    }
-
-    [DllImport("d3d11.dll", ExactSpelling = true)]
-    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-    private static extern HRESULT CreateDirect3D11DeviceFromDXGIDevice(nint dxgiDevice, out nint graphicsDevice);
-}
-
-[GeneratedComInterface]
-[Guid("3628E81B-3CAC-4C60-B7F4-23CE0E0C3356")]
-[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-[ComVisible(true)]
-internal partial interface IGraphicsCaptureItemInterop
-{
-    // https://learn.microsoft.com/windows/win32/api/windows.graphics.capture.interop/nf-windows-graphics-capture-interop-igraphicscaptureiteminterop-createforwindow
-    nint CreateForWindow(nint window, in Guid iid);
-
-    // https://learn.microsoft.com/windows/win32/api/windows.graphics.capture.interop/nf-windows-graphics-capture-interop-igraphicscaptureiteminterop-createformonitor
-    nint CreateForMonitor(nint monitor, in Guid iid);
-}
-
-[GeneratedComInterface]
-[Guid("A9B3D012-3DF2-4EE3-B8D1-8695F457D3C1")]
-[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-[ComVisible(true)]
-internal partial interface IDirect3DDxgiInterfaceAccess
-{
-    nint GetInterface(in Guid iid);
-};
 
 public static class AutomationExtension
 {

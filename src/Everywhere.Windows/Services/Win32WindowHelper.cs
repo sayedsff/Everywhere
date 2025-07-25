@@ -121,29 +121,25 @@ public class Win32WindowHelper : IWindowHelper
 
     public void SetWindowHitTestInvisible(Window window)
     {
-        window.Loaded += delegate
+        Win32Properties.AddWindowStylesCallback(window, WindowStylesCallback);
+        static (uint style, uint exStyle) WindowStylesCallback(uint style, uint exStyle)
         {
-            Win32Properties.AddWindowStylesCallback(window, WindowStylesCallback);
+            return (style, exStyle |
+                (uint)WINDOW_EX_STYLE.WS_EX_TOOLWINDOW |
+                (uint)WINDOW_EX_STYLE.WS_EX_LAYERED |
+                (uint)WINDOW_EX_STYLE.WS_EX_TRANSPARENT);
+        }
 
-            static (uint style, uint exStyle) WindowStylesCallback(uint style, uint exStyle)
-            {
-                return (style, exStyle |
-                    (uint)WINDOW_EX_STYLE.WS_EX_TOOLWINDOW |
-                    (uint)WINDOW_EX_STYLE.WS_EX_LAYERED |
-                    (uint)WINDOW_EX_STYLE.WS_EX_TRANSPARENT);
-            }
-
-            if (window.TryGetPlatformHandle() is not { } handle) return;
-            var hWnd = (HWND)handle.Handle;
-            PInvoke.SetWindowLong(
-                hWnd,
-                WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE,
-                PInvoke.GetWindowLong(hWnd, WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE) |
-                (int)WINDOW_EX_STYLE.WS_EX_TOOLWINDOW |
-                (int)WINDOW_EX_STYLE.WS_EX_LAYERED |
-                (int)WINDOW_EX_STYLE.WS_EX_TRANSPARENT);
-            PInvoke.SetLayeredWindowAttributes(hWnd, new COLORREF(), 255, LAYERED_WINDOW_ATTRIBUTES_FLAGS.LWA_ALPHA);
-        };
+        if (window.TryGetPlatformHandle() is not { } handle) return;
+        var hWnd = (HWND)handle.Handle;
+        PInvoke.SetWindowLong(
+            hWnd,
+            WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE,
+            PInvoke.GetWindowLong(hWnd, WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE) |
+            (int)WINDOW_EX_STYLE.WS_EX_TOOLWINDOW |
+            (int)WINDOW_EX_STYLE.WS_EX_LAYERED |
+            (int)WINDOW_EX_STYLE.WS_EX_TRANSPARENT);
+        PInvoke.SetLayeredWindowAttributes(hWnd, new COLORREF(), 255, LAYERED_WINDOW_ATTRIBUTES_FLAGS.LWA_ALPHA);
     }
 
     private readonly Dictionary<nint, CompositionContext> compositionContexts = [];

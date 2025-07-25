@@ -26,6 +26,8 @@ RegisterHotKey
 UnregisterHotKey
 
 GetCursorPos
+SetCapture
+ReleaseCapture
 SendInput
 BlockInput
 SetWindowsHookEx
@@ -39,6 +41,7 @@ XBUTTON2
 EnumDisplayMonitors
 EnumDisplayDevices
 GetMonitorInfo
+MonitorFromPoint
 MonitorFromWindow
 GetDC
 ReleaseDC

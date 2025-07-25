@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using Avalonia.Media.Imaging;
+﻿using Avalonia.Media.Imaging;
 
 namespace Everywhere.Interfaces;
 
@@ -47,7 +46,7 @@ public enum VisualElementStates
     Password = 1 << 5,
 }
 
-public interface IVisualElement : INotifyPropertyChanged
+public interface IVisualElement
 {
     IVisualElementContext Context { get; }
 
@@ -90,12 +89,6 @@ public interface IVisualElement : INotifyPropertyChanged
     string? GetText(int maxLength = -1);
 
     void SetText(string text, bool append);
-
-    /// <summary>
-    /// Create a scope for caching visual elements and its properties until the scope is disposed.
-    /// </summary>
-    /// <returns></returns>
-    // IDisposable CreateCacheScope();
 
     Task<Bitmap> CaptureAsync();
 }
