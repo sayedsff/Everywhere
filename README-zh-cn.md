@@ -1,5 +1,15 @@
 <a id="readme-top"></a>
 
+<a href="https://github.com/DearVa/Everywhere">Go to English Version »</a>
+
+[![贡献者][contributors-shield]][contributors-url]
+[![Fork 数][forks-shield]][forks-url]
+[![Star 数][stars-shield]][stars-url]
+[![问题数][issues-shield]][issues-url]
+[![MIT 许可证][license-shield]][license-url]<a id="readme-top"></a>
+
+---
+
 <div align="center">
   <img src="https://raw.githubusercontent.com/DearVa/Everywhere/refs/heads/main/img/banner.webp" alt="Banner"/>
 
@@ -24,27 +34,131 @@
   </p>
 </div>
 
----
-
-<a href="https://github.com/DearVa/Everywhere">Go to English Version »</a>
-
-[![贡献者][contributors-shield]][contributors-url]
-[![Fork 数][forks-shield]][forks-url]
-[![Star 数][stars-shield]][stars-url]
-[![问题数][issues-shield]][issues-url]
-[![MIT 许可证][license-shield]][license-url]
-
 ## 关于 Everywhere
 
-**Everywhere** 是一款基于 .NET 和 Avalonia 构建的跨平台 AI 助手应用。它能在任意桌面应用中直接提供上下文感知的多模态 AI 支持——无论你是在浏览网页、撰写文档、进行设计，还是编写代码。
+**Everywhere** 是一款基于 .NET 和 Avalonia 构建的具有上下文感知能力的交互式 AI 助手。与传统的聊天界面不同，Everywhere 直接集成到您的桌面环境中，感知您的屏幕内容，理解应用程序上下文，并代表您采取行动。
 
-### ✨ 主要特性
+### 🌟 使用场景示例
 
-* **通用输入助手** – 在任意文本框中唤起助手，生成、润色、翻译或总结内容，无需切换应用程序。
-* **屏幕感知** – 捕获并分析当前窗口或所选区域，提供上下文相关的建议或摘要。
-* **MCP 集成** – 利用 Model Context Protocol 连接自定义工具和数据源，进行更深层次的自动化。
-* **多模态理解** – 支持文本、图像、截图处理，执行代码解析、界面分析、视觉问答等任务。
-* **自由选择LLM** – 自由选择云端 LLM（如 ChatGPT、DeepSeek）或本地模型（如 Ollama、LM Studio），确保数据尽在掌握。
+<details open>
+<summary><b>💬 上下文提醒</b></summary>
+
+> 当您在 Discord 中聊天时，注意到一条关于项目会议的重要消息
+>
+> 📌 **调用 Everywhere**（通过键盘快捷键）
+>
+> 🗣️ **命令：**"今晚8点提醒我这件事"
+>
+> ✨ **结果：**Everywhere 捕获消息上下文并自动设置包含相关详细信息的日历提醒
+
+</details>
+
+<details open>
+<summary><b>📰 快速网页摘要</b></summary>
+
+> 您正在浏览一篇冗长的技术文章，但只需要了解关键要点
+>
+> 📌 **在网页上调用 Everywhere**
+>
+> 🗣️ **命令：**"给我一个三点总结"
+>
+> ✨ **结果：**无需阅读整篇内容，立即获取主要论点
+
+</details>
+
+<details open>
+<summary><b>🌐 即时翻译</b></summary>
+
+> 在研究过程中遇到外语文本
+>
+> 📌 **在文本上调用 Everywhere**
+>
+> 🗣️ **命令：**"把这个翻译成中文"
+>
+> ✨ **结果：**无需切换到其他应用，立即查看翻译结果
+
+</details>
+
+<details open>
+<summary><b>✉️ 邮件起草辅助</b></summary>
+
+> 您正在撰写一封重要的商务邮件，但不确定语气是否恰当
+>
+> 📌 **在草稿上调用 Everywhere**
+>
+> 🗣️ **命令：**"让这封邮件更专业一些"
+>
+> ✨ **结果：**您的随意文本被转化为精炼的商务沟通内容
+
+</details>
+
+### 🛠️ 技术特点
+
+<table>
+  <tr>
+    <th width="20%">类别</th>
+    <th width="40%">✅ 当前支持</th>
+    <th width="40%">🚧 计划中</th>
+  </tr>
+  <tr>
+    <td><b>LLM 支持</b></td>
+    <td>
+      • OpenAI (ChatGPT)<br>
+      • Azure OpenAI
+    </td>
+    <td>
+      • Claude<br>
+      • Gemini<br>
+      • Ollama<br>
+      • Grok
+    </td>
+  </tr>
+  <tr>
+    <td><b>工具集成</b></td>
+    <td>
+      • 网页搜索
+    </td>
+    <td>
+      • 模型上下文协议 (MCP) 工具<br>
+      • 系统 API<br>
+      • 文件操作
+    </td>
+  </tr>
+  <tr>
+    <td><b>界面</b></td>
+    <td>
+      • 键盘快捷键<br>
+      • Markdown 渲染<br>
+      • 代码语法高亮
+    </td>
+    <td>
+      • LaTeX 支持<br>
+      • 语音输入<br>
+      • 高级格式选项
+    </td>
+  </tr>
+  <tr>
+    <td><b>平台支持</b></td>
+    <td>
+      • Windows
+    </td>
+    <td>
+      • macOS<br>
+      • Linux
+    </td>
+  </tr>
+  <tr>
+    <td><b>语言支持</b></td>
+    <td>
+      • 简体中文<br>
+      • English
+    </td>
+    <td>
+      • 更多语言<br>
+      <i>（欢迎贡献）</i>
+    </td>
+  </tr>
+</table>
 
 ### 🛠 构建工具
 
@@ -54,10 +168,11 @@
 
 ## 📋 系统要求
 
-| 平台      | 最低版本    |
-|---------|---------|
+| 平台      | 最低版本         |
+|---------|--------------|
 | Windows | 10.0.19041.0 |
-| macOS   | *计划支持*  |
+| macOS   | *计划支持*       |
+| Linux   | *计划支持*       |
 
 ---
 
@@ -66,17 +181,6 @@
 ### 安装
 
 > **注意**：目前尚无发行版，仅支持从源码构建。
-
----
-
-## ✈️ 路线图
-
-- [x] 基于屏幕的助手
-- [x] 网页搜索
-- [ ] 推理能力
-- [ ] MCP 工具集成
-- [ ] 语音输入
-- [ ] RAG 和知识库
 
 ---
 

@@ -1,5 +1,15 @@
 <a id="readme-top"></a>
 
+<a href="https://github.com/DearVa/Everywhere/blob/main/README-zh-cn.md">前往中文版本 »</a>
+
+[![Contributors][contributors-shield]][contributors-url]
+[![Forks][forks-shield]][forks-url]
+[![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url]
+[![MIT License][license-shield]][license-url]
+
+---
+
 <div align="center">
   <img src="https://raw.githubusercontent.com/DearVa/Everywhere/refs/heads/main/img/banner.webp" alt="Banner"/>
 
@@ -12,7 +22,7 @@
   <p align="center">
     <br />
     <h2>🚧 NOTICE: This project is under active development and is not yet ready for use 🚧</h2>
-    <br/>
+    <br />
     <a href="https://github.com/DearVa/Everywhere"><strong>(WIP) Explore the docs »</strong></a>
     <br />
     <br />
@@ -21,36 +31,133 @@
     <a href="https://github.com/DearVa/Everywhere/issues/new?labels=bug&template=bug-report.md">Report Bug</a>
     &middot;
     <a href="https://github.com/DearVa/Everywhere/issues/new?labels=enhancement&template=feature-request.md">Request Feature</a>
-  </p>
+
 </div>
-
----
-
-<a href="https://github.com/DearVa/Everywhere/blob/main/README-zh-cn.md">前往中文版本 »</a>
-
-[![Contributors][contributors-shield]][contributors-url]
-[![Forks][forks-shield]][forks-url]
-[![Stargazers][stars-shield]][stars-url]
-[![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
 
 ## About Everywhere
 
-**Everywhere** is a cross‑platform AI assistant built with .NET and Avalonia. It delivers contextual, multimodal AI
-support directly inside any desktop application—whether you’re browsing, writing, designing, or coding.
+**Everywhere** is a context-aware, interactive AI assistant built with .NET and Avalonia. Unlike traditional chat interfaces, Everywhere integrates directly with your desktop environment, perceiving your screen, understanding application context, and taking actions on your behalf.
 
-### ✨ Key Features
+### 🌟 Experience Examples
 
-- **Universal Input Assistance** – Call the assistant in any text field to generate, rewrite, translate, or summarize
-  without leaving your workflow.
-- **Screen Awareness** – Capture and analyze the current window or selected region to offer context‑specific suggestions
-  and summaries.
-- **MCP Integration** – Leverage the Model Context Protocol to wire up custom tools and data sources for deeper
-  automation.
-- **Multimodal Understanding** – Process text, images, and screenshots for code explanations, UI analysis, or visual
-  Q&A.
-- **LLMs under control** – Choose between cloud LLMs (ChatGPT, DeepSeek, etc.) and fully local models (Ollama, LM
-  Studio).
+<details open>
+<summary><b>💬 Contextual Reminders</b></summary>
+
+> While chatting in Discord, you notice an important message about a project meeting
+>
+> 📌 **Invoke Everywhere** with a keyboard shortcut
+>
+> 🗣️ **Command:** "Remind me about this at 8pm tonight"
+>
+> ✨ **Result:** Everywhere captures the message context and automatically sets up a calendar reminder with relevant details
+
+</details>
+
+<details open>
+<summary><b>📰 Quick Web Summarization</b></summary>
+
+> You're browsing a lengthy technical article but need just the key points
+>
+> 📌 **Invoke Everywhere** over the webpage
+>
+> 🗣️ **Command:** "Give me a 3-point summary of this"
+>
+> ✨ **Result:** Instantly receive the main arguments without reading the entire content
+
+</details>
+
+<details open>
+<summary><b>🌐 Instant Translation</b></summary>
+
+> You encounter text in a foreign language while researching
+>
+> 📌 **Invoke Everywhere** over the text
+>
+> 🗣️ **Command:** "Translate this to English"
+>
+> ✨ **Result:** See an immediate translation without switching to another app
+
+</details>
+
+<details open>
+<summary><b>✉️ Email Draft Assistance</b></summary>
+
+> You're writing an important business email but unsure about the tone
+>
+> 📌 **Invoke Everywhere** over your draft
+>
+> 🗣️ **Command:** "Make this sound more professional"
+>
+> ✨ **Result:** Your casual text is transformed into polished business communication
+
+</details>
+
+### 🛠️ Technical Features
+
+<table>
+  <tr>
+    <th width="20%">Category</th>
+    <th width="40%">✅ Currently Supported</th>
+    <th width="40%">🚧 Planned</th>
+  </tr>
+  <tr>
+    <td><b>LLM Support</b></td>
+    <td>
+      • OpenAI (ChatGPT)<br>
+      • Azure OpenAI
+    </td>
+    <td>
+      • Claude<br>
+      • Gemini<br>
+      • Ollama<br>
+      • Grok
+    </td>
+  </tr>
+  <tr>
+    <td><b>Tool Integration</b></td>
+    <td>
+      • Web search
+    </td>
+    <td>
+      • Model Context Protocol (MCP) tools<br>
+      • System APIs
+    </td>
+  </tr>
+  <tr>
+    <td><b>Interface</b></td>
+    <td>
+      • Keyboard shortcuts<br>
+      • Markdown rendering<br>
+      • Code syntax highlighting
+    </td>
+    <td>
+      • LaTeX support<br>
+      • Voice input<br>
+      • Advanced formatting options
+    </td>
+  </tr>
+  <tr>
+    <td><b>Platform Support</b></td>
+    <td>
+      • Windows
+    </td>
+    <td>
+      • macOS<br>
+      • Linux
+    </td>
+  </tr>
+  <tr>
+    <td><b>Language Support</b></td>
+    <td>
+      • 简体中文<br>
+      • English
+    </td>
+    <td>
+      • Additional languages<br>
+      <i>(contributions welcome)</i>
+    </td>
+  </tr>
+</table>
 
 ### 🛠 Built With
 
@@ -64,6 +171,7 @@ support directly inside any desktop application—whether you’re browsing, wri
 |----------|-----------------|
 | Windows  | 10.0.19041.0    |
 | macOS    | *Planned*       |
+| Linux    | *Planned*       |
 
 ---
 
@@ -72,17 +180,6 @@ support directly inside any desktop application—whether you’re browsing, wri
 ### Installation
 
 > **Note**: Pre‑built installers are not yet available; build from source for now.
-
----
-
-## ✈️ Roadmap
-
-- [x] Screen-based assistant
-- [x] Web searching
-- [ ] Reasoning
-- [ ] MCP Tools
-- [ ] Voice input
-- [ ] RAG & Knowledge base
 
 ---
 
