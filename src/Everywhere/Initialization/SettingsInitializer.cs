@@ -1,5 +1,4 @@
 ﻿using System.Globalization;
-using Everywhere.I18N;
 using Everywhere.Models;
 using Everywhere.Utils;
 using Microsoft.Extensions.Configuration;

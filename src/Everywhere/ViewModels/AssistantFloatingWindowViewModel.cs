@@ -80,7 +80,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
         [
             new(
                 LucideIconKind.Languages,
-                "AssistantFloatingWindowViewModel_TextEditActions_Translate",
+                LocaleKey.AssistantFloatingWindowViewModel_TextEditActions_Translate,
                 null,
                 SendMessageCommand,
                 $"Translate the content in focused element to {new CultureInfo(Settings.Common.Language).Name}. " +
@@ -89,7 +89,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
             ),
             new(
                 LucideIconKind.StepForward,
-                "AssistantFloatingWindowViewModel_TextEditActions_ContinueWriting",
+                LocaleKey.AssistantFloatingWindowViewModel_TextEditActions_ContinueWriting,
                 null,
                 SendMessageCommand,
                 "I have already written a beginning as the content of the focused element. " +
@@ -98,7 +98,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
             ),
             new(
                 LucideIconKind.ScrollText,
-                "AssistantFloatingWindowViewModel_TextEditActions_Summarize",
+                LocaleKey.AssistantFloatingWindowViewModel_TextEditActions_Summarize,
                 null,
                 SendMessageCommand,
                 "Please summarize the content in focused element. " +
@@ -110,12 +110,12 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
         [
             new(
                 "/translate",
-                "AssistantCommand_Translate_Description",
+                LocaleKey.AssistantCommand_Translate_Description,
                 "Based on context, translate the content of focused element into {0}",
                 () => Settings.Common.Language),
             new(
                 "/rewrite",
-                "AssistantCommand_Rewrite_Description",
+                LocaleKey.AssistantCommand_Rewrite_Description,
                 "Based on context, rewrite the content of focused element"),
         ];
 
@@ -171,7 +171,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
                 }
 
                 TargetBoundingRect = targetElement.BoundingRectangle;
-                Title = "AssistantFloatingWindow_Title";
+                Title = LocaleKey.AssistantFloatingWindow_Title;
                 chatAttachments.Clear();
                 chatAttachments.Add(await Task.Run(() => CreateFromVisualElement(targetElement), token));
                 IsOpened = true;

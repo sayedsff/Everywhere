@@ -3,7 +3,6 @@ using System.Globalization;
 using System.Text.Json.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Everywhere.Attributes;
-using Everywhere.I18N;
 using Everywhere.Utils;
 using MessagePack;
 

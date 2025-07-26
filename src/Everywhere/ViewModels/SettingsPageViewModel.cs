@@ -179,7 +179,7 @@ public class SettingsPageViewModel : ReactiveViewModelBase
 
         TrackableObject<SettingsBase>.AddPropertyChangedEventHandler(
             (_, _) => debounceHelper.Execute(() => Dispatcher.UIThread.Invoke(() => ToastManager
-                .CreateToast(new DynamicResourceKey("SettingsPage_Saved_Toast_Title").ToString() ?? "")
+                .CreateToast(DynamicResourceKey.Resolve(LocaleKey.SettingsPage_Saved_Toast_Title) ?? "")
                 .OnBottomRight()
                 .DismissOnClick()
                 .WithDelay(1)
