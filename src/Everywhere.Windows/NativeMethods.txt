@@ -52,3 +52,11 @@ GetCurrentProcessId
 GetWindowThreadProcessId
 GetModuleHandle
 EnumWindows
+
+OpenClipboard
+CloseClipboard
+GetClipboardData
+GetDIBits
+GetObject
+BITMAP
+BI_RGB

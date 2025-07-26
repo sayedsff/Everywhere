@@ -12,6 +12,7 @@ using CommunityToolkit.Mvvm.Input;
 using Everywhere.Models;
 using Everywhere.Utils;
 using Lucide.Avalonia;
+using Microsoft.Extensions.Logging;
 using ObservableCollections;
 using ZLinq;
 using ChatMessage = Everywhere.Models.ChatMessage;
@@ -51,6 +52,8 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
     private readonly IVisualElementContext visualElementContext;
     private readonly IClipboard clipboard;
     private readonly IStorageProvider storageProvider;
+    private readonly INativeHelper nativeHelper;
+    private readonly ILogger<AssistantFloatingWindowViewModel> logger;
 
     private readonly ObservableList<ChatAttachment> chatAttachments = [];
     private readonly ReusableCancellationTokenSource cancellationTokenSource = new();
@@ -61,7 +64,9 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
         Settings settings,
         IVisualElementContext visualElementContext,
         IClipboard clipboard,
-        IStorageProvider storageProvider)
+        IStorageProvider storageProvider,
+        INativeHelper nativeHelper,
+        ILogger<AssistantFloatingWindowViewModel> logger)
     {
         ChatContextManager = chatContextManager;
         ChatService = chatService;
@@ -70,6 +75,8 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
         this.visualElementContext = visualElementContext;
         this.clipboard = clipboard;
         this.storageProvider = storageProvider;
+        this.nativeHelper = nativeHelper;
+        this.logger = logger;
 
         InitializeCommands();
     }
@@ -199,7 +206,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
         var formats = await clipboard.GetFormatsAsync();
         if (formats.Length == 0)
         {
-            Console.WriteLine("Clipboard is empty."); // TODO: logging
+            logger.LogInformation("Clipboard is empty.");
             return;
         }
 
@@ -223,6 +230,20 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
             if (text.IsNullOrEmpty()) return;
             chatAttachments.Add(new ChatTextAttachment(new DirectResourceKey(text.SafeSubstring(0, 10)), text));
         }
+        else
+        {
+            TryAddClipboardImage();
+        }
+    }
+
+    public void TryAddClipboardImage()
+    {
+        if (IsBusy) return;
+        if (!Settings.Model.IsImageSupported) return;
+        if (chatAttachments.Count >= Settings.Internal.MaxChatAttachmentCount) return;
+        if (nativeHelper.GetClipboardBitmap() is not { } bitmap) return;
+
+        chatAttachments.Add(new ChatImageAttachment(DynamicResourceKey.Empty, bitmap));
     }
 
     [RelayCommand(CanExecute = nameof(IsNotBusy))]
@@ -234,7 +255,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
         if (files.Count <= 0) return;
         if (files[0].TryGetLocalPath() is not { } filePath)
         {
-            Console.WriteLine("File path is not available."); // TODO: logging
+            logger.LogInformation("File path is not available.");
             return;
         }
 
@@ -246,7 +267,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
         if (string.IsNullOrWhiteSpace(filePath)) return;
         if (!File.Exists(filePath))
         {
-            Console.WriteLine($"File not found: {filePath}"); // TODO: logging
+            logger.LogInformation("File not found: {FilePath}", filePath);
             return;
         }
 

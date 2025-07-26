@@ -13,6 +13,7 @@ using Everywhere.Models;
 using Everywhere.ViewModels;
 using Everywhere.Views;
 using Everywhere.Views.Pages;
+using Everywhere.Windows.Interop;
 using Everywhere.Windows.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,8 +41,9 @@ public static class Program
                 .AddSingleton<IRuntimeConstantProvider, RuntimeConstantProvider>()
                 .AddSingleton<IVisualElementContext, Win32VisualElementContext>()
                 .AddSingleton<IHotkeyListener, Win32HotkeyListener>()
-                .AddSingleton<IWindowHelper, Win32WindowHelper>()
-                .AddKeyedSingleton<IConfiguration>(nameof(Settings),
+                .AddSingleton<INativeHelper, Win32NativeHelper>()
+                .AddKeyedSingleton<IConfiguration>(
+                    nameof(Settings),
                     (xx, _) =>
                     {
                         IConfiguration configuration;
@@ -169,7 +171,16 @@ public static class Program
 
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
         {
-            Console.WriteLine(formatter(state, exception));
+            switch (logLevel)
+            {
+                case LogLevel.Error:
+                case LogLevel.Critical:
+                    Console.Error.WriteLine(formatter(state, exception));
+                    break;
+                default:
+                    Console.WriteLine(formatter(state, exception));
+                    break;
+            }
         }
     }
 }

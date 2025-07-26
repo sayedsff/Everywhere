@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media.Imaging;
 using Everywhere.Utils;
 using Everywhere.Views;
 using Window = Avalonia.Controls.Window;
@@ -35,7 +36,7 @@ public class App : Application
                     .AddSingleton<IRuntimeConstantProvider, DesignTimeRuntimeConstantProvider>()
                     .AddSingleton<IVisualElementContext, DesignTimeVisualElementContext>()
                     .AddSingleton<IHotkeyListener, DesignTimeHotkeyListener>()
-                    .AddSingleton<IWindowHelper, DesignTimeWindowHelper>()
+                    .AddSingleton<INativeHelper, DesignTimeNativeHelper>()
                     .AddSingleton<Settings>()
 
                     #endregion
@@ -181,13 +182,14 @@ file class DesignTimeHotkeyListener : IHotkeyListener
     public IKeyboardHotkeyScope StartCaptureKeyboardHotkey() => throw new NotSupportedException();
 }
 
-file class DesignTimeWindowHelper : IWindowHelper
+file class DesignTimeNativeHelper : INativeHelper
 {
     public void SetWindowNoFocus(Window window) { }
     public void SetWindowAutoHide(Window window) { }
     public void SetWindowHitTestInvisible(Window window) { }
     public void SetWindowCornerRadius(Window window, CornerRadius cornerRadius) { }
     public void HideWindowWithoutAnimation(Window window) { }
+    public WriteableBitmap? GetClipboardBitmap() => null;
 }
 
 #endif

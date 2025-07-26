@@ -36,31 +36,32 @@ public partial class AssistantFloatingWindow : ReactiveWindow<AssistantFloatingW
         set => SetValue(PlacementProperty, value);
     }
 
-    private readonly IWindowHelper windowHelper;
+    private readonly INativeHelper nativeHelper;
     private readonly ILauncher launcher;
 
-    public AssistantFloatingWindow(IWindowHelper windowHelper, ILauncher launcher)
+    public AssistantFloatingWindow(INativeHelper nativeHelper, ILauncher launcher)
     {
-        this.windowHelper = windowHelper;
+        this.nativeHelper = nativeHelper;
         this.launcher = launcher;
 
         InitializeComponent();
-        // windowHelper.SetWindowNoFocus(this);
+        // nativeHelper.SetWindowNoFocus(this);
 
         BackgroundBorder.PropertyChanged += HandleBackgroundBorderPropertyChanged;
+        ChatInputBox.PastingFromClipboard += HandlePastingFromClipboard;
     }
 
     private void HandleBackgroundBorderPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
     {
         if (e.Property != Border.CornerRadiusProperty || e.NewValue is not CornerRadius cornerRadius) return;
-        windowHelper.SetWindowCornerRadius(this, cornerRadius);
+        nativeHelper.SetWindowCornerRadius(this, cornerRadius);
     }
 
     protected override void OnLoaded(RoutedEventArgs e)
     {
         base.OnLoaded(e);
 
-        windowHelper.SetWindowCornerRadius(this, BackgroundBorder.CornerRadius);
+        nativeHelper.SetWindowCornerRadius(this, BackgroundBorder.CornerRadius);
         CalculatePositionAndPlacement();
 
         // Make the window topmost
@@ -188,6 +189,16 @@ public partial class AssistantFloatingWindow : ReactiveWindow<AssistantFloatingW
     private void HandleTitleBarPointerPressed(object? sender, PointerPressedEventArgs e)
     {
         BeginMoveDrag(e);
+    }
+
+    /// <summary>
+    /// TODO: Avalonia says they will support this in 12.0
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void HandlePastingFromClipboard(object? sender, RoutedEventArgs e)
+    {
+        ViewModel.TryAddClipboardImage();
     }
 
     [RelayCommand]

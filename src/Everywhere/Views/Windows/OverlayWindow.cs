@@ -14,7 +14,7 @@ public class OverlayWindow : Window
         TransparencyLevelHint = [WindowTransparencyLevel.Transparent];
         Background = null;
 
-        var windowHelper = ServiceLocator.Resolve<IWindowHelper>();
+        var windowHelper = ServiceLocator.Resolve<INativeHelper>();
         windowHelper.SetWindowNoFocus(this);
         windowHelper.SetWindowHitTestInvisible(this);
     }

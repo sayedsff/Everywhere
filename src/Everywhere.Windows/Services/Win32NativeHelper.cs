@@ -6,10 +6,13 @@ using Windows.UI.Composition.Desktop;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Dwm;
+using Windows.Win32.Graphics.Gdi;
 using Windows.Win32.UI.Accessibility;
 using Windows.Win32.UI.WindowsAndMessaging;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform;
 using Avalonia.Threading;
 using Everywhere.Interfaces;
 using Everywhere.Windows.Interop;
@@ -18,7 +21,7 @@ using Visual = Windows.UI.Composition.Visual;
 
 namespace Everywhere.Windows.Services;
 
-public class Win32WindowHelper : IWindowHelper
+public class Win32NativeHelper : INativeHelper
 {
     // ReSharper disable InconsistentNaming
     // ReSharper disable IdentifierTypo
@@ -259,6 +262,56 @@ public class Win32WindowHelper : IWindowHelper
                 DWMWINDOWATTRIBUTE.DWMWA_TRANSITIONS_FORCEDISABLED,
                 &disableTransitions,
                 (uint)sizeof(BOOL));
+        }
+    }
+
+    public unsafe WriteableBitmap? GetClipboardBitmap()
+    {
+        if (!PInvoke.OpenClipboard(HWND.Null)) return null;
+
+        var hDc = PInvoke.GetDC(HWND.Null);
+        try
+        {
+            using var hBitmap = PInvoke.GetClipboardData_SafeHandle(2); // CF_BITMAP
+            if (hBitmap.IsInvalid) return null;
+
+            var bmp = new BITMAP();
+            PInvoke.GetObject(hBitmap, sizeof(BITMAP), &bmp);
+            var width = bmp.bmWidth;
+            var height = bmp.bmHeight;
+            if (width <= 0 || height <= 0) return null;
+
+            var bitmap = new WriteableBitmap(
+                new PixelSize(width, height),
+                new Avalonia.Vector(96, 96),
+                PixelFormat.Bgra8888,
+                AlphaFormat.Unpremul);
+            using var buffer = bitmap.Lock();
+
+            var bmi = new BITMAPINFO();
+            bmi.bmiHeader.biSize = (uint)sizeof(BITMAPINFOHEADER);
+            bmi.bmiHeader.biWidth = width;
+            bmi.bmiHeader.biHeight = -height; // 负值表示自顶向下
+            bmi.bmiHeader.biPlanes = 1;
+            bmi.bmiHeader.biBitCount = 32;
+            bmi.bmiHeader.biCompression = (int)BI_COMPRESSION.BI_RGB;
+
+            PInvoke.GetDIBits(
+                hDc,
+                hBitmap,
+                0U,
+                (uint)height,
+                buffer.Address.ToPointer(),
+                &bmi,
+                DIB_USAGE.DIB_RGB_COLORS
+            );
+
+            return bitmap;
+        }
+        finally
+        {
+            if (hDc != HDC.Null) PInvoke.ReleaseDC(HWND.Null, hDc);
+            PInvoke.CloseClipboard();
         }
     }
 

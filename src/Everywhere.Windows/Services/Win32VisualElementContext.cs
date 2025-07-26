@@ -46,11 +46,11 @@ public partial class Win32VisualElementContext : IVisualElementContext
 
     public IVisualElement? PointerOverElement => TryFrom(static () => PInvoke.GetCursorPos(out var point) ? Automation.FromPoint(point) : null);
 
-    private readonly IWindowHelper windowHelper;
+    private readonly INativeHelper nativeHelper;
 
-    public Win32VisualElementContext(IWindowHelper windowHelper)
+    public Win32VisualElementContext(INativeHelper nativeHelper)
     {
-        this.windowHelper = windowHelper;
+        this.nativeHelper = nativeHelper;
 
         Automation.RegisterFocusChangedEvent(element =>
         {
@@ -76,8 +76,8 @@ public partial class Win32VisualElementContext : IVisualElementContext
         }
 
         var windows = desktopLifetime.Windows.AsValueEnumerable().Where(w => w.IsVisible).ToList();
-        foreach (var window in windows) windowHelper.HideWindowWithoutAnimation(window);
-        var result = await ElementPicker.PickAsync(this, windowHelper, mode);
+        foreach (var window in windows) nativeHelper.HideWindowWithoutAnimation(window);
+        var result = await ElementPicker.PickAsync(this, nativeHelper, mode);
         foreach (var window in windows) window.IsVisible = true;
         return result;
     }

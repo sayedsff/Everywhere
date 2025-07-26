@@ -111,12 +111,41 @@
                 </ItemsPanelTemplate>
               </ItemsControl.ItemsPanel>
 
-              <ItemsControl.ItemTemplate>
+              <ItemsControl.DataTemplates>
+                <DataTemplate DataType="m:ChatImageAttachment">
+                  <Border
+                    Height="24"
+                    Background="{DynamicResource CardBackgroundColor}"
+                    CornerRadius="4">
+                    <ToolTip.Tip>
+                      <Image Source="{Binding Image}"/>
+                    </ToolTip.Tip>
+
+                    <StackPanel
+                      Margin="6,0,4,0" Orientation="Horizontal"
+                      Spacing="4">
+                      <Image
+                        Margin="0,4" VerticalAlignment="Center"
+                        Source="{Binding Image}"/>
+                      <Button
+                        Padding="1" VerticalAlignment="Center"
+                        Background="Transparent" BorderThickness="0"
+                        Command="{Binding $parent[v:ChatInputBox].RemoveAttachmentCommand}"
+                        CommandParameter="{Binding}"
+                        ToolTip.Tip="{DynamicResource ChatAttachment_RemoveButton_ToolTip}">
+                        <LucideIcon
+                          Foreground="{DynamicResource MutedColor}"
+                          Kind="X" Size="12"/>
+                      </Button>
+                    </StackPanel>
+                  </Border>
+                </DataTemplate>
+
                 <DataTemplate DataType="m:ChatAttachment">
                   <Border
                     Height="24"
                     Background="{DynamicResource CardBackgroundColor}"
-                    CornerRadius="12">
+                    CornerRadius="4">
                     <StackPanel
                       Margin="6,0,4,0" Orientation="Horizontal"
                       Spacing="4">
@@ -131,7 +160,8 @@
                         Padding="1" VerticalAlignment="Center"
                         Background="Transparent" BorderThickness="0"
                         Command="{Binding $parent[v:ChatInputBox].RemoveAttachmentCommand}"
-                        CommandParameter="{Binding}">
+                        CommandParameter="{Binding}"
+                        ToolTip.Tip="{DynamicResource ChatAttachment_RemoveButton_ToolTip}">
                         <LucideIcon
                           Foreground="{DynamicResource MutedColor}"
                           Kind="X" Size="12"/>
@@ -139,7 +169,7 @@
                     </StackPanel>
                   </Border>
                 </DataTemplate>
-              </ItemsControl.ItemTemplate>
+              </ItemsControl.DataTemplates>
             </ItemsControl>
           </ScrollViewer>
 

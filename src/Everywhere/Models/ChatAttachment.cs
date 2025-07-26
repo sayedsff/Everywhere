@@ -61,6 +61,9 @@ public partial class ChatImageAttachment : ChatAttachment
 
     public WriteableBitmap Image { get; }
 
+    /// <summary>
+    /// Encoded image data for serialization.
+    /// </summary>
     [Key(1)]
     private byte[] ImageData
     {

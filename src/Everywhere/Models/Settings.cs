@@ -92,6 +92,7 @@ public partial class ModelSettings() : SettingsBase("Model")
     public partial bool IsImageSupported { get; set; }
 
     [ObservableProperty]
+    [IgnoreMember]
     public partial bool IsToolCallSupported { get; set; }
 
     [ObservableProperty]

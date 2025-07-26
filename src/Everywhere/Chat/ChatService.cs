@@ -140,7 +140,7 @@ public class ChatService(
                 .Select(n => n.Message)
                 .Where(m => !Equals(m, assistantChatMessage)) // exclude the current assistant message
                 .Where(m => m.Role.Label is "system" or "assistant" or "user" or "tool")
-                .Select(m => new ChatMessageContent(m.Role, m.ToString())));
+                .Select(CreateChatMessageContent));
 
         try
         {
@@ -232,6 +232,45 @@ public class ChatService(
                 assistantMessage,
                 chatContext.Metadata,
                 cancellationToken).Detach(IExceptionHandler.DangerouslyIgnoreAllException);
+        }
+
+        ChatMessageContent CreateChatMessageContent(ChatMessage chatMessage)
+        {
+            ChatMessageContent? content;
+            switch (chatMessage)
+            {
+                case UserChatMessage user:
+                {
+                    content = new ChatMessageContent(chatMessage.Role, user.UserPrompt);
+
+                    if (user.Attachments.OfType<ChatImageAttachment>().ToArray() is not { Length: > 0 } imageAttachments) break;
+                    foreach (var imageAttachment in imageAttachments)
+                    {
+                        using var ms = new MemoryStream();
+                        imageAttachment.Image.Save(ms, 100);
+                        ms.Position = 0;
+                        content.Items.Add(new ImageContent(ms.ToArray(), "image/png"));
+                    }
+
+                    break;
+                }
+                case AssistantChatMessage assistant:
+                {
+                    content = new ChatMessageContent(chatMessage.Role, assistant.MarkdownBuilder.ToString());
+                    break;
+                }
+                case SystemChatMessage system:
+                {
+                    content = new ChatMessageContent(chatMessage.Role, system.SystemPrompt);
+                    break;
+                }
+                default:
+                {
+                    content = new ChatMessageContent(chatMessage.Role, chatMessage.ToString());
+                    break;
+                }
+            }
+            return content;
         }
     }
 

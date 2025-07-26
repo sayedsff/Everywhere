@@ -25,6 +25,8 @@ public abstract partial class DynamicResourceKeyBase : IObservable<object?>
 [MessagePackObject(OnlyIncludeKeyedMembers = true, AllowPrivate = true)]
 public partial class DynamicResourceKey(object key) : DynamicResourceKeyBase
 {
+    public static DynamicResourceKey Empty { get; } = new(string.Empty);
+
     /// <summary>
     /// so why axaml DOES NOT SUPPORT {Binding .^} ???????
     /// </summary>

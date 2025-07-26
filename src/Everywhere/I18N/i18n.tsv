@@ -88,3 +88,4 @@ AssistantVisualElementAttachment_Header_WithProcess_TopLevel	{0} - 窗口	{0} - 
 AssistantFloatingWindow_Title	有什么可以帮忙的？	How can I assist you?
 KeyboardHotkeyInputBox_Watermark	点击设置快捷键	Click to set a hotkey
 ChatContext_Metadata_Title_Default	未命名会话	Unnamed session
+ChatAttachment_RemoveButton_ToolTip	移除	Remove
