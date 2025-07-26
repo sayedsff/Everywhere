@@ -166,7 +166,7 @@
                 <MenuItem.Header>
                   <LucideIcon
                     HorizontalAlignment="Center" VerticalAlignment="Center"
-                    Kind="Plus" Size="18"/>
+                    Kind="Paperclip" Size="18"/>
                 </MenuItem.Header>
               </MenuItem>
             </Menu>

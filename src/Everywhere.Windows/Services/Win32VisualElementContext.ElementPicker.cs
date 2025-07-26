@@ -76,7 +76,7 @@ public partial class Win32VisualElementContext
             Topmost = true;
             CanResize = false;
             ShowInTaskbar = false;
-            Cursor = Cursor.Parse("Cross");
+            Cursor = new Cursor(StandardCursorType.Cross);
             SystemDecorations = SystemDecorations.None;
             WindowStartupLocation = WindowStartupLocation.Manual;
 
