@@ -150,8 +150,6 @@ public partial class ChatContext : ObservableObject, IEnumerable<ChatMessageNode
             if (node.ChoiceIndex < 0 || node.ChoiceIndex >= node.Children.Count) break;
             branchNodes.Add(node = messageNodeMap[node.Children[node.ChoiceIndex]]);
         }
-
-        Metadata.DateModified = DateTimeOffset.UtcNow;
     }
 
     private void Insert(int index, ChatMessageNode newNode)
@@ -177,7 +175,8 @@ public partial class ChatContextMetadata : ObservableObject
     public DateTimeOffset DateCreated { get; set; }
 
     [Key(1)]
-    public DateTimeOffset DateModified { get; set; }
+    [ObservableProperty]
+    public partial DateTimeOffset DateModified { get; set; }
 
     [Key(2)]
     [ObservableProperty]

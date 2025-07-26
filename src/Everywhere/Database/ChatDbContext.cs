@@ -133,7 +133,8 @@ public class ChatContextDbItem : TrackableObject<ChatContextDbItem>
             isTrackingEnabled == false,
             "Tracking should not be enabled when subscribing. This indicates a duplicate subscription.");
 
-        value.PropertyChanged += HandleValueChanged;
+        // Subscribe to property changes of the ChatContext.Metadata
+        // This actually tracks changes to the DateModified property
         value.Metadata.PropertyChanged += HandleValueChanged;
         isTrackingEnabled = true;
     }
