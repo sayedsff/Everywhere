@@ -7,3 +7,6 @@
 [submodule "3rd/MessagePack-CSharp"]
 	path = 3rd/MessagePack-CSharp
 	url = https://github.com/NodisAI/MessagePack-CSharp
+[submodule "3rd/LiveMarkdown.Avalonia"]
+	path = 3rd/LiveMarkdown.Avalonia
+	url = https://github.com/DearVa/LiveMarkdown.Avalonia

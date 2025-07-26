@@ -1,6 +1,9 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Platform.Storage;
+using CommunityToolkit.Mvvm.Input;
+using LiveMarkdown.Avalonia;
 
 namespace Everywhere.Views;
 
@@ -34,10 +37,12 @@ public partial class AssistantFloatingWindow : ReactiveWindow<AssistantFloatingW
     }
 
     private readonly IWindowHelper windowHelper;
+    private readonly ILauncher launcher;
 
-    public AssistantFloatingWindow(IWindowHelper windowHelper)
+    public AssistantFloatingWindow(IWindowHelper windowHelper, ILauncher launcher)
     {
         this.windowHelper = windowHelper;
+        this.launcher = launcher;
 
         InitializeComponent();
         // windowHelper.SetWindowNoFocus(this);
@@ -183,5 +188,12 @@ public partial class AssistantFloatingWindow : ReactiveWindow<AssistantFloatingW
     private void HandleTitleBarPointerPressed(object? sender, PointerPressedEventArgs e)
     {
         BeginMoveDrag(e);
+    }
+
+    [RelayCommand]
+    private Task LaunchInlineHyperlink(InlineHyperlinkClickedEventArgs e)
+    {
+        // currently we only support http(s) links for safety reasons
+        return e.HRef is not { Scheme: "http" or "https" } uri ? Task.CompletedTask : launcher.LaunchUriAsync(uri);
     }
 }

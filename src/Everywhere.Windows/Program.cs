@@ -80,6 +80,9 @@ public static class Program
                 .AddTransient<IStorageProvider>(_ =>
                     Application.Current.As<App>()?.TopLevel.StorageProvider ??
                     throw new InvalidOperationException("StorageProvider is not available."))
+                .AddTransient<ILauncher>(_ =>
+                    Application.Current.As<App>()?.TopLevel.Launcher ??
+                    throw new InvalidOperationException("Launcher is not available."))
 
                 #endregion
 
