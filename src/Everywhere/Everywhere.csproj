@@ -15,11 +15,11 @@
         <PackageReference Include="CommunityToolkit.Mvvm"/>
         <PackageReference Include="Lucide.Avalonia"/>
         <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="JetBrains.Profiler.Api"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite"/>
         <PackageReference Include="Microsoft.Extensions.Configuration"/>
         <PackageReference Include="Microsoft.KernelMemory.Core"/>
-        <PackageReference Include="Microsoft.ML.OnnxRuntime"/>
+        <!--        <PackageReference Include="Microsoft.ML.OnnxRuntime"/>-->
         <PackageReference Include="Microsoft.SemanticKernel"/>
         <PackageReference Include="Microsoft.SemanticKernel.Connectors.OpenAI"/>
         <PackageReference Include="Microsoft.SemanticKernel.Plugins.Web"/>
@@ -32,7 +32,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\3rd\LiveMarkdown.Avalonia\src\LiveMarkdown.Avalonia\LiveMarkdown.Avalonia.csproj" />
+        <ProjectReference Include="..\..\3rd\LiveMarkdown.Avalonia\src\LiveMarkdown.Avalonia\LiveMarkdown.Avalonia.csproj"/>
         <ProjectReference Include="..\..\3rd\MessagePack-CSharp\src\MessagePack.SourceGenerator\MessagePack.SourceGenerator.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer"/>
         <ProjectReference Include="..\..\3rd\MessagePack-CSharp\src\MessagePack\MessagePack.csproj"/>
         <ProjectReference Include="..\..\3rd\shad-ui\src\ShadUI\ShadUI.csproj"/>
@@ -48,23 +48,23 @@
         </AvaloniaResource>
     </ItemGroup>
 
-    <ItemGroup>
-        <None Update="Assets\text2vec-chinese-base\model.onnx">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Assets\text2vec-chinese-base\special_tokens_map.json">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Assets\text2vec-chinese-base\tokenizer.json">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Assets\text2vec-chinese-base\tokenizer_config.json">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Assets\text2vec-chinese-base\vocab.txt">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-    </ItemGroup>
+    <!--    <ItemGroup>-->
+    <!--        <None Update="Assets\text2vec-chinese-base\model.onnx">-->
+    <!--            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>-->
+    <!--        </None>-->
+    <!--        <None Update="Assets\text2vec-chinese-base\special_tokens_map.json">-->
+    <!--            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>-->
+    <!--        </None>-->
+    <!--        <None Update="Assets\text2vec-chinese-base\tokenizer.json">-->
+    <!--            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>-->
+    <!--        </None>-->
+    <!--        <None Update="Assets\text2vec-chinese-base\tokenizer_config.json">-->
+    <!--            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>-->
+    <!--        </None>-->
+    <!--        <None Update="Assets\text2vec-chinese-base\vocab.txt">-->
+    <!--            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>-->
+    <!--        </None>-->
+    <!--    </ItemGroup>-->
 
     <Target Name="I18N" BeforeTargets="PreBuildEvent">
         <Exec Command="dotnet run --project ../Everywhere.I18N.Generator/Everywhere.I18N.Generator.csproj -- ../Everywhere/I18N/i18n.tsv ../Everywhere/I18N"/>
