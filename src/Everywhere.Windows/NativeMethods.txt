@@ -59,4 +59,4 @@ GetClipboardData
 GetDIBits
 GetObject
 BITMAP
-BI_RGB
+BI_COMPRESSION

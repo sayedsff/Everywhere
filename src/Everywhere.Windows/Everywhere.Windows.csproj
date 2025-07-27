@@ -27,7 +27,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Everywhere\Everywhere.csproj" />
-        <ProjectReference Include="..\Everywhere\Everywhere.Windows.InteropHelper.csproj" ReferenceOutputAssembly="false" />
     </ItemGroup>
 
     <ItemGroup>
@@ -40,12 +39,16 @@
       </None>
     </ItemGroup>
 
+    <Target Name="Build InteropHelper" BeforeTargets="PreBuildEvent">
+        <Exec Command="powershell -ExecutionPolicy Bypass -File &quot;$(SolutionDir)tools\build_vcproj.ps1&quot; -configuration $(Configuration) -projectPath &quot;$(SolutionDir)src\Everywhere.Windows.InteropHelper\Everywhere.Windows.InteropHelper.vcxproj&quot;" />
+    </Target>
+
     <ItemGroup>
-      <Content Include="..\..\x64\$(Configuration)\Everywhere.Windows.InteropHelper.dll">
+      <Content Include="$(SolutionDir)src\Everywhere.Windows.InteropHelper\x64\$(Configuration)\Everywhere.Windows.InteropHelper.dll">
         <Link>runtimes\win-x64\native\Everywhere.Windows.InteropHelper.dll</Link>
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
-      <Content Include="..\..\x64\$(Configuration)\Everywhere.Windows.InteropHelper.pdb" Condition="'$(DebugSymbols)' == 'true'">
+      <Content Include="$(SolutionDir)src\Everywhere.Windows.InteropHelper\x64\$(Configuration)\Everywhere.Windows.InteropHelper.pdb" Condition="'$(DebugSymbols)' == 'true'">
         <Link>runtimes\win-x64\native\Everywhere.Windows.InteropHelper.pdb</Link>
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>

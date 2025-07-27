@@ -18,6 +18,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 		.gitmodules = .gitmodules
 		Settings.XamlStyler = Settings.XamlStyler
+		tools\build_vcproj.ps1 = tools\build_vcproj.ps1
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3rd", "3rd", "{53D93485-1520-4753-81CE-DA1CFF334372}"
