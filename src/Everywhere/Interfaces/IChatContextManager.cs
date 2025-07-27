@@ -7,7 +7,7 @@ namespace Everywhere.Interfaces;
 
 public interface IChatContextManager : INotifyPropertyChanged
 {
-    INotifyCollectionChangedSynchronizedViewList<ChatMessageNode> ChatMessageNodes { get; }
+    NotifyCollectionChangedSynchronizedViewList<ChatMessageNode> ChatMessageNodes { get; }
 
     ChatContext Current { get; set; }
 

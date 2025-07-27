@@ -13,7 +13,7 @@ namespace Everywhere.Chat;
 
 public class ChatContextManager(Settings settings, IChatDatabase chatDatabase) : ObservableObject, IChatContextManager, IAsyncInitializer
 {
-    public INotifyCollectionChangedSynchronizedViewList<ChatMessageNode> ChatMessageNodes =>
+    public NotifyCollectionChangedSynchronizedViewList<ChatMessageNode> ChatMessageNodes =>
         Current.ToNotifyCollectionChanged(
             v => v.AttachFilter(m => m.Message.Role != AuthorRole.System),
             SynchronizationContextCollectionEventDispatcher.Current);

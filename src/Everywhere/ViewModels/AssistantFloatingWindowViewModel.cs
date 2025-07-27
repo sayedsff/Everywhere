@@ -2,10 +2,8 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using Avalonia.Controls.Documents;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
-using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -38,9 +36,6 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
 
     [ObservableProperty]
     public partial IReadOnlyList<DynamicNamedCommand>? QuickActions { get; private set; }
-
-    [ObservableProperty]
-    public partial IReadOnlyList<ChatCommand>? ChatCommands { get; private set; }
 
     [ObservableProperty]
     public partial bool IsExpanded { get; set; }
@@ -113,35 +108,13 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
             )
         ];
 
-        ChatCommand[] textEditCommands =
-        [
-            new(
-                "/translate",
-                LocaleKey.AssistantCommand_Translate_Description,
-                "Based on context, translate the content of focused element into {0}",
-                () => Settings.Common.Language),
-            new(
-                "/rewrite",
-                LocaleKey.AssistantCommand_Rewrite_Description,
-                "Based on context, rewrite the content of focused element"),
-        ];
-
         void HandleChatAttachmentsCollectionChanged(in NotifyCollectionChangedEventArgs<ChatAttachment> x)
         {
-            QuickActions = null;
-            ChatCommands = null;
-
-            if (chatAttachments.Count <= 0) return;
-
-            switch (chatAttachments[0])
+            QuickActions = chatAttachments switch
             {
-                case ChatVisualElementAttachment { Element.Type: VisualElementType.TextEdit }:
-                {
-                    QuickActions = textEditActions;
-                    ChatCommands = textEditCommands;
-                    break;
-                }
-            }
+                [ChatVisualElementAttachment { Element.Type: VisualElementType.TextEdit }] => textEditActions,
+                _ => null
+            };
         }
 
         chatAttachments.CollectionChanged += HandleChatAttachmentsCollectionChanged;
@@ -329,30 +302,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
             message = message.Trim();
             if (message.Length == 0) return;
 
-            UserChatMessage? userMessage = null;
-            if (message[0] == '/')
-            {
-                var commandString = message.IndexOf(' ') is var index and > 0 ? message[..index] : message;
-                if (ChatCommands?.FirstOrDefault(c => c.Command.Equals(commandString, StringComparison.OrdinalIgnoreCase)) is { } command)
-                {
-                    var commandArgument = message[commandString.Length..].Trim();
-                    if (commandArgument.Length == 0)
-                    {
-                        commandArgument = command.DefaultValueFactory?.Invoke() ?? string.Empty;
-                    }
-                    var userPrompt = string.Format(command.UserPrompt, commandArgument);
-                    userMessage = new UserChatMessage(userPrompt, chatAttachments.AsValueEnumerable().ToList())
-                    {
-                        Inlines =
-                        {
-                            new Run(commandString) { TextDecorations = TextDecorations.Underline },
-                            new Run(' ' + commandArgument)
-                        }
-                    };
-                }
-            }
-
-            userMessage ??= new UserChatMessage(message, chatAttachments.AsValueEnumerable().ToImmutableArray())
+            var userMessage = new UserChatMessage(message, chatAttachments.AsValueEnumerable().ToImmutableArray())
             {
                 Inlines = { message }
             };
@@ -388,7 +338,6 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
         TargetBoundingRect = default;
         IsExpanded = false;
         QuickActions = [];
-        ChatCommands = [];
     }
 
     protected override void OnPropertyChanged(PropertyChangedEventArgs e)

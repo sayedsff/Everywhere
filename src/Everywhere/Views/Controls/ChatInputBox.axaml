@@ -54,11 +54,10 @@
               Text="{TemplateBinding Watermark}"
               TextAlignment="{TemplateBinding TextAlignment}"
               TextWrapping="{TemplateBinding TextWrapping}"/>
-            <v:ChatInputTextPresenter
+            <TextPresenter
               x:Name="PART_TextPresenter"
               CaretBrush="{TemplateBinding CaretBrush}"
               CaretIndex="{TemplateBinding CaretIndex}"
-              SelectedChatCommand="{Binding $parent[v:ChatInputBox].SelectedChatCommand}"
               SelectionBrush="{TemplateBinding SelectionBrush}"
               SelectionEnd="{TemplateBinding SelectionEnd}"
               SelectionForegroundBrush="{TemplateBinding SelectionForegroundBrush}"
@@ -69,28 +68,6 @@
               TextBlock.Foreground="{TemplateBinding Foreground}"
               TextWrapping="{TemplateBinding TextWrapping}"/>
           </Panel>
-
-          <Popup
-            Grid.Row="0" Grid.Column="0"
-            IsOpen="{Binding IsChatCommandFlyoutOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
-            Placement="TopEdgeAlignedLeft" PlacementTarget="PART_TextPresenter">
-            <ListBox
-              Background="{DynamicResource CardBackgroundColor}"
-              CornerRadius="6" Grid.IsSharedSizeScope="True"
-              ItemsSource="{TemplateBinding ChatCommandItemsSource}"
-              SelectedItem="{Binding SelectedChatCommand, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
-              <ListBox.DataTemplates>
-                <DataTemplate DataType="m:ChatCommand">
-                  <TextBlock>
-                    <Run
-                      FontWeight="Black"
-                      Text="{Binding Command}"/>
-                    <Run Text="{Binding DescriptionKey^, FallbackValue={x:Null}}"/>
-                  </TextBlock>
-                </DataTemplate>
-              </ListBox.DataTemplates>
-            </ListBox>
-          </Popup>
 
           <ScrollViewer
             Grid.Row="1" Grid.Column="0"

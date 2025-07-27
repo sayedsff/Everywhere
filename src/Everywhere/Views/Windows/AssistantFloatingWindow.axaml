@@ -544,7 +544,6 @@
             AcceptsReturn="True"
             CancelCommand="{Binding CancelCommand}"
             ChatAttachmentItemsSource="{Binding ChatAttachments}"
-            ChatCommandItemsSource="{Binding ChatCommands}"
             Command="{Binding SendMessageCommand}"
             IsImageEnabled="{Binding Settings.Internal.IsImageEnabled, Mode=TwoWay}"
             IsImageSupported="{Binding Settings.Model.IsImageSupported}"
