@@ -302,13 +302,14 @@
                   <Setter Property="Template">
                     <ControlTemplate>
                       <ButtonSpinner
-                        Name="PART_Spinner" HorizontalContentAlignment="Stretch"
-                        VerticalContentAlignment="Stretch">
+                        Name="PART_Spinner" HorizontalContentAlignment="Center"
+                        VerticalContentAlignment="Center">
                         <Panel>
+                          <!--  TextBox is useless but necessary for NumericUpDown  -->
                           <TextBox
                             x:Name="PART_TextBox" IsVisible="False"/>
                           <TextBlock
-                            Margin="0,0,0,1" FontSize="12"
+                            Margin="0,2,0,0" FontSize="12"
                             Foreground="{TemplateBinding Foreground}"
                             TextAlignment="Center" TextWrapping="NoWrap">
                             <Run Text="{Binding Value, StringFormat={}{0:F0}, RelativeSource={RelativeSource TemplatedParent}}"/>

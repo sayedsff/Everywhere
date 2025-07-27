@@ -344,7 +344,7 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
     {
         base.OnPropertyChanged(e);
 
-        if (e.PropertyName == nameof(IsNotBusy))
+        if (e.PropertyName == nameof(IsBusy))
         {
             AddElementCommand.NotifyCanExecuteChanged();
             AddClipboardCommand.NotifyCanExecuteChanged();

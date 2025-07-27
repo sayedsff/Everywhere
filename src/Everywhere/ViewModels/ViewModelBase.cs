@@ -73,6 +73,7 @@ public enum ExecutionFlags
 public abstract partial class BusyViewModelBase : ReactiveViewModelBase
 {
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsNotBusy))]
     public partial bool IsBusy { get; private set; }
 
     public bool IsNotBusy => !IsBusy;
