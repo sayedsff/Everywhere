@@ -1,9 +1,10 @@
-﻿
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Security;
 using System.Text;
+#if DEBUG
 using JetBrains.Profiler.Api;
+#endif
 using Microsoft.KernelMemory.AI;
 
 namespace Everywhere.Chat;
