@@ -55,7 +55,7 @@
             <Setter Property="CornerRadius" Value="4"/>
             <Setter Property="Background" Value="Transparent"/>
 
-            <Style Selector="^:pointerover.Close /template/ Border#RootBorder">
+            <Style Selector="^.Close /template/ Border#HoverBackground">
               <Setter Property="Background" Value="#C42B1C"/>
             </Style>
 
@@ -318,6 +318,13 @@
                           <markdown:MarkdownRenderer
                             InlineHyperlinkCommand="{Binding $parent[v:ChatFloatingWindow].LaunchInlineHyperlinkCommand}"
                             MarkdownBuilder="{Binding MarkdownBuilder}"/>
+
+                          <shadui:Skeleton
+                            Width="12" Height="12"
+                            HorizontalAlignment="Left"
+                            Background="{DynamicResource PrimaryColor}"
+                            CornerRadius="8"
+                            IsVisible="{Binding IsBusy}"/>
 
                           <StackPanel
                             x:Name="ChatMessageOperationPanel"
