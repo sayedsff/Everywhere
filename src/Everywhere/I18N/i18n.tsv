@@ -14,7 +14,6 @@ SettingsSelectionItem_Common_Theme_Light	浅色主题	Light Theme
 SettingsGroup_Behavior_Header	行为	Behavior
 Settings_Behavior_AssistantHotkey_Header	助手快捷键	Assistant Hotkey
 Settings_Behavior_AssistantHotkey_Description	设置一个快捷键，在任何时候按下即可唤出助手。	Set a hotkey to invoke the assistant at any time.
-Settings_Behavior_ShowAssistantFloatingWindowWhenInput_Header	输入时显示助手悬浮框	Show assistant floating window when input
 Settings_Behavior_ShowAssistantFloatingWindowWhenInput_Description	开启后，在任意软件中输入时，会在旁边弹出悬浮面板以便快速访问。	When enabled, a floating panel will pop up beside the input area in any software for quick access while typing.
 SettingsGroup_Model_Header	模型	Model
 Settings_Model_ModelName_Header	模型名称	Model Name

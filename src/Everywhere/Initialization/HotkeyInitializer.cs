@@ -14,23 +14,6 @@ public class HotkeyInitializer(
 
     public Task InitializeAsync()
     {
-        visualElementContext.KeyboardFocusedElementChanged += element =>
-        {
-            if (!settings.Behavior.ShowAssistantFloatingWindowWhenInput) return;
-            if (element is not { Type: VisualElementType.TextEdit } ||
-                (element.States & (
-                    VisualElementStates.Offscreen |
-                    VisualElementStates.Disabled |
-                    VisualElementStates.ReadOnly |
-                    VisualElementStates.Password)) != 0)
-            {
-                element = null;
-            }
-
-            Dispatcher.UIThread.InvokeOnDemandAsync(() =>
-                ServiceLocator.Resolve<ChatFloatingWindow>().ViewModel.TryFloatToTargetElementAsync(element).Detach()).Detach();
-        };
-
         // initialize hotkey listener
         settings.Behavior.PropertyChanged += (_, args) =>
         {
@@ -51,7 +34,7 @@ public class HotkeyInitializer(
                     .LastOrDefault();
             if (element == null) return;
             Dispatcher.UIThread.InvokeOnDemandAsync(() =>
-                ServiceLocator.Resolve<ChatFloatingWindow>().ViewModel.TryFloatToTargetElementAsync(element, true).Detach()).Detach();
+                ServiceLocator.Resolve<ChatFloatingWindow>().ViewModel.TryFloatToTargetElementAsync(element).Detach()).Detach();
         };
         // hotkeyListener.PointerHotkeyActivated += point =>
         // {

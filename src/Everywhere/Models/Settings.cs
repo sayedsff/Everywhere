@@ -61,9 +61,6 @@ public partial class BehaviorSettings() : SettingsBase("Behavior")
 {
     [ObservableProperty]
     public partial KeyboardHotkey AssistantHotkey { get; set; }
-
-    [ObservableProperty]
-    public partial bool ShowAssistantFloatingWindowWhenInput { get; set; }
 }
 
 public partial class ModelSettings() : SettingsBase("Model")

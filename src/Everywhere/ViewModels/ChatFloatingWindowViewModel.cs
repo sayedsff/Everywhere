@@ -37,9 +37,6 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
     [ObservableProperty]
     public partial IReadOnlyList<DynamicNamedCommand>? QuickActions { get; private set; }
 
-    [ObservableProperty]
-    public partial bool IsExpanded { get; set; }
-
     public IChatContextManager ChatContextManager { get; }
 
     public IChatService ChatService { get; }
@@ -122,7 +119,7 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
 
     private CancellationTokenSource? targetElementChangedTokenSource;
 
-    public async Task TryFloatToTargetElementAsync(IVisualElement? targetElement, bool showExpanded = false)
+    public async Task TryFloatToTargetElementAsync(IVisualElement? targetElement)
     {
         // debouncing
         if (targetElementChangedTokenSource is not null) await targetElementChangedTokenSource.CancelAsync();
@@ -155,7 +152,6 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
                 chatAttachments.Clear();
                 chatAttachments.Add(await Task.Run(() => CreateFromVisualElement(targetElement), token));
                 IsOpened = true;
-                IsExpanded = showExpanded;
             },
             flags: ExecutionFlags.EnqueueIfBusy,
             cancellationToken: cancellationToken);
@@ -336,7 +332,6 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
     {
         cancellationTokenSource.Cancel();
         TargetBoundingRect = default;
-        IsExpanded = false;
         QuickActions = [];
     }
 

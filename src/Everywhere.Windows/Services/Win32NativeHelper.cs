@@ -177,15 +177,10 @@ public class Win32NativeHelper : INativeHelper
             var target = DesktopWindowTarget.FromAbi(avaloniaTarget.NativePointer);
             compositionContexts[hWnd] = compositionContext = new CompositionContext(compositor, rootVisual = target.Root);
 
-            // var previousDesktopScaling = window.DesktopScaling;
-            // window.PositionChanged += delegate
-            // {
-            //     if (previousDesktopScaling.IsCloseTo(window.DesktopScaling)) return;
-            //
-            //     previousDesktopScaling = window.DesktopScaling;
-            //     Debug.WriteLine(previousDesktopScaling);
-            //     SetWindowCornerRadiusInternal();
-            // };
+            window.ScalingChanged += delegate
+            {
+                SetWindowCornerRadiusInternal();
+            };
 
             window.SizeChanged += delegate
             {

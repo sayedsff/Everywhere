@@ -3,11 +3,10 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:be="clr-namespace:Everywhere.Behaviors"
   xmlns:i="clr-namespace:Everywhere.Interfaces" xmlns:m="clr-namespace:Everywhere.Models"
   xmlns:markdown="clr-namespace:LiveMarkdown.Avalonia;assembly=LiveMarkdown.Avalonia" xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI"
-  xmlns:system="clr-namespace:System;assembly=System.Runtime" xmlns:themes="clr-namespace:ShadUI.Themes;assembly=ShadUI"
-  xmlns:v="clr-namespace:Everywhere.Views" xmlns:vc="clr-namespace:Everywhere.ValueConverters"
-  xmlns:vm="clr-namespace:Everywhere.ViewModels" x:DataType="vm:ChatFloatingWindowViewModel"
-  x:TypeArguments="vm:ChatFloatingWindowViewModel" Background="Transparent"
-  CanResize="False"
+  xmlns:themes="clr-namespace:ShadUI.Themes;assembly=ShadUI" xmlns:v="clr-namespace:Everywhere.Views"
+  xmlns:vc="clr-namespace:Everywhere.ValueConverters" xmlns:vm="clr-namespace:Everywhere.ViewModels"
+  x:DataType="vm:ChatFloatingWindowViewModel" x:TypeArguments="vm:ChatFloatingWindowViewModel"
+  Background="Transparent" CanResize="False"
   IsOpened="{Binding IsOpened, Mode=TwoWay}"
   RequestedThemeVariant="{x:Static themes:ThemeVariants.Acrylic}"
   ShowActivated="True" ShowInTaskbar="False"
@@ -18,45 +17,11 @@
 
   <Grid
     x:Name="RootGrid" RowDefinitions="*,Auto">
-    <Grid.Resources>
-      <vc:PlacementToCornerRadiusConverter x:Key="PlacementToCornerRadiusConverter"/>
-    </Grid.Resources>
-
     <Border
       x:Name="BackgroundBorder" Grid.Row="0"
       Grid.RowSpan="2"
       BorderBrush="{DynamicResource AcrylicBorderBrush}"
-      BorderThickness="1"
-      Classes.IsExpanded="{Binding IsExpanded}">
-      <Border.CornerRadius>
-        <MultiBinding Converter="{StaticResource PlacementToCornerRadiusConverter}">
-          <Binding>
-            <Binding.Source>
-              <system:Double>4</system:Double>
-            </Binding.Source>
-          </Binding>
-          <Binding>
-            <Binding.Source>
-              <CornerRadius>12,18</CornerRadius>
-            </Binding.Source>
-          </Binding>
-          <Binding Path="$self.Bounds.Width"/>
-          <Binding Path="$parent[v:ChatFloatingWindow].Placement"/>
-          <Binding Path="IsExpanded"/>
-        </MultiBinding>
-      </Border.CornerRadius>
-
-      <Border.Transitions>
-        <Transitions>
-          <CornerRadiusTransition
-            Easing="SineEaseInOut" Property="CornerRadius"
-            Duration="0:0:0.2"/>
-          <DoubleTransition
-            Easing="SineEaseInOut" Property="Opacity"
-            Duration="0:0:0.2"/>
-        </Transitions>
-      </Border.Transitions>
-    </Border>
+      BorderThickness="1" CornerRadius="12,12,16,16"/>
 
     <ExperimentalAcrylicBorder
       x:Name="ExperimentalAcrylicBorder" Grid.Row="0"
@@ -73,24 +38,14 @@
       Grid.Row="0" Margin="8"
       Background="Transparent" LastChildFill="True"
       PointerPressed="HandleTitleBarPointerPressed">
-      <ToggleButton
-        DockPanel.Dock="Left" MinHeight="32"
-        Padding="0"
-        IsChecked="{Binding IsExpanded, Mode=TwoWay}">
-        <ToggleButton.Template>
-          <ControlTemplate TargetType="ToggleButton">
-            <Viewbox
-              Width="36" Height="36"
-              Margin="0,0,0,-4">
-              <ContentPresenter Content="{StaticResource AssistantAvatar}"/>
-            </Viewbox>
-          </ControlTemplate>
-        </ToggleButton.Template>
-      </ToggleButton>
+      <Viewbox
+        DockPanel.Dock="Left" Width="36"
+        Height="36" Margin="0,0,0,-4">
+        <ContentPresenter Content="{StaticResource AssistantAvatar}"/>
+      </Viewbox>
 
       <StackPanel
         DockPanel.Dock="Right" VerticalAlignment="Center"
-        IsVisible="{Binding IsExpanded}"
         Orientation="Horizontal" Spacing="4">
         <StackPanel.Styles>
           <Style Selector=":is(Button).TitleBar">
@@ -180,13 +135,10 @@
       <TextBlock
         Classes="Large" Margin="8,0,0,0"
         VerticalAlignment="Center" IsHitTestVisible="False"
-        IsVisible="{Binding IsExpanded}"
         Text="{Binding Title^, FallbackValue={x:Null}}"/>
     </DockPanel>
 
-    <Panel
-      Grid.Row="1"
-      IsVisible="{Binding IsExpanded}">
+    <Panel Grid.Row="1">
       <Panel.Styles>
         <Style Selector="shadui|Loading">
           <Setter Property="Foreground" Value="{DynamicResource SukiLowText}"/>

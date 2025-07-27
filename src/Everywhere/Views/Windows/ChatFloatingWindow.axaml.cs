@@ -61,7 +61,6 @@ public partial class ChatFloatingWindow : ReactiveWindow<ChatFloatingWindowViewM
     {
         base.OnLoaded(e);
 
-        nativeHelper.SetWindowCornerRadius(this, BackgroundBorder.CornerRadius);
         CalculatePositionAndPlacement();
 
         // Make the window topmost
