@@ -277,15 +277,15 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
     private static ChatVisualElementAttachment CreateFromVisualElement(IVisualElement element)
     {
         DynamicResourceKey headerKey;
-
+        var elementTypeKey = new DynamicResourceKey($"VisualElementType_{element.Type}");
         if (element.ProcessId != 0)
         {
             using var process = Process.GetProcessById(element.ProcessId);
-            headerKey = new FormattedDynamicResourceKey($"AssistantVisualElementAttachment_Header_WithProcess_{element.Type}", process.ProcessName);
+            headerKey = new FormattedDynamicResourceKey("{0} - {1}", process.ProcessName, elementTypeKey);
         }
         else
         {
-            headerKey = new DynamicResourceKey($"AssistantVisualElementAttachment_Header_{element.Type}");
+            headerKey = elementTypeKey;
         }
 
         return new ChatVisualElementAttachment(
@@ -296,8 +296,27 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
                 VisualElementType.TextEdit => LucideIconKind.TextCursorInput,
                 VisualElementType.Document => LucideIconKind.FileText,
                 VisualElementType.Image => LucideIconKind.Image,
-                VisualElementType.Screen => LucideIconKind.Monitor,
+                VisualElementType.CheckBox => LucideIconKind.SquareCheck,
+                VisualElementType.RadioButton => LucideIconKind.CircleCheckBig,
+                VisualElementType.ComboBox => LucideIconKind.ChevronDown,
+                VisualElementType.ListView => LucideIconKind.List,
+                VisualElementType.ListViewItem => LucideIconKind.List,
+                VisualElementType.TreeView => LucideIconKind.ListTree,
+                VisualElementType.TreeViewItem => LucideIconKind.ListTree,
+                VisualElementType.DataGrid => LucideIconKind.Table,
+                VisualElementType.DataGridItem => LucideIconKind.Table,
+                VisualElementType.TabControl => LucideIconKind.LayoutPanelTop,
+                VisualElementType.TabItem => LucideIconKind.LayoutPanelTop,
+                VisualElementType.Table => LucideIconKind.Table,
+                VisualElementType.TableRow => LucideIconKind.Table,
+                VisualElementType.Menu => LucideIconKind.Menu,
+                VisualElementType.MenuItem => LucideIconKind.Menu,
+                VisualElementType.Slider => LucideIconKind.SlidersHorizontal,
+                VisualElementType.ScrollBar => LucideIconKind.Settings2,
+                VisualElementType.ProgressBar => LucideIconKind.Percent,
+                VisualElementType.Panel => LucideIconKind.Group,
                 VisualElementType.TopLevel => LucideIconKind.AppWindow,
+                VisualElementType.Screen => LucideIconKind.Monitor,
                 _ => LucideIconKind.Component
             },
             element);

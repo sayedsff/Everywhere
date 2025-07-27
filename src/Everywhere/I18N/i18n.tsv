@@ -73,19 +73,35 @@ AssistantFloatingWindow_AssistantInputBox_AddAttachmentMenuItems_AddFile	添加�
 AssistantFloatingWindowViewModel_TextEditActions_Translate	翻译	Translate
 AssistantFloatingWindowViewModel_TextEditActions_ContinueWriting	续写	Continue
 AssistantFloatingWindowViewModel_TextEditActions_Summarize	总结	Summary
-AssistantVisualElementAttachment_Header_Label	文本	Text
-AssistantVisualElementAttachment_Header_TextEdit	输入框	Input Box
-AssistantVisualElementAttachment_Header_Document	文档	Document
-AssistantVisualElementAttachment_Header_Image	图像	Image
-AssistantVisualElementAttachment_Header_Screen	屏幕	Screen
-AssistantVisualElementAttachment_Header_TopLevel	窗口	Window
-AssistantVisualElementAttachment_Header_WithProcess_Label	{0} - 文本	{0} - Text
-AssistantVisualElementAttachment_Header_WithProcess_TextEdit	{0} - 输入框	{0} - Input Box
-AssistantVisualElementAttachment_Header_WithProcess_Document	{0} - 文档	{0} - Document
-AssistantVisualElementAttachment_Header_WithProcess_Image	{0} - 图像	{0} - Image
-AssistantVisualElementAttachment_Header_WithProcess_Screen	{0} - 屏幕	{0} - Screen
-AssistantVisualElementAttachment_Header_WithProcess_TopLevel	{0} - 窗口	{0} - Window
 AssistantFloatingWindow_Title	有什么可以帮忙的？	How can I assist you?
 KeyboardHotkeyInputBox_Watermark	点击设置快捷键	Click to set a hotkey
 ChatContext_Metadata_Title_Default	未命名会话	Unnamed session
 ChatAttachment_RemoveButton_ToolTip	移除	Remove
+VisualElementType_Unknown	未知	Unknown
+VisualElementType_Label	标签	Label
+VisualElementType_TextEdit	文本框	Text box
+VisualElementType_Document	文档	Document
+VisualElementType_Button	按钮	Button
+VisualElementType_Hyperlink	超链接	Hyperlink
+VisualElementType_Image	图片	Image
+VisualElementType_CheckBox	复选框	Check box
+VisualElementType_RadioButton	单选按钮	Radio button
+VisualElementType_ComboBox	组合框	Combo box
+VisualElementType_ListView	列表视图	List
+VisualElementType_ListViewItem	列表项	List item
+VisualElementType_TreeView	树视图	Tree
+VisualElementType_TreeViewItem	树项	Tree item
+VisualElementType_DataGrid	数据表	Table
+VisualElementType_DataGridItem	数据项	Table item
+VisualElementType_TabControl	标签页	Tab
+VisualElementType_TabItem	标签页	Tab
+VisualElementType_Table	表格	Table
+VisualElementType_TableRow	表格	Table
+VisualElementType_Menu	菜单	Menu
+VisualElementType_MenuItem	菜单项	MenuItem
+VisualElementType_Slider	滑块	Slider
+VisualElementType_ScrollBar	滚动条	ScrollBar
+VisualElementType_ProgressBar	进度条	ProgressBar
+VisualElementType_Panel	面板	Panel
+VisualElementType_TopLevel	窗口	Window
+VisualElementType_Screen	屏幕	Screen

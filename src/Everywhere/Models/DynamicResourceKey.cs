@@ -35,7 +35,7 @@ public partial class DynamicResourceKey(object key) : DynamicResourceKeyBase
     [Key(0)]
     protected object Key => key;
 
-    public IObservable<object?> GetObservable() =>
+    protected IObservable<object?> GetObservable() =>
         Application.Current!.Resources.GetResourceObservable(key);
 
     public override IDisposable Subscribe(IObserver<object?> observer) =>
@@ -68,6 +68,11 @@ public class DynamicResourceKeyWrapper<T>(object key, T value) : DynamicResource
     public override int GetHashCode() => Value?.GetHashCode() ?? 0;
 }
 
+/// <summary>
+/// Directly wraps a raw string for use in axaml.
+/// This is useful for cases where you want to use a string as a resource key without any formatting or dynamic behavior.
+/// </summary>
+/// <param name="key"></param>
 [MessagePackObject(OnlyIncludeKeyedMembers = true, AllowPrivate = true)]
 public partial class DirectResourceKey(object key) : DynamicResourceKey(key)
 {
@@ -80,18 +85,46 @@ public partial class DirectResourceKey(object key) : DynamicResourceKey(key)
     }
 }
 
+/// <summary>
+/// This class is used to create a dynamic resource key for axaml Binding with formatted arguments.
+/// It first resolves the resource key, then formats it with the provided arguments.
+/// Arguments will be also resolved if they are dynamic resource keys.
+/// </summary>
+/// <param name="key"></param>
+/// <param name="args"></param>
 [MessagePackObject(OnlyIncludeKeyedMembers = true, AllowPrivate = true)]
 public partial class FormattedDynamicResourceKey(object key, params object?[] args) : DynamicResourceKey(key)
 {
     [Key(1)]
     private object?[] Args => args;
 
-    public override IDisposable Subscribe(IObserver<object?> observer) =>
-        Application.Current!.Resources.GetResourceObservable(Key).Subscribe(
-            new AnonymousObserver<object?>(o =>
-            {
-                observer.OnNext(string.Format(o?.ToString() ?? string.Empty, args));
-            }));
+    public override IDisposable Subscribe(IObserver<object?> observer)
+    {
+        var formatter = new AnonymousObserver<object?>(_ => Format(observer));
+        var disposableCollector = new DisposeCollector();
+        disposableCollector.Add(GetObservable().Subscribe(formatter));
+        Args.OfType<DynamicResourceKey>().ForEach(arg => disposableCollector.Add(arg.Subscribe(formatter)));
+        return disposableCollector;
+    }
+
+    private void Format(IObserver<object?> observer)
+    {
+        var resolvedKey = Resolve(Key);
+        if (string.IsNullOrEmpty(resolvedKey))
+        {
+            observer.OnNext(string.Empty);
+            return;
+        }
+
+        var resolvedArgs = new object?[Args.Length];
+        for (var i = 0; i < Args.Length; i++)
+        {
+            if (Args[i] is DynamicResourceKey dynamicKey) resolvedArgs[i] = dynamicKey.ToString();
+            else resolvedArgs[i] = Args[i];
+        }
+
+        observer.OnNext(string.Format(resolvedKey, resolvedArgs));
+    }
 }
 
 [AttributeUsage(AttributeTargets.All)]
