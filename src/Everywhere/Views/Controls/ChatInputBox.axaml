@@ -32,7 +32,7 @@
       <Setter Property="IsVisible" Value="False"/>
     </Style>
 
-    <Setter Property="Watermark" Value="{DynamicResource AssistantInputBox_Watermark}"/>
+    <Setter Property="Watermark" Value="{DynamicResource ChatInputBox_Watermark}"/>
     <Setter Property="FontSize" Value="14"/>
     <Setter Property="Padding" Value="6"/>
     <Setter Property="SelectionBrush" Value="{DynamicResource PrimaryColor}"/>
@@ -158,10 +158,10 @@
                 Classes="Outline Rounded" shadui:MenuItemAssist.PopupPlacement="TopEdgeAlignedLeft"
                 shadui:MenuItemAssist.PopupVerticalOffset="-4"
                 ItemsSource="{TemplateBinding AddChatAttachmentMenuItems}"
-                ToolTip.Tip="{DynamicResource AssistantInputBox_AddAttachmentButton_ToolTip}">
+                ToolTip.Tip="{DynamicResource ChatInputBox_AddAttachmentButton_ToolTip}">
                 <shadui:MenuItemAssist.Label>
                   <TextBlock>
-                    <Run Text="{DynamicResource AssistantInputBox_AddAttachmentMenuItem_Header}"/>
+                    <Run Text="{DynamicResource ChatInputBox_AddAttachmentMenuItem_Header}"/>
                     <Run Text=" ("/>
                     <Run Text="{Binding $parent[v:ChatInputBox].ChatAttachmentItemsSource.Count, FallbackValue=0}"/>
                     <Run Text="/"/>
@@ -182,12 +182,12 @@
               Classes="Outline Rounded"
               IsChecked="{Binding IsImageEnabled, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
               IsVisible="{TemplateBinding IsImageSupported}"
-              ToolTip.Tip="{DynamicResource AssistantInputBox_ImageButton_ToolTip}">
+              ToolTip.Tip="{DynamicResource ChatInputBox_ImageButton_ToolTip}">
               <StackPanel
                 Orientation="Horizontal" Spacing="2">
                 <LucideIcon
                   Kind="Image" Size="16"/>
-                <TextBlock Text="{DynamicResource AssistantInputBox_ImageButton_Text}"/>
+                <TextBlock Text="{DynamicResource ChatInputBox_ImageButton_Text}"/>
               </StackPanel>
             </ToggleButton>
 
@@ -195,12 +195,12 @@
               Classes="Outline Rounded"
               IsChecked="{Binding IsWebSearchEnabled, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
               IsVisible="{TemplateBinding IsWebSearchSupported}"
-              ToolTip.Tip="{DynamicResource AssistantInputBox_WebSearchButton_ToolTip}">
+              ToolTip.Tip="{DynamicResource ChatInputBox_WebSearchButton_ToolTip}">
               <StackPanel
                 Orientation="Horizontal" Spacing="2">
                 <LucideIcon
                   Kind="Globe" Size="16"/>
-                <TextBlock Text="{DynamicResource AssistantInputBox_WebSearchButton_Text}"/>
+                <TextBlock Text="{DynamicResource ChatInputBox_WebSearchButton_Text}"/>
               </StackPanel>
             </ToggleButton>
 
@@ -208,12 +208,12 @@
               Classes="Outline Rounded"
               IsChecked="{Binding IsToolCallEnabled, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
               IsVisible="{TemplateBinding IsToolCallSupported}"
-              ToolTip.Tip="{DynamicResource AssistantInputBox_ToolCallButton_ToolTip}">
+              ToolTip.Tip="{DynamicResource ChatInputBox_ToolCallButton_ToolTip}">
               <StackPanel
                 Orientation="Horizontal" Spacing="2">
                 <LucideIcon
                   Kind="Hammer" Size="16"/>
-                <TextBlock Text="{DynamicResource AssistantInputBox_ToolCallButton_Text}"/>
+                <TextBlock Text="{DynamicResource ChatInputBox_ToolCallButton_Text}"/>
               </StackPanel>
             </ToggleButton>
           </StackPanel>
@@ -225,7 +225,7 @@
             <Button
               x:Name="PART_SendButton" Classes="Primary Rounded"
               IsVisible="{Binding !IsVisible, ElementName=PART_CancelButton}"
-              ToolTip.Tip="{DynamicResource AssistantInputBox_SendButton_ToolTip}">
+              ToolTip.Tip="{DynamicResource ChatInputBox_SendButton_ToolTip}">
               <Button.IsEnabled>
                 <MultiBinding Converter="{x:Static BoolConverters.And}">
                   <Binding
@@ -246,7 +246,7 @@
             <Button
               x:Name="PART_CancelButton" Classes="Primary Rounded"
               Command="{TemplateBinding CancelCommand}"
-              ToolTip.Tip="{DynamicResource AssistantInputBox_CancelButton_ToolTip}">
+              ToolTip.Tip="{DynamicResource ChatInputBox_CancelButton_ToolTip}">
               <Border
                 Width="12" Height="12"
                 Background="{DynamicResource ForegroundColor}"

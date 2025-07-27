@@ -51,8 +51,8 @@ public class App : Application
                     #region View & ViewModel
 
                     .AddSingleton<VisualTreeDebugger>()
-                    .AddSingleton<AssistantFloatingWindowViewModel>()
-                    .AddSingleton<AssistantFloatingWindow>()
+                    .AddSingleton<ChatFloatingWindowViewModel>()
+                    .AddSingleton<ChatFloatingWindow>()
                     .AddSingleton<SettingsPageViewModel>()
                     .AddSingleton<IMainViewPage, SettingsPage>()
                     .AddSingleton<MainViewModel>()

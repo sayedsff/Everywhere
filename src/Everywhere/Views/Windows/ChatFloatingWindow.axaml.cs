@@ -7,10 +7,10 @@ using LiveMarkdown.Avalonia;
 
 namespace Everywhere.Views;
 
-public partial class AssistantFloatingWindow : ReactiveWindow<AssistantFloatingWindowViewModel>
+public partial class ChatFloatingWindow : ReactiveWindow<ChatFloatingWindowViewModel>
 {
     public static readonly StyledProperty<bool> IsOpenedProperty =
-        AvaloniaProperty.Register<AssistantFloatingWindow, bool>(nameof(IsOpened));
+        AvaloniaProperty.Register<ChatFloatingWindow, bool>(nameof(IsOpened));
 
     public bool IsOpened
     {
@@ -19,7 +19,7 @@ public partial class AssistantFloatingWindow : ReactiveWindow<AssistantFloatingW
     }
 
     public static readonly StyledProperty<PixelRect> TargetBoundingRectProperty =
-        AvaloniaProperty.Register<AssistantFloatingWindow, PixelRect>(nameof(TargetBoundingRect));
+        AvaloniaProperty.Register<ChatFloatingWindow, PixelRect>(nameof(TargetBoundingRect));
 
     public PixelRect TargetBoundingRect
     {
@@ -28,7 +28,7 @@ public partial class AssistantFloatingWindow : ReactiveWindow<AssistantFloatingW
     }
 
     public static readonly StyledProperty<PlacementMode> PlacementProperty =
-        AvaloniaProperty.Register<AssistantFloatingWindow, PlacementMode>(nameof(Placement));
+        AvaloniaProperty.Register<ChatFloatingWindow, PlacementMode>(nameof(Placement));
 
     public PlacementMode Placement
     {
@@ -39,7 +39,7 @@ public partial class AssistantFloatingWindow : ReactiveWindow<AssistantFloatingW
     private readonly INativeHelper nativeHelper;
     private readonly ILauncher launcher;
 
-    public AssistantFloatingWindow(INativeHelper nativeHelper, ILauncher launcher)
+    public ChatFloatingWindow(INativeHelper nativeHelper, ILauncher launcher)
     {
         this.nativeHelper = nativeHelper;
         this.launcher = launcher;

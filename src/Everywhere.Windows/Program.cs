@@ -91,8 +91,8 @@ public static class Program
                 #region View & ViewModel
 
                 .AddSingleton<VisualTreeDebugger>()
-                .AddSingleton<AssistantFloatingWindowViewModel>()
-                .AddSingleton<AssistantFloatingWindow>()
+                .AddSingleton<ChatFloatingWindowViewModel>()
+                .AddSingleton<ChatFloatingWindow>()
                 .AddSingleton<SettingsPageViewModel>()
                 .AddSingleton<IMainViewPage, SettingsPage>()
                 .AddSingleton<MainViewModel>()

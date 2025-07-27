@@ -1,12 +1,12 @@
 ﻿<v:ReactiveWindow
-  x:Class="Everywhere.Views.AssistantFloatingWindow" xmlns="https://github.com/avaloniaui"
+  x:Class="Everywhere.Views.ChatFloatingWindow" xmlns="https://github.com/avaloniaui"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:be="clr-namespace:Everywhere.Behaviors"
   xmlns:i="clr-namespace:Everywhere.Interfaces" xmlns:m="clr-namespace:Everywhere.Models"
   xmlns:markdown="clr-namespace:LiveMarkdown.Avalonia;assembly=LiveMarkdown.Avalonia" xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI"
   xmlns:system="clr-namespace:System;assembly=System.Runtime" xmlns:themes="clr-namespace:ShadUI.Themes;assembly=ShadUI"
   xmlns:v="clr-namespace:Everywhere.Views" xmlns:vc="clr-namespace:Everywhere.ValueConverters"
-  xmlns:vm="clr-namespace:Everywhere.ViewModels" x:DataType="vm:AssistantFloatingWindowViewModel"
-  x:TypeArguments="vm:AssistantFloatingWindowViewModel" Background="Transparent"
+  xmlns:vm="clr-namespace:Everywhere.ViewModels" x:DataType="vm:ChatFloatingWindowViewModel"
+  x:TypeArguments="vm:ChatFloatingWindowViewModel" Background="Transparent"
   CanResize="False"
   IsOpened="{Binding IsOpened, Mode=TwoWay}"
   RequestedThemeVariant="{x:Static themes:ThemeVariants.Acrylic}"
@@ -41,7 +41,7 @@
             </Binding.Source>
           </Binding>
           <Binding Path="$self.Bounds.Width"/>
-          <Binding Path="$parent[v:AssistantFloatingWindow].Placement"/>
+          <Binding Path="$parent[v:ChatFloatingWindow].Placement"/>
           <Binding Path="IsExpanded"/>
         </MultiBinding>
       </Border.CornerRadius>
@@ -123,7 +123,7 @@
         <Button
           x:Name="HistoryToggleButton" Classes="Ghost TitleBar"
           Command="{Binding ChatContextManager.UpdateHistory}"
-          ToolTip.Tip="{DynamicResource AssistantFloatingWindow_History_ToolTip}">
+          ToolTip.Tip="{DynamicResource ChatFloatingWindow_History_ToolTip}">
           <Button.Flyout>
             <Flyout ShowMode="Transient">
               <ScrollViewer
@@ -144,7 +144,7 @@
                           Padding="0" Background="Transparent"
                           BorderThickness="0"
                           ItemsSource="{Binding Contexts}"
-                          SelectedItem="{Binding $parent[v:AssistantFloatingWindow].((vm:AssistantFloatingWindowViewModel)DataContext).ChatContextManager.Current, FallbackValue={x:Null}}">
+                          SelectedItem="{Binding $parent[v:ChatFloatingWindow].((vm:ChatFloatingWindowViewModel)DataContext).ChatContextManager.Current, FallbackValue={x:Null}}">
                           <ListBox.DataTemplates>
                             <DataTemplate DataType="m:ChatContext">
                               <TextBlock Text="{Binding Metadata.Topic, TargetNullValue={StaticResource ChatContext_Metadata_Title_Default}}"/>
@@ -165,14 +165,14 @@
         <Button
           Classes="Ghost TitleBar" Margin="0,0,4,0"
           Command="{Binding ChatContextManager.CreateNewCommand}"
-          ToolTip.Tip="{DynamicResource AssistantFloatingWindow_CreateNew_ToolTip}">
+          ToolTip.Tip="{DynamicResource ChatFloatingWindow_CreateNew_ToolTip}">
           <LucideIcon Kind="Plus"/>
         </Button>
 
         <Button
           Classes="Ghost TitleBar Close"
           Command="{Binding CloseCommand}"
-          ToolTip.Tip="{DynamicResource AssistantFloatingWindow_Close_ToolTip}">
+          ToolTip.Tip="{DynamicResource ChatFloatingWindow_Close_ToolTip}">
           <LucideIcon Kind="X"/>
         </Button>
       </StackPanel>
@@ -363,7 +363,7 @@
                           Classes="ChatMessage Assistant" Background="Transparent"
                           Orientation="Vertical" Spacing="4">
                           <markdown:MarkdownRenderer
-                            InlineHyperlinkCommand="{Binding $parent[v:AssistantFloatingWindow].LaunchInlineHyperlinkCommand}"
+                            InlineHyperlinkCommand="{Binding $parent[v:ChatFloatingWindow].LaunchInlineHyperlinkCommand}"
                             MarkdownBuilder="{Binding MarkdownBuilder}"/>
 
                           <StackPanel
@@ -379,16 +379,16 @@
 
                             <Button
                               Classes="Ghost"
-                              Command="{Binding $parent[v:AssistantFloatingWindow].ViewModel.RetryCommand}"
+                              Command="{Binding $parent[v:ChatFloatingWindow].ViewModel.RetryCommand}"
                               CommandParameter="{Binding $parent[ContentControl].DataContext}"
-                              ToolTip.Tip="{DynamicResource AssistantFloatingWindow_ChatMessage_Assistant_Regenerate}">
+                              ToolTip.Tip="{DynamicResource ChatFloatingWindow_ChatMessage_Assistant_Regenerate}">
                               <LucideIcon Kind="RefreshCcw"/>
                             </Button>
                             <Button
                               Classes="Ghost"
-                              Command="{Binding $parent[v:AssistantFloatingWindow].ViewModel.CopyCommand}"
+                              Command="{Binding $parent[v:ChatFloatingWindow].ViewModel.CopyCommand}"
                               CommandParameter="{Binding}"
-                              ToolTip.Tip="{DynamicResource AssistantFloatingWindow_ChatMessage_Assistant_Copy}">
+                              ToolTip.Tip="{DynamicResource ChatFloatingWindow_ChatMessage_Assistant_Copy}">
                               <LucideIcon Kind="Copy"/>
                             </Button>
                           </StackPanel>
@@ -566,7 +566,7 @@
               <MenuItem
                 Command="{Binding AddElementCommand}"
                 CommandParameter="{x:Static i:PickElementMode.Screen}"
-                Header="{DynamicResource AssistantFloatingWindow_AssistantInputBox_AddAttachmentMenuItems_AddScreen}">
+                Header="{DynamicResource ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AddScreen}">
                 <MenuItem.Icon>
                   <LucideIcon
                     Width="18" Height="18"
@@ -576,7 +576,7 @@
               <MenuItem
                 Command="{Binding AddElementCommand}"
                 CommandParameter="{x:Static i:PickElementMode.Window}"
-                Header="{DynamicResource AssistantFloatingWindow_AssistantInputBox_AddAttachmentMenuItems_AddWindow}">
+                Header="{DynamicResource ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AddWindow}">
                 <MenuItem.Icon>
                   <LucideIcon
                     Width="18" Height="18"
@@ -586,7 +586,7 @@
               <MenuItem
                 Command="{Binding AddElementCommand}"
                 CommandParameter="{x:Static i:PickElementMode.Element}"
-                Header="{DynamicResource AssistantFloatingWindow_AssistantInputBox_AddAttachmentMenuItems_AddElement}">
+                Header="{DynamicResource ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AddElement}">
                 <MenuItem.Icon>
                   <LucideIcon
                     Width="18" Height="18"
@@ -595,7 +595,7 @@
               </MenuItem>
               <MenuItem
                 Command="{Binding AddClipboardCommand}"
-                Header="{DynamicResource AssistantFloatingWindow_AssistantInputBox_AddAttachmentMenuItems_AddClipboard}">
+                Header="{DynamicResource ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AddClipboard}">
                 <MenuItem.Icon>
                   <LucideIcon
                     Width="18" Height="18"
@@ -604,7 +604,7 @@
               </MenuItem>
               <MenuItem
                 Command="{Binding AddFileCommand}"
-                Header="{DynamicResource AssistantFloatingWindow_AssistantInputBox_AddAttachmentMenuItems_AddFile}">
+                Header="{DynamicResource ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AddFile}">
                 <MenuItem.Icon>
                   <LucideIcon
                     Width="18" Height="18"

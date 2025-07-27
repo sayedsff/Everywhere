@@ -28,7 +28,7 @@ public class HotkeyInitializer(
             }
 
             Dispatcher.UIThread.InvokeOnDemandAsync(() =>
-                ServiceLocator.Resolve<AssistantFloatingWindow>().ViewModel.TryFloatToTargetElementAsync(element).Detach()).Detach();
+                ServiceLocator.Resolve<ChatFloatingWindow>().ViewModel.TryFloatToTargetElementAsync(element).Detach()).Detach();
         };
 
         // initialize hotkey listener
@@ -51,14 +51,14 @@ public class HotkeyInitializer(
                     .LastOrDefault();
             if (element == null) return;
             Dispatcher.UIThread.InvokeOnDemandAsync(() =>
-                ServiceLocator.Resolve<AssistantFloatingWindow>().ViewModel.TryFloatToTargetElementAsync(element, true).Detach()).Detach();
+                ServiceLocator.Resolve<ChatFloatingWindow>().ViewModel.TryFloatToTargetElementAsync(element, true).Detach()).Detach();
         };
         // hotkeyListener.PointerHotkeyActivated += point =>
         // {
         //     Dispatcher.UIThread.InvokeOnDemandAsync(
         //         () =>
         //         {
-        //             var window = ServiceLocator.Resolve<AssistantFloatingWindow>();
+        //             var window = ServiceLocator.Resolve<ChatFloatingWindow>();
         //             window.Position = point;
         //             window.IsOpened = true;
         //         });

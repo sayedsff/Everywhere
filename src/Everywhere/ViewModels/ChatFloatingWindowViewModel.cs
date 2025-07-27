@@ -17,7 +17,7 @@ using ChatMessage = Everywhere.Models.ChatMessage;
 
 namespace Everywhere.ViewModels;
 
-public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
+public partial class ChatFloatingWindowViewModel : BusyViewModelBase
 {
     public Settings Settings { get; }
 
@@ -48,12 +48,12 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
     private readonly IClipboard clipboard;
     private readonly IStorageProvider storageProvider;
     private readonly INativeHelper nativeHelper;
-    private readonly ILogger<AssistantFloatingWindowViewModel> logger;
+    private readonly ILogger<ChatFloatingWindowViewModel> logger;
 
     private readonly ObservableList<ChatAttachment> chatAttachments = [];
     private readonly ReusableCancellationTokenSource cancellationTokenSource = new();
 
-    public AssistantFloatingWindowViewModel(
+    public ChatFloatingWindowViewModel(
         IChatContextManager chatContextManager,
         IChatService chatService,
         Settings settings,
@@ -61,7 +61,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
         IClipboard clipboard,
         IStorageProvider storageProvider,
         INativeHelper nativeHelper,
-        ILogger<AssistantFloatingWindowViewModel> logger)
+        ILogger<ChatFloatingWindowViewModel> logger)
     {
         ChatContextManager = chatContextManager;
         ChatService = chatService;
@@ -82,7 +82,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
         [
             new(
                 LucideIconKind.Languages,
-                LocaleKey.AssistantFloatingWindowViewModel_TextEditActions_Translate,
+                LocaleKey.ChatFloatingWindowViewModel_TextEditActions_Translate,
                 null,
                 SendMessageCommand,
                 $"Translate the content in focused element to {new CultureInfo(Settings.Common.Language).Name}. " +
@@ -91,7 +91,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
             ),
             new(
                 LucideIconKind.StepForward,
-                LocaleKey.AssistantFloatingWindowViewModel_TextEditActions_ContinueWriting,
+                LocaleKey.ChatFloatingWindowViewModel_TextEditActions_ContinueWriting,
                 null,
                 SendMessageCommand,
                 "I have already written a beginning as the content of the focused element. " +
@@ -100,7 +100,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
             ),
             new(
                 LucideIconKind.ScrollText,
-                LocaleKey.AssistantFloatingWindowViewModel_TextEditActions_Summarize,
+                LocaleKey.ChatFloatingWindowViewModel_TextEditActions_Summarize,
                 null,
                 SendMessageCommand,
                 "Please summarize the content in focused element. " +
@@ -151,7 +151,7 @@ public partial class AssistantFloatingWindowViewModel : BusyViewModelBase
                 }
 
                 TargetBoundingRect = targetElement.BoundingRectangle;
-                Title = LocaleKey.AssistantFloatingWindow_Title;
+                Title = LocaleKey.ChatFloatingWindow_Title;
                 chatAttachments.Clear();
                 chatAttachments.Add(await Task.Run(() => CreateFromVisualElement(targetElement), token));
                 IsOpened = true;
