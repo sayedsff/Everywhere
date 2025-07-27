@@ -177,13 +177,16 @@ public class SettingsPageViewModel : ReactiveViewModelBase
                         .ToImmutableArray());
             }).ToImmutableArray();
 
-        TrackableObject<SettingsBase>.AddPropertyChangedEventHandler(
-            (_, _) => debounceHelper.Execute(() => Dispatcher.UIThread.Invoke(() => ToastManager
+        TrackableObject<SettingsBase>.AddPropertyChangedEventHandler((s, _) =>
+        {
+            if (s.GetType().GetCustomAttribute<HiddenSettingsAttribute>() is not null) return;
+            debounceHelper.Execute(() => Dispatcher.UIThread.Invoke(() => ToastManager
                 .CreateToast(DynamicResourceKey.Resolve(LocaleKey.SettingsPage_Saved_Toast_Title) ?? "")
                 .OnBottomRight()
                 .DismissOnClick()
                 .WithDelay(1)
-                .ShowSuccess())));
+                .ShowSuccess()));
+        });
     }
 
     private class SettingsValueProxy<T> : IValueProxy<T>, INotifyPropertyChanged

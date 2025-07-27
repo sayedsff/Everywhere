@@ -11,12 +11,26 @@
       Padding="8"
       Background="{DynamicResource CardBackgroundColor}"
       BorderThickness="0,0,1,0"
+      Expanded="{Binding Settings.Internal.IsMainViewSidebarExpanded}"
       SelectedSidebarItem="{Binding SelectedPage, Mode=TwoWay}">
       <shadui:Sidebar.Styles>
         <Style Selector="LucideIcon">
           <Setter Property="Foreground" Value="{Binding $parent[shadui:SidebarItem].Foreground}"/>
         </Style>
       </shadui:Sidebar.Styles>
+
+      <shadui:Sidebar.Header>
+        <ToggleButton
+          Width="40" Height="40"
+          HorizontalAlignment="Left" VerticalAlignment="Center"
+          Cursor="Hand"
+          IsChecked="{Binding Settings.Internal.IsMainViewSidebarExpanded, Mode=TwoWay}"
+          Theme="{DynamicResource SideTogglerTheme}">
+          <LucideIcon
+            Foreground="{DynamicResource ForegroundColor}"
+            Kind="PanelLeft" Size="20"/>
+        </ToggleButton>
+      </shadui:Sidebar.Header>
 
       <ItemsControl
         BorderThickness="0"
@@ -30,29 +44,10 @@
         DockPanel.Dock="Top"
         BorderBrush="{DynamicResource BorderColor}"
         BorderThickness="0,0,0,1">
-        <StackPanel
-          Margin="8" Orientation="Horizontal"
-          Spacing="8">
-          <ToggleButton
-            Width="32" Height="32"
-            Padding="6,8" HorizontalAlignment="Left"
-            VerticalAlignment="Top"
-            IsChecked="{Binding #Sidebar.Expanded}"
-            Theme="{DynamicResource SideTogglerTheme}">
-            <LucideIcon
-              Kind="PanelLeft" Size="20"/>
-          </ToggleButton>
-
-          <Rectangle
-            Width="1" Height="32"
-            VerticalAlignment="Center"
-            Fill="{DynamicResource BorderColor}"/>
-
-          <TextBlock
-            Classes="h4" Margin="6,-1,0,1"
-            VerticalAlignment="Center"
-            Text="{Binding #Sidebar.((interfaces:IMainViewPage)CurrentRoute).Title^, FallbackValue={x:Null}}"/>
-        </StackPanel>
+        <TextBlock
+          Classes="h4" Margin="16,8"
+          VerticalAlignment="Center"
+          Text="{Binding #Sidebar.((interfaces:IMainViewPage)CurrentRoute).Title^, FallbackValue={x:Null}}"/>
       </Border>
 
       <TransitioningContentControl Content="{Binding #Sidebar.CurrentRoute, FallbackValue={x:Null}}"/>

@@ -8,6 +8,11 @@ using MessagePack;
 
 namespace Everywhere.Models;
 
+/// <summary>
+/// This attribute is used to mark properties that should not be serialized or displayed in the UI.
+/// </summary>
+public class HiddenSettingsAttribute : Attribute;
+
 public class SettingsBase : TrackableObject<SettingsBase>
 {
     public string Section { get; }
@@ -29,7 +34,7 @@ public class Settings
 
     public ModelSettings Model { get; init; } = new();
 
-    [IgnoreMember]
+    [HiddenSettings]
     public InternalSettings Internal { get; init; } = new();
 }
 
@@ -89,7 +94,7 @@ public partial class ModelSettings() : SettingsBase("Model")
     public partial bool IsImageSupported { get; set; }
 
     [ObservableProperty]
-    [IgnoreMember]
+    [HiddenSettings]
     public partial bool IsToolCallSupported { get; set; }
 
     [ObservableProperty]
@@ -113,6 +118,7 @@ public partial class ModelSettings() : SettingsBase("Model")
     public partial string WebSearchEndpoint { get; set; } = string.Empty;
 }
 
+[HiddenSettings]
 public partial class InternalSettings() : SettingsBase("Internal")
 {
     [ObservableProperty]
@@ -125,4 +131,7 @@ public partial class InternalSettings() : SettingsBase("Internal")
     public partial bool IsWebSearchEnabled { get; set; }
 
     public int MaxChatAttachmentCount { get; set; } = 10;
+
+    [ObservableProperty]
+    public partial bool IsMainViewSidebarExpanded { get; set; }
 }
