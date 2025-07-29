@@ -4,16 +4,16 @@ namespace Everywhere.Enums;
 
 public enum HumanizedDate
 {
-    [DynamicResourceKey("HumanizedDate_Today")]
+    [DynamicResourceKey(LocaleKey.HumanizedDate_Today)]
     Today,
-    [DynamicResourceKey("HumanizedDate_Yesterday")]
+    [DynamicResourceKey(LocaleKey.HumanizedDate_Yesterday)]
     Yesterday,
-    [DynamicResourceKey("HumanizedDate_LastWeek")]
+    [DynamicResourceKey(LocaleKey.HumanizedDate_LastWeek)]
     LastWeek,
-    [DynamicResourceKey("HumanizedDate_LastMonth")]
+    [DynamicResourceKey(LocaleKey.HumanizedDate_LastMonth)]
     LastMonth,
-    [DynamicResourceKey("HumanizedDate_LastYear")]
+    [DynamicResourceKey(LocaleKey.HumanizedDate_LastYear)]
     LastYear,
-    [DynamicResourceKey("HumanizedDate_Earlier")]
+    [DynamicResourceKey(LocaleKey.HumanizedDate_Earlier)]
     Earlier
 }

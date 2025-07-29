@@ -6,7 +6,7 @@
   <TextBox
     x:Name="HotKeyTextBox" CaretBrush="Transparent"
     IsReadOnly="True" SelectionBrush="Transparent"
-    Watermark="{DynamicResource KeyboardHotkeyInputBox_Watermark}">
+    Watermark="{I18N {x:Static LocaleKey.KeyboardHotkeyInputBox_Watermark}}">
     <TextBox.InnerRightContent>
       <Button
         Classes="Ghost" DockPanel.Dock="Right"

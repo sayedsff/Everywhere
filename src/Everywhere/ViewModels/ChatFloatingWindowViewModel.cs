@@ -250,7 +250,7 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
         if (element.ProcessId != 0)
         {
             using var process = Process.GetProcessById(element.ProcessId);
-            headerKey = new FormattedDynamicResourceKey("{0} - {1}", process.ProcessName, elementTypeKey);
+            headerKey = new FormattedDynamicResourceKey("{0} - {1}", new DirectResourceKey(process.ProcessName), elementTypeKey);
         }
         else
         {

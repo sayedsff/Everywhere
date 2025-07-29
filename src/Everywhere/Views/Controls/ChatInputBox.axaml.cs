@@ -141,7 +141,7 @@ public partial class ChatInputBox : TextBox
     }
 
     private IDisposable? sendButtonClickSubscription;
-    private IDisposable? attachmentItemsControlPointerMovedSubscription;
+    private IDisposable? chatAttachmentItemsControlPointerMovedSubscription;
     private IDisposable? attachmentItemsControlPointerExitedSubscription;
 
     private readonly OverlayWindow visualElementAttachmentOverlayWindow = new()
@@ -168,47 +168,43 @@ public partial class ChatInputBox : TextBox
         base.OnApplyTemplate(e);
 
         sendButtonClickSubscription?.Dispose();
-        attachmentItemsControlPointerMovedSubscription?.Dispose();
+        chatAttachmentItemsControlPointerMovedSubscription?.Dispose();
         attachmentItemsControlPointerExitedSubscription?.Dispose();
 
         // We handle the click event of the SendButton here instead of using Command binding,
         // because we need to clear the text after sending the message.
-        if (e.NameScope.Find<Button>("PART_SendButton") is { } sendButton)
-        {
-            sendButtonClickSubscription = sendButton.AddDisposableHandler(
-                Button.ClickEvent,
-                (_, args) =>
-                {
-                    if (Command?.CanExecute(Text) is not true) return;
-                    Command.Execute(Text);
-                    Text = string.Empty;
-                    args.Handled = true;
-                },
-                handledEventsToo: true);
-        }
+        var sendButton = e.NameScope.Find<Button>("PART_SendButton").NotNull();
+        sendButtonClickSubscription = sendButton.AddDisposableHandler(
+            Button.ClickEvent,
+            (_, args) =>
+            {
+                if (Command?.CanExecute(Text) is not true) return;
+                Command.Execute(Text);
+                Text = string.Empty;
+                args.Handled = true;
+            },
+            handledEventsToo: true);
 
-        if (e.NameScope.Find<ItemsControl>("PART_AttachmentItemsControl") is { } attachmentItemsControl)
-        {
-            attachmentItemsControlPointerMovedSubscription = attachmentItemsControl.AddDisposableHandler(
-                PointerMovedEvent,
-                (_, args) =>
+        var chatAttachmentItemsControl = e.NameScope.Find<ItemsControl>("PART_ChatAttachmentItemsControl").NotNull();
+        chatAttachmentItemsControlPointerMovedSubscription = chatAttachmentItemsControl.AddDisposableHandler(
+            PointerMovedEvent,
+            (_, args) =>
+            {
+                var element = args.Source as StyledElement;
+                while (element != null)
                 {
-                    var element = args.Source as StyledElement;
-                    while (element != null)
-                    {
-                        element = element.Parent;
-                        if (element is not { DataContext: ChatVisualElementAttachment attachment }) continue;
-                        visualElementAttachmentOverlayWindow.UpdateForVisualElement(attachment.Element);
-                        return;
-                    }
-                    visualElementAttachmentOverlayWindow.UpdateForVisualElement(null);
-                },
-                handledEventsToo: true);
-            attachmentItemsControlPointerExitedSubscription = attachmentItemsControl.AddDisposableHandler(
-                PointerExitedEvent,
-                (_, _) => visualElementAttachmentOverlayWindow.UpdateForVisualElement(null),
-                handledEventsToo: true);
-        }
+                    element = element.Parent;
+                    if (element is not { DataContext: ChatVisualElementAttachment attachment }) continue;
+                    visualElementAttachmentOverlayWindow.UpdateForVisualElement(attachment.Element);
+                    return;
+                }
+                visualElementAttachmentOverlayWindow.UpdateForVisualElement(null);
+            },
+            handledEventsToo: true);
+        attachmentItemsControlPointerExitedSubscription = chatAttachmentItemsControl.AddDisposableHandler(
+            PointerExitedEvent,
+            (_, _) => visualElementAttachmentOverlayWindow.UpdateForVisualElement(null),
+            handledEventsToo: true);
     }
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)

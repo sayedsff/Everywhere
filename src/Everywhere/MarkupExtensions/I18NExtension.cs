@@ -11,7 +11,7 @@ public class I18NExtension : MarkupExtension
     public required object Key { get; set; }
 
     [Content, AssignBinding]
-    public object?[] Arguments { get; set; } = [];
+    public object[] Arguments { get; set; } = [];
 
     public I18NExtension() { }
 
@@ -20,10 +20,13 @@ public class I18NExtension : MarkupExtension
 
     public override object ProvideValue(IServiceProvider serviceProvider)
     {
-        return new Binding
-        {
-            Path = "Self^",
-            Source = Arguments is { Length: > 0 } args ? new FormattedDynamicResourceKey(Key, args) : new DynamicResourceKey(Key)
-        };
+        var dynamicResourceKey = Arguments is { Length: > 0 } args ?
+            new FormattedDynamicResourceKey(Key, args.Select(a => a switch
+            {
+                DynamicResourceKeyBase drk => drk,
+                _ => new DynamicResourceKey(a)
+            }).ToArray()) :
+            new DynamicResourceKey(Key);
+        return dynamicResourceKey.ToBinding();
     }
 }

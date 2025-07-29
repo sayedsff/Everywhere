@@ -1,4 +1,6 @@
-﻿using Avalonia.Threading;
+﻿using Avalonia.Controls;
+using Avalonia.Threading;
+using Everywhere.Models;
 
 namespace Everywhere.Extensions;
 
@@ -183,5 +185,14 @@ public static class AvaloniaExtension
         }
 
         return result ?? throw new InvalidOperationException("Task result is null");
+    }
+
+    public static TextBlock ToTextBlock(this DynamicResourceKey dynamicResourceKey)
+    {
+        return new TextBlock
+        {
+            Classes = { nameof(DynamicResourceKey) },
+            [!TextBlock.TextProperty] = dynamicResourceKey.ToBinding()
+        };
     }
 }

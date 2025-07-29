@@ -13,6 +13,7 @@ namespace Everywhere.Models;
 [Union(0, typeof(DynamicResourceKey))]
 [Union(1, typeof(DirectResourceKey))]
 [Union(2, typeof(FormattedDynamicResourceKey))]
+[Union(3, typeof(AggregateDynamicResourceKey))]
 public abstract partial class DynamicResourceKeyBase : IObservable<object?>
 {
     public abstract IDisposable Subscribe(IObserver<object?> observer);
@@ -33,10 +34,10 @@ public partial class DynamicResourceKey(object key) : DynamicResourceKeyBase
     public DynamicResourceKey Self => this;
 
     [Key(0)]
-    protected object Key => key;
+    protected object Key { get; } = key;
 
     protected IObservable<object?> GetObservable() =>
-        Application.Current!.Resources.GetResourceObservable(key);
+        Application.Current!.Resources.GetResourceObservable(Key);
 
     public override IDisposable Subscribe(IObserver<object?> observer) =>
         GetObservable().Subscribe(observer);
@@ -47,7 +48,7 @@ public partial class DynamicResourceKey(object key) : DynamicResourceKeyBase
     public static string? Resolve(object key) =>
         Application.Current!.Resources.TryGetResource(key, null, out var resource) ? resource?.ToString() : key.ToString();
 
-    public override string? ToString() => Resolve(key);
+    public override string? ToString() => Resolve(Key);
 }
 
 /// <summary>
@@ -58,11 +59,11 @@ public partial class DynamicResourceKey(object key) : DynamicResourceKeyBase
 /// <typeparam name="T"></typeparam>
 public class DynamicResourceKeyWrapper<T>(object key, T value) : DynamicResourceKey(key)
 {
-    public T Value => value;
+    public T Value { get; } = value;
 
     public override bool Equals(object? obj)
     {
-        return obj is DynamicResourceKeyWrapper<T> other && EqualityComparer<T>.Default.Equals(value, other.Value);
+        return obj is DynamicResourceKeyWrapper<T> other && EqualityComparer<T>.Default.Equals(Value, other.Value);
     }
 
     public override int GetHashCode() => Value?.GetHashCode() ?? 0;
@@ -83,6 +84,8 @@ public partial class DirectResourceKey(object key) : DynamicResourceKey(key)
         observer.OnNext(Key);
         return NullDisposable;
     }
+
+    public override string? ToString() => Key.ToString();
 }
 
 /// <summary>
@@ -93,27 +96,26 @@ public partial class DirectResourceKey(object key) : DynamicResourceKey(key)
 /// <param name="key"></param>
 /// <param name="args"></param>
 [MessagePackObject(OnlyIncludeKeyedMembers = true, AllowPrivate = true)]
-public partial class FormattedDynamicResourceKey(object key, params object?[] args) : DynamicResourceKey(key)
+public partial class FormattedDynamicResourceKey(object key, params DynamicResourceKeyBase[] args) : DynamicResourceKey(key)
 {
     [Key(1)]
-    private object?[] Args => args;
+    private DynamicResourceKeyBase[] Args { get; } = args;
 
     public override IDisposable Subscribe(IObserver<object?> observer)
     {
-        var formatter = new AnonymousObserver<object?>(_ => Format(observer));
+        var formatter = new AnonymousObserver<object?>(_ => observer.OnNext(ToString()));
         var disposeCollector = new DisposeCollector();
         disposeCollector.Add(GetObservable().Subscribe(formatter));
         Args.OfType<DynamicResourceKey>().ForEach(arg => disposeCollector.Add(arg.Subscribe(formatter)));
         return disposeCollector;
     }
 
-    private void Format(IObserver<object?> observer)
+    public override string ToString()
     {
         var resolvedKey = Resolve(Key);
         if (string.IsNullOrEmpty(resolvedKey))
         {
-            observer.OnNext(string.Empty);
-            return;
+            return string.Empty;
         }
 
         var resolvedArgs = new object?[Args.Length];
@@ -123,7 +125,39 @@ public partial class FormattedDynamicResourceKey(object key, params object?[] ar
             else resolvedArgs[i] = Args[i];
         }
 
-        observer.OnNext(string.Format(resolvedKey, resolvedArgs));
+        return string.Format(resolvedKey, resolvedArgs);
+    }
+}
+
+[MessagePackObject(OnlyIncludeKeyedMembers = true, AllowPrivate = true)]
+public partial class AggregateDynamicResourceKey(params DynamicResourceKeyBase[] keys) : DynamicResourceKeyBase
+{
+    [Key(0)]
+    private DynamicResourceKeyBase[] Keys { get; } = keys;
+
+    public override IDisposable Subscribe(IObserver<object?> observer)
+    {
+        var formatter = new AnonymousObserver<object?>(_ => observer.OnNext(ToString()));
+        var disposeCollector = new DisposeCollector();
+        Keys.OfType<DynamicResourceKey>().ForEach(key => disposeCollector.Add(key.Subscribe(formatter)));
+        return disposeCollector;
+    }
+
+    public override string ToString()
+    {
+        if (Keys is not { Length: > 0 })
+        {
+            return string.Empty;
+        }
+
+        var resolvedKeys = new object?[Keys.Length];
+        for (var i = 0; i < Keys.Length; i++)
+        {
+            if (Keys[i] is DynamicResourceKey dynamicKey) resolvedKeys[i] = dynamicKey.ToString();
+            else resolvedKeys[i] = Keys[i];
+        }
+
+        return string.Join(", ", resolvedKeys);
     }
 }
 

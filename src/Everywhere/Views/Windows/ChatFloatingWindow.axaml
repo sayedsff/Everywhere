@@ -21,7 +21,7 @@
       x:Name="BackgroundBorder" Grid.Row="0"
       Grid.RowSpan="2"
       BorderBrush="{DynamicResource AcrylicBorderBrush}"
-      BorderThickness="1" CornerRadius="12,12,16,16"/>
+      BorderThickness="1" CornerRadius="16,16,20,20"/>
 
     <ExperimentalAcrylicBorder
       x:Name="ExperimentalAcrylicBorder" Grid.Row="0"
@@ -78,7 +78,7 @@
         <Button
           x:Name="HistoryToggleButton" Classes="Ghost TitleBar"
           Command="{Binding ChatContextManager.UpdateHistory}"
-          ToolTip.Tip="{DynamicResource ChatFloatingWindow_History_ToolTip}">
+          ToolTip.Tip="{I18N {x:Static LocaleKey.ChatFloatingWindow_History_ToolTip}}">
           <Button.Flyout>
             <Flyout ShowMode="Transient">
               <ScrollViewer
@@ -102,7 +102,7 @@
                           SelectedItem="{Binding $parent[v:ChatFloatingWindow].((vm:ChatFloatingWindowViewModel)DataContext).ChatContextManager.Current, FallbackValue={x:Null}}">
                           <ListBox.DataTemplates>
                             <DataTemplate DataType="m:ChatContext">
-                              <TextBlock Text="{Binding Metadata.Topic, TargetNullValue={StaticResource ChatContext_Metadata_Title_Default}}"/>
+                              <TextBlock Text="{Binding Metadata.Topic, TargetNullValue={I18N {x:Static LocaleKey.ChatContext_Metadata_Title_Default}}}"/>
                             </DataTemplate>
                           </ListBox.DataTemplates>
                         </ListBox>
@@ -120,14 +120,14 @@
         <Button
           Classes="Ghost TitleBar" Margin="0,0,4,0"
           Command="{Binding ChatContextManager.CreateNewCommand}"
-          ToolTip.Tip="{DynamicResource ChatFloatingWindow_CreateNew_ToolTip}">
+          ToolTip.Tip="{I18N {x:Static LocaleKey.ChatFloatingWindow_CreateNew_ToolTip}}">
           <LucideIcon Kind="Plus"/>
         </Button>
 
         <Button
           Classes="Ghost TitleBar Close"
           Command="{Binding CloseCommand}"
-          ToolTip.Tip="{DynamicResource ChatFloatingWindow_Close_ToolTip}">
+          ToolTip.Tip="{I18N {x:Static LocaleKey.ChatFloatingWindow_Close_ToolTip}}">
           <LucideIcon Kind="X"/>
         </Button>
       </StackPanel>
@@ -341,14 +341,14 @@
                               Classes="Ghost"
                               Command="{Binding $parent[v:ChatFloatingWindow].ViewModel.RetryCommand}"
                               CommandParameter="{Binding $parent[ContentControl].DataContext}"
-                              ToolTip.Tip="{DynamicResource ChatFloatingWindow_ChatMessage_Assistant_Regenerate}">
+                              ToolTip.Tip="{I18N {x:Static LocaleKey.ChatFloatingWindow_ChatMessage_Assistant_Regenerate}}">
                               <LucideIcon Kind="RefreshCcw"/>
                             </Button>
                             <Button
                               Classes="Ghost"
                               Command="{Binding $parent[v:ChatFloatingWindow].ViewModel.CopyCommand}"
                               CommandParameter="{Binding}"
-                              ToolTip.Tip="{DynamicResource ChatFloatingWindow_ChatMessage_Assistant_Copy}">
+                              ToolTip.Tip="{I18N {x:Static LocaleKey.ChatFloatingWindow_ChatMessage_Assistant_Copy}}">
                               <LucideIcon Kind="Copy"/>
                             </Button>
                           </StackPanel>
@@ -526,7 +526,7 @@
               <MenuItem
                 Command="{Binding AddElementCommand}"
                 CommandParameter="{x:Static i:PickElementMode.Screen}"
-                Header="{DynamicResource ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AddScreen}">
+                Header="{I18N {x:Static LocaleKey.ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AddScreen}}">
                 <MenuItem.Icon>
                   <LucideIcon
                     Width="18" Height="18"
@@ -536,7 +536,7 @@
               <MenuItem
                 Command="{Binding AddElementCommand}"
                 CommandParameter="{x:Static i:PickElementMode.Window}"
-                Header="{DynamicResource ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AddWindow}">
+                Header="{I18N {x:Static LocaleKey.ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AddWindow}}">
                 <MenuItem.Icon>
                   <LucideIcon
                     Width="18" Height="18"
@@ -546,7 +546,7 @@
               <MenuItem
                 Command="{Binding AddElementCommand}"
                 CommandParameter="{x:Static i:PickElementMode.Element}"
-                Header="{DynamicResource ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AddElement}">
+                Header="{I18N {x:Static LocaleKey.ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AddElement}}">
                 <MenuItem.Icon>
                   <LucideIcon
                     Width="18" Height="18"
@@ -555,7 +555,7 @@
               </MenuItem>
               <MenuItem
                 Command="{Binding AddClipboardCommand}"
-                Header="{DynamicResource ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AddClipboard}">
+                Header="{I18N {x:Static LocaleKey.ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AddClipboard}}">
                 <MenuItem.Icon>
                   <LucideIcon
                     Width="18" Height="18"
@@ -564,7 +564,7 @@
               </MenuItem>
               <MenuItem
                 Command="{Binding AddFileCommand}"
-                Header="{DynamicResource ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AddFile}">
+                Header="{I18N {x:Static LocaleKey.ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AddFile}}">
                 <MenuItem.Icon>
                   <LucideIcon
                     Width="18" Height="18"

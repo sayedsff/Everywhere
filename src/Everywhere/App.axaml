@@ -25,14 +25,14 @@
           <NativeMenu>
             <NativeMenuItem
               Click="HandleOpenMainWindowMenuItemClicked"
-              Header="{DynamicResource Application_TrayIcon_Menu_OpenMainWindow}"/>
+              Header="{I18N {x:Static LocaleKey.Application_TrayIcon_Menu_OpenMainWindow}}"/>
             <NativeMenuItem
               Click="HandleOpenDebugWindowMenuItemClicked"
-              Header="{DynamicResource Application_TrayIcon_Menu_OpenDebugWindow}"/>
+              Header="{I18N {x:Static LocaleKey.Application_TrayIcon_Menu_OpenDebugWindow}}"/>
             <NativeMenuItemSeparator/>
             <NativeMenuItem
               Click="HandleExitMenuItemClicked"
-              Header="{DynamicResource Application_TrayIcon_Menu_Exit}"/>
+              Header="{I18N {x:Static LocaleKey.Application_TrayIcon_Menu_Exit}}"/>
           </NativeMenu>
         </TrayIcon.Menu>
       </TrayIcon>

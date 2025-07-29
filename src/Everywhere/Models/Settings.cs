@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text.Json.Serialization;
+using Avalonia.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Everywhere.Attributes;
 using Everywhere.Utils;
@@ -64,7 +65,7 @@ public partial class CommonSettings() : SettingsBase("Common")
 public partial class BehaviorSettings() : SettingsBase("Behavior")
 {
     [ObservableProperty]
-    public partial KeyboardHotkey AssistantHotkey { get; set; }
+    public partial KeyboardHotkey AssistantHotkey { get; set; } = new(Key.E, KeyModifiers.Control | KeyModifiers.Shift);
 }
 
 public partial class ModelSettings() : SettingsBase("Model")
