@@ -22,7 +22,7 @@ public class SettingsPageViewModel : ReactiveViewModelBase
         Groups = typeof(Settings)
             .GetProperties(BindingFlags.Instance | BindingFlags.Public)
             .AsValueEnumerable()
-            .Where(p => p.GetCustomAttribute<IgnoreMemberAttribute>() is null)
+            .Where(p => p.GetCustomAttribute<HiddenSettingsAttribute>() is null)
             .Where(p => p.PropertyType.IsAssignableTo(typeof(SettingsBase)))
             .Select(p =>
             {
@@ -33,7 +33,7 @@ public class SettingsPageViewModel : ReactiveViewModelBase
                         .GetProperties(BindingFlags.Instance | BindingFlags.Public)
                         .AsValueEnumerable()
                         .Where(pp => pp is { CanRead: true, CanWrite: true })
-                        .Where(pp => pp.GetCustomAttribute<IgnoreMemberAttribute>() is null)
+                        .Where(pp => pp.GetCustomAttribute<HiddenSettingsAttribute>() is null)
                         .Select(pp =>
                         {
                             var name = $"{p.Name}_{pp.Name}";
