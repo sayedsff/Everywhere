@@ -19,5 +19,9 @@ public interface INativeHelper
 
     void HideWindowWithoutAnimation(Window window);
 
-    WriteableBitmap? GetClipboardBitmap();
+    /// <summary>
+    /// Get the bitmap from the clipboard. This method is asynchronous and may return null if the clipboard does not contain a bitmap.
+    /// </summary>
+    /// <returns></returns>
+    Task<WriteableBitmap?> GetClipboardBitmapAsync();
 }

@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using System.ComponentModel;
+using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
@@ -10,13 +11,13 @@ namespace Everywhere.Views;
 
 public partial class ChatFloatingWindow : ReactiveWindow<ChatFloatingWindowViewModel>
 {
-    public static readonly StyledProperty<bool> IsOpenedProperty =
-        AvaloniaProperty.Register<ChatFloatingWindow, bool>(nameof(IsOpened));
+    public static readonly DirectProperty<ChatFloatingWindow, bool> IsOpenedProperty =
+        AvaloniaProperty.RegisterDirect<ChatFloatingWindow, bool>(nameof(IsOpened), o => o.IsOpened);
 
     public bool IsOpened
     {
-        get => GetValue(IsOpenedProperty);
-        set => SetValue(IsOpenedProperty, value);
+        get;
+        private set => SetAndRaise(IsOpenedProperty, ref field, value);
     }
 
     public static readonly StyledProperty<PixelRect> TargetBoundingRectProperty =
@@ -48,8 +49,26 @@ public partial class ChatFloatingWindow : ReactiveWindow<ChatFloatingWindowViewM
         InitializeComponent();
         // nativeHelper.SetWindowNoFocus(this);
 
+        ViewModel.PropertyChanged += HandleViewModelPropertyChanged;
         BackgroundBorder.PropertyChanged += HandleBackgroundBorderPropertyChanged;
         ChatInputBox.PastingFromClipboard += HandlePastingFromClipboard;
+    }
+
+    private void HandleViewModelPropertyChanged(object? sender, PropertyChangedEventArgs args)
+    {
+        if (args.PropertyName != nameof(ViewModel.IsOpened)) return;
+
+        IsOpened = ViewModel.IsOpened;
+        if (IsOpened)
+        {
+            Show();
+            Topmost = false;
+            Topmost = true;
+        }
+        else
+        {
+            Hide();
+        }
     }
 
     private void HandleBackgroundBorderPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
@@ -79,16 +98,14 @@ public partial class ChatFloatingWindow : ReactiveWindow<ChatFloatingWindowViewM
     {
         base.OnPropertyChanged(change);
 
-        if (change.Property == IsOpenedProperty)
-        {
-            if (change.NewValue is true) Show();
-            else Hide();
-        }
-        else if (change.Property == IsVisibleProperty)
+        if (change.Property == IsVisibleProperty)
         {
             IsOpened = change.NewValue is true;
         }
-        else if (change.Property == TargetBoundingRectProperty) CalculatePositionAndPlacement();
+        else if (change.Property == TargetBoundingRectProperty)
+        {
+            CalculatePositionAndPlacement();
+        }
     }
 
     protected override void OnSizeChanged(SizeChangedEventArgs e)
@@ -202,7 +219,9 @@ public partial class ChatFloatingWindow : ReactiveWindow<ChatFloatingWindowViewM
     /// <param name="e"></param>
     private void HandlePastingFromClipboard(object? sender, RoutedEventArgs e)
     {
-        ViewModel.TryAddClipboardImage();
+        if (!ViewModel.AddClipboardCommand.CanExecute(null)) return;
+
+        ViewModel.AddClipboardCommand.Execute(null);
     }
 
     [RelayCommand]

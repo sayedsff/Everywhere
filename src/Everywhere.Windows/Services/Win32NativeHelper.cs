@@ -266,8 +266,12 @@ public class Win32NativeHelper : INativeHelper
         }
     }
 
-    public unsafe WriteableBitmap? GetClipboardBitmap()
+    private readonly Lock clipboardLock = new();
+
+    public unsafe Task<WriteableBitmap?> GetClipboardBitmapAsync() => Task.Run(() =>
     {
+        using var _ = clipboardLock.EnterScope();
+
         if (!PInvoke.OpenClipboard(HWND.Null)) return null;
 
         var hDc = PInvoke.GetDC(HWND.Null);
@@ -314,7 +318,7 @@ public class Win32NativeHelper : INativeHelper
             if (hDc != HDC.Null) PInvoke.ReleaseDC(HWND.Null, hDc);
             PInvoke.CloseClipboard();
         }
-    }
+    });
 
     private record CompositionContext(Compositor Compositor, Visual RootVisual)
     {

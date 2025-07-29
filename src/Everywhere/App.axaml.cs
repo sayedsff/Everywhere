@@ -189,7 +189,7 @@ file class DesignTimeNativeHelper : INativeHelper
     public void SetWindowHitTestInvisible(Window window) { }
     public void SetWindowCornerRadius(Window window, CornerRadius cornerRadius) { }
     public void HideWindowWithoutAnimation(Window window) { }
-    public WriteableBitmap? GetClipboardBitmap() => null;
+    public Task<WriteableBitmap?> GetClipboardBitmapAsync() => Task.FromResult<WriteableBitmap?>(null);
 }
 
 #endif

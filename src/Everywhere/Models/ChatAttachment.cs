@@ -59,7 +59,7 @@ public partial class ChatImageAttachment : ChatAttachment
 {
     public override LucideIconKind Icon => LucideIconKind.Image;
 
-    public WriteableBitmap Image { get; }
+    public Bitmap Image { get; }
 
     /// <summary>
     /// Encoded image data for serialization.
@@ -82,7 +82,7 @@ public partial class ChatImageAttachment : ChatAttachment
         Image = WriteableBitmap.Decode(stream);
     }
 
-    public ChatImageAttachment(DynamicResourceKeyBase headerKey, WriteableBitmap image) : base(headerKey)
+    public ChatImageAttachment(DynamicResourceKeyBase headerKey, Bitmap image) : base(headerKey)
     {
         Image = image;
     }

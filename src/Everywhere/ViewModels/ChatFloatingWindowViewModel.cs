@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Avalonia.Input;
-using Avalonia.Input.Platform;
+using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -21,8 +21,17 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
 {
     public Settings Settings { get; }
 
-    [ObservableProperty]
-    public partial bool IsOpened { get; set; }
+    public bool IsOpened
+    {
+        get;
+        set
+        {
+            field = value;
+            // notify property changed even if the value is the same
+            // so that the view can update its visibility and topmost
+            OnPropertyChanged();
+        }
+    }
 
     [ObservableProperty]
     public partial PixelRect TargetBoundingRect { get; private set; }
@@ -42,8 +51,6 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
     public IChatService ChatService { get; }
 
     private readonly IVisualElementContext visualElementContext;
-    private readonly IClipboard clipboard;
-    private readonly IStorageProvider storageProvider;
     private readonly INativeHelper nativeHelper;
     private readonly ILogger<ChatFloatingWindowViewModel> logger;
 
@@ -55,8 +62,6 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
         IChatService chatService,
         Settings settings,
         IVisualElementContext visualElementContext,
-        IClipboard clipboard,
-        IStorageProvider storageProvider,
         INativeHelper nativeHelper,
         ILogger<ChatFloatingWindowViewModel> logger)
     {
@@ -65,8 +70,6 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
         Settings = settings;
 
         this.visualElementContext = visualElementContext;
-        this.clipboard = clipboard;
-        this.storageProvider = storageProvider;
         this.nativeHelper = nativeHelper;
         this.logger = logger;
 
@@ -168,11 +171,11 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
     }
 
     [RelayCommand(CanExecute = nameof(IsNotBusy))]
-    private async Task AddClipboardAsync()
+    public async Task AddClipboardAsync()
     {
         if (chatAttachments.Count >= Settings.Internal.MaxChatAttachmentCount) return;
 
-        var formats = await clipboard.GetFormatsAsync();
+        var formats = await Clipboard.GetFormatsAsync();
         if (formats.Length == 0)
         {
             logger.LogInformation("Clipboard is empty.");
@@ -181,38 +184,47 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
 
         if (formats.Contains(DataFormats.Files))
         {
-            var files = await clipboard.GetDataAsync(DataFormats.Files);
+            var files = await Clipboard.GetDataAsync(DataFormats.Files);
             if (files is IEnumerable enumerable)
             {
                 foreach (var storageItem in enumerable.OfType<IStorageItem>())
                 {
                     var uri = storageItem.Path;
                     if (!uri.IsFile) break;
-                    AddFile(uri.AbsolutePath);
+                    await AddFileUncheckAsync(uri.AbsolutePath);
                     if (chatAttachments.Count >= Settings.Internal.MaxChatAttachmentCount) break;
                 }
             }
         }
-        else if (formats.Contains(DataFormats.Text))
+        else if (Settings.Model.IsImageSupported)
         {
-            var text = await clipboard.GetTextAsync();
-            if (text.IsNullOrEmpty()) return;
-            chatAttachments.Add(new ChatTextAttachment(new DirectResourceKey(text.SafeSubstring(0, 10)), text));
+            if (await nativeHelper.GetClipboardBitmapAsync() is not { } bitmap) return;
+
+            chatAttachments.Add(new ChatImageAttachment(DynamicResourceKey.Empty, await ResizeImageOnDemandAsync(bitmap)));
         }
-        else
-        {
-            TryAddClipboardImage();
-        }
+
+        // TODO: add as text attachment when text is too long
+        // else if (formats.Contains(DataFormats.Text))
+        // {
+        //     var text = await Clipboard.GetTextAsync();
+        //     if (text.IsNullOrEmpty()) return;
+        //
+        //     chatAttachments.Add(new ChatTextAttachment(new DirectResourceKey(text.SafeSubstring(0, 10)), text));
+        // }
     }
 
-    public void TryAddClipboardImage()
+    private async static ValueTask<Bitmap> ResizeImageOnDemandAsync(Bitmap image, int maxWidth = 2560, int maxHeight = 2560)
     {
-        if (IsBusy) return;
-        if (!Settings.Model.IsImageSupported) return;
-        if (chatAttachments.Count >= Settings.Internal.MaxChatAttachmentCount) return;
-        if (nativeHelper.GetClipboardBitmap() is not { } bitmap) return;
+        if (image.PixelSize.Width <= maxWidth && image.PixelSize.Height <= maxHeight)
+        {
+            return image;
+        }
 
-        chatAttachments.Add(new ChatImageAttachment(DynamicResourceKey.Empty, bitmap));
+        var scale = Math.Min(maxWidth / (double)image.PixelSize.Width, maxHeight / (double)image.PixelSize.Height);
+        var newWidth = (int)(image.PixelSize.Width * scale);
+        var newHeight = (int)(image.PixelSize.Height * scale);
+
+        return await Task.Run(() => image.CreateScaledBitmap(new PixelSize(newWidth, newHeight)));
     }
 
     [RelayCommand(CanExecute = nameof(IsNotBusy))]
@@ -220,7 +232,32 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
     {
         if (chatAttachments.Count >= Settings.Internal.MaxChatAttachmentCount) return;
 
-        var files = await storageProvider.OpenFilePickerAsync(new FilePickerOpenOptions());
+        IReadOnlyList<IStorageFile> files;
+        IsOpened = false;
+        try
+        {
+            files = await StorageProvider.OpenFilePickerAsync(
+                new FilePickerOpenOptions
+                {
+                    AllowMultiple = true,
+                    FileTypeFilter =
+                    [
+                        new FilePickerFileType("Images")
+                        {
+                            Patterns = ["*.png", "*.jpg", "*.jpeg", "*.gif", "*.bmp", "*.webp"]
+                        },
+                        new FilePickerFileType("All Files")
+                        {
+                            Patterns = ["*"]
+                        }
+                    ]
+                });
+        }
+        finally
+        {
+            IsOpened = true;
+        }
+
         if (files.Count <= 0) return;
         if (files[0].TryGetLocalPath() is not { } filePath)
         {
@@ -228,10 +265,14 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
             return;
         }
 
-        AddFile(filePath);
+        await AddFileUncheckAsync(filePath);
     }
 
-    private void AddFile(string filePath)
+    /// <summary>
+    /// Add a file to the chat attachments without checking the attachment count limit.
+    /// </summary>
+    /// <param name="filePath"></param>
+    private async ValueTask AddFileUncheckAsync(string filePath)
     {
         if (string.IsNullOrWhiteSpace(filePath)) return;
         if (!File.Exists(filePath))
@@ -240,7 +281,28 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
             return;
         }
 
-        chatAttachments.Add(new ChatFileAttachment(new DirectResourceKey(Path.GetFileName(filePath)), filePath));
+        var ext = Path.GetExtension(filePath).ToLower();
+        if (ext is ".png" or ".jpg" or ".jpeg" or ".gif" or ".bmp" or ".webp")
+        {
+            if (Settings.Model.IsImageSupported)
+            {
+                try
+                {
+                    var bitmap = await Task.Run(() => new Bitmap(filePath));
+                    chatAttachments.Add(
+                        new ChatImageAttachment(
+                            new DirectResourceKey(Path.GetFileName(filePath)),
+                            await ResizeImageOnDemandAsync(bitmap)));
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, "Failed to load image from file: {FilePath}", filePath);
+                }
+            }
+        }
+
+        // TODO: 0.3.0
+        // chatAttachments.Add(new ChatFileAttachment(new DirectResourceKey(Path.GetFileName(filePath)), filePath));
     }
 
     private static ChatVisualElementAttachment CreateFromVisualElement(IVisualElement element)
@@ -320,7 +382,7 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
     }
 
     [RelayCommand]
-    private Task CopyAsync(ChatMessage chatMessage) => clipboard.SetTextAsync(chatMessage.ToString());
+    private Task CopyAsync(ChatMessage chatMessage) => Clipboard.SetTextAsync(chatMessage.ToString());
 
     [RelayCommand]
     private void Close()

@@ -7,7 +7,7 @@
   xmlns:vc="clr-namespace:Everywhere.ValueConverters" xmlns:vm="clr-namespace:Everywhere.ViewModels"
   x:DataType="vm:ChatFloatingWindowViewModel" x:TypeArguments="vm:ChatFloatingWindowViewModel"
   Background="Transparent" CanResize="False"
-  IsOpened="{Binding IsOpened, Mode=TwoWay}"
+  IsOpened="{Binding IsOpened, Mode=OneWayToSource}"
   RequestedThemeVariant="{x:Static themes:ThemeVariants.Acrylic}"
   ShowActivated="True" ShowInTaskbar="False"
   SizeToContent="WidthAndHeight" SystemDecorations="None"

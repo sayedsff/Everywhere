@@ -1,4 +1,6 @@
 ﻿using Avalonia.Controls;
+using Avalonia.Input.Platform;
+using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Everywhere.Utils;
 using ShadUI;
@@ -19,6 +21,10 @@ public abstract class ReactiveViewModelBase : ObservableValidator
             .DismissOnClick()
             .ShowError());
 
+    protected IClipboard Clipboard { get; private set; } = ServiceLocator.Resolve<IClipboard>();
+
+    protected IStorageProvider StorageProvider { get; private set; } = ServiceLocator.Resolve<IStorageProvider>();
+
     protected internal virtual Task ViewLoaded(CancellationToken cancellationToken) => Task.CompletedTask;
 
     protected internal virtual Task ViewUnloaded() => Task.CompletedTask;
@@ -33,9 +39,16 @@ public abstract class ReactiveViewModelBase : ObservableValidator
 
     public void Bind(Control target)
     {
-        var cancellationTokenSource = new ReusableCancellationTokenSource();
-
         target.DataContext = this;
+
+        var topLevel = TopLevel.GetTopLevel(target);
+        if (topLevel is not null)
+        {
+            if (topLevel.Clipboard is { } clipboard) Clipboard = clipboard;
+            StorageProvider = topLevel.StorageProvider;
+        }
+
+        var cancellationTokenSource = new ReusableCancellationTokenSource();
         target.Loaded += async (_, _) =>
         {
             try
