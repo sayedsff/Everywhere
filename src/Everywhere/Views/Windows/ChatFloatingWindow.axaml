@@ -319,6 +319,16 @@
                             InlineHyperlinkCommand="{Binding $parent[v:ChatFloatingWindow].LaunchInlineHyperlinkCommand}"
                             MarkdownBuilder="{Binding MarkdownBuilder}"/>
 
+                          <Border
+                            Padding="8,4" HorizontalAlignment="Left"
+                            Background="{DynamicResource ErrorColor20}"
+                            CornerRadius="4"
+                            IsVisible="{Binding !!ErrorMessageKey}">
+                            <TextBlock
+                              Text="{Binding ErrorMessageKey^, FallbackValue={x:Null}}"
+                              TextWrapping="Wrap"/>
+                          </Border>
+
                           <shadui:Skeleton
                             Width="12" Height="12"
                             HorizontalAlignment="Left"
@@ -487,8 +497,25 @@
                                 <LucideIcon
                                   VerticalAlignment="Center"
                                   Foreground="{DynamicResource SuccessColor}"
-                                  IsVisible="{Binding !IsBusy}"
-                                  Kind="Check" Size="14"/>
+                                  Kind="Check" Size="14">
+                                  <LucideIcon.IsVisible>
+                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                      <Binding Path="!IsBusy"/>
+                                      <Binding Path="!ErrorMessageKey"/>
+                                    </MultiBinding>
+                                  </LucideIcon.IsVisible>
+                                </LucideIcon>
+                                <LucideIcon
+                                  VerticalAlignment="Center"
+                                  Foreground="{DynamicResource ErrorColor}"
+                                  Kind="X" Size="14">
+                                  <LucideIcon.IsVisible>
+                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                      <Binding Path="!IsBusy"/>
+                                      <Binding Path="!!ErrorMessageKey"/>
+                                    </MultiBinding>
+                                  </LucideIcon.IsVisible>
+                                </LucideIcon>
                               </StackPanel>
                             </Expander.Header>
 

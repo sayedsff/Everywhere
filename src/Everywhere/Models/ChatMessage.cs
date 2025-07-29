@@ -51,6 +51,10 @@ public partial class AssistantChatMessage : ChatMessage
         init => MarkdownBuilder.Append(value);
     }
 
+    [Key(1)]
+    [ObservableProperty]
+    public partial DynamicResourceKeyBase? ErrorMessageKey { get; set; }
+
     public AssistantChatMessage()
     {
         MarkdownBuilder = new ObservableStringBuilder();
@@ -112,6 +116,10 @@ public partial class ActionChatMessage : ChatMessage
     /// </summary>
     [Key(3)]
     public string? Content { get; set; }
+
+    [Key(4)]
+    [ObservableProperty]
+    public partial DynamicResourceKeyBase? ErrorMessageKey { get; set; }
 
     [SerializationConstructor]
     private ActionChatMessage() { }
