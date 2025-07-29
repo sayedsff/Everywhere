@@ -34,8 +34,7 @@
 
       <ItemsControl
         BorderThickness="0"
-        ItemsSource="{Binding Pages}">
-      </ItemsControl>
+        ItemsSource="{Binding Pages}"/>
     </shadui:Sidebar>
 
     <DockPanel

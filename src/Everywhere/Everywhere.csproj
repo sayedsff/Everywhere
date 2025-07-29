@@ -37,6 +37,7 @@
         <ProjectReference Include="..\..\3rd\MessagePack-CSharp\src\MessagePack\MessagePack.csproj"/>
         <ProjectReference Include="..\..\3rd\shad-ui\src\ShadUI\ShadUI.csproj"/>
         <ProjectReference Include="..\..\3rd\WritableJsonConfiguration\src\WritableJsonConfiguration\WritableJsonConfiguration.csproj"/>
+        <ProjectReference Include="..\Everywhere.I18N.SourceGenerator\Everywhere.I18N.SourceGenerator.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
     </ItemGroup>
 
     <ItemGroup>
@@ -46,6 +47,11 @@
         <AvaloniaResource Include="..\..\img\Everywhere.ico">
             <Link>Assets\Everywhere.ico</Link>
         </AvaloniaResource>
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="i18n.tsv" />
+      <AdditionalFiles Include="i18n.tsv" />
     </ItemGroup>
 
     <!--    <ItemGroup>-->
@@ -65,8 +71,4 @@
     <!--            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>-->
     <!--        </None>-->
     <!--    </ItemGroup>-->
-
-    <Target Name="I18N" BeforeTargets="PreBuildEvent">
-        <Exec Command="dotnet run --project ../Everywhere.I18N.Generator/Everywhere.I18N.Generator.csproj -- ../Everywhere/I18N/i18n.tsv ../Everywhere/I18N"/>
-    </Target>
 </Project>

@@ -28,7 +28,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3rd", "3rd", "{53D93485-152
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Everywhere.Windows.TextService", "src\Everywhere.Windows.TextService\Everywhere.Windows.TextService.vcxproj", "{D5F1DA2F-CE8F-4F35-A2C2-6DC5378211DF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Everywhere.I18N.Generator", "src\Everywhere.I18N.Generator\Everywhere.I18N.Generator.csproj", "{A68C1BEB-0FC2-4A47-BFEB-E96BB14A9913}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Everywhere.I18N.SourceGenerator", "src\Everywhere.I18N.SourceGenerator\Everywhere.I18N.SourceGenerator.csproj", "{A68C1BEB-0FC2-4A47-BFEB-E96BB14A9913}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WritableJsonConfiguration", "3rd\WritableJsonConfiguration\src\WritableJsonConfiguration\WritableJsonConfiguration.csproj", "{85AE2A7B-E780-4741-9BE5-FB22F37D7E21}"
 EndProject

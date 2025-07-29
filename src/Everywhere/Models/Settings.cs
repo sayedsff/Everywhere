@@ -4,7 +4,6 @@ using System.Text.Json.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Everywhere.Attributes;
 using Everywhere.Utils;
-using MessagePack;
 
 namespace Everywhere.Models;
 

@@ -101,10 +101,10 @@ public partial class FormattedDynamicResourceKey(object key, params object?[] ar
     public override IDisposable Subscribe(IObserver<object?> observer)
     {
         var formatter = new AnonymousObserver<object?>(_ => Format(observer));
-        var disposableCollector = new DisposeCollector();
-        disposableCollector.Add(GetObservable().Subscribe(formatter));
-        Args.OfType<DynamicResourceKey>().ForEach(arg => disposableCollector.Add(arg.Subscribe(formatter)));
-        return disposableCollector;
+        var disposeCollector = new DisposeCollector();
+        disposeCollector.Add(GetObservable().Subscribe(formatter));
+        Args.OfType<DynamicResourceKey>().ForEach(arg => disposeCollector.Add(arg.Subscribe(formatter)));
+        return disposeCollector;
     }
 
     private void Format(IObserver<object?> observer)
