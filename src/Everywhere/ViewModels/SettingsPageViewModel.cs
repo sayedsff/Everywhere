@@ -4,7 +4,6 @@ using Avalonia.Threading;
 using Everywhere.Attributes;
 using Everywhere.Models;
 using Everywhere.Utils;
-using MessagePack;
 using ShadUI;
 using ZLinq;
 

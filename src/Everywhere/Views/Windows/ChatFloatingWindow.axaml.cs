@@ -2,6 +2,7 @@
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.Input;
 using LiveMarkdown.Avalonia;
 
@@ -66,6 +67,10 @@ public partial class ChatFloatingWindow : ReactiveWindow<ChatFloatingWindowViewM
         // Make the window topmost
         Topmost = false;
         Topmost = true;
+
+        Dispatcher.UIThread.InvokeAsync(
+            () => nativeHelper.SetWindowCornerRadius(this, BackgroundBorder.CornerRadius),
+            DispatcherPriority.Loaded);
 
         ChatInputBox.Focus();
     }

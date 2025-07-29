@@ -163,11 +163,11 @@ public class Win32NativeHelper : INativeHelper
         {
             // we will need lots of hacks, let's go
             if (window.PlatformImpl?.GetType().GetField("_glSurface", BindingFlags.Instance | BindingFlags.NonPublic) is not { } glSurfaceField) return;
-            if (glSurfaceField.GetValue(window.PlatformImpl) is not { } glSurface) return;
+            if (glSurfaceField.GetValue(window.PlatformImpl) is not { } glSurface) return; // Avalonia.Win32.WinRT.Composition.WinUiCompositedWindowSurface
             if (glSurface.GetType().GetField("_window", BindingFlags.Instance | BindingFlags.NonPublic) is not { } windowField) return;
             if (windowField.GetValue(glSurface) is not { } compositedWindow) return; // Avalonia.Win32.WinRT.Composition.WinUiCompositedWindow
-            if (compositedWindow.GetType().GetField("_shared", BindingFlags.Instance | BindingFlags.NonPublic) is not { } sharedField) return;
-            if (sharedField.GetValue(compositedWindow) is not { } shared) return; // Avalonia.Win32.WinRT.Composition.WinUiCompositionShared
+            if (glSurface.GetType().GetField("_shared", BindingFlags.Instance | BindingFlags.NonPublic) is not { } sharedField) return;
+            if (sharedField.GetValue(glSurface) is not { } shared) return; // Avalonia.Win32.WinRT.Composition.WinUiCompositionShared
             if (shared.GetType().GetProperty("Compositor", BindingFlags.Instance | BindingFlags.Public) is not { } compositorProperty) return;
             if (compositorProperty.GetValue(shared) is not MicroComProxyBase avaloniaCompositor) return; // Avalonia.Win32.WinRT.ICompositor
             if (compositedWindow.GetType().GetField("_target", BindingFlags.Instance | BindingFlags.NonPublic) is not { } targetField) return;
@@ -202,6 +202,8 @@ public class Win32NativeHelper : INativeHelper
 
         void SetWindowCornerRadiusInternal()
         {
+            // todo: HitTest region is not updated
+
             var bounds = window.Bounds;
             var scale = window.DesktopScaling;
             var width = (float)(bounds.Width * scale);
@@ -221,13 +223,17 @@ public class Win32NativeHelper : INativeHelper
             }
             else
             {
+                var topRight = (float)Math.Min(cornerRadius.TopRight * scale, cornerRadiusLimit);
+                var bottomRight = (float)Math.Min(cornerRadius.BottomRight * scale, cornerRadiusLimit);
+                var bottomLeft = (float)Math.Min(cornerRadius.BottomLeft * scale, cornerRadiusLimit);
+
                 CreateComplexRoundedRectangleCompositionPath(
                     width,
                     height,
                     topLeft,
-                    (float)Math.Min(cornerRadius.TopRight * scale, cornerRadiusLimit),
-                    (float)Math.Min(cornerRadius.BottomRight * scale, cornerRadiusLimit),
-                    (float)Math.Min(cornerRadius.BottomLeft * scale, cornerRadiusLimit),
+                    topRight,
+                    bottomRight,
+                    bottomLeft,
                     out var pathGeometryPtr).ThrowOnFailure();
                 var pathGeometry = CompositionPath.FromAbi(pathGeometryPtr);
                 using var compositionGeometry = compositor.CreatePathGeometry(pathGeometry);
