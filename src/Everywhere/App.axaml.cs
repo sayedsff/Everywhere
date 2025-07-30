@@ -17,11 +17,28 @@ namespace Everywhere;
 
 public class App : Application
 {
-    private Mutex? appMutex;
+    private readonly static Mutex AppMutex;
 
     public TopLevel TopLevel { get; } = new Window();
 
     private TransientWindow? mainWindow, debugWindow;
+
+    static App()
+    {
+#if DEBUG
+        AppMutex = null!; // axaml designer may launch this code, so we need to set it to null.
+#else
+        AppMutex = new Mutex(true, "EverywhereAppMutex", out var createdNew);
+        if (createdNew) return;
+
+        NativeMessageBox.Show(
+            "Info",
+            "Everywhere is already running. Please check your system tray for the application window.",
+            NativeMessageBoxButtons.Ok,
+            NativeMessageBoxIcon.Information);
+        Environment.Exit(0);
+#endif
+    }
 
     public override void Initialize()
     {
@@ -80,20 +97,6 @@ public class App : Application
                 NativeMessageBoxButtons.Ok,
                 NativeMessageBoxIcon.Error);
         }
-
-        appMutex = new Mutex(true, "EverywhereAppMutex", out var createdNew);
-        if (createdNew) return;
-
-#if !DEBUG
-        NativeMessageBox.Show(
-            DynamicResourceKey.Resolve(LocaleKey.Common_Info),
-            DynamicResourceKey.Resolve(LocaleKey.App_EverywhereIsAlreadyRunning),
-            NativeMessageBoxButtons.Ok,
-            NativeMessageBoxIcon.Information);
-        Environment.Exit(0);
-#endif
-
-        SetValue(TrayIcon.IconsProperty, [this.FindResource("TrayIcon").NotNull<TrayIcon>()]);
     }
 
     public override void OnFrameworkInitializationCompleted()
@@ -136,7 +139,7 @@ public class App : Application
 
     public override string? ToString()
     {
-        GC.KeepAlive(appMutex);
+        GC.KeepAlive(AppMutex);
         return base.ToString();
     }
 

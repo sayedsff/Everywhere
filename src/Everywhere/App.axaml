@@ -14,24 +14,28 @@
         <ResourceInclude Source="avares://Everywhere/Views/Controls/ChatInputBox.axaml"/>
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
-
-    <TrayIcon
-      x:Key="TrayIcon" Clicked="HandleOpenMainWindowMenuItemClicked"
-      Icon="avares://Everywhere/Assets/Everywhere.ico" ToolTipText="Everywhere">
-      <TrayIcon.Menu>
-        <NativeMenu>
-          <NativeMenuItem
-            Click="HandleOpenMainWindowMenuItemClicked"
-            Header="{I18N {x:Static LocaleKey.Application_TrayIcon_Menu_OpenMainWindow}}"/>
-          <NativeMenuItem
-            Click="HandleOpenDebugWindowMenuItemClicked"
-            Header="{I18N {x:Static LocaleKey.Application_TrayIcon_Menu_OpenDebugWindow}}"/>
-          <NativeMenuItemSeparator/>
-          <NativeMenuItem
-            Click="HandleExitMenuItemClicked"
-            Header="{I18N {x:Static LocaleKey.Application_TrayIcon_Menu_Exit}}"/>
-        </NativeMenu>
-      </TrayIcon.Menu>
-    </TrayIcon>
   </Application.Resources>
+
+  <TrayIcon.Icons>
+    <TrayIcons>
+      <TrayIcon
+        Clicked="HandleOpenMainWindowMenuItemClicked" Icon="avares://Everywhere/Assets/Everywhere.ico"
+        ToolTipText="Everywhere">
+        <TrayIcon.Menu>
+          <NativeMenu>
+            <NativeMenuItem
+              Click="HandleOpenMainWindowMenuItemClicked"
+              Header="{I18N {x:Static LocaleKey.Application_TrayIcon_Menu_OpenMainWindow}}"/>
+            <NativeMenuItem
+              Click="HandleOpenDebugWindowMenuItemClicked"
+              Header="{I18N {x:Static LocaleKey.Application_TrayIcon_Menu_OpenDebugWindow}}"/>
+            <NativeMenuItemSeparator/>
+            <NativeMenuItem
+              Click="HandleExitMenuItemClicked"
+              Header="{I18N {x:Static LocaleKey.Application_TrayIcon_Menu_Exit}}"/>
+          </NativeMenu>
+        </TrayIcon.Menu>
+      </TrayIcon>
+    </TrayIcons>
+  </TrayIcon.Icons>
 </Application>
