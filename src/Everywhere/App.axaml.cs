@@ -7,13 +7,11 @@ using Avalonia.Media.Imaging;
 using Everywhere.Utils;
 using Everywhere.Views;
 using Window = Avalonia.Controls.Window;
-#if DEBUG
 using Everywhere.Enums;
 using Everywhere.Models;
 using Everywhere.Views.Pages;
 using Microsoft.Extensions.DependencyInjection;
 using ShadUI;
-#endif
 
 namespace Everywhere;
 
