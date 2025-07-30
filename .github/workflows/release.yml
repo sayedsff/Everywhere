@@ -7,13 +7,17 @@ on:
 
 jobs:
   build-windows:
-    runs-on: windows-latest
+    runs-on: windows-2022
 
     steps:
+    - name: Enable long paths in git
+      run: git config --global core.longpaths true
+
     - name: Checkout code
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
+        submodules: true
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
@@ -22,6 +26,13 @@ jobs:
 
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
+
+    - name: Setup MSVC
+      uses: TheMrMilchmann/setup-msvc-dev@v2.0.1
+      with:
+        arch: x64
+        toolset: 14
+        sdk: 10.0.19041.0
 
     - name: Install dependencies
       run: dotnet restore Everywhere.sln
