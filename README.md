@@ -23,7 +23,7 @@
     <br />
     <h2>🚧 NOTICE: This project is under active development and is not yet ready for use 🚧</h2>
     <br />
-    <a href="https://github.com/DearVa/Everywhere"><strong>(WIP) Explore the docs »</strong></a>
+    <a href="https://everywhere.nekora.dev"><strong>(WIP) Explore the docs »</strong></a>
     <br />
     <br />
     <a href="https://github.com/DearVa/Everywhere">View Demo</a>
@@ -41,15 +41,15 @@
 ### 🌟 Experience Examples
 
 <details open>
-<summary><b>💬 Contextual Reminders</b></summary>
+<summary><b>❔ Troubleshooting Expert</b></summary>
 
-> While chatting in Discord, you notice an important message about a project meeting
+> You encounter an error message while using your computer but are unsure how to resolve it
 >
-> 📌 **Invoke Everywhere** with a keyboard shortcut
+> 📌 **Invoke Everywhere** next to the error message
 >
-> 🗣️ **Command:** "Remind me about this at 8pm tonight"
+> 🗣️ **Command:** "What is this error? How to solve it?"
 >
-> ✨ **Result:** Everywhere captures the message context and automatically sets up a calendar reminder with relevant details
+> ✨ **Result:** Everywhere captures the message context and provides a solution
 
 </details>
 
@@ -197,49 +197,11 @@ We welcome issues, feature ideas, and PRs! See [CONTRIBUTING.md](CONTRIBUTING.md
 
 ## 📄 License
 
+© DearVa, AuroraZiling, feast107 and contributors. All rights reserved.
+
 Distributed under the Apache 2.0 License. See [LICENSE](LICENSE) for more information.
 
-### Third-Party Licenses
-
-- **shad-ui** - [MIT License](https://github.com/accntech/shad-ui/blob/main/LICENSE)
-    - UI Styles and Components
-    - Source repo: https://github.com/accntech/shad-ui
-- **Lucide.Avalonia** - [MIT License](https://github.com/dme-compunet/Lucide.Avalonia/blob/master/LICENSE)
-    - Icons
-    - Source repo: https://github.com/dme-compunet/Lucide.Avalonia
-- **HotAvalonia** - [MIT License](https://github.com/Kira-NT/HotAvalonia/blob/master/LICENSE.md)
-    - Avalonia hot reload
-    - Source repo: https://github.com/Kira-NT/HotAvalonia
-- **CommunityToolkit.Mvvm** - [MIT License](https://github.com/CommunityToolkit/dotnet/blob/main/License.md)
-    - MVVM framework
-    - Source repo: https://github.com/CommunityToolkit/dotnet
-- **ObservableCollections** - [MIT License](https://github.com/Cysharp/ObservableCollections/blob/master/LICENSE)
-    - Observable collections for MVVM
-    - Source repo: https://github.com/Cysharp/ObservableCollections
-- **Zlinq** - [MIT License](https://github.com/Cysharp/ZLinq/blob/master/LICENSE)
-    - Zero allocation LINQ
-    - Source repo: https://github.com/Cysharp/ZLinq
-- **FlaUI** - [MIT License](https://github.com/FlaUI/FlaUI/blob/master/LICENSE.txt)
-    - Screen Aware & UI Automation
-    - Source repo: https://github.com/FlaUI/FlaUI
-- **CsWin32** - [MIT License](https://github.com/microsoft/CsWin32/blob/main/LICENSE)
-    - Win32 API Autogen
-    - Source repo: https://github.com/microsoft/CsWin32
-- **WritableJsonConfiguration** - [MIT License](https://github.com/Kibnet/WritableJsonConfiguration/blob/master/LICENSE)
-    - Settings storage
-    - Source repo: https://github.com/Kibnet/WritableJsonConfiguration
-- **semantic-kernel** - [MIT License](https://github.com/microsoft/semantic-kernel/blob/main/LICENSE)
-    - LLMs, RAG, Tool call, etc.
-    - Source repo: https://github.com/microsoft/semantic-kernel
-- **Sep** - [MIT License](https://github.com/nietras/Sep/blob/main/LICENSE)
-    - TSV Reader for i18n
-    - Source repo: https://github.com/nietras/Sep
-- **markdig** - [BSD-2-Clause License](https://github.com/xoofx/markdig/blob/master/license.txt)
-    - Markdown parser for Everywhere.Markdown rendering
-    - Source repo: https://github.com/xoofx/markdig
-- **AsyncImageLoader.Avalonia** - [MIT License](https://github.com/AvaloniaUtils/AsyncImageLoader.Avalonia/blob/master/LICENSE)
-    - Asynchronous image loading for Avalonia
-    - Source repo: https://github.com/AvaloniaUtils/AsyncImageLoader.Avalonia
+Third-Party Licenses See [ThirdPartyNotices.txt](ThirdPartyNotices.txt) for details.
 
 ---
 

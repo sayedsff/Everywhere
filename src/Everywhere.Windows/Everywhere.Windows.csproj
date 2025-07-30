@@ -4,6 +4,7 @@
         <TargetFramework>net9.0-windows10.0.19041.0</TargetFramework>
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
         <ApplicationIcon>..\..\img\Everywhere.ico</ApplicationIcon>
+        <IsDeploymentTarget>true</IsDeploymentTarget>
     </PropertyGroup>
 
     <PropertyGroup>

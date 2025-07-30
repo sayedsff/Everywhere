@@ -1,0 +1,521 @@
+This product bundles the following components under the described licenses:
+
+--------------------------------------------------------------------------------
+
+AsyncImageLoader.Avalonia
+
+Id:        AsyncImageLoader.Avalonia
+Version:   3.3.0
+Project:   https://github.com/AvaloniaUtils/AsyncImageLoader.Avalonia
+Copyright: 
+License:   MIT (https://github.com/AvaloniaUtils/AsyncImageLoader.Avalonia/blob/master/LICENSE) 
+
+--------------------------------------------------------------------------------
+
+Avalonia
+
+Id:        Avalonia
+Version:   11.3.2
+Project:   https://avaloniaui.net/?utm_source=nuget&utm_medium=referral&utm_content=project_homepage_link
+Copyright: Copyright 2013-2025 © The AvaloniaUI Project
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+Avalonia.Controls.ColorPicker
+
+Id:        Avalonia.Controls.ColorPicker
+Version:   11.3.2
+Project:   https://avaloniaui.net/?utm_source=nuget&utm_medium=referral&utm_content=project_homepage_link
+Copyright: Copyright 2013-2025 © The AvaloniaUI Project
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+Avalonia.Controls.DataGrid
+
+Id:        Avalonia.Controls.DataGrid
+Version:   11.3.2
+Project:   https://avaloniaui.net/?utm_source=nuget&utm_medium=referral&utm_content=project_homepage_link
+Copyright: Copyright 2013-2025 © The AvaloniaUI Project
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+Avalonia.Desktop
+
+Id:        Avalonia.Desktop
+Version:   11.3.2
+Project:   https://avaloniaui.net/?utm_source=nuget&utm_medium=referral&utm_content=project_homepage_link
+Copyright: Copyright 2013-2025 © The AvaloniaUI Project
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+Avalonia.Diagnostics
+
+Id:        Avalonia.Diagnostics
+Version:   11.3.2
+Project:   https://avaloniaui.net/?utm_source=nuget&utm_medium=referral&utm_content=project_homepage_link
+Copyright: Copyright 2013-2025 © The AvaloniaUI Project
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+Avalonia.Fonts.Inter
+
+Id:        Avalonia.Fonts.Inter
+Version:   11.3.2
+Project:   https://avaloniaui.net/?utm_source=nuget&utm_medium=referral&utm_content=project_homepage_link
+Copyright: Copyright 2013-2025 © The AvaloniaUI Project
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+Avalonia.Skia
+
+Id:        Avalonia.Skia
+Version:   11.3.2
+Project:   https://avaloniaui.net/?utm_source=nuget&utm_medium=referral&utm_content=project_homepage_link
+Copyright: Copyright 2013-2025 © The AvaloniaUI Project
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+Avalonia.Themes.Fluent
+
+Id:        Avalonia.Themes.Fluent
+Version:   11.3.2
+Project:   https://avaloniaui.net/?utm_source=nuget&utm_medium=referral&utm_content=project_homepage_link
+Copyright: Copyright 2013-2025 © The AvaloniaUI Project
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+Avalonia.Themes.Simple
+
+Id:        Avalonia.Themes.Simple
+Version:   11.3.2
+Project:   https://avaloniaui.net/?utm_source=nuget&utm_medium=referral&utm_content=project_homepage_link
+Copyright: Copyright 2013-2025 © The AvaloniaUI Project
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+ColorCode-Universal
+
+Id:        ColorCode.Core
+Version:   2.0.15
+Project:   https://github.com/CommunityToolkit/ColorCode-Universal
+Copyright: (c) .NET Foundation and Contributors. All rights reserved.
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+.NET Community Toolkit - MVVM
+
+Id:        CommunityToolkit.Mvvm
+Version:   8.4.0
+Project:   https://github.com/CommunityToolkit/dotnet
+Copyright: (c) .NET Foundation and Contributors. All rights reserved.
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+FlaUI.UIA3
+
+Id:        FlaUI.UIA3
+Version:   4.0.0
+Project:   https://github.com/FlaUI/FlaUI
+Copyright: Copyright (c) 2016-2022
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+JetBrains.Profiler.Api
+
+Id:        JetBrains.Profiler.Api
+Version:   1.4.10
+Project:   https://github.com/JetBrains/profiler-api/blob/master/README.md
+Copyright: Copyright © 2019-2025 JetBrains s.r.o.
+License:   Apache-2.0
+
+--------------------------------------------------------------------------------
+
+Lucide.Avalonia
+
+Id:        Lucide.Avalonia
+Version:   0.1.38
+Project:   
+Copyright: 
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+Markdig
+
+Id:        Markdig
+Version:   0.41.3
+Project:   https://github.com/xoofx/markdig
+Copyright: Alexandre Mutel
+License:   BSD-2-Clause
+
+--------------------------------------------------------------------------------
+
+Microsoft.Bcl.AsyncInterfaces
+
+Id:        Microsoft.Bcl.AsyncInterfaces
+Version:   8.0.0
+Project:   https://dot.net/
+Copyright: © Microsoft Corporation. All rights reserved.
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+Microsoft.CodeAnalysis.CSharp
+
+Id:        Microsoft.CodeAnalysis.CSharp
+Version:   4.0.1
+Project:   https://github.com/dotnet/roslyn
+Copyright: © Microsoft Corporation. All rights reserved.
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+Microsoft.CodeAnalysis.CSharp.Workspaces
+
+Id:        Microsoft.CodeAnalysis.CSharp.Workspaces
+Version:   4.3.0
+Project:   https://github.com/dotnet/roslyn
+Copyright: © Microsoft Corporation. All rights reserved.
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+Microsoft.EntityFrameworkCore
+
+Id:        Microsoft.EntityFrameworkCore
+Version:   9.0.7
+Project:   https://docs.microsoft.com/ef/core/
+Copyright: © Microsoft Corporation. All rights reserved.
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+Microsoft.EntityFrameworkCore.Sqlite
+
+Id:        Microsoft.EntityFrameworkCore.Sqlite
+Version:   9.0.7
+Project:   https://docs.microsoft.com/ef/core/
+Copyright: © Microsoft Corporation. All rights reserved.
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+Microsoft.Extensions.Configuration
+
+Id:        Microsoft.Extensions.Configuration
+Version:   9.0.7
+Project:   https://dot.net/
+Copyright: © Microsoft Corporation. All rights reserved.
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+Microsoft.Extensions.Configuration.Binder
+
+Id:        Microsoft.Extensions.Configuration.Binder
+Version:   9.0.7
+Project:   https://dot.net/
+Copyright: © Microsoft Corporation. All rights reserved.
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+Microsoft.Extensions.Configuration.Json
+
+Id:        Microsoft.Extensions.Configuration.Json
+Version:   9.0.7
+Project:   https://dot.net/
+Copyright: © Microsoft Corporation. All rights reserved.
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+Microsoft.KernelMemory.Core
+
+Id:        Microsoft.KernelMemory.Core
+Version:   0.98.250508.3
+Project:   https://github.com/microsoft/kernel-memory
+Copyright: © Microsoft Corporation. All rights reserved.
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+Semantic Kernel
+
+Id:        Microsoft.SemanticKernel
+Version:   1.61.0
+Project:   https://aka.ms/semantic-kernel
+Copyright: © Microsoft Corporation. All rights reserved.
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+Semantic Kernel - OpenAI connector
+
+Id:        Microsoft.SemanticKernel.Connectors.OpenAI
+Version:   1.61.0
+Project:   https://aka.ms/semantic-kernel
+Copyright: © Microsoft Corporation. All rights reserved.
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+Semantic Kernel - Web Plugins
+
+Id:        Microsoft.SemanticKernel.Plugins.Web
+Version:   1.61.0-alpha
+Project:   https://aka.ms/semantic-kernel
+Copyright: © Microsoft Corporation. All rights reserved.
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+Microsoft.Windows.CsWin32
+
+Id:        Microsoft.Windows.CsWin32
+Version:   0.3.183
+Project:   https://github.com/Microsoft/CsWin32
+Copyright: © Microsoft Corporation. All rights reserved.
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+MinVer
+
+Id:        MinVer
+Version:   6.0.0
+Project:   https://github.com/adamralph/minver
+Copyright: 
+License:   Apache-2.0
+
+--------------------------------------------------------------------------------
+
+ObservableCollections
+
+Id:        ObservableCollections
+Version:   3.3.4
+Project:   https://github.com/Cysharp/ObservableCollections
+Copyright: © Cysharp, Inc.
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+SharpGen.Runtime
+
+Id:        SharpGen.Runtime
+Version:   2.2.0-beta
+Project:   https://github.com/SharpGenTools/SharpGenTools
+Copyright: (c) 2010-2017 Alexandre Mutel, 2017-2023 Jeremy Koritzinsky, 2023-2024 Amer Koleci
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+SharpGen.Runtime.COM
+
+Id:        SharpGen.Runtime.COM
+Version:   2.2.0-beta
+Project:   https://github.com/SharpGenTools/SharpGenTools
+Copyright: (c) 2010-2017 Alexandre Mutel, 2017-2023 Jeremy Koritzinsky, 2023-2024 Amer Koleci
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+System.Collections.Immutable
+
+Id:        System.Collections.Immutable
+Version:   8.0.0
+Project:   https://dot.net/
+Copyright: © Microsoft Corporation. All rights reserved.
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+System.Drawing.Common
+
+Id:        System.Drawing.Common
+Version:   9.0.7
+Project:   https://github.com/dotnet/winforms
+Copyright: © Microsoft Corporation. All rights reserved.
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+System.Reflection.Emit
+
+Id:        System.Reflection.Emit
+Version:   4.7.0
+Project:   https://github.com/dotnet/corefx
+Copyright: © Microsoft Corporation. All rights reserved.
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+System.Reflection.Emit.Lightweight
+
+Id:        System.Reflection.Emit.Lightweight
+Version:   4.7.0
+Project:   https://github.com/dotnet/corefx
+Copyright: © Microsoft Corporation. All rights reserved.
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+System.Text.Json
+
+Id:        System.Text.Json
+Version:   9.0.7
+Project:   https://dot.net/
+Copyright: © Microsoft Corporation. All rights reserved.
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+System.Threading.Tasks.Extensions
+
+Id:        System.Threading.Tasks.Extensions
+Version:   4.5.4
+Project:   https://dot.net/
+Copyright: © Microsoft Corporation. All rights reserved.
+License:   MIT (https://github.com/dotnet/corefx/blob/master/LICENSE.TXT) 
+
+--------------------------------------------------------------------------------
+
+Tokenizers.DotNet
+
+Id:        Tokenizers.DotNet
+Version:   1.2.1
+Project:   https://github.com/sappho192/Tokenizers.DotNet
+Copyright: Copyright (c) Taein Kim(sappho192)
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+Tokenizers.DotNet.runtime.win-x64
+
+Id:        Tokenizers.DotNet.runtime.win-x64
+Version:   1.2.1
+Project:   https://github.com/sappho192/Tokenizers.DotNet
+Copyright: Copyright (c) Taein Kim(sappho192)
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+Vortice.Direct2D1
+
+Id:        Vortice.Direct2D1
+Version:   3.6.2
+Project:   
+Copyright: Copyright (c) Amer Koleci and Contributors
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+Vortice.Direct3D11
+
+Id:        Vortice.Direct3D11
+Version:   3.6.2
+Project:   
+Copyright: Copyright (c) Amer Koleci and Contributors
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+Vortice.DirectComposition
+
+Id:        Vortice.DirectComposition
+Version:   3.6.2
+Project:   
+Copyright: Copyright (c) Amer Koleci and Contributors
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+Vortice.DirectX
+
+Id:        Vortice.DirectX
+Version:   3.6.2
+Project:   
+Copyright: Copyright (c) Amer Koleci and Contributors
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+Vortice.DXGI
+
+Id:        Vortice.DXGI
+Version:   3.6.2
+Project:   
+Copyright: Copyright (c) Amer Koleci and Contributors
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+Vortice.Mathematics
+
+Id:        Vortice.Mathematics
+Version:   1.9.2
+Project:   https://github.com/amerkoleci/Vortice.Mathematics
+Copyright: Copyright (c) Amer Koleci and Contributors
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+Xaml.Behaviors.Avalonia
+
+Id:        Xaml.Behaviors.Avalonia
+Version:   11.3.2
+Project:   https://github.com/wieslawsoltes/Xaml.Behaviors
+Copyright: Copyright © Wiesław Šoltés 2025
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+ZLinq
+
+Id:        ZLinq
+Version:   1.5.2
+Project:   https://github.com/Cysharp/ZLinq
+Copyright: © Cysharp, Inc.
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+MessagePack-CSharp
+
+Id:        MessagePack
+Version:   
+Project:   https://github.com/MessagePack-CSharp/MessagePack-CSharp
+Copyright: © Yoshifumi Kawai and contributors. All rights reserved.
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+ShadUI
+
+Id:        ShadUI
+Version:   
+Project:   https://github.com/accntech/shad-ui
+Copyright: 
+License:   MIT
+
+--------------------------------------------------------------------------------
+
+WritableJsonConfiguration
+
+Id:        WritableJsonConfiguration
+Version:   
+Project:   https://github.com/Kibnet/WritableJsonConfiguration
+Copyright: 
+License:   MIT

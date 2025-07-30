@@ -23,7 +23,7 @@
     <br />
     <h2>🚧 注意：本项目正在积极开发，尚无法投入使用 🚧</h2>
     <br/>
-    <a href="https://github.com/DearVa/Everywhere"><strong>（开发中）查看文档 »</strong></a>
+    <a href="https://everywhere.nekora.dev/zh-CN/"><strong>（开发中）查看文档 »</strong></a>
     <br />
     <br />
     <a href="https://github.com/DearVa/Everywhere">查看演示</a>
@@ -41,15 +41,15 @@
 ### 🌟 使用场景示例
 
 <details open>
-<summary><b>💬 上下文提醒</b></summary>
+<summary><b>❔ 疑难杂症专家</b></summary>
 
-> 当您在 Discord 中聊天时，注意到一条关于项目会议的重要消息
+> 当您在使用电脑时，弹出了一个错误消息，但您不确定如何解决
 >
-> 📌 **调用 Everywhere**（通过键盘快捷键）
+> 📌 在错误消息旁**唤起 Everywhere**
 >
-> 🗣️ **命令：**"今晚8点提醒我这件事"
+> 🗣️ **命令:** "这是什么错误？如何解决？"
 >
-> ✨ **结果：**Everywhere 捕获消息上下文并自动设置包含相关详细信息的日历提醒
+> ✨ **结果:** Everywhere 捕获消息上下文并给出解决方案
 
 </details>
 
@@ -58,11 +58,11 @@
 
 > 您正在浏览一篇冗长的技术文章，但只需要了解关键要点
 >
-> 📌 **在网页上调用 Everywhere**
+> 📌 在网页上**唤起 Everywhere**
 >
-> 🗣️ **命令：**"给我一个三点总结"
+> 🗣️ **命令:** "给我一个简短的总结"
 >
-> ✨ **结果：**无需阅读整篇内容，立即获取主要论点
+> ✨ **结果:** 无需阅读整篇内容，立即获取主要论点
 
 </details>
 
@@ -71,11 +71,11 @@
 
 > 在研究过程中遇到外语文本
 >
-> 📌 **在文本上调用 Everywhere**
+> 📌 在文本上**唤起 Everywhere**
 >
-> 🗣️ **命令：**"把这个翻译成中文"
+> 🗣️ **命令:** "把这个翻译成中文"
 >
-> ✨ **结果：**无需切换到其他应用，立即查看翻译结果
+> ✨ **结果:** 无需切换到其他应用，立即查看翻译结果
 
 </details>
 
@@ -84,11 +84,11 @@
 
 > 您正在撰写一封重要的商务邮件，但不确定语气是否恰当
 >
-> 📌 **在草稿上调用 Everywhere**
+> 📌 在草稿上**唤起 Everywhere**
 >
-> 🗣️ **命令：**"让这封邮件更专业一些"
+> 🗣️ **命令:** "让这封邮件更专业一些"
 >
-> ✨ **结果：**您的随意文本被转化为精炼的商务沟通内容
+> ✨ **结果:** 您的文本被转化为精炼的商务沟通内容
 
 </details>
 
@@ -198,49 +198,11 @@
 
 ## 📄 许可证
 
-本项目基于 Apache 2.0 许可证发布，详情请查阅 [`LICENSE`](LICENSE)。
+© DearVa、AuroraZiling、feast107 和贡献者们。保留所有权利。
 
-### 第三方许可证
+本项目基于 Apache 2.0 许可证发布，详情请查阅 [LICENSE](LICENSE)。
 
-- **shad-ui** - [MIT License](https://github.com/accntech/shad-ui/blob/main/LICENSE)
-    - UI 样式和组件
-    - Source repo: https://github.com/accntech/shad-ui
-- **Lucide.Avalonia** - [MIT License](https://github.com/dme-compunet/Lucide.Avalonia/blob/master/LICENSE)
-    - 图标
-    - Source repo: https://github.com/dme-compunet/Lucide.Avalonia
-- **HotAvalonia** - [MIT License](https://github.com/Kira-NT/HotAvalonia/blob/master/LICENSE.md)
-    - 热重载支持
-    - Source repo: https://github.com/Kira-NT/HotAvalonia
-- **CommunityToolkit.Mvvm** - [MIT License](https://github.com/CommunityToolkit/dotnet/blob/main/License.md)
-    - MVVM 框架
-    - Source repo: https://github.com/CommunityToolkit/dotnet
-- **ObservableCollections** - [MIT License](https://github.com/Cysharp/ObservableCollections/blob/master/LICENSE)
-    - Observable collections for MVVM
-    - Source repo: https://github.com/Cysharp/ObservableCollections
-- **Zlinq** - [MIT License](https://github.com/Cysharp/ZLinq/blob/master/LICENSE)
-    - 零分配 LINQ
-    - Source repo: https://github.com/Cysharp/ZLinq
-- **FlaUI** - [MIT License](https://github.com/FlaUI/FlaUI/blob/master/LICENSE.txt)
-    - 屏幕感知和 UI 自动化
-    - Source repo: https://github.com/FlaUI/FlaUI
-- **CsWin32** - [MIT License](https://github.com/microsoft/CsWin32/blob/main/LICENSE)
-    - Win32 API 自动生成
-    - Source repo: https://github.com/microsoft/CsWin32
-- **WritableJsonConfiguration** - [MIT License](https://github.com/Kibnet/WritableJsonConfiguration/blob/master/LICENSE)
-    - 设置存储
-    - Source repo: https://github.com/Kibnet/WritableJsonConfiguration
-- **semantic-kernel** - [MIT License](https://github.com/microsoft/semantic-kernel/blob/main/LICENSE)
-    - 语义内核和插件系统
-    - Source repo: https://github.com/microsoft/semantic-kernel
-- **Sep** - [MIT License](https://github.com/nietras/Sep/blob/main/LICENSE)
-    - TSV 读取器，用于国际化
-    - Source repo: https://github.com/nietras/Sep
-- **markdig** - [BSD-2-Clause License](https://github.com/xoofx/markdig/blob/master/license.txt)
-    - Markdown 解析器，用于 Everywhere.Markdown 渲染
-    - Source repo: https://github.com/xoofx/markdig
-- **AsyncImageLoader.Avalonia** - [MIT License](https://github.com/AvaloniaUtils/AsyncImageLoader.Avalonia/blob/master/LICENSE)
-    - 异步图像加载器
-    - Source repo: https://github.com/AvaloniaUtils/AsyncImageLoader.Avalonia
+第三方许可证请参见 [ThirdPartyNotices.txt](ThirdPartyNotices.txt)。
 
 ---
 
