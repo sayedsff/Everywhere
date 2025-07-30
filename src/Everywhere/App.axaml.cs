@@ -105,7 +105,7 @@ public class App : Application
             case IClassicDesktopStyleApplicationLifetime:
             {
                 DisableAvaloniaDataAnnotationValidation();
-                ShowWelcomePageWhenNeeded();
+                ShowMainWindowOnNeeded();
                 break;
             }
         }
@@ -124,14 +124,16 @@ public class App : Application
         }
     }
 
-    private void ShowWelcomePageWhenNeeded()
+    /// <summary>
+    /// Show the main window if it was not shown before or the version has changed.
+    /// </summary>
+    private void ShowMainWindowOnNeeded()
     {
         var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString();
         var settings = ServiceLocator.Resolve<Settings>();
         if (settings.Internal.PreviousLaunchVersion == version) return;
 
         ShowWindow<MainView>(ref mainWindow);
-        settings.Internal.PreviousLaunchVersion = version;
     }
 
     public override string? ToString()

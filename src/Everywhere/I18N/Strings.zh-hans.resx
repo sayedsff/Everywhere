@@ -473,4 +473,29 @@
     <data name="ChatFloatingWindow_HistoryAction_Delete" xml:space="preserve">
         <value>删除</value>
     </data>
+    <data name="AboutPage_WelcomePage" xml:space="preserve">
+        <value>欢迎页面</value>
+    </data>
+    <data name="WelcomeView_QQGroup" xml:space="preserve">
+        <value>QQ 群</value>
+    </data>
+    <data name="WelcomeView_OfficialDocs" xml:space="preserve">
+        <value>官方文档</value>
+    </data>
+    <data name="WelcomeView_Header" xml:space="preserve">
+        <value>欢迎来到 Everywhere 👋</value>
+    </data>
+    <data name="WelcomeView_Content" xml:space="preserve">
+        <value>很高兴认识你！就让我做你的助手，陪伴你解决问题吧！
+如果你是第一次使用，请点击下方官方文档查看使用说明！
+目前我还刚诞生不久，如果遇到问题，欢迎点击下方链接反馈，我会不断进化的！
+也欢迎点击下方链接进入群组讨论，更多的社交媒体正在建设中，敬请期待。
+提示：你可点击“关于-欢迎页面”重新打开此消息。</value>
+    </data>
+    <data name="WelcomeView_ReportBug" xml:space="preserve">
+        <value>反馈 Bug</value>
+    </data>
+    <data name="WelcomeView_FeatureRequest" xml:space="preserve">
+        <value>功能请求</value>
+    </data>
 </root>

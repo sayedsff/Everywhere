@@ -1,0 +1,54 @@
+﻿<UserControl
+  x:Class="Everywhere.Views.WelcomeView" xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" d:DesignHeight="450"
+  d:DesignWidth="800" mc:Ignorable="d">
+  <StackPanel
+    Margin="32,20" HorizontalAlignment="Center"
+    VerticalAlignment="Center" Spacing="16">
+    <StackPanel
+      HorizontalAlignment="Center" Orientation="Horizontal"
+      Spacing="8">
+      <Viewbox
+        Width="36" Height="36"
+        Margin="0,0,4,-4" VerticalAlignment="Center">
+        <ContentPresenter Content="{StaticResource AssistantAvatar}"/>
+      </Viewbox>
+      <TextBlock
+        Classes="h2" VerticalAlignment="Center"
+        FontWeight="Normal"
+        Text="{I18N {x:Static LocaleKey.WelcomeView_Header}}"/>
+    </StackPanel>
+
+    <TextBlock
+      Width="620" HorizontalAlignment="Center"
+      LineHeight="22"
+      Text="{I18N {x:Static LocaleKey.WelcomeView_Content}}"
+      TextAlignment="Center" TextWrapping="Wrap"/>
+
+    <StackPanel
+      HorizontalAlignment="Center" Orientation="Horizontal"
+      Spacing="8">
+      <HyperlinkButton
+        VerticalAlignment="Center"
+        Content="{I18N {x:Static LocaleKey.WelcomeView_OfficialDocs}}"
+        NavigateUri="https://everywhere.nekora.dev"
+        TextElement.Foreground="{DynamicResource InfoColor}"/>
+      <HyperlinkButton
+        VerticalAlignment="Center"
+        Content="{I18N {x:Static LocaleKey.WelcomeView_ReportBug}}"
+        NavigateUri="https://github.com/DearVa/Everywhere/issues/new?labels=bug&amp;template=bug-report.md"
+        TextElement.Foreground="{DynamicResource InfoColor}"/>
+      <HyperlinkButton
+        VerticalAlignment="Center"
+        Content="{I18N {x:Static LocaleKey.WelcomeView_FeatureRequest}}"
+        NavigateUri="https://github.com/DearVa/Everywhere/issues/new?labels=enhancement&amp;template=enhancement.md"
+        TextElement.Foreground="{DynamicResource InfoColor}"/>
+      <HyperlinkButton
+        VerticalAlignment="Center"
+        Content="{I18N {x:Static LocaleKey.WelcomeView_QQGroup}}"
+        NavigateUri="https://qm.qq.com/cgi-bin/qm/qr?k=wp9aDBBnLc7pYATqT99tB-N2ZP2ETmJC&amp;jump_from=webapi&amp;authKey=97qUJfsQoI70dUNcgBZ0C3HCZeiEn8inLT7pzg8x+KinbQwfIrHFu3dB2+aHMbRD"
+        TextElement.Foreground="{DynamicResource InfoColor}"/>
+    </StackPanel>
+  </StackPanel>
+</UserControl>

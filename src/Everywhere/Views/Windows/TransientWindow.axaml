@@ -6,7 +6,9 @@
   TitleFontWeight="SemiBold" TransparencyLevelHint="Mica,AcrylicBlur,Blur,None">
 
   <shadui:Window.Hosts>
-    <shadui:DialogHost Manager="{ServiceLocator shadui:DialogManager}"/>
+    <shadui:DialogHost
+      Manager="{ServiceLocator shadui:DialogManager}"
+      Owner="{Binding RelativeSource={RelativeSource AncestorType=shadui:Window}}"/>
     <shadui:ToastHost Manager="{ServiceLocator shadui:ToastManager}"/>
   </shadui:Window.Hosts>
 </shadui:Window>

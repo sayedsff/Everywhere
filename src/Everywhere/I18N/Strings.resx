@@ -492,4 +492,29 @@
     <data name="ChatFloatingWindow_HistoryAction_Delete" xml:space="preserve">
         <value>Delete</value>
     </data>
+    <data name="AboutPage_WelcomePage" xml:space="preserve">
+        <value>Welcome Page</value>
+    </data>
+    <data name="WelcomeView_QQGroup" xml:space="preserve">
+        <value>QQ Group</value>
+    </data>
+    <data name="WelcomeView_OfficialDocs" xml:space="preserve">
+        <value>Official Docs</value>
+    </data>
+    <data name="WelcomeView_Header" xml:space="preserve">
+        <value>Welcome to Everywhere 👋</value>
+    </data>
+    <data name="WelcomeView_Content" xml:space="preserve">
+        <value>It's a pleasure to meet you! Let me be your assistant and accompany you in solving your problems!
+If this is your first time using it, please click on the official documentation below for instructions!
+I'm still very young, so if you have any problems, feel free to click the link below for feedback, I'll keep on evolving!
+You're also welcome to click the link below to enter the group discussion, more social media is under construction, so stay tuned.
+Tip: You can reopen this message by clicking “About - Welcome Page”.</value>
+    </data>
+    <data name="WelcomeView_ReportBug" xml:space="preserve">
+        <value>Report a Bug</value>
+    </data>
+    <data name="WelcomeView_FeatureRequest" xml:space="preserve">
+        <value>Feature Request</value>
+    </data>
 </root>

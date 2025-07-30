@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Everywhere.Models;
@@ -36,6 +37,25 @@ public partial class MainViewModel(IServiceProvider serviceProvider, Settings se
                     Icon = new LucideIcon { Kind = p.Icon, Size = 20 }
                 }));
         SelectedPage = pages.FirstOrDefault();
+
+        ShowWelcomeDialogOnNeeded();
+
         return base.ViewLoaded(cancellationToken);
+    }
+
+    /// <summary>
+    /// Shows the welcome dialog if the application is launched for the first time or after an update.
+    /// </summary>
+    private void ShowWelcomeDialogOnNeeded()
+    {
+        var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString();
+        if (settings.Internal.PreviousLaunchVersion == version) return;
+
+        DialogManager
+            .CreateDialog(ServiceLocator.Resolve<WelcomeViewModel>())
+            .Dismissible()
+            .Show();
+
+        settings.Internal.PreviousLaunchVersion = version;
     }
 }

@@ -59,6 +59,13 @@
       <AdditionalFiles Include="I18N\*.resx" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Update="Views\WelcomeView.axaml.cs">
+        <DependentUpon>WelcomeView.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+    </ItemGroup>
+
     <!--    <ItemGroup>-->
     <!--        <None Update="Assets\text2vec-chinese-base\model.onnx">-->
     <!--            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>-->

@@ -94,6 +94,11 @@ public static class Program
                 .AddSingleton<IMainViewPage, SettingsPage>()
                 .AddSingleton<AboutPageViewModel>()
                 .AddSingleton<IMainViewPage, AboutPage>()
+                .AddSingleton<WelcomeViewModel>(xx =>
+                {
+                    xx.GetRequiredService<DialogManager>().Register<WelcomeView, WelcomeViewModel>();
+                    return new WelcomeViewModel();
+                })
                 .AddSingleton<MainViewModel>()
                 .AddSingleton<MainView>()
 

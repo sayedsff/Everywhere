@@ -4,6 +4,7 @@ namespace Everywhere.Views;
 
 public class OverlayWindow : Window
 {
+    // todo: make this window don't cover the owner
     public OverlayWindow(WindowBase? owner = null)
     {
         Owner = owner;
