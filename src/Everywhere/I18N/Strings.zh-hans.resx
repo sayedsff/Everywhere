@@ -443,4 +443,19 @@
     <data name="SettingsSelectionItem_Common_Language_zh-hant-hk" xml:space="preserve">
         <value>中文 (繁體 香港特別行政區)</value>
     </data>
+    <data name="AboutPage_Title" xml:space="preserve">
+        <value>关于</value>
+    </data>
+    <data name="AboutPage_Description" xml:space="preserve">
+        <value>Everywhere 是一款基于 .NET 和 Avalonia 构建的具有上下文感知能力的交互式 AI 助手。与传统的聊天界面不同，Everywhere 直接集成到您的桌面环境中，感知您的屏幕内容，理解应用程序上下文，并代表您采取行动。</value>
+    </data>
+    <data name="AboutPage_Version" xml:space="preserve">
+        <value>版本：</value>
+    </data>
+    <data name="AboutPage_ProjectLink" xml:space="preserve">
+        <value>项目地址</value>
+    </data>
+    <data name="AboutPage_OpenSourceNotice" xml:space="preserve">
+        <value>开放源代码通知</value>
+    </data>
 </root>

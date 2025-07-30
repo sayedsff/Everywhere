@@ -92,6 +92,8 @@ public static class Program
                 .AddSingleton<ChatFloatingWindow>()
                 .AddSingleton<SettingsPageViewModel>()
                 .AddSingleton<IMainViewPage, SettingsPage>()
+                .AddSingleton<AboutPageViewModel>()
+                .AddSingleton<IMainViewPage, AboutPage>()
                 .AddSingleton<MainViewModel>()
                 .AddSingleton<MainView>()
 

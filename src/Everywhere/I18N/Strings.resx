@@ -462,4 +462,19 @@
     <data name="SettingsSelectionItem_Common_Language_zh-hant-hk" xml:space="preserve">
         <value>中文 (繁體 香港特別行政區)</value>
     </data>
+    <data name="AboutPage_Title" xml:space="preserve">
+        <value>About</value>
+    </data>
+    <data name="AboutPage_Description" xml:space="preserve">
+        <value>Everywhere is a context-aware, interactive AI assistant built with .NET and Avalonia. Unlike traditional chat interfaces, Everywhere integrates directly with your desktop environment, perceiving your screen, understanding application context, and taking actions on your behalf.</value>
+    </data>
+    <data name="AboutPage_Version" xml:space="preserve">
+        <value>Version: </value>
+    </data>
+    <data name="AboutPage_ProjectLink" xml:space="preserve">
+        <value>Project Link</value>
+    </data>
+    <data name="AboutPage_OpenSourceNotice" xml:space="preserve">
+        <value>Open Source Notice</value>
+    </data>
 </root>
