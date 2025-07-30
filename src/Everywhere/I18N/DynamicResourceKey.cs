@@ -4,7 +4,7 @@ using Avalonia.Reactive;
 using Everywhere.Utils;
 using MessagePack;
 
-namespace Everywhere.Models;
+namespace Everywhere.I18N;
 
 /// <summary>
 /// MessagePack serializable base class for dynamic resource keys. Make them happy.
@@ -37,7 +37,9 @@ public partial class DynamicResourceKey(object key) : DynamicResourceKeyBase
     protected object Key { get; } = key;
 
     protected IObservable<object?> GetObservable() =>
-        Application.Current!.Resources.GetResourceObservable(Key);
+        Application.Current!.Resources.GetResourceObservable(Key, NotFoundConverter);
+
+    private object? NotFoundConverter(object? value) => value is UnsetValueType ? Key : value;
 
     public override IDisposable Subscribe(IObserver<object?> observer) =>
         GetObservable().Subscribe(observer);

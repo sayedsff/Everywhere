@@ -63,7 +63,7 @@ public class ChatService(
         var analyzingContextMessage = new ActionChatMessage(
             new AuthorRole("action"),
             LucideIconKind.TextSearch,
-            "ActionChatMessage_Header_AnalyzingContext")
+            LocaleKey.ActionChatMessage_Header_AnalyzingContext)
         {
             IsBusy = true
         };
@@ -188,7 +188,7 @@ public class ChatService(
                         "web_search" => new ActionChatMessage(
                             AuthorRole.Tool,
                             LucideIconKind.Globe,
-                            "ActionChatMessage_Header_WebSearching"),
+                            LocaleKey.ActionChatMessage_Header_WebSearching),
                         _ => throw new NotImplementedException()
                     };
                     actionChatMessage.IsBusy = true;

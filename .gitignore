@@ -455,9 +455,6 @@ $RECYCLE.BIN/
 *.pb.h
 *.pb.cc
 
-/src/Everywhere/I18N/*.axaml
-/src/Everywhere/I18N/*.cs
-
 # VitePress
 /docs/.vitepress/cache
 /docs/.vitepress/dist

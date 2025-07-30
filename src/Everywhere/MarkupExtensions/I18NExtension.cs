@@ -2,7 +2,7 @@
 using Avalonia.Data;
 using Avalonia.Markup.Xaml;
 using Avalonia.Metadata;
-using Everywhere.Models;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Everywhere.MarkupExtensions;
 
@@ -20,6 +20,7 @@ public class I18NExtension : MarkupExtension
 
     public override object ProvideValue(IServiceProvider serviceProvider)
     {
+        var target = serviceProvider.GetService<IProvideValueTarget>();
         var dynamicResourceKey = Arguments is { Length: > 0 } args ?
             new FormattedDynamicResourceKey(Key, args.Select(a => a switch
             {
@@ -27,6 +28,8 @@ public class I18NExtension : MarkupExtension
                 _ => new DynamicResourceKey(a)
             }).ToArray()) :
             new DynamicResourceKey(Key);
-        return dynamicResourceKey.ToBinding();
+        return target?.TargetProperty is AvaloniaProperty ?
+            dynamicResourceKey.ToBinding() :
+            dynamicResourceKey.ToString() ?? string.Empty; // Only AvaloniaProperty can resolve binding, otherwise return resolved string
     }
 }

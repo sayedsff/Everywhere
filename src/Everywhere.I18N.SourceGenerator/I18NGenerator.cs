@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System.Collections.Immutable;
+using System.Text;
+using System.Xml.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 
@@ -9,51 +11,87 @@ public class I18NSourceGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        // Register the additional file provider
-        var tsvFiles = context.AdditionalTextsProvider
-            .Where(file => Path.GetFileName(file.Path).Equals("i18n.tsv", StringComparison.OrdinalIgnoreCase))
-            .Select((file, _) => file);
+        // Register the additional file provider for RESX files
+        var resxFiles = context.AdditionalTextsProvider
+            .Where(file => Path.GetExtension(file.Path).Equals(".resx", StringComparison.OrdinalIgnoreCase) &&
+                           Path.GetFileName(file.Path).StartsWith("Strings.", StringComparison.OrdinalIgnoreCase) &&
+                           Path.GetDirectoryName(file.Path)?.EndsWith("I18N", StringComparison.OrdinalIgnoreCase) == true)
+            .Collect();
 
         // Register the output source
-        context.RegisterSourceOutput(tsvFiles, GenerateI18NCode);
+        context.RegisterSourceOutput(resxFiles, GenerateI18NCode);
     }
 
-    private void GenerateI18NCode(SourceProductionContext context, AdditionalText tsvFile)
+    private static void GenerateI18NCode(SourceProductionContext context, ImmutableArray<AdditionalText> resxFiles)
     {
-        if (tsvFile.GetText(context.CancellationToken) is not { } tsvContent)
+        if (resxFiles.Length == 0)
         {
             return;
         }
 
-        var filePath = tsvFile.Path;
-
         try
         {
-            // Parse the TSV content
-            var tsvRows = ParseTsv(tsvContent.ToString());
-            if (tsvRows.Count == 0)
+            // Group RESX files by base name and locale
+            var defaultResxFile = resxFiles.FirstOrDefault(f => Path.GetFileName(f.Path).Equals("Strings.resx", StringComparison.OrdinalIgnoreCase));
+            if (defaultResxFile == null)
+            {
+                context.ReportDiagnostic(
+                    Diagnostic.Create(
+                        new DiagnosticDescriptor(
+                            "I18N001",
+                            "Missing Default RESX File",
+                            "Could not find the default Strings.resx file in I18N directory",
+                            "I18N",
+                            DiagnosticSeverity.Error,
+                            isEnabledByDefault: true),
+                        Location.None));
+                return;
+            }
+
+            // Parse the default RESX to get all keys
+            var defaultContent = defaultResxFile.GetText(context.CancellationToken)?.ToString();
+            if (string.IsNullOrEmpty(defaultContent))
             {
                 return;
             }
 
-            var header = tsvRows[0];
-            var dataRows = tsvRows.Skip(1).ToList();
+            // Parse default RESX for keys and values
+            var defaultEntries = ParseResxEntries(defaultContent!);
+            if (defaultEntries.Count == 0)
+            {
+                return;
+            }
 
-            // Generate LocaleKey.g.cs
-            var localeKeySource = GenerateLocaleKeyClass(filePath, dataRows);
+            // Generate LocaleKey.g.cs based on all available keys
+            var localeKeySource = GenerateLocaleKeyClass(defaultResxFile.Path, defaultEntries);
             context.AddSource("LocaleKey.g.cs", SourceText.From(localeKeySource, Encoding.UTF8));
 
-            // Generate locale files for each column
-            for (var col = 1; col < header.Count; col++)
+            // Generate default locale file
+            var defaultLocaleSource = GenerateLocaleClass(defaultResxFile.Path, "@default", defaultEntries);
+            context.AddSource("default.g.cs", SourceText.From(defaultLocaleSource, Encoding.UTF8));
+
+            // Generate locale files for each language-specific RESX
+            var localeNames = new List<string>();
+            foreach (var resxFile in resxFiles.Where(f => !Path.GetFileName(f.Path).Equals("Strings.resx", StringComparison.OrdinalIgnoreCase)))
             {
-                var localeName = header[col];
+                var fileName = Path.GetFileNameWithoutExtension(resxFile.Path);
+                var localeName = fileName.Substring(fileName.IndexOf('.') + 1);
                 var escapedLocaleName = localeName.Replace("-", "_");
-                var localeSource = GenerateLocaleClass(filePath, escapedLocaleName, dataRows, col);
+                localeNames.Add(localeName);
+
+                var content = resxFile.GetText(context.CancellationToken)?.ToString();
+                if (string.IsNullOrEmpty(content))
+                {
+                    continue;
+                }
+
+                var entries = ParseResxEntries(content!);
+                var localeSource = GenerateLocaleClass(resxFile.Path, escapedLocaleName, entries);
                 context.AddSource($"{localeName}.g.cs", SourceText.From(localeSource, Encoding.UTF8));
             }
 
             // Generate LocaleManager.g.cs
-            var localeManagerSource = GenerateLocaleManagerClass(filePath, header.Skip(1).ToList());
+            var localeManagerSource = GenerateLocaleManagerClass(defaultResxFile.Path, localeNames);
             context.AddSource("LocaleManager.g.cs", SourceText.From(localeManagerSource, Encoding.UTF8));
         }
         catch (Exception ex)
@@ -62,7 +100,7 @@ public class I18NSourceGenerator : IIncrementalGenerator
             context.ReportDiagnostic(
                 Diagnostic.Create(
                     new DiagnosticDescriptor(
-                        "I18N001",
+                        "I18N002",
                         "I18N Generation Error",
                         $"Error generating I18N code: {ex.Message}",
                         "I18N",
@@ -72,90 +110,46 @@ public class I18NSourceGenerator : IIncrementalGenerator
         }
     }
 
-    private static List<List<string>> ParseTsv(string content)
+    private static Dictionary<string, string> ParseResxEntries(string resxContent)
     {
-        var rows = new List<List<string>>();
-        var currentRow = new List<string>();
-        var currentField = new StringBuilder();
-        var inQuotes = false;
-        var i = 0;
+        var entries = new Dictionary<string, string>();
 
-        while (i < content.Length)
+        try
         {
-            var c = content[i];
+            var doc = XDocument.Parse(resxContent);
+            var dataNodes = doc.Root?.Elements("data");
 
-            switch (c)
+            if (dataNodes != null)
             {
-                // Handle quoted fields that can contain newlines
-                case '"' when !inQuotes:
-                    // Start of a quoted field
-                    inQuotes = true;
-                    break;
-                case '"' when i + 1 < content.Length && content[i + 1] == '"':
-                    // Escaped quote inside a quoted field
-                    currentField.Append('"');
-                    i++; // Skip the next quote character
-                    break;
-                case '"':
-                    // End of quoted field
-                    inQuotes = false;
-                    break;
-                case '\t' when !inQuotes:
-                    // Tab outside quotes means end of field
-                    currentRow.Add(currentField.ToString());
-                    currentField.Clear();
-                    break;
-                default:
+                foreach (var dataNode in dataNodes)
                 {
-                    if ((c == '\n' || (c == '\r' && i + 1 < content.Length && content[i + 1] == '\n')) && !inQuotes)
-                    {
-                        // Newline outside quotes means end of row
-                        // First add the last field in the row
-                        currentRow.Add(currentField.ToString());
-                        currentField.Clear();
+                    var nameAttr = dataNode.Attribute("name");
+                    var valueNode = dataNode.Element("value");
 
-                        // Add the row if it's not empty
-                        if (currentRow.Count > 0)
-                        {
-                            rows.Add(currentRow);
-                            currentRow = [];
-                        }
-
-                        // Skip \n if this was \r\n
-                        if (c == '\r' && i + 1 < content.Length && content[i + 1] == '\n')
-                        {
-                            i++;
-                        }
-                    }
-                    else
+                    if (nameAttr != null && valueNode != null)
                     {
-                        // Normal character, add to current field
-                        currentField.Append(c);
+                        entries[nameAttr.Value] = valueNode.Value;
                     }
-                    break;
                 }
             }
-
-            i++;
+        }
+        catch (Exception)
+        {
+            // Silently fail and return an empty dictionary
+            return new Dictionary<string, string>();
         }
 
-        if (currentField.Length <= 0 && currentRow.Count <= 0) return rows;
-
-        // Don't forget the last field and row if there's no newline at the end
-        currentRow.Add(currentField.ToString());
-        rows.Add(currentRow);
-
-        return rows;
+        return entries;
     }
 
-    private static string GenerateLocaleKeyClass(string tsvPath, List<List<string>> rows)
+    private static string GenerateLocaleKeyClass(string resxPath, Dictionary<string, string> entries)
     {
         var sb = new StringBuilder();
 
         sb.AppendLine(
             $$"""
               // Generated by Everywhere.I18N.SourceGenerator, do not edit manually
-              // Edit {{Path.GetFileName(tsvPath)}} instead, run the generator or build project to update this file
+              // Edit {{Path.GetFileName(resxPath)}} instead, run the generator or build project to update this file
 
               #nullable enable
 
@@ -165,11 +159,9 @@ public class I18NSourceGenerator : IIncrementalGenerator
               {
               """);
 
-        foreach (var row in rows)
+        foreach (var entry in entries)
         {
-            if (row.Count == 0) continue;
-
-            var key = row[0];
+            var key = entry.Key;
             var escapedKey = EscapeVariableName(key);
 
             sb.AppendLine($"    public const string {escapedKey} = \"{key}\";");
@@ -180,14 +172,14 @@ public class I18NSourceGenerator : IIncrementalGenerator
         return sb.ToString();
     }
 
-    private static string GenerateLocaleClass(string tsvPath, string escapedLocaleName, List<List<string>> rows, int col)
+    private static string GenerateLocaleClass(string resxPath, string escapedLocaleName, Dictionary<string, string> entries)
     {
         var sb = new StringBuilder();
 
         sb.AppendLine(
             $$"""
               // Generated by Everywhere.I18N.SourceGenerator, do not edit manually
-              // Edit {{Path.GetFileName(tsvPath)}} instead, run the generator or build project to update this file
+              // Edit {{Path.GetFileName(resxPath)}} instead, run the generator or build project to update this file
 
               #nullable enable
 
@@ -199,15 +191,17 @@ public class I18NSourceGenerator : IIncrementalGenerator
                   {
               """);
 
-        foreach (var row in rows)
+        foreach (var entry in entries)
         {
-            if (row.Count == 0 || col >= row.Count) continue;
-
-            var key = row[0];
-            var value = row[col];
+            var key = entry.Key;
+            var value = entry.Value;
 
             // Escape quotes in the value
-            value = value.Replace("\"", "\\\"").Replace(Environment.NewLine, "\\n");
+            value = value
+                .Replace("\"", "\\\"")
+                .Replace(Environment.NewLine, "\\n")
+                .Replace("\r", "\\n")
+                .Replace("\n", "\\n");
 
             sb.AppendLine($"        Add(\"{key}\", \"{value}\");");
         }
@@ -221,14 +215,14 @@ public class I18NSourceGenerator : IIncrementalGenerator
         return sb.ToString();
     }
 
-    private static string GenerateLocaleManagerClass(string tsvPath, List<string> localeNames)
+    private static string GenerateLocaleManagerClass(string resxPath, List<string> localeNames)
     {
         var sb = new StringBuilder();
 
         sb.AppendLine(
             $$"""
               // Generated by Everywhere.I18N.SourceGenerator, do not edit manually
-              // Edit {{Path.GetFileName(tsvPath)}} instead, run the generator or build project to update this file
+              // Edit {{Path.GetFileName(resxPath)}} instead, run the generator or build project to update this file
 
               #nullable enable
 
@@ -242,10 +236,10 @@ public class I18NSourceGenerator : IIncrementalGenerator
                   public static IEnumerable<string> AvailableLocaleNames => Locales.Keys;
 
                   private static readonly Dictionary<string, ResourceDictionary> Locales = new();
-                  private static string? field;
 
                   static LocaleManager()
                   {
+                      Locales.Add("default", new @default());
               """);
 
         foreach (var localeName in localeNames)

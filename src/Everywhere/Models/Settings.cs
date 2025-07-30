@@ -11,6 +11,7 @@ namespace Everywhere.Models;
 /// <summary>
 /// This attribute is used to mark properties that should not be serialized or displayed in the UI.
 /// </summary>
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Field)]
 public class HiddenSettingsAttribute : Attribute;
 
 public class SettingsBase : TrackableObject<SettingsBase>
@@ -43,7 +44,7 @@ public partial class CommonSettings() : SettingsBase("Common")
     [SettingsSelectionItem(ItemsSource = nameof(LanguageSource))]
     public string Language
     {
-        get => LocaleManager.CurrentLocale ?? CultureInfo.CurrentUICulture.Name;
+        get => LocaleManager.CurrentLocale ?? CultureInfo.CurrentUICulture.Parent.Name.ToLower();
         set
         {
             if (LocaleManager.CurrentLocale == value) return;

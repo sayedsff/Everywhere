@@ -51,7 +51,8 @@
 
     <ItemGroup>
       <None Remove="i18n.tsv" />
-      <AdditionalFiles Include="i18n.tsv" />
+      <EmbeddedResource Remove="I18N\*.resx" />
+      <AdditionalFiles Include="I18N\*.resx" />
     </ItemGroup>
 
     <!--    <ItemGroup>-->
