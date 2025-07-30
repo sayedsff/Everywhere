@@ -11,7 +11,7 @@ using ZLinq;
 
 namespace Everywhere.Chat;
 
-public class ChatContextManager(Settings settings, IChatDatabase chatDatabase) : ObservableObject, IChatContextManager, IAsyncInitializer
+public partial class ChatContextManager(Settings settings, IChatDatabase chatDatabase) : ObservableObject, IChatContextManager, IAsyncInitializer
 {
     public NotifyCollectionChangedSynchronizedViewList<ChatMessageNode> ChatMessageNodes =>
         Current.ToNotifyCollectionChanged(
@@ -91,12 +91,8 @@ public class ChatContextManager(Settings settings, IChatDatabase chatDatabase) :
         OnPropertyChanged(nameof(ChatMessageNodes));
     }
 
-    public void UpdateHistory()
-    {
-        OnPropertyChanged(nameof(History));
-    }
-
-    public void Remove(ChatContext chatContext)
+    [RelayCommand]
+    private void Remove(ChatContext chatContext)
     {
         if (!history.Remove(chatContext, out var dbItem)) return;
 
@@ -116,6 +112,18 @@ public class ChatContextManager(Settings settings, IChatDatabase chatDatabase) :
             }
         }
 
+        OnPropertyChanged(nameof(History));
+    }
+
+    [RelayCommand]
+    private void Rename(ChatContext chatContext)
+    {
+        foreach (var other in history.Keys) other.IsRenamingMetadataTitle = false;
+        chatContext.IsRenamingMetadataTitle = true;
+    }
+
+    public void UpdateHistory()
+    {
         OnPropertyChanged(nameof(History));
     }
 

@@ -47,8 +47,8 @@ public partial class DynamicResourceKey(object key) : DynamicResourceKeyBase
     [return: NotNullIfNotNull(nameof(key))]
     public static implicit operator DynamicResourceKey?(string? key) => key == null ? null : new DynamicResourceKey(key);
 
-    public static string? Resolve(object key) =>
-        Application.Current!.Resources.TryGetResource(key, null, out var resource) ? resource?.ToString() : key.ToString();
+    public static string Resolve(object key) =>
+        (Application.Current!.Resources.TryGetResource(key, null, out var resource) ? resource?.ToString() : key.ToString()) ?? string.Empty;
 
     public override string? ToString() => Resolve(Key);
 }

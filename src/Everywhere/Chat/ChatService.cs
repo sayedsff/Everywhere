@@ -121,7 +121,8 @@ public class ChatService(
                             // TODO: "google" => new GoogleConnector(webSearchApiKey, webSearchEndPoint),
                             "brave" => new BraveConnector(webSearchApiKey, webSearchEndPoint),
                             "bocha" => new BoChaConnector(webSearchApiKey, webSearchEndPoint),
-                            _ => new BingConnector(webSearchApiKey, webSearchEndPoint)
+                            "bing" => new BingConnector(webSearchApiKey, webSearchEndPoint),
+                            _ => throw new NotSupportedException($"Web search provider '{modelSettings.WebSearchProvider}' is not supported.")
                         }),
                     "web_search");
             }
@@ -235,6 +236,7 @@ public class ChatService(
         }
         finally
         {
+            assistantChatMessage.FinishedAt = DateTimeOffset.UtcNow;
             assistantChatMessage.IsBusy = false;
         }
 

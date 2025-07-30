@@ -4,9 +4,10 @@ namespace Everywhere.Views;
 
 public class OverlayWindow : Window
 {
-    public OverlayWindow()
+    public OverlayWindow(WindowBase? owner = null)
     {
-        Topmost = true;
+        Owner = owner;
+
         CanResize = false;
         ShowInTaskbar = false;
         ShowActivated = false;
@@ -30,12 +31,10 @@ public class OverlayWindow : Window
         if (element == null)
         {
             Hide();
-            Topmost = false;
         }
         else
         {
             Show();
-            Topmost = true;
             var boundingRectangle = element.BoundingRectangle;
             Position = new PixelPoint(boundingRectangle.X, boundingRectangle.Y);
             var scaling = DesktopScaling;

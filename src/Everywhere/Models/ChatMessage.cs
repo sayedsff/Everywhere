@@ -55,6 +55,12 @@ public partial class AssistantChatMessage : ChatMessage
     [ObservableProperty]
     public partial DynamicResourceKeyBase? ErrorMessageKey { get; set; }
 
+    [Key(2)]
+    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+
+    [Key(3)]
+    public DateTimeOffset FinishedAt { get; set; } = DateTimeOffset.UtcNow;
+
     public AssistantChatMessage()
     {
         MarkdownBuilder = new ObservableStringBuilder();
@@ -93,6 +99,9 @@ public partial class UserChatMessage(string userPrompt, IReadOnlyList<ChatAttach
         set => Dispatcher.UIThread.InvokeOnDemand(() => Inlines.Reset(value.Select(i => i.ToInline())));
     }
 
+    [Key(3)]
+    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+
     public override string ToString() => UserPrompt;
 }
 
@@ -120,6 +129,9 @@ public partial class ActionChatMessage : ChatMessage
     [Key(4)]
     [ObservableProperty]
     public partial DynamicResourceKeyBase? ErrorMessageKey { get; set; }
+
+    [Key(5)]
+    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 
     [SerializationConstructor]
     private ActionChatMessage() { }

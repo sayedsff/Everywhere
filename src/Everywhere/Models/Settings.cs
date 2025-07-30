@@ -122,6 +122,12 @@ public partial class ModelSettings() : SettingsBase("Model")
 [HiddenSettings]
 public partial class InternalSettings() : SettingsBase("Internal")
 {
+    /// <summary>
+    /// Used to popup welcome dialog on first launch and update.
+    /// </summary>
+    [ObservableProperty]
+    public partial string? PreviousLaunchVersion { get; set; }
+
     [ObservableProperty]
     public partial bool IsImageEnabled { get; set; }
 

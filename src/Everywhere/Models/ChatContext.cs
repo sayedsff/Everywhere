@@ -17,6 +17,10 @@ public partial class ChatContext : ObservableObject, IEnumerable<ChatMessageNode
     public ChatContextMetadata Metadata { get; }
 
     [IgnoreMember]
+    [ObservableProperty]
+    public partial bool IsRenamingMetadataTitle { get; set; }
+
+    [IgnoreMember]
     public int MessageCount => branchNodes.Count;
 
     /// <summary>

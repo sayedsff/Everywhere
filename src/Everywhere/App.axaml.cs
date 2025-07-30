@@ -1,3 +1,4 @@
+using System.Reflection;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
@@ -18,6 +19,8 @@ namespace Everywhere;
 
 public class App : Application
 {
+    private Mutex? appMutex;
+
     public TopLevel TopLevel { get; } = new Window();
 
     private TransientWindow? mainWindow, debugWindow;
@@ -79,6 +82,20 @@ public class App : Application
                 NativeMessageBoxButtons.Ok,
                 NativeMessageBoxIcon.Error);
         }
+
+        appMutex = new Mutex(true, "EverywhereAppMutex", out var createdNew);
+        if (createdNew) return;
+
+#if !DEBUG
+        NativeMessageBox.Show(
+            DynamicResourceKey.Resolve(LocaleKey.Common_Info),
+            DynamicResourceKey.Resolve(LocaleKey.App_EverywhereIsAlreadyRunning),
+            NativeMessageBoxButtons.Ok,
+            NativeMessageBoxIcon.Information);
+        Environment.Exit(0);
+#endif
+
+        SetValue(TrayIcon.IconsProperty, [this.FindResource("TrayIcon").NotNull<TrayIcon>()]);
     }
 
     public override void OnFrameworkInitializationCompleted()
@@ -88,6 +105,7 @@ public class App : Application
             case IClassicDesktopStyleApplicationLifetime:
             {
                 DisableAvaloniaDataAnnotationValidation();
+                ShowWelcomePageWhenNeeded();
                 break;
             }
         }
@@ -104,6 +122,22 @@ public class App : Application
         {
             BindingPlugins.DataValidators.Remove(plugin);
         }
+    }
+
+    private void ShowWelcomePageWhenNeeded()
+    {
+        var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString();
+        var settings = ServiceLocator.Resolve<Settings>();
+        if (settings.Internal.PreviousLaunchVersion == version) return;
+
+        ShowWindow<MainView>(ref mainWindow);
+        settings.Internal.PreviousLaunchVersion = version;
+    }
+
+    public override string? ToString()
+    {
+        GC.KeepAlive(appMutex);
+        return base.ToString();
     }
 
     private void HandleOpenMainWindowMenuItemClicked(object? sender, EventArgs e)

@@ -142,16 +142,9 @@ public partial class ChatInputBox : TextBox
 
     private IDisposable? sendButtonClickSubscription;
     private IDisposable? chatAttachmentItemsControlPointerMovedSubscription;
-    private IDisposable? attachmentItemsControlPointerExitedSubscription;
+    private IDisposable? chatAttachmentItemsControlPointerExitedSubscription;
 
-    private readonly OverlayWindow visualElementAttachmentOverlayWindow = new()
-    {
-        Content = new Border
-        {
-            Background = Brushes.DodgerBlue,
-            Opacity = 0.2
-        },
-    };
+    private readonly Lazy<OverlayWindow> visualElementAttachmentOverlayWindow;
 
     static ChatInputBox()
     {
@@ -160,6 +153,15 @@ public partial class ChatInputBox : TextBox
 
     public ChatInputBox()
     {
+        visualElementAttachmentOverlayWindow = new Lazy<OverlayWindow>(() => new OverlayWindow(TopLevel.GetTopLevel(this) as WindowBase)
+        {
+            Content = new Border
+            {
+                Background = Brushes.DodgerBlue,
+                Opacity = 0.2
+            },
+        }, LazyThreadSafetyMode.None);
+
         this.AddDisposableHandler(KeyDownEvent, HandleTextBoxKeyDown, RoutingStrategies.Tunnel);
     }
 
@@ -169,7 +171,7 @@ public partial class ChatInputBox : TextBox
 
         sendButtonClickSubscription?.Dispose();
         chatAttachmentItemsControlPointerMovedSubscription?.Dispose();
-        attachmentItemsControlPointerExitedSubscription?.Dispose();
+        chatAttachmentItemsControlPointerExitedSubscription?.Dispose();
 
         // We handle the click event of the SendButton here instead of using Command binding,
         // because we need to clear the text after sending the message.
@@ -195,15 +197,15 @@ public partial class ChatInputBox : TextBox
                 {
                     element = element.Parent;
                     if (element is not { DataContext: ChatVisualElementAttachment attachment }) continue;
-                    visualElementAttachmentOverlayWindow.UpdateForVisualElement(attachment.Element);
+                    visualElementAttachmentOverlayWindow.Value.UpdateForVisualElement(attachment.Element);
                     return;
                 }
-                visualElementAttachmentOverlayWindow.UpdateForVisualElement(null);
+                visualElementAttachmentOverlayWindow.Value.UpdateForVisualElement(null);
             },
             handledEventsToo: true);
-        attachmentItemsControlPointerExitedSubscription = chatAttachmentItemsControl.AddDisposableHandler(
+        chatAttachmentItemsControlPointerExitedSubscription = chatAttachmentItemsControl.AddDisposableHandler(
             PointerExitedEvent,
-            (_, _) => visualElementAttachmentOverlayWindow.UpdateForVisualElement(null),
+            (_, _) => visualElementAttachmentOverlayWindow.Value.UpdateForVisualElement(null),
             handledEventsToo: true);
     }
 

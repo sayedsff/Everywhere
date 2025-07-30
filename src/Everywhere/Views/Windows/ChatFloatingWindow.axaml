@@ -73,6 +73,18 @@
             <Setter Property="CornerRadius" Value="8.5"/>
             <Setter Property="Padding" Value="0"/>
           </Style>
+
+          <Style Selector="MenuFlyoutPresenter">
+            <Setter Property="Background" Value="{DynamicResource SecondaryColor}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource AcrylicBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8.5"/>
+            <Setter Property="Padding" Value="0"/>
+
+            <Style Selector="^ MenuItem.MenuFlyoutMenuItem /template/ Border#HoverBackground">
+              <Setter Property="Background" Value="{DynamicResource SecondaryCardBackgroundColor}"/>
+            </Style>
+          </Style>
         </StackPanel.Styles>
 
         <Button
@@ -82,29 +94,135 @@
           <Button.Flyout>
             <Flyout ShowMode="Transient">
               <ScrollViewer
-                MinWidth="160" MaxHeight="400"
+                Width="200" MaxHeight="400"
                 HorizontalContentAlignment="Stretch" HorizontalScrollBarVisibility="Disabled"
                 VerticalScrollBarVisibility="Auto">
                 <ItemsControl
                   Margin="8" Padding="0"
                   ItemsSource="{Binding ChatContextManager.History}">
+                  <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                      <StackPanel
+                        Orientation="Vertical" Spacing="8"/>
+                    </ItemsPanelTemplate>
+                  </ItemsControl.ItemsPanel>
+
                   <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="m:ChatContextHistory">
                       <StackPanel
                         Orientation="Vertical" Spacing="4">
                         <TextBlock
-                          HorizontalAlignment="Left" FontSize="16"
+                          Classes="Muted" HorizontalAlignment="Left"
+                          FontSize="12"
                           Text="{Binding Date}"/>
+
                         <ListBox
                           Padding="0" Background="Transparent"
                           BorderThickness="0"
                           ItemsSource="{Binding Contexts}"
+                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                           SelectedItem="{Binding $parent[v:ChatFloatingWindow].((vm:ChatFloatingWindowViewModel)DataContext).ChatContextManager.Current, FallbackValue={x:Null}}">
-                          <ListBox.DataTemplates>
+                          <ListBox.Styles>
+                            <Style Selector="Button.More">
+                              <Setter Property="Padding" Value="4"/>
+                            </Style>
+
+                            <Style Selector="LucideIcon.MenuFlyoutIcon">
+                              <Setter Property="Width" Value="14"/>
+                              <Setter Property="Height" Value="14"/>
+                              <Setter Property="Size" Value="14"/>
+                            </Style>
+                          </ListBox.Styles>
+
+                          <ListBox.ItemContainerTheme>
+                            <ControlTheme TargetType="ListBoxItem">
+                              <Style Selector="^:pointerover">
+                                <Setter Property="Background" Value="{DynamicResource CardBackgroundColor}"/>
+
+                                <Style Selector="^ Button.More">
+                                  <Setter Property="IsVisible" Value="True"/>
+                                  <Setter Property="Height" Value="28"/>
+                                  <Setter Property="CornerRadius" Value="4"/>
+                                </Style>
+                              </Style>
+
+                              <Style Selector="^:selected">
+                                <Setter Property="Background" Value="{DynamicResource SecondaryCardBackgroundColor}"/>
+
+                                <Style Selector="^ Border#SelectedBorder">
+                                  <Setter Property="Background" Value="{DynamicResource PrimaryColor}"/>
+                                </Style>
+                              </Style>
+
+                              <Setter Property="Background" Value="Transparent"/>
+                              <Setter Property="Template">
+                                <ControlTemplate TargetType="ListBoxItem">
+                                  <DockPanel
+                                    Height="28" LastChildFill="True">
+                                    <Border
+                                      x:Name="SelectedBorder" DockPanel.Dock="Left"
+                                      Width="4" Margin="0,2,2,2"
+                                      CornerRadius="2"/>
+
+                                    <Border
+                                      Background="{TemplateBinding Background}"
+                                      CornerRadius="4">
+                                      <DockPanel LastChildFill="True">
+                                        <Button
+                                          Classes="Ghost More" DockPanel.Dock="Right"
+                                          MinWidth="28" MinHeight="28"
+                                          IsVisible="False">
+                                          <LucideIcon
+                                            Kind="Ellipsis" Size="16"/>
+
+                                          <Button.Flyout>
+                                            <MenuFlyout Placement="BottomEdgeAlignedLeft">
+                                              <MenuItem
+                                                Classes="MenuFlyoutMenuItem"
+                                                Command="{Binding $parent[v:ChatFloatingWindow].((vm:ChatFloatingWindowViewModel)DataContext).ChatContextManager.RenameCommand, FallbackValue={x:Null}}"
+                                                CommandParameter="{Binding $parent[ListBoxItem].Content}"
+                                                Header="{I18N {x:Static LocaleKey.ChatFloatingWindow_HistoryAction_Rename}}">
+                                                <MenuItem.Icon>
+                                                  <LucideIcon
+                                                    Classes="MenuFlyoutIcon" Kind="Pencil"/>
+                                                </MenuItem.Icon>
+                                              </MenuItem>
+                                              <MenuItem
+                                                Classes="MenuFlyoutMenuItem"
+                                                Command="{Binding $parent[v:ChatFloatingWindow].((vm:ChatFloatingWindowViewModel)DataContext).ChatContextManager.RemoveCommand, FallbackValue={x:Null}}"
+                                                CommandParameter="{Binding $parent[ListBoxItem].Content}"
+                                                Foreground="{DynamicResource ErrorColor}"
+                                                Header="{I18N {x:Static LocaleKey.ChatFloatingWindow_HistoryAction_Delete}}">
+                                                <MenuItem.Icon>
+                                                  <LucideIcon
+                                                    Classes="MenuFlyoutIcon"
+                                                    Foreground="{DynamicResource ErrorColor}"
+                                                    Kind="Trash"/>
+                                                </MenuItem.Icon>
+                                              </MenuItem>
+                                            </MenuFlyout>
+                                          </Button.Flyout>
+                                        </Button>
+
+                                        <ContentPresenter
+                                          Margin="4,0" VerticalAlignment="Center"
+                                          Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"/>
+                                      </DockPanel>
+                                    </Border>
+                                  </DockPanel>
+                                </ControlTemplate>
+                              </Setter>
+                            </ControlTheme>
+                          </ListBox.ItemContainerTheme>
+
+                          <ListBox.ItemTemplate>
                             <DataTemplate DataType="m:ChatContext">
-                              <TextBlock Text="{Binding Metadata.Topic, TargetNullValue={I18N {x:Static LocaleKey.ChatContext_Metadata_Title_Default}}}"/>
+                              <TextBlock
+                                Text="{Binding Metadata.Topic, TargetNullValue={I18N {x:Static LocaleKey.ChatContext_Metadata_Title_Default}}}"
+                                TextTrimming="CharacterEllipsis"/>
                             </DataTemplate>
-                          </ListBox.DataTemplates>
+                          </ListBox.ItemTemplate>
                         </ListBox>
                       </StackPanel>
                     </DataTemplate>
@@ -501,7 +619,9 @@
                                   <LucideIcon.IsVisible>
                                     <MultiBinding Converter="{x:Static BoolConverters.And}">
                                       <Binding Path="!IsBusy"/>
-                                      <Binding Path="!ErrorMessageKey"/>
+                                      <Binding
+                                        Converter="{x:Static ObjectConverters.IsNull}"
+                                        Path="ErrorMessageKey"/>
                                     </MultiBinding>
                                   </LucideIcon.IsVisible>
                                 </LucideIcon>
@@ -512,14 +632,16 @@
                                   <LucideIcon.IsVisible>
                                     <MultiBinding Converter="{x:Static BoolConverters.And}">
                                       <Binding Path="!IsBusy"/>
-                                      <Binding Path="!!ErrorMessageKey"/>
+                                      <Binding
+                                        Converter="{x:Static ObjectConverters.IsNotNull}"
+                                        Path="ErrorMessageKey"/>
                                     </MultiBinding>
                                   </LucideIcon.IsVisible>
                                 </LucideIcon>
                               </StackPanel>
                             </Expander.Header>
 
-                            <!-- <SelectableTextBlock Inlines="{Binding InlineCollection}"/> -->
+                            <!--  TODO: Steps  -->
                           </Expander>
                         </Border>
                       </DataTemplate>

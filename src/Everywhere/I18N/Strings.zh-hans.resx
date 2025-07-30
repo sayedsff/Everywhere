@@ -458,4 +458,19 @@
     <data name="AboutPage_OpenSourceNotice" xml:space="preserve">
         <value>开放源代码通知</value>
     </data>
+    <data name="App_EverywhereIsAlreadyRunning" xml:space="preserve">
+        <value>Everywhere 已在运行，请检查托盘图标。</value>
+    </data>
+    <data name="Common_Info" xml:space="preserve">
+        <value>提示</value>
+    </data>
+    <data name="MainView_EverywhereHasMinimizedToTray" xml:space="preserve">
+        <value>Everywhere 已最小化到托盘</value>
+    </data>
+    <data name="ChatFloatingWindow_HistoryAction_Rename" xml:space="preserve">
+        <value>重命名</value>
+    </data>
+    <data name="ChatFloatingWindow_HistoryAction_Delete" xml:space="preserve">
+        <value>删除</value>
+    </data>
 </root>

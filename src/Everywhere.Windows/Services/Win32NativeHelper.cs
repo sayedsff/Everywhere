@@ -17,6 +17,7 @@ using Avalonia.Threading;
 using Everywhere.Interfaces;
 using Everywhere.Windows.Interop;
 using MicroCom.Runtime;
+using Vector = Avalonia.Vector;
 using Visual = Windows.UI.Composition.Visual;
 
 namespace Everywhere.Windows.Services;
@@ -288,7 +289,7 @@ public class Win32NativeHelper : INativeHelper
 
             var bitmap = new WriteableBitmap(
                 new PixelSize(width, height),
-                new Avalonia.Vector(96, 96),
+                new Vector(96, 96),
                 PixelFormat.Bgra8888,
                 AlphaFormat.Unpremul);
             using var buffer = bitmap.Lock();

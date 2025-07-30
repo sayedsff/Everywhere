@@ -67,6 +67,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 		.github\workflows\release.yml = .github\workflows\release.yml
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{30A74410-E803-4C56-BE95-C8E1BE690C7A}"
+	ProjectSection(SolutionItems) = preProject
+		tools\build_vcproj.ps1 = tools\build_vcproj.ps1
+		tools\installer.nsi = tools\installer.nsi
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

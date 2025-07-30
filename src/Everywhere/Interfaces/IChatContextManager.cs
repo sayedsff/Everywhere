@@ -15,7 +15,9 @@ public interface IChatContextManager : INotifyPropertyChanged
 
     IRelayCommand CreateNewCommand { get; }
 
-    void UpdateHistory();
+    IRelayCommand<ChatContext> RenameCommand { get; }
 
-    void Remove(ChatContext chatContext);
+    IRelayCommand<ChatContext> RemoveCommand { get; }
+    
+    void UpdateHistory();
 }
