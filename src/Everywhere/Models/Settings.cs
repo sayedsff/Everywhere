@@ -16,6 +16,7 @@ public class HiddenSettingsAttribute : Attribute;
 
 public class SettingsBase : TrackableObject<SettingsBase>
 {
+    [JsonIgnore]
     public string Section { get; }
 
     protected SettingsBase(string section)
@@ -44,7 +45,26 @@ public partial class CommonSettings() : SettingsBase("Common")
     [SettingsSelectionItem(ItemsSource = nameof(LanguageSource))]
     public string Language
     {
-        get => LocaleManager.CurrentLocale ?? CultureInfo.CurrentUICulture.Parent.Name.ToLower();
+        get
+        {
+            var currentLocale = LocaleManager.CurrentLocale;
+            if (currentLocale is not null) return currentLocale;
+
+            var cultureInfo = CultureInfo.CurrentUICulture;
+            while (!string.IsNullOrEmpty(cultureInfo.Name))
+            {
+                var nameLowered = cultureInfo.Name.ToLower();
+                if (LocaleManager.AvailableLocaleNames.Contains(nameLowered))
+                {
+                    currentLocale = nameLowered;
+                    break;
+                }
+
+                cultureInfo = cultureInfo.Parent;
+            }
+
+            return LocaleManager.CurrentLocale = currentLocale ?? "default";
+        }
         set
         {
             if (LocaleManager.CurrentLocale == value) return;
