@@ -20,9 +20,6 @@
   </h1>
 
   <p align="center">
-    <br />
-    <h2>🚧 NOTICE: This project is under active development and is not yet ready for use 🚧</h2>
-    <br />
     <a href="https://everywhere.nekora.dev"><strong>(WIP) Explore the docs »</strong></a>
     <br />
     <br />
@@ -170,8 +167,8 @@
 | Platform | Minimum Version |
 |----------|-----------------|
 | Windows  | 10.0.19041.0    |
-| macOS    | *Planned*       |
-| Linux    | *Planned*       |
+| macOS    | **Comming soon**|
+| Linux    | **Comming soon**|
 
 ---
 
@@ -179,7 +176,27 @@
 
 ### Installation
 
-> **Note**: Pre‑built installers are not yet available; build from source for now.
+- Windows
+  
+  Download here: [Latest Release](https://github.com/DearVa/Everywhere/releases/latest)
+
+  Where the `Everywhere-Windows-x64-Setup-vx.x.x.exe` is installer package and the `Everywhere-Windows-x64-vx.x.x.zip` is install-free package. Their content are in the same.
+
+- Mac OS and Linux
+  
+  Currently not supported but **coming soon**.
+
+### Documents
+
+Visit here: [Official Docs](https://everywhere.nekora.dev)
+
+Document is in development. Contributions are welcomed.
+
+### Support
+
+[![](https://dcbadge.limes.pink/api/server/5fyg6nE3yn)](https://discord.gg/5fyg6nE3yn)
+
+[Join QQ Group](https://qm.qq.com/cgi-bin/qm/qr?k=wp9aDBBnLc7pYATqT99tB-N2ZP2ETmJC&jump_from=webapi&authKey=97qUJfsQoI70dUNcgBZ0C3HCZeiEn8inLT7pzg8x+KinbQwfIrHFu3dB2+aHMbRD)
 
 ---
 
