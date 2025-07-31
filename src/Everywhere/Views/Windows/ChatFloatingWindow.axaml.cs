@@ -3,7 +3,6 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
-using Avalonia.Threading;
 using CommunityToolkit.Mvvm.Input;
 using LiveMarkdown.Avalonia;
 
@@ -38,19 +37,15 @@ public partial class ChatFloatingWindow : ReactiveWindow<ChatFloatingWindowViewM
         set => SetValue(PlacementProperty, value);
     }
 
-    private readonly INativeHelper nativeHelper;
     private readonly ILauncher launcher;
 
-    public ChatFloatingWindow(INativeHelper nativeHelper, ILauncher launcher)
+    public ChatFloatingWindow(ILauncher launcher)
     {
-        this.nativeHelper = nativeHelper;
         this.launcher = launcher;
 
         InitializeComponent();
-        // nativeHelper.SetWindowNoFocus(this);
 
         ViewModel.PropertyChanged += HandleViewModelPropertyChanged;
-        BackgroundBorder.PropertyChanged += HandleBackgroundBorderPropertyChanged;
         ChatInputBox.PastingFromClipboard += HandlePastingFromClipboard;
     }
 
@@ -64,34 +59,12 @@ public partial class ChatFloatingWindow : ReactiveWindow<ChatFloatingWindowViewM
             Show();
             Topmost = false;
             Topmost = true;
+            ChatInputBox.Focus();
         }
         else
         {
             Hide();
         }
-    }
-
-    private void HandleBackgroundBorderPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
-    {
-        if (e.Property != Border.CornerRadiusProperty || e.NewValue is not CornerRadius cornerRadius) return;
-        nativeHelper.SetWindowCornerRadius(this, cornerRadius);
-    }
-
-    protected override void OnLoaded(RoutedEventArgs e)
-    {
-        base.OnLoaded(e);
-
-        CalculatePositionAndPlacement();
-
-        // Make the window topmost
-        Topmost = false;
-        Topmost = true;
-
-        Dispatcher.UIThread.InvokeAsync(
-            () => nativeHelper.SetWindowCornerRadius(this, BackgroundBorder.CornerRadius),
-            DispatcherPriority.Loaded);
-
-        ChatInputBox.Focus();
     }
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)

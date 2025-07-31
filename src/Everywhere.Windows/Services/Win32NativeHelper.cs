@@ -224,21 +224,23 @@ public class Win32NativeHelper : INativeHelper
             }
             else
             {
-                var topRight = (float)Math.Min(cornerRadius.TopRight * scale, cornerRadiusLimit);
-                var bottomRight = (float)Math.Min(cornerRadius.BottomRight * scale, cornerRadiusLimit);
-                var bottomLeft = (float)Math.Min(cornerRadius.BottomLeft * scale, cornerRadiusLimit);
+                throw new NotImplementedException();
 
-                CreateComplexRoundedRectangleCompositionPath(
-                    width,
-                    height,
-                    topLeft,
-                    topRight,
-                    bottomRight,
-                    bottomLeft,
-                    out var pathGeometryPtr).ThrowOnFailure();
-                var pathGeometry = CompositionPath.FromAbi(pathGeometryPtr);
-                using var compositionGeometry = compositor.CreatePathGeometry(pathGeometry);
-                rootVisual.Clip = compositionContext.Clip = compositor.CreateGeometricClip(compositionGeometry);
+                // var topRight = (float)Math.Min(cornerRadius.TopRight * scale, cornerRadiusLimit);
+                // var bottomRight = (float)Math.Min(cornerRadius.BottomRight * scale, cornerRadiusLimit);
+                // var bottomLeft = (float)Math.Min(cornerRadius.BottomLeft * scale, cornerRadiusLimit);
+
+                // CreateComplexRoundedRectangleCompositionPath(
+                //     width,
+                //     height,
+                //     topLeft,
+                //     topRight,
+                //     bottomRight,
+                //     bottomLeft,
+                //     out var pathGeometryPtr).ThrowOnFailure();
+                // var pathGeometry = CompositionPath.FromAbi(pathGeometryPtr);
+                // using var compositionGeometry = compositor.CreatePathGeometry(pathGeometry);
+                // rootVisual.Clip = compositionContext.Clip = compositor.CreateGeometricClip(compositionGeometry);
             }
         }
     }
@@ -325,14 +327,4 @@ public class Win32NativeHelper : INativeHelper
     {
         public CompositionClip? Clip { get; set; }
     }
-
-    [DllImport("Everywhere.Windows.InteropHelper.dll", ExactSpelling = true)]
-    private static extern HRESULT CreateComplexRoundedRectangleCompositionPath(
-        float width,
-        float height,
-        float topLeft,
-        float topRight,
-        float bottomRight,
-        float bottomLeft,
-        out nint pCompositionPath);
 }

@@ -28,15 +28,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3rd", "3rd", "{53D93485-152
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Everywhere.Windows.TextService", "src\Everywhere.Windows.TextService\Everywhere.Windows.TextService.vcxproj", "{D5F1DA2F-CE8F-4F35-A2C2-6DC5378211DF}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Everywhere.I18N.SourceGenerator", "src\Everywhere.I18N.SourceGenerator\Everywhere.I18N.SourceGenerator.csproj", "{A68C1BEB-0FC2-4A47-BFEB-E96BB14A9913}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WritableJsonConfiguration", "3rd\WritableJsonConfiguration\src\WritableJsonConfiguration\WritableJsonConfiguration.csproj", "{85AE2A7B-E780-4741-9BE5-FB22F37D7E21}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShadUI", "3rd\shad-ui\src\ShadUI\ShadUI.csproj", "{BCD7009B-3ACA-4FD4-8C64-70DCD2E39D4F}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Everywhere.Windows.InteropHelper", "src\Everywhere.Windows.InteropHelper\Everywhere.Windows.InteropHelper.vcxproj", "{C53E2EB6-688B-467B-96BB-1749E8E9A72E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{9933B251-881A-4638-8995-EB7CC5370002}"
 EndProject
@@ -118,16 +114,6 @@ Global
 		{ABC31E74-02FF-46EB-B3B2-4E6AE43B456C}.Release|x64.Build.0 = Release|Any CPU
 		{ABC31E74-02FF-46EB-B3B2-4E6AE43B456C}.Release|x86.ActiveCfg = Release|Any CPU
 		{ABC31E74-02FF-46EB-B3B2-4E6AE43B456C}.Release|x86.Build.0 = Release|Any CPU
-		{D5F1DA2F-CE8F-4F35-A2C2-6DC5378211DF}.Debug|Any CPU.ActiveCfg = Debug|x64
-		{D5F1DA2F-CE8F-4F35-A2C2-6DC5378211DF}.Debug|Any CPU.Build.0 = Debug|x64
-		{D5F1DA2F-CE8F-4F35-A2C2-6DC5378211DF}.Debug|ARM64.ActiveCfg = Debug|x64
-		{D5F1DA2F-CE8F-4F35-A2C2-6DC5378211DF}.Debug|x64.ActiveCfg = Debug|x64
-		{D5F1DA2F-CE8F-4F35-A2C2-6DC5378211DF}.Debug|x86.ActiveCfg = Debug|x64
-		{D5F1DA2F-CE8F-4F35-A2C2-6DC5378211DF}.Release|Any CPU.ActiveCfg = Release|x64
-		{D5F1DA2F-CE8F-4F35-A2C2-6DC5378211DF}.Release|Any CPU.Build.0 = Release|x64
-		{D5F1DA2F-CE8F-4F35-A2C2-6DC5378211DF}.Release|ARM64.ActiveCfg = Release|x64
-		{D5F1DA2F-CE8F-4F35-A2C2-6DC5378211DF}.Release|x64.ActiveCfg = Release|x64
-		{D5F1DA2F-CE8F-4F35-A2C2-6DC5378211DF}.Release|x86.ActiveCfg = Release|x64
 		{A68C1BEB-0FC2-4A47-BFEB-E96BB14A9913}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A68C1BEB-0FC2-4A47-BFEB-E96BB14A9913}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A68C1BEB-0FC2-4A47-BFEB-E96BB14A9913}.Debug|ARM64.ActiveCfg = Debug|Any CPU
@@ -176,22 +162,6 @@ Global
 		{BCD7009B-3ACA-4FD4-8C64-70DCD2E39D4F}.Release|x64.Build.0 = Release|x64
 		{BCD7009B-3ACA-4FD4-8C64-70DCD2E39D4F}.Release|x86.ActiveCfg = Release|Any CPU
 		{BCD7009B-3ACA-4FD4-8C64-70DCD2E39D4F}.Release|x86.Build.0 = Release|Any CPU
-		{C53E2EB6-688B-467B-96BB-1749E8E9A72E}.Debug|Any CPU.ActiveCfg = Debug|x64
-		{C53E2EB6-688B-467B-96BB-1749E8E9A72E}.Debug|Any CPU.Build.0 = Debug|x64
-		{C53E2EB6-688B-467B-96BB-1749E8E9A72E}.Debug|ARM64.ActiveCfg = Debug|x64
-		{C53E2EB6-688B-467B-96BB-1749E8E9A72E}.Debug|ARM64.Build.0 = Debug|x64
-		{C53E2EB6-688B-467B-96BB-1749E8E9A72E}.Debug|x64.ActiveCfg = Debug|x64
-		{C53E2EB6-688B-467B-96BB-1749E8E9A72E}.Debug|x64.Build.0 = Debug|x64
-		{C53E2EB6-688B-467B-96BB-1749E8E9A72E}.Debug|x86.ActiveCfg = Debug|x64
-		{C53E2EB6-688B-467B-96BB-1749E8E9A72E}.Debug|x86.Build.0 = Debug|x64
-		{C53E2EB6-688B-467B-96BB-1749E8E9A72E}.Release|Any CPU.ActiveCfg = Release|x64
-		{C53E2EB6-688B-467B-96BB-1749E8E9A72E}.Release|Any CPU.Build.0 = Release|x64
-		{C53E2EB6-688B-467B-96BB-1749E8E9A72E}.Release|ARM64.ActiveCfg = Release|x64
-		{C53E2EB6-688B-467B-96BB-1749E8E9A72E}.Release|ARM64.Build.0 = Release|x64
-		{C53E2EB6-688B-467B-96BB-1749E8E9A72E}.Release|x64.ActiveCfg = Release|x64
-		{C53E2EB6-688B-467B-96BB-1749E8E9A72E}.Release|x64.Build.0 = Release|x64
-		{C53E2EB6-688B-467B-96BB-1749E8E9A72E}.Release|x86.ActiveCfg = Release|x64
-		{C53E2EB6-688B-467B-96BB-1749E8E9A72E}.Release|x86.Build.0 = Release|x64
 		{0E6C8529-D309-43F3-90BC-619EF9E6B1F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0E6C8529-D309-43F3-90BC-619EF9E6B1F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0E6C8529-D309-43F3-90BC-619EF9E6B1F1}.Debug|ARM64.ActiveCfg = Debug|Any CPU

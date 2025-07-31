@@ -7,26 +7,20 @@
   xmlns:vc="clr-namespace:Everywhere.ValueConverters" xmlns:vm="clr-namespace:Everywhere.ViewModels"
   x:DataType="vm:ChatFloatingWindowViewModel" x:TypeArguments="vm:ChatFloatingWindowViewModel"
   Background="Transparent" CanResize="False"
+  ExtendClientAreaChromeHints="NoChrome" ExtendClientAreaToDecorationsHint="True"
   IsOpened="{Binding IsOpened, Mode=OneWayToSource}"
   RequestedThemeVariant="{x:Static themes:ThemeVariants.Acrylic}"
-  ShowActivated="True" ShowInTaskbar="False"
-  SizeToContent="WidthAndHeight" SystemDecorations="None"
+  ShowInTaskbar="False" SizeToContent="WidthAndHeight"
+  SystemDecorations="BorderOnly"
   TargetBoundingRect="{Binding TargetBoundingRect}"
   Topmost="True" TransparencyLevelHint="AcrylicBlur"
   WindowStartupLocation="Manual">
 
   <Grid
     x:Name="RootGrid" RowDefinitions="*,Auto">
-    <Border
-      x:Name="BackgroundBorder" Grid.Row="0"
-      Grid.RowSpan="2"
-      BorderBrush="{DynamicResource AcrylicBorderBrush}"
-      BorderThickness="1" CornerRadius="16,16,20,20"/>
-
     <ExperimentalAcrylicBorder
       x:Name="ExperimentalAcrylicBorder" Grid.Row="0"
-      Grid.RowSpan="2"
-      CornerRadius="{Binding CornerRadius, ElementName=BackgroundBorder}">
+      Grid.RowSpan="2">
       <ExperimentalAcrylicBorder.Material>
         <ExperimentalAcrylicMaterial
           MaterialOpacity="0.6" TintColor="Black"
@@ -253,7 +247,7 @@
       <TextBlock
         Classes="Large" Margin="8,0,0,0"
         VerticalAlignment="Center" IsHitTestVisible="False"
-        Text="{Binding Title^, FallbackValue={x:Null}}"/>
+        Text="{I18N {x:Static LocaleKey.ChatFloatingWindow_Title}}"/>
     </DockPanel>
 
     <Panel Grid.Row="1">
@@ -655,13 +649,14 @@
 
         <shadui:Card
           Padding="0" BorderThickness="0,1,0,0"
-          CornerRadius="0,0,18,18">
+          CornerRadius="0">
           <v:ChatInputBox
             x:Name="ChatInputBox" Margin="8"
             AcceptsReturn="True"
             CancelCommand="{Binding CancelCommand}"
             ChatAttachmentItemsSource="{Binding ChatAttachments}"
             Command="{Binding SendMessageCommand}"
+            Focusable="True"
             IsImageEnabled="{Binding Settings.Internal.IsImageEnabled, Mode=TwoWay}"
             IsImageSupported="{Binding Settings.Model.IsImageSupported}"
             IsSendButtonEnabled="{Binding !IsBusy}"
