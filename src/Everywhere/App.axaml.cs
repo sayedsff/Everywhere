@@ -4,41 +4,22 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media.Imaging;
-using Everywhere.Utils;
-using Everywhere.Views;
-using Window = Avalonia.Controls.Window;
 using Everywhere.Enums;
 using Everywhere.Models;
+using Everywhere.Utils;
+using Everywhere.Views;
 using Everywhere.Views.Pages;
 using Microsoft.Extensions.DependencyInjection;
 using ShadUI;
+using Window = Avalonia.Controls.Window;
 
 namespace Everywhere;
 
 public class App : Application
 {
-    private readonly static Mutex AppMutex;
-
     public TopLevel TopLevel { get; } = new Window();
 
     private TransientWindow? mainWindow, debugWindow;
-
-    static App()
-    {
-#if DEBUG
-        AppMutex = null!; // axaml designer may launch this code, so we need to set it to null.
-#else
-        AppMutex = new Mutex(true, "EverywhereAppMutex", out var createdNew);
-        if (createdNew) return;
-
-        NativeMessageBox.Show(
-            "Info",
-            "Everywhere is already running. Please check your system tray for the application window.",
-            NativeMessageBoxButtons.Ok,
-            NativeMessageBoxIcon.Information);
-        Environment.Exit(0);
-#endif
-    }
 
     public override void Initialize()
     {
@@ -137,12 +118,6 @@ public class App : Application
         ShowWindow<MainView>(ref mainWindow);
     }
 
-    public override string? ToString()
-    {
-        GC.KeepAlive(AppMutex);
-        return base.ToString();
-    }
-
     private void HandleOpenMainWindowMenuItemClicked(object? sender, EventArgs e)
     {
         ShowWindow<MainView>(ref mainWindow);
@@ -196,7 +171,6 @@ public class App : Application
 }
 
 #if DEBUG
-
 file class DesignTimeRuntimeConstantProvider : IRuntimeConstantProvider
 {
     public object? this[RuntimeConstantType type] => null;

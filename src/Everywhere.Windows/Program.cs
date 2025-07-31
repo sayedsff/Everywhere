@@ -16,10 +16,10 @@ using Everywhere.Views.Pages;
 using Everywhere.Windows.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.KernelMemory.AI;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.TextGeneration;
+using Serilog;
 using ShadUI;
 using WritableJsonConfiguration;
 
@@ -30,11 +30,13 @@ public static class Program
     [STAThread]
     public static void Main(string[] args)
     {
+        Entrance.Initialize(args);
+
         ServiceLocator.Build(x => x
 
                 #region Basic
 
-                .AddSingleton(typeof(ILogger<>), typeof(ConsoleLogger<>))
+                .AddLogging(builder => builder.AddSerilog(dispose: true))
                 .AddSingleton<IRuntimeConstantProvider, RuntimeConstantProvider>()
                 .AddSingleton<IVisualElementContext, Win32VisualElementContext>()
                 .AddSingleton<IHotkeyListener, Win32HotkeyListener>()
@@ -166,25 +168,4 @@ public static class Program
             .UsePlatformDetect()
             .WithInterFont()
             .LogToTrace();
-
-    private class ConsoleLogger<TCategory> : ILogger<TCategory>
-    {
-        public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
-
-        public bool IsEnabled(LogLevel logLevel) => true;
-
-        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
-        {
-            switch (logLevel)
-            {
-                case LogLevel.Error:
-                case LogLevel.Critical:
-                    Console.Error.WriteLine(formatter(state, exception));
-                    break;
-                default:
-                    Console.WriteLine(formatter(state, exception));
-                    break;
-            }
-        }
-    }
 }

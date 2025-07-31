@@ -242,6 +242,46 @@ License:   MIT
 
 --------------------------------------------------------------------------------
 
+Serilog
+
+Id:        Serilog
+Version:   4.3.0
+Project:   https://serilog.net/
+Copyright: Copyright © Serilog Contributors
+License:   Apache-2.0
+
+--------------------------------------------------------------------------------
+
+Serilog.Extensions.Logging
+
+Id:        Serilog.Extensions.Logging
+Version:   9.0.2
+Project:   https://github.com/serilog/serilog-extensions-logging
+Copyright:
+License:   Apache-2.0
+
+--------------------------------------------------------------------------------
+
+Serilog.Sinks.Console
+
+Id:        Serilog.Sinks.Console
+Version:   6.0.0
+Project:   https://github.com/serilog/serilog-sinks-console
+Copyright:
+License:   Apache-2.0
+
+--------------------------------------------------------------------------------
+
+Serilog.Sinks.File
+
+Id:        Serilog.Sinks.File
+Version:   7.0.0
+Project:   https://github.com/serilog/serilog-sinks-file
+Copyright:
+License:   Apache-2.0
+
+--------------------------------------------------------------------------------
+
 Microsoft.KernelMemory.Core
 
 Id:        Microsoft.KernelMemory.Core

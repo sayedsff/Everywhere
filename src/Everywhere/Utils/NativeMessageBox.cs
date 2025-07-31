@@ -40,10 +40,10 @@ public static partial class NativeMessageBox
 
     private class ExceptionHandlerImpl : IExceptionHandler
     {
-        public void HandleException(Exception exception, string? message = null, object? source = null)
+        public void HandleException(Exception exception, string? message = null, object? source = null, int lineNumber = 0)
         {
             Show(
-                "Error",
+                $"Error at [{source}:{lineNumber}]",
                 $"{message ?? "An error occurred."}\n\n{exception.GetFriendlyMessage()}",
                 NativeMessageBoxButtons.Ok,
                 NativeMessageBoxIcon.Error);

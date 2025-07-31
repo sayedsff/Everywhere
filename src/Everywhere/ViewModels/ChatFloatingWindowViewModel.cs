@@ -36,9 +36,6 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
     [ObservableProperty]
     public partial PixelRect TargetBoundingRect { get; private set; }
 
-    [ObservableProperty]
-    public partial DynamicResourceKey? Title { get; private set; }
-
     [field: AllowNull, MaybeNull]
     public NotifyCollectionChangedSynchronizedViewList<ChatAttachment> ChatAttachments =>
         field ??= chatAttachments.ToNotifyCollectionChangedSlim(SynchronizationContextCollectionEventDispatcher.Current);
@@ -151,67 +148,71 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
                 }
 
                 TargetBoundingRect = targetElement.BoundingRectangle;
-                Title = LocaleKey.ChatFloatingWindow_Title;
                 chatAttachments.Clear();
                 chatAttachments.Add(await Task.Run(() => CreateFromVisualElement(targetElement), token));
                 IsOpened = true;
             },
-            flags: ExecutionFlags.EnqueueIfBusy,
-            cancellationToken: cancellationToken);
+            logger.ToExceptionHandler(),
+            ExecutionFlags.EnqueueIfBusy,
+            cancellationToken);
     }
 
     [RelayCommand(CanExecute = nameof(IsNotBusy))]
-    private async Task AddElementAsync(PickElementMode mode)
-    {
-        if (chatAttachments.Count >= Settings.Internal.MaxChatAttachmentCount) return;
+    private Task AddElementAsync(PickElementMode mode) => ExecuteBusyTaskAsync(
+        async cancellationToken =>
+        {
+            if (chatAttachments.Count >= Settings.Internal.MaxChatAttachmentCount) return;
 
-        if (await visualElementContext.PickElementAsync(mode) is not { } element) return;
-        if (chatAttachments.OfType<ChatVisualElementAttachment>().Any(a => a.Element.Id == element.Id)) return;
-        chatAttachments.Add(await Task.Run(() => CreateFromVisualElement(element)));
-    }
+            if (await visualElementContext.PickElementAsync(mode) is not { } element) return;
+            if (chatAttachments.OfType<ChatVisualElementAttachment>().Any(a => a.Element.Id == element.Id)) return;
+            chatAttachments.Add(await Task.Run(() => CreateFromVisualElement(element), cancellationToken));
+        },
+        logger.ToExceptionHandler());
 
     [RelayCommand(CanExecute = nameof(IsNotBusy))]
-    public async Task AddClipboardAsync()
-    {
-        if (chatAttachments.Count >= Settings.Internal.MaxChatAttachmentCount) return;
-
-        var formats = await Clipboard.GetFormatsAsync();
-        if (formats.Length == 0)
+    private Task AddClipboardAsync() => ExecuteBusyTaskAsync(
+        async _ =>
         {
-            logger.LogInformation("Clipboard is empty.");
-            return;
-        }
+            if (chatAttachments.Count >= Settings.Internal.MaxChatAttachmentCount) return;
 
-        if (formats.Contains(DataFormats.Files))
-        {
-            var files = await Clipboard.GetDataAsync(DataFormats.Files);
-            if (files is IEnumerable enumerable)
+            var formats = await Clipboard.GetFormatsAsync();
+            if (formats.Length == 0)
             {
-                foreach (var storageItem in enumerable.OfType<IStorageItem>())
+                logger.LogInformation("Clipboard is empty.");
+                return;
+            }
+
+            if (formats.Contains(DataFormats.Files))
+            {
+                var files = await Clipboard.GetDataAsync(DataFormats.Files);
+                if (files is IEnumerable enumerable)
                 {
-                    var uri = storageItem.Path;
-                    if (!uri.IsFile) break;
-                    await AddFileUncheckAsync(uri.AbsolutePath);
-                    if (chatAttachments.Count >= Settings.Internal.MaxChatAttachmentCount) break;
+                    foreach (var storageItem in enumerable.OfType<IStorageItem>())
+                    {
+                        var uri = storageItem.Path;
+                        if (!uri.IsFile) break;
+                        await AddFileUncheckAsync(uri.AbsolutePath);
+                        if (chatAttachments.Count >= Settings.Internal.MaxChatAttachmentCount) break;
+                    }
                 }
             }
-        }
-        else if (Settings.Model.IsImageSupported)
-        {
-            if (await nativeHelper.GetClipboardBitmapAsync() is not { } bitmap) return;
+            else if (Settings.Model.IsImageSupported)
+            {
+                if (await nativeHelper.GetClipboardBitmapAsync() is not { } bitmap) return;
 
-            chatAttachments.Add(new ChatImageAttachment(DynamicResourceKey.Empty, await ResizeImageOnDemandAsync(bitmap)));
-        }
+                chatAttachments.Add(new ChatImageAttachment(DynamicResourceKey.Empty, await ResizeImageOnDemandAsync(bitmap)));
+            }
 
-        // TODO: add as text attachment when text is too long
-        // else if (formats.Contains(DataFormats.Text))
-        // {
-        //     var text = await Clipboard.GetTextAsync();
-        //     if (text.IsNullOrEmpty()) return;
-        //
-        //     chatAttachments.Add(new ChatTextAttachment(new DirectResourceKey(text.SafeSubstring(0, 10)), text));
-        // }
-    }
+            // TODO: add as text attachment when text is too long
+            // else if (formats.Contains(DataFormats.Text))
+            // {
+            //     var text = await Clipboard.GetTextAsync();
+            //     if (text.IsNullOrEmpty()) return;
+            //
+            //     chatAttachments.Add(new ChatTextAttachment(new DirectResourceKey(text.SafeSubstring(0, 10)), text));
+            // }
+        },
+        logger.ToExceptionHandler());
 
     private async static ValueTask<Bitmap> ResizeImageOnDemandAsync(Bitmap image, int maxWidth = 2560, int maxHeight = 2560)
     {
@@ -368,11 +369,13 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
 
             await ChatService.SendMessageAsync(userMessage, cancellationToken);
         },
+        logger.ToExceptionHandler(),
         cancellationToken: cancellationTokenSource.Token);
 
     [RelayCommand(CanExecute = nameof(IsNotBusy))]
     private Task RetryAsync(ChatMessageNode chatMessageNode) => ExecuteBusyTaskAsync(
         cancellationToken => ChatService.RetryAsync(chatMessageNode, cancellationToken),
+        logger.ToExceptionHandler(),
         cancellationToken: cancellationTokenSource.Token);
 
     [RelayCommand(CanExecute = nameof(IsBusy))]

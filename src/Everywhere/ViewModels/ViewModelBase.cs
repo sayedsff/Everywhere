@@ -12,11 +12,11 @@ public abstract class ReactiveViewModelBase : ObservableValidator
     protected static DialogManager DialogManager { get; } = ServiceLocator.Resolve<DialogManager>();
     protected static ToastManager ToastManager { get; } = ServiceLocator.Resolve<ToastManager>();
 
-    protected static AnonymousExceptionHandler DialogExceptionHandler => new((exception, message, source) =>
-        DialogManager.CreateDialog($"[{source}] {message ?? "Error"}", exception.GetFriendlyMessage().ToString() ?? "Unknown error"));
+    protected static AnonymousExceptionHandler DialogExceptionHandler => new((exception, message, source, lineNumber) =>
+        DialogManager.CreateDialog($"[{source}:{lineNumber}] {message ?? "Error"}", exception.GetFriendlyMessage().ToString() ?? "Unknown error"));
 
-    protected static AnonymousExceptionHandler ToastExceptionHandler => new((exception, message, source) =>
-        ToastManager.CreateToast($"[{source}] {message ?? "Error"}")
+    protected static AnonymousExceptionHandler ToastExceptionHandler => new((exception, message, source, lineNumber) =>
+        ToastManager.CreateToast($"[{source}:{lineNumber}] {message ?? "Error"}")
             .WithContent(exception.GetFriendlyMessage().ToTextBlock())
             .DismissOnClick()
             .ShowError());

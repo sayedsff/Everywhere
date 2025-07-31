@@ -28,6 +28,10 @@
         <PackageReference Include="Microsoft.SemanticKernel.Connectors.OpenAI"/>
         <PackageReference Include="Microsoft.SemanticKernel.Plugins.Web"/>
         <PackageReference Include="ObservableCollections"/>
+        <PackageReference Include="Serilog" />
+        <PackageReference Include="Serilog.Extensions.Logging" />
+        <PackageReference Include="Serilog.Sinks.Console" />
+        <PackageReference Include="Serilog.Sinks.File" />
         <PackageReference Include="System.Drawing.Common"/>
         <PackageReference Include="Tokenizers.DotNet"/>
         <PackageReference Include="Tokenizers.DotNet.runtime.win-x64"/>

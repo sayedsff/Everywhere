@@ -1,13 +1,15 @@
 ﻿using Avalonia.Threading;
 using Everywhere.Models;
 using Everywhere.Views;
+using Microsoft.Extensions.Logging;
 
 namespace Everywhere.Initialization;
 
 public class HotkeyInitializer(
     Settings settings,
     IHotkeyListener hotkeyListener,
-    IVisualElementContext visualElementContext
+    IVisualElementContext visualElementContext,
+    ILogger<HotkeyInitializer> logger
 ) : IAsyncInitializer
 {
     public int Priority => 0;
@@ -25,16 +27,19 @@ public class HotkeyInitializer(
         hotkeyListener.KeyboardHotkey = settings.Behavior.AssistantHotkey;
         hotkeyListener.KeyboardHotkeyActivated += () =>
         {
-            var element = visualElementContext.KeyboardFocusedElement?
-                    .GetAncestors(true)
-                    .CurrentAndNext()
-                    .FirstOrDefault(t => t.Current.Type == VisualElementType.TextEdit || t.Current.ProcessId != t.Next.ProcessId).Current ??
-                visualElementContext.PointerOverElement?
-                    .GetAncestors(true)
-                    .LastOrDefault();
-            if (element == null) return;
-            Dispatcher.UIThread.InvokeOnDemandAsync(() =>
-                ServiceLocator.Resolve<ChatFloatingWindow>().ViewModel.TryFloatToTargetElementAsync(element).Detach()).Detach();
+            ThreadPool.QueueUserWorkItem(_ =>
+            {
+                var element = visualElementContext.KeyboardFocusedElement?
+                        .GetAncestors(true)
+                        .CurrentAndNext()
+                        .FirstOrDefault(t => t.Current.Type == VisualElementType.TextEdit || t.Current.ProcessId != t.Next.ProcessId).Current ??
+                    visualElementContext.PointerOverElement?
+                        .GetAncestors(true)
+                        .LastOrDefault();
+                if (element == null) return;
+                Dispatcher.UIThread.Invoke(() =>
+                    ServiceLocator.Resolve<ChatFloatingWindow>().ViewModel.TryFloatToTargetElementAsync(element).Detach(logger.ToExceptionHandler()));
+            });
         };
         // hotkeyListener.PointerHotkeyActivated += point =>
         // {

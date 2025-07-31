@@ -6,31 +6,17 @@ public static class LoggingExtension
 {
     public static AnonymousExceptionHandler ToExceptionHandler(this ILogger logger)
     {
-        return new AnonymousExceptionHandler((exception, message, source) =>
+        return new AnonymousExceptionHandler((exception, message, source, lineNumber) =>
         {
-            if (message is null)
-            {
-                logger.LogError(exception, "[{Source}]", source);
-            }
-            else
-            {
-                logger.LogError(exception, "[{Source}] {Message}", source, message);
-            }
+            logger.LogError(exception, "[{MemberName}: {LineNumber}] {Message}", source, lineNumber, message);
         });
     }
 
     public static AnonymousExceptionHandler<T> ToExceptionHandler<T>(this ILogger<T> logger)
     {
-        return new AnonymousExceptionHandler<T>((exception, message, source) =>
+        return new AnonymousExceptionHandler<T>((exception, message, source, lineNumber) =>
         {
-            if (message is null)
-            {
-                logger.LogError(exception, "[{Source}]", source);
-            }
-            else
-            {
-                logger.LogError(exception, "[{Source}] {Message}", source, message);
-            }
+            logger.LogError(exception, "[{MemberName}:{LineNumber}] {Message}", source, lineNumber, message);
         });
     }
 }
