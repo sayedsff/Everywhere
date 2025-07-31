@@ -20,9 +20,6 @@
   </h1>
 
   <p align="center">
-    <br />
-    <h2>🚧 注意：本项目正在积极开发，尚无法投入使用 🚧</h2>
-    <br/>
     <a href="https://everywhere.nekora.dev/zh-CN/"><strong>（开发中）查看文档 »</strong></a>
     <br />
     <br />
@@ -171,8 +168,8 @@
 | 平台      | 最低版本         |
 |---------|--------------|
 | Windows | 10.0.19041.0 |
-| macOS   | *计划支持*       |
-| Linux   | *计划支持*       |
+| macOS   | **即将到来**       |
+| Linux   | **即将到来**       |
 
 ---
 
@@ -180,7 +177,28 @@
 
 ### 安装
 
-> **注意**：目前尚无发行版，仅支持从源码构建。
+
+- Windows
+  
+  在这里下载 [最新发布版本](https://github.com/DearVa/Everywhere/releases/latest)
+
+  其中 `Everywhere-Windows-x64-Setup-vx.x.x.exe` 是安装包，`Everywhere-Windows-x64-vx.x.x.zip` 是免安装版。它们的内容完全一样。
+
+- Mac OS 和 Linux
+  
+  目前尚不支持，但**即将到来**。
+
+### 文档
+
+访问 [官方文档](https://everywhere.nekora.dev)
+
+文档正在建设中，欢迎贡献！
+
+### 支持
+
+[![](https://dcbadge.limes.pink/api/server/5fyg6nE3yn)](https://discord.gg/5fyg6nE3yn)
+
+[加入 QQ 群](https://qm.qq.com/cgi-bin/qm/qr?k=wp9aDBBnLc7pYATqT99tB-N2ZP2ETmJC&jump_from=webapi&authKey=97qUJfsQoI70dUNcgBZ0C3HCZeiEn8inLT7pzg8x+KinbQwfIrHFu3dB2+aHMbRD)
 
 ---
 
