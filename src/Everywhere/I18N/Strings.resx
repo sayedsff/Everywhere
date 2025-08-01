@@ -517,4 +517,13 @@ Tip: You can reopen this message by clicking “About - Welcome Page”.</value>
     <data name="WelcomeView_FeatureRequest" xml:space="preserve">
         <value>Feature Request</value>
     </data>
+    <data name="WelcomeView_ReportBugUri" xml:space="preserve">
+        <value>https://github.com/DearVa/Everywhere/issues/new?template=bug-report.yml</value>
+    </data>
+    <data name="WelcomeView_FeatureRequestUri" xml:space="preserve">
+        <value>https://github.com/DearVa/Everywhere/issues/new?template=feature-request.yml</value>
+    </data>
+    <data name="WelcomeView_Discord" xml:space="preserve">
+        <value>Discord</value>
+    </data>
 </root>

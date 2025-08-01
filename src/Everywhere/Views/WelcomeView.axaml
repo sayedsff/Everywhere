@@ -1,8 +1,9 @@
 ﻿<UserControl
   x:Class="Everywhere.Views.WelcomeView" xmlns="https://github.com/avaloniaui"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" d:DesignHeight="450"
-  d:DesignWidth="800" mc:Ignorable="d">
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:vc="clr-namespace:Everywhere.ValueConverters"
+  d:DesignHeight="450" d:DesignWidth="800"
+  mc:Ignorable="d">
   <StackPanel
     Margin="32,20" HorizontalAlignment="Center"
     VerticalAlignment="Center" Spacing="16">
@@ -37,12 +38,17 @@
       <HyperlinkButton
         VerticalAlignment="Center"
         Content="{I18N {x:Static LocaleKey.WelcomeView_ReportBug}}"
-        NavigateUri="https://github.com/DearVa/Everywhere/issues/new?labels=bug&amp;template=bug-report.md"
+        NavigateUri="{I18N {x:Static LocaleKey.WelcomeView_ReportBugUri}, Converter={x:Static vc:CommonConverters.StringToUri}}"
         TextElement.Foreground="{DynamicResource InfoColor}"/>
       <HyperlinkButton
         VerticalAlignment="Center"
         Content="{I18N {x:Static LocaleKey.WelcomeView_FeatureRequest}}"
-        NavigateUri="https://github.com/DearVa/Everywhere/issues/new?labels=enhancement&amp;template=enhancement.md"
+        NavigateUri="{I18N {x:Static LocaleKey.WelcomeView_FeatureRequestUri}, Converter={x:Static vc:CommonConverters.StringToUri}}"
+        TextElement.Foreground="{DynamicResource InfoColor}"/>
+      <HyperlinkButton
+        VerticalAlignment="Center"
+        Content="{I18N {x:Static LocaleKey.WelcomeView_Discord}}"
+        NavigateUri="https://discord.gg/5fyg6nE3yn"
         TextElement.Foreground="{DynamicResource InfoColor}"/>
       <HyperlinkButton
         VerticalAlignment="Center"

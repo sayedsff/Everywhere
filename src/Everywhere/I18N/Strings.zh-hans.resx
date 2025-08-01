@@ -498,4 +498,13 @@
     <data name="WelcomeView_FeatureRequest" xml:space="preserve">
         <value>功能请求</value>
     </data>
+    <data name="WelcomeView_ReportBugUri" xml:space="preserve">
+        <value>https://github.com/DearVa/Everywhere/issues/new?template=bug-report-zh.yml</value>
+    </data>
+    <data name="WelcomeView_FeatureRequestUri" xml:space="preserve">
+        <value>https://github.com/DearVa/Everywhere/issues/new?template=feature-request-zh.yml</value>
+    </data>
+    <data name="WelcomeView_Discord" xml:space="preserve">
+        <value>Discord</value>
+    </data>
 </root>

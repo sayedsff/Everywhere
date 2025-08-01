@@ -247,7 +247,7 @@ indent_style = space
 indent_size = 4
 tab_width = 4
 
-[*.{axaml,html,xaml,xml}]
+[*.{axaml,html,xaml,xml,yml}]
 indent_style = space
 indent_size = 2
 tab_width = 2

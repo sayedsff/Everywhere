@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using Avalonia.Data;
+using Avalonia.Data.Converters;
 using Avalonia.Markup.Xaml;
 using Avalonia.Metadata;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,6 +14,12 @@ public class I18NExtension : MarkupExtension
 
     [Content, AssignBinding]
     public object[] Arguments { get; set; } = [];
+
+    public IValueConverter? Converter { get; set; }
+
+    public object? ConverterParameter { get; set; }
+
+    public CultureInfo? ConverterCulture { get; set; }
 
     public I18NExtension() { }
 
@@ -29,7 +37,14 @@ public class I18NExtension : MarkupExtension
             }).ToArray()) :
             new DynamicResourceKey(Key);
         return target?.TargetProperty is AvaloniaProperty ?
-            dynamicResourceKey.ToBinding() :
+            new Binding
+            {
+                Path = "Self^",
+                Source = dynamicResourceKey,
+                Converter = Converter,
+                ConverterParameter = ConverterParameter,
+                ConverterCulture = ConverterCulture,
+            } :
             dynamicResourceKey.ToString() ?? string.Empty; // Only AvaloniaProperty can resolve binding, otherwise return resolved string
     }
 }
