@@ -24,4 +24,6 @@ public interface INativeHelper
     /// </summary>
     /// <returns></returns>
     Task<WriteableBitmap?> GetClipboardBitmapAsync();
+
+    void ShowDesktopNotification(string message, string? title = null);
 }

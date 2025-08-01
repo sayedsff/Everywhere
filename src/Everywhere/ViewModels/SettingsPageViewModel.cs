@@ -180,7 +180,7 @@ public class SettingsPageViewModel : ReactiveViewModelBase
         {
             if (s.GetType().GetCustomAttribute<HiddenSettingsAttribute>() is not null) return;
             debounceHelper.Execute(() => Dispatcher.UIThread.Invoke(() => ToastManager
-                .CreateToast(DynamicResourceKey.Resolve(LocaleKey.SettingsPage_Saved_Toast_Title))
+                .CreateToast(LocaleKey.SettingsPage_Saved_Toast_Title.I18N())
                 .OnBottomRight()
                 .DismissOnClick()
                 .WithDelay(1)

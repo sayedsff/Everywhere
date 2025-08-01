@@ -201,6 +201,7 @@ file class DesignTimeNativeHelper : INativeHelper
     public void SetWindowCornerRadius(Window window, CornerRadius cornerRadius) { }
     public void HideWindowWithoutAnimation(Window window) { }
     public Task<WriteableBitmap?> GetClipboardBitmapAsync() => Task.FromResult<WriteableBitmap?>(null);
+    public void ShowDesktopNotification(string message, string? title) { }
 }
 
 #endif

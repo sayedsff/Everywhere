@@ -148,6 +148,12 @@ public partial class InternalSettings() : SettingsBase("Internal")
     [ObservableProperty]
     public partial string? PreviousLaunchVersion { get; set; }
 
+    /// <summary>
+    /// Pop a tray notification when the application is launched for the first time.
+    /// </summary>
+    [ObservableProperty]
+    public partial bool IsFirstTimeHideToTrayIcon { get; set; } = true;
+
     [ObservableProperty]
     public partial bool IsImageEnabled { get; set; }
 

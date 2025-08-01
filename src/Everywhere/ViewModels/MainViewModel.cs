@@ -25,20 +25,19 @@ public partial class MainViewModel(IServiceProvider serviceProvider, Settings se
     protected internal override Task ViewLoaded(CancellationToken cancellationToken)
     {
         pages.Reset(
-            serviceProvider.GetServices<IMainViewPage>().Select(
-                p => new SidebarItem
+            serviceProvider.GetServices<IMainViewPage>().Select(p => new SidebarItem
+            {
+                [ContentControl.ContentProperty] = new TextBlock
                 {
-                    [ContentControl.ContentProperty] = new TextBlock
-                    {
-                        Classes = { "p" },
-                        [!TextBlock.TextProperty] = p.Title.ToBinding()
-                    },
-                    [SidebarItem.RouteProperty] = p,
-                    Icon = new LucideIcon { Kind = p.Icon, Size = 20 }
-                }));
+                    Classes = { "p" },
+                    [!TextBlock.TextProperty] = p.Title.ToBinding()
+                },
+                [SidebarItem.RouteProperty] = p,
+                Icon = new LucideIcon { Kind = p.Icon, Size = 20 }
+            }));
         SelectedPage = pages.FirstOrDefault();
 
-        ShowWelcomeDialogOnNeeded();
+        ShowWelcomeDialogOnDemand();
 
         return base.ViewLoaded(cancellationToken);
     }
@@ -46,7 +45,7 @@ public partial class MainViewModel(IServiceProvider serviceProvider, Settings se
     /// <summary>
     /// Shows the welcome dialog if the application is launched for the first time or after an update.
     /// </summary>
-    private void ShowWelcomeDialogOnNeeded()
+    private void ShowWelcomeDialogOnDemand()
     {
         var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString();
         if (settings.Internal.PreviousLaunchVersion == version) return;
@@ -57,5 +56,20 @@ public partial class MainViewModel(IServiceProvider serviceProvider, Settings se
             .Show();
 
         settings.Internal.PreviousLaunchVersion = version;
+    }
+
+    protected internal override Task ViewUnloaded()
+    {
+        ShowHideToTrayNotificationOnDemand();
+
+        return base.ViewUnloaded();
+    }
+
+    private void ShowHideToTrayNotificationOnDemand()
+    {
+        if (!settings.Internal.IsFirstTimeHideToTrayIcon) return;
+
+        ServiceLocator.Resolve<INativeHelper>().ShowDesktopNotification(LocaleKey.MainView_EverywhereHasMinimizedToTray.I18N());
+        settings.Internal.IsFirstTimeHideToTrayIcon = false;
     }
 }

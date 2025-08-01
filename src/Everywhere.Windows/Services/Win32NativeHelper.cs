@@ -1,8 +1,10 @@
 ﻿using System.Numerics;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using Windows.Data.Xml.Dom;
 using Windows.UI.Composition;
 using Windows.UI.Composition.Desktop;
+using Windows.UI.Notifications;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Dwm;
@@ -17,6 +19,7 @@ using Avalonia.Threading;
 using Everywhere.Interfaces;
 using Everywhere.Windows.Interop;
 using MicroCom.Runtime;
+using Microsoft.Win32;
 using Vector = Avalonia.Vector;
 using Visual = Windows.UI.Composition.Visual;
 
@@ -322,6 +325,53 @@ public class Win32NativeHelper : INativeHelper
             PInvoke.CloseClipboard();
         }
     });
+
+    public void ShowDesktopNotification(string message, string? title)
+    {
+        const string ModelId = "Everywhere-{FF7A2913-28D0-4BC2-A5BC-F2CF62FF6F1F}";
+        var registryKey = Registry.CurrentUser.CreateSubKey(@"Software\Classes\AppUserModelId");
+        var subKey = registryKey.CreateSubKey(ModelId);
+        subKey.SetValue("DisplayName", "Everywhere");
+
+        var iconResource = AssetLoader.Open(new Uri("avares://Everywhere/Assets/Everywhere.ico"));
+        var tempFilePath = Path.Combine(Path.GetTempPath(), $"{ModelId}.ico");
+        using (var fs = File.Create(tempFilePath))
+        {
+            iconResource.CopyTo(fs);
+        }
+
+        subKey.SetValue("IconUri", tempFilePath);
+
+        var xml =
+            $"""
+             <toast launch='conversationId=9813'>
+                 <visual>
+                     <binding template='ToastGeneric'>
+                         {(string.IsNullOrEmpty(title) ? "" : $"<text>{title}</text>")}
+                         <text>{message}</text>
+                     </binding>
+                 </visual>
+             </toast>
+             """;
+        var xmlDocument = new XmlDocument();
+        xmlDocument.LoadXml(xml);
+
+        var toast = new ToastNotification(xmlDocument);
+        ToastNotificationManager.CreateToastNotifier(ModelId).Show(toast);
+
+        toast.Dismissed += delegate
+        {
+            try
+            {
+                registryKey.DeleteSubKey(ModelId);
+                File.Delete(tempFilePath);
+            }
+            catch
+            {
+                // ignore
+            }
+        };
+    }
 
     private record CompositionContext(Compositor Compositor, Visual RootVisual)
     {
