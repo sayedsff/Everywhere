@@ -118,7 +118,7 @@ public partial class ChatFloatingWindow : ReactiveWindow<ChatFloatingWindowViewM
     {
         base.OnLostFocus(e);
 
-        if (!IsKeyboardFocusWithin && !IsWindowPinned)
+        if (!IsActive && !IsWindowPinned)
         {
             IsOpened = false;
         }
