@@ -663,8 +663,8 @@
           Padding="0" BorderThickness="0,1,0,0"
           CornerRadius="0">
           <v:ChatInputBox
-            x:Name="ChatInputBox" Margin="8"
-            AcceptsReturn="True"
+            x:Name="ChatInputBox" MaxHeight="200"
+            Margin="8" AcceptsReturn="True"
             CancelCommand="{Binding CancelCommand}"
             ChatAttachmentItemsSource="{Binding ChatAttachments}"
             Command="{Binding SendMessageCommand}"

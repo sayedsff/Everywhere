@@ -43,31 +43,34 @@
         <Grid
           ColumnDefinitions="*,Auto" RowDefinitions="*,Auto,Auto"
           RowSpacing="4">
-          <Panel
+          <ScrollViewer
             Grid.Row="0" Grid.Column="0"
             Grid.ColumnSpan="2" Margin="2,0"
-            Background="Transparent" Cursor="IBeam">
-            <TextBlock
-              FontSize="{TemplateBinding FontSize}"
-              IsVisible="{TemplateBinding Text, Converter={x:Static StringConverters.IsNullOrEmpty}}"
-              Opacity="0.5"
-              Text="{TemplateBinding Watermark}"
-              TextAlignment="{TemplateBinding TextAlignment}"
-              TextWrapping="{TemplateBinding TextWrapping}"/>
-            <TextPresenter
-              x:Name="PART_TextPresenter"
-              CaretBrush="{TemplateBinding CaretBrush}"
-              CaretIndex="{TemplateBinding CaretIndex}"
-              SelectionBrush="{TemplateBinding SelectionBrush}"
-              SelectionEnd="{TemplateBinding SelectionEnd}"
-              SelectionForegroundBrush="{TemplateBinding SelectionForegroundBrush}"
-              SelectionStart="{TemplateBinding SelectionStart}"
-              Text="{TemplateBinding Text, Mode=TwoWay}"
-              TextAlignment="{TemplateBinding TextAlignment}"
-              TextBlock.FontSize="{TemplateBinding FontSize}"
-              TextBlock.Foreground="{TemplateBinding Foreground}"
-              TextWrapping="{TemplateBinding TextWrapping}"/>
-          </Panel>
+            HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <Panel
+              Background="Transparent" Cursor="IBeam">
+              <TextBlock
+                FontSize="{TemplateBinding FontSize}"
+                IsVisible="{TemplateBinding Text, Converter={x:Static StringConverters.IsNullOrEmpty}}"
+                Opacity="0.5"
+                Text="{TemplateBinding Watermark}"
+                TextAlignment="{TemplateBinding TextAlignment}"
+                TextWrapping="{TemplateBinding TextWrapping}"/>
+              <TextPresenter
+                x:Name="PART_TextPresenter"
+                CaretBrush="{TemplateBinding CaretBrush}"
+                CaretIndex="{TemplateBinding CaretIndex}"
+                SelectionBrush="{TemplateBinding SelectionBrush}"
+                SelectionEnd="{TemplateBinding SelectionEnd}"
+                SelectionForegroundBrush="{TemplateBinding SelectionForegroundBrush}"
+                SelectionStart="{TemplateBinding SelectionStart}"
+                Text="{TemplateBinding Text, Mode=TwoWay}"
+                TextAlignment="{TemplateBinding TextAlignment}"
+                TextBlock.FontSize="{TemplateBinding FontSize}"
+                TextBlock.Foreground="{TemplateBinding Foreground}"
+                TextWrapping="{TemplateBinding TextWrapping}"/>
+            </Panel>
+          </ScrollViewer>
 
           <ScrollViewer
             Grid.Row="1" Grid.Column="0"
