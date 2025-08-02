@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using Avalonia.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Everywhere.Attributes;
+using Everywhere.Enums;
 using Everywhere.Utils;
 
 namespace Everywhere.Models;
@@ -87,6 +88,9 @@ public partial class BehaviorSettings() : SettingsBase("Behavior")
 {
     [ObservableProperty]
     public partial KeyboardHotkey AssistantHotkey { get; set; } = new(Key.E, KeyModifiers.Control | KeyModifiers.Shift);
+
+    [ObservableProperty]
+    public partial ChatFloatingWindowPinMode ChatFloatingWindowPinMode { get; set; }
 }
 
 public partial class ModelSettings() : SettingsBase("Model")
@@ -167,4 +171,7 @@ public partial class InternalSettings() : SettingsBase("Internal")
 
     [ObservableProperty]
     public partial bool IsMainViewSidebarExpanded { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsChatFloatingWindowPinned { get; set; }
 }

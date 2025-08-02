@@ -201,7 +201,7 @@
         <value>创建新会话</value>
     </data>
     <data name="ChatFloatingWindow_Close_ToolTip" xml:space="preserve">
-        <value>关闭</value>
+        <value>关闭 (Esc)</value>
     </data>
     <data name="ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AddScreen" xml:space="preserve">
         <value>添加屏幕</value>
@@ -506,5 +506,26 @@
     </data>
     <data name="WelcomeView_Discord" xml:space="preserve">
         <value>Discord</value>
+    </data>
+    <data name="ChatFloatingWindow_TogglePin_ToolTip" xml:space="preserve">
+        <value>固定窗口 (Ctrl+D)</value>
+    </data>
+    <data name="ChatFloatingWindowPinMode_RemeberLast" xml:space="preserve">
+        <value>记住之前的状态</value>
+    </data>
+    <data name="ChatFloatingWindowPinMode_AlwaysPinned" xml:space="preserve">
+        <value>总是固定</value>
+    </data>
+    <data name="ChatFloatingWindowPinMode_AlwaysUnpinned" xml:space="preserve">
+        <value>总是不固定</value>
+    </data>
+    <data name="ChatFloatingWindowPinMode_PinOnInput" xml:space="preserve">
+        <value>输入时固定</value>
+    </data>
+    <data name="Settings_Behavior_ChatFloatingWindowPinMode_Header" xml:space="preserve">
+        <value>聊天浮动窗口固定模式</value>
+    </data>
+    <data name="Settings_Behavior_ChatFloatingWindowPinMode_Description" xml:space="preserve">
+        <value>指定聊天浮动窗口打开时的固定模式，当窗口没有固定时，失去焦点会自动隐藏。</value>
     </data>
 </root>

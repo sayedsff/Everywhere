@@ -4,6 +4,8 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.Input;
+using Everywhere.Enums;
+using Everywhere.Models;
 using LiveMarkdown.Avalonia;
 
 namespace Everywhere.Views;
@@ -37,33 +39,45 @@ public partial class ChatFloatingWindow : ReactiveWindow<ChatFloatingWindowViewM
         set => SetValue(PlacementProperty, value);
     }
 
-    private readonly ILauncher launcher;
+    public static readonly StyledProperty<bool> IsWindowPinnedProperty = AvaloniaProperty.Register<ChatFloatingWindow, bool>(
+        nameof(IsWindowPinned));
 
-    public ChatFloatingWindow(ILauncher launcher)
+    public bool IsWindowPinned
     {
-        this.launcher = launcher;
-
-        InitializeComponent();
-
-        ViewModel.PropertyChanged += HandleViewModelPropertyChanged;
-        ChatInputBox.PastingFromClipboard += HandlePastingFromClipboard;
+        get => GetValue(IsWindowPinnedProperty);
+        set => SetValue(IsWindowPinnedProperty, value);
     }
 
-    private void HandleViewModelPropertyChanged(object? sender, PropertyChangedEventArgs args)
-    {
-        if (args.PropertyName != nameof(ViewModel.IsOpened)) return;
+    private readonly ILauncher launcher;
+    private readonly Settings settings;
 
-        IsOpened = ViewModel.IsOpened;
-        if (IsOpened)
+    public ChatFloatingWindow(ILauncher launcher, Settings settings)
+    {
+        this.launcher = launcher;
+        this.settings = settings;
+
+        InitializeComponent();
+        AddHandler(KeyDownEvent, HandleKeyDown, RoutingStrategies.Tunnel);
+
+        ViewModel.PropertyChanged += HandleViewModelPropertyChanged;
+        ChatInputBox.TextChanged += HandleChatInputBoxTextChanged;
+        ChatInputBox.PastingFromClipboard += HandleChatInputBoxPastingFromClipboard;
+    }
+
+    private void HandleKeyDown(object? sender, KeyEventArgs e)
+    {
+        switch (e.Key)
         {
-            Show();
-            Topmost = false;
-            Topmost = true;
-            ChatInputBox.Focus();
-        }
-        else
-        {
-            Hide();
+            case Key.Escape when e.KeyModifiers == KeyModifiers.None:
+            {
+                IsOpened = false;
+                break;
+            }
+            case Key.D when e.KeyModifiers == KeyModifiers.Control:
+            {
+                IsWindowPinned = !IsWindowPinned;
+                break;
+            }
         }
     }
 
@@ -79,6 +93,18 @@ public partial class ChatFloatingWindow : ReactiveWindow<ChatFloatingWindowViewM
         {
             CalculatePositionAndPlacement();
         }
+        else if (change.Property == IsWindowPinnedProperty)
+        {
+            var value = change.NewValue is true;
+            settings.Internal.IsChatFloatingWindowPinned = value;
+
+            if (value)
+            {
+                // Pin the window to the topmost level
+                Topmost = false;
+                Topmost = true;
+            }
+        }
     }
 
     protected override void OnSizeChanged(SizeChangedEventArgs e)
@@ -86,6 +112,16 @@ public partial class ChatFloatingWindow : ReactiveWindow<ChatFloatingWindowViewM
         base.OnSizeChanged(e);
 
         ClampToScreen();
+    }
+
+    protected override void OnLostFocus(RoutedEventArgs e)
+    {
+        base.OnLostFocus(e);
+
+        if (!IsKeyboardFocusWithin && !IsWindowPinned)
+        {
+            IsOpened = false;
+        }
     }
 
     private void CalculatePositionAndPlacement()
@@ -185,12 +221,56 @@ public partial class ChatFloatingWindow : ReactiveWindow<ChatFloatingWindowViewM
         BeginMoveDrag(e);
     }
 
+    private void HandleViewModelPropertyChanged(object? sender, PropertyChangedEventArgs args)
+    {
+        if (args.PropertyName != nameof(ViewModel.IsOpened)) return;
+
+        IsOpened = ViewModel.IsOpened;
+        if (IsOpened)
+        {
+            Show();
+            ChatInputBox.Focus();
+
+            switch (settings.Behavior.ChatFloatingWindowPinMode)
+            {
+                case ChatFloatingWindowPinMode.RememberLast:
+                {
+                    IsWindowPinned = settings.Internal.IsChatFloatingWindowPinned;
+                    break;
+                }
+                case ChatFloatingWindowPinMode.AlwaysPinned:
+                {
+                    IsWindowPinned = true;
+                    break;
+                }
+                case ChatFloatingWindowPinMode.AlwaysUnpinned:
+                case ChatFloatingWindowPinMode.PinOnInput:
+                {
+                    IsWindowPinned = false;
+                    break;
+                }
+            }
+        }
+        else
+        {
+            Hide();
+        }
+    }
+
+    private void HandleChatInputBoxTextChanged(object? sender, TextChangedEventArgs e)
+    {
+        if (settings.Behavior.ChatFloatingWindowPinMode == ChatFloatingWindowPinMode.PinOnInput)
+        {
+            IsWindowPinned = true;
+        }
+    }
+
     /// <summary>
     /// TODO: Avalonia says they will support this in 12.0
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void HandlePastingFromClipboard(object? sender, RoutedEventArgs e)
+    private void HandleChatInputBoxPastingFromClipboard(object? sender, RoutedEventArgs e)
     {
         if (!ViewModel.AddClipboardCommand.CanExecute(null)) return;
 

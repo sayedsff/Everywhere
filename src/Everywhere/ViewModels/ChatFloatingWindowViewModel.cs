@@ -82,7 +82,7 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
                 LocaleKey.ChatFloatingWindowViewModel_TextEditActions_Translate,
                 null,
                 SendMessageCommand,
-                $"Translate the content in focused element to {new CultureInfo(Settings.Common.Language).Name}. " +
+                $"Translate the content in focused element to {GetLanguageDisplayName()}. " +
                 $"If it's already in target language, translate it to English. " +
                 $"You MUST only reply with the translated content, without any other text or explanation"
             ),
@@ -104,6 +104,22 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
                 "You MUST only reply with the summarize content, without any other text or explanation"
             )
         ];
+
+        string GetLanguageDisplayName()
+        {
+            try
+            {
+                return Settings.Common.Language switch
+                {
+                    "default" => "English (United States)",
+                    _ => new CultureInfo(Settings.Common.Language).DisplayName
+                };
+            }
+            catch
+            {
+                return "English (United States)";
+            }
+        }
 
         void HandleChatAttachmentsCollectionChanged(in NotifyCollectionChangedEventArgs<ChatAttachment> x)
         {

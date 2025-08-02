@@ -43,8 +43,11 @@
         Orientation="Horizontal" Spacing="4">
         <StackPanel.Styles>
           <Style Selector=":is(Button).TitleBar">
-            <Setter Property="Width" Value="32"/>
-            <Setter Property="Height" Value="32"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="MinHeight" Value="28"/>
+            <Setter Property="MinWidth" Value="28"/>
+            <Setter Property="Width" Value="28"/>
             <Setter Property="Padding" Value="0"/>
             <Setter Property="CornerRadius" Value="4"/>
             <Setter Property="Background" Value="Transparent"/>
@@ -82,7 +85,7 @@
         </StackPanel.Styles>
 
         <Button
-          x:Name="HistoryToggleButton" Classes="Ghost TitleBar"
+          x:Name="HistoryButton" Classes="Ghost TitleBar"
           Command="{Binding ChatContextManager.UpdateHistory}"
           ToolTip.Tip="{I18N {x:Static LocaleKey.ChatFloatingWindow_History_ToolTip}}">
           <Button.Flyout>
@@ -226,15 +229,24 @@
             </Flyout>
           </Button.Flyout>
 
-          <LucideIcon Kind="History"/>
+          <LucideIcon
+            Kind="History" Size="16"/>
         </Button>
 
         <Button
-          Classes="Ghost TitleBar" Margin="0,0,4,0"
+          Classes="Ghost TitleBar"
           Command="{Binding ChatContextManager.CreateNewCommand}"
           ToolTip.Tip="{I18N {x:Static LocaleKey.ChatFloatingWindow_CreateNew_ToolTip}}">
           <LucideIcon Kind="Plus"/>
         </Button>
+
+        <ToggleButton
+          Classes="Ghost TitleBar"
+          IsChecked="{Binding $parent[v:ChatFloatingWindow].IsWindowPinned, Mode=TwoWay}"
+          ToolTip.Tip="{I18N {x:Static LocaleKey.ChatFloatingWindow_TogglePin_ToolTip}}">
+          <LucideIcon
+            Kind="Pin" Size="16"/>
+        </ToggleButton>
 
         <Button
           Classes="Ghost TitleBar Close"

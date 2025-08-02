@@ -215,7 +215,7 @@
         <value>Create New Session</value>
     </data>
     <data name="ChatFloatingWindow_Close_ToolTip" xml:space="preserve">
-        <value>Close</value>
+        <value>Close (Esc)</value>
     </data>
     <data name="ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AddScreen"
         xml:space="preserve">
@@ -525,5 +525,26 @@ Tip: You can reopen this message by clicking “About - Welcome Page”.</value>
     </data>
     <data name="WelcomeView_Discord" xml:space="preserve">
         <value>Discord</value>
+    </data>
+    <data name="ChatFloatingWindow_TogglePin_ToolTip" xml:space="preserve">
+        <value>Pin Window (Ctrl+D)</value>
+    </data>
+    <data name="ChatFloatingWindowPinMode_RemeberLast" xml:space="preserve">
+        <value>Remeber last status</value>
+    </data>
+    <data name="ChatFloatingWindowPinMode_AlwaysPinned" xml:space="preserve">
+        <value>Always pinned</value>
+    </data>
+    <data name="ChatFloatingWindowPinMode_AlwaysUnpinned" xml:space="preserve">
+        <value>Always unpinned</value>
+    </data>
+    <data name="ChatFloatingWindowPinMode_PinOnInput" xml:space="preserve">
+        <value>Pin on input</value>
+    </data>
+    <data name="Settings_Behavior_ChatFloatingWindowPinMode_Header" xml:space="preserve">
+        <value>Chat Floating Window Pin Mode</value>
+    </data>
+    <data name="Settings_Behavior_ChatFloatingWindowPinMode_Description" xml:space="preserve">
+        <value>Specifies the pin mode for the chat floating window when it is opened. When the window is not fixed, it will be hidden automatically when it loses focus.</value>
     </data>
 </root>
