@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-windows:
-    runs-on: windows-2022
+    runs-on: windows-latest
 
     steps:
     - name: Enable long paths in git
@@ -32,9 +32,6 @@ jobs:
       with:
         nsis-version: '3.11'
 
-    - name: Restore dependencies
-      run: dotnet restore Everywhere.sln
-
     - name: Get version from tag
       id: get_version
       shell: pwsh
@@ -42,15 +39,10 @@ jobs:
         $version = $env:GITHUB_REF -replace 'refs/tags/v', ''
         echo "VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
-    - name: Build Everywhere.Windows (Release)
-      shell: pwsh
-      run: |
-        dotnet build src/Everywhere.Windows/Everywhere.Windows.csproj -c Release --no-restore
-
     - name: Publish Everywhere.Windows
       shell: pwsh
       run: |
-        dotnet publish src/Everywhere.Windows/Everywhere.Windows.csproj -c Release -r win-x64 --self-contained true -p:AssemblyVersion=$env:VERSION -p:FileVersion=$env:VERSION -o ./publish
+        dotnet publish src/Everywhere.Windows/Everywhere.Windows.csproj -c Release --configfile nuget.config --self-contained true -p:AssemblyVersion=$env:VERSION -p:FileVersion=$env:VERSION -o ./publish
 
     - name: Build NSIS installer
       shell: pwsh
