@@ -70,7 +70,11 @@ public partial class AssistantChatMessage : ChatMessage
         };
     }
 
-    public override string ToString() => Content;
+    public override string ToString()
+    {
+        if (ErrorMessageKey is null) return Content;
+        return Content + ErrorMessageKey;
+    }
 }
 
 [MessagePackObject(OnlyIncludeKeyedMembers = true, AllowPrivate = true)]

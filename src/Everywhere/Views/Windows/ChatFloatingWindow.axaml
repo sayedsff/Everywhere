@@ -448,7 +448,7 @@
                             Background="{DynamicResource ErrorColor20}"
                             CornerRadius="4"
                             IsVisible="{Binding !!ErrorMessageKey}">
-                            <TextBlock
+                            <SelectableTextBlock
                               Text="{Binding ErrorMessageKey^, FallbackValue={x:Null}}"
                               TextWrapping="Wrap"/>
                           </Border>

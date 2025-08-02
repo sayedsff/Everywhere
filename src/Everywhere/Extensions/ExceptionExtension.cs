@@ -1,5 +1,4 @@
 ﻿using System.Net.Sockets;
-using Everywhere.Models;
 
 namespace Everywhere.Extensions;
 

@@ -401,7 +401,7 @@
     <data name="FriendlyExceptionMessage_OperationCanceled" xml:space="preserve">
         <value>操作已取消</value>
     </data>
-    <data name="FriendlyExceptionMessage_TimeoutException" xml:space="preserve">
+    <data name="FriendlyExceptionMessage_Timeout" xml:space="preserve">
         <value>已超过最长等待时间</value>
     </data>
     <data name="FriendlyExceptionMessage_Json" xml:space="preserve">
@@ -527,5 +527,8 @@
     </data>
     <data name="Settings_Behavior_ChatFloatingWindowPinMode_Description" xml:space="preserve">
         <value>指定聊天浮动窗口打开时的固定模式，当窗口没有固定时，失去焦点会自动隐藏。</value>
+    </data>
+    <data name="FriendlyExceptionMessage_ClientResult" xml:space="preserve">
+        <value>客户端错误 {0}</value>
     </data>
 </root>

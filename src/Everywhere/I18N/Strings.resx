@@ -420,17 +420,17 @@
     <data name="FriendlyExceptionMessage_OperationCanceled" xml:space="preserve">
         <value>Operation canceled</value>
     </data>
-    <data name="FriendlyExceptionMessage_TimeoutException" xml:space="preserve">
+    <data name="FriendlyExceptionMessage_Timeout" xml:space="preserve">
         <value>Maximum wait time exceeded</value>
     </data>
     <data name="FriendlyExceptionMessage_Json" xml:space="preserve">
         <value>Could not parse JSON data</value>
     </data>
     <data name="FriendlyExceptionMessage_Format" xml:space="preserve">
-        <value>Format error</value>
+        <value>Format error {0}</value>
     </data>
     <data name="FriendlyExceptionMessage_Argument" xml:space="preserve">
-        <value>Argument error</value>
+        <value>Argument error {0}</value>
     </data>
     <data name="SettingsSelectionItem_Common_Language_de" xml:space="preserve">
         <value>Deutsch</value>
@@ -546,5 +546,8 @@ Tip: You can reopen this message by clicking “About - Welcome Page”.</value>
     </data>
     <data name="Settings_Behavior_ChatFloatingWindowPinMode_Description" xml:space="preserve">
         <value>Specifies the pin mode for the chat floating window when it is opened. When the window is not fixed, it will be hidden automatically when it loses focus.</value>
+    </data>
+    <data name="FriendlyExceptionMessage_ClientResult" xml:space="preserve">
+        <value>Client error {0}</value>
     </data>
 </root>
