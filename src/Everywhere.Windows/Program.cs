@@ -16,9 +16,6 @@ using Everywhere.Views.Pages;
 using Everywhere.Windows.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.KernelMemory.AI;
-using Microsoft.SemanticKernel.ChatCompletion;
-using Microsoft.SemanticKernel.TextGeneration;
 using Serilog;
 using ShadUI;
 using WritableJsonConfiguration;
@@ -41,33 +38,7 @@ public static class Program
                 .AddSingleton<IVisualElementContext, Win32VisualElementContext>()
                 .AddSingleton<IHotkeyListener, Win32HotkeyListener>()
                 .AddSingleton<INativeHelper, Win32NativeHelper>()
-                .AddKeyedSingleton<IConfiguration>(
-                    nameof(Settings),
-                    (xx, _) =>
-                    {
-                        IConfiguration configuration;
-                        var settingsJsonPath = Path.Combine(
-                            xx.GetRequiredService<IRuntimeConstantProvider>().Get<string>(RuntimeConstantType.WritableDataPath),
-                            "settings.json");
-                        try
-                        {
-                            configuration = WritableJsonConfigurationFabric.Create(settingsJsonPath);
-                        }
-                        catch (Exception ex) when (ex is JsonException or InvalidDataException)
-                        {
-                            File.Delete(settingsJsonPath);
-                            configuration = WritableJsonConfigurationFabric.Create(settingsJsonPath);
-                        }
-                        return configuration;
-                    })
-                .AddSingleton<Settings>(xx =>
-                {
-                    var configuration = xx.GetRequiredKeyedService<IConfiguration>(nameof(Settings));
-                    if (configuration.Get<Settings>() is { } settings) return settings;
-                    settings = new Settings();
-                    configuration.Bind(settings);
-                    return settings;
-                })
+                .AddSettings()
 
                 #endregion
 
@@ -115,7 +86,6 @@ public static class Program
                 #region Initialize
 
                 .AddSingleton<IAsyncInitializer, HotkeyInitializer>()
-                .AddSingleton<IAsyncInitializer, SettingsInitializer>()
                 .AddSingleton<IAsyncInitializer>(xx => xx.GetRequiredService<ChatContextManager>())
                 .AddSingleton<IAsyncInitializer>(xx => xx.GetRequiredService<ChatDbContext>())
 
@@ -124,11 +94,6 @@ public static class Program
                 #region Assistant Chat
 
                 .AddSingleton<IKernelMixinFactory, KernelMixinFactory>()
-                .AddTransient<IKernelMixin>(xx => xx.GetRequiredService<IKernelMixinFactory>().Create())
-                .AddTransient<ITextGenerationService>(xx => xx.GetRequiredService<IKernelMixin>())
-                .AddTransient<IChatCompletionService>(xx => xx.GetRequiredService<IKernelMixin>())
-                .AddTransient<ITextGenerator>(xx => xx.GetRequiredService<IKernelMixin>())
-                .AddTransient<ITextTokenizer>(xx => xx.GetRequiredService<IKernelMixin>())
                 .AddSingleton<ChatContextManager>()
                 .AddSingleton<IChatContextManager>(xx => xx.GetRequiredService<ChatContextManager>())
                 .AddSingleton<IChatService, ChatService>()

@@ -1,10 +1,12 @@
 ﻿using System.Text;
+using System.Text.Json.Serialization;
 using Avalonia.Input;
 
 namespace Everywhere.Models;
 
 public readonly record struct KeyboardHotkey(Key Key, KeyModifiers Modifiers)
 {
+    [JsonIgnore]
     public bool IsEmpty => Key == Key.None && Modifiers == KeyModifiers.None;
 
     public override string ToString()

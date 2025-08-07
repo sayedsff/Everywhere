@@ -7,7 +7,7 @@ namespace Everywhere.Utils;
 
 public delegate void TrackableObjectPropertyChangedEventHandler<in TScope>(TScope sender, PropertyChangedEventArgs e);
 
-public class TrackableObject<TScope> : ObservableObject where TScope : TrackableObject<TScope>
+public class TrackableObject<TScope>(bool isTrackingEnabled = false) : ObservableObject where TScope : TrackableObject<TScope>
 {
     private static readonly HashSet<TrackableObjectPropertyChangedEventHandler<TScope>> ScopeHandlers = [];
 
@@ -29,7 +29,7 @@ public class TrackableObject<TScope> : ObservableObject where TScope : Trackable
 
     [JsonIgnore]
     [IgnoreMember]
-    protected bool isTrackingEnabled;
+    protected bool isTrackingEnabled = isTrackingEnabled;
 
     protected override void OnPropertyChanged(PropertyChangedEventArgs e)
     {

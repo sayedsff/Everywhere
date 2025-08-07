@@ -61,11 +61,11 @@
     <data name="SettingsGroup_Behavior_Header" xml:space="preserve">
         <value>Behavior</value>
     </data>
-    <data name="Settings_Behavior_AssistantHotkey_Header" xml:space="preserve">
-        <value>Assistant Hotkey</value>
+    <data name="Settings_Behavior_ChatHotkey_Header" xml:space="preserve">
+        <value>Chat Hotkey</value>
     </data>
-    <data name="Settings_Behavior_AssistantHotkey_Description" xml:space="preserve">
-        <value>Set a hotkey to invoke the assistant at any time.</value>
+    <data name="Settings_Behavior_ChatHotkey_Description" xml:space="preserve">
+        <value>Set a hotkey to invoke the chat window at any time.</value>
     </data>
     <data name="SettingsGroup_Model_Header" xml:space="preserve">
         <value>Model</value>
@@ -89,22 +89,16 @@
         <value>Specify the API access key for the model, obtainable from the provider’s API site; leave blank for local models (e.g., Ollama or LM Studio) that do not require authentication.</value>
     </data>
     <data name="Settings_Model_Temperature_Header" xml:space="preserve">
-        <value>Creativity (Temperature)</value>
+        <value>Creativity (temperature)</value>
     </data>
     <data name="Settings_Model_Temperature_Description" xml:space="preserve">
         <value>Higher values yield more imaginative, creative responses; lower values produce more precise, conservative outputs; note that temperatures above 1.0 may cause garbled output in some models.</value>
     </data>
     <data name="Settings_Model_TopP_Header" xml:space="preserve">
-        <value>Thought Openness (Top p)</value>
+        <value>Thought Openness (top_p)</value>
     </data>
     <data name="Settings_Model_TopP_Description" xml:space="preserve">
         <value>Higher values allow a wider range of possible responses; lower values favor the most probable answers; it’s not recommended to modify this alongside the temperature.</value>
-    </data>
-    <data name="Settings_Model_IsImageSupported_Header" xml:space="preserve">
-        <value>Enable Multimodal Image Support</value>
-    </data>
-    <data name="Settings_Model_IsImageSupported_Description" xml:space="preserve">
-        <value>When enabled, for vision-capable models (e.g., GPT-4o), the assistant will include images at the right times to enhance contextual understanding; if the model doesn’t support image inputs, enabling this may cause failures.</value>
     </data>
     <data name="Settings_Model_IsToolCallSupported_Header" xml:space="preserve">
         <value>Enable Tool Calling</value>
@@ -549,5 +543,75 @@ Tip: You can reopen this message by clicking “About - Welcome Page”.</value>
     </data>
     <data name="FriendlyExceptionMessage_ClientResult" xml:space="preserve">
         <value>Client error {0}</value>
+    </data>
+    <data name="Settings_Model_PresencePenalty_Header" xml:space="preserve">
+        <value>Expression Divergence (presence_penalty)</value>
+    </data>
+    <data name="Settings_Model_PresencePenalty_Description" xml:space="preserve">
+        <value>The higher the value, the more inclined to use different expressions and avoid concept repetition; the lower the value, the more inclined to use repeated concepts or narratives, resulting in more consistent expression.</value>
+    </data>
+    <data name="Settings_Model_FrequencyPenalty_Header" xml:space="preserve">
+        <value>Vocabulary Richness 
+(frequency_penalty)</value>
+    </data>
+    <data name="Settings_Model_FrequencyPenalty_Description" xml:space="preserve">
+        <value>The higher the value, the more diverse and rich the vocabulary; the lower the value, the simpler and more straightforward the language.</value>
+    </data>
+    <data name="Settings_Model_SelectedModelProvider_Description" xml:space="preserve">
+        <value>Select the large language model service provider.</value>
+    </data>
+    <data name="Settings_Model_SelectedModelProvider_Header" xml:space="preserve">
+        <value>Model Provider</value>
+    </data>
+    <data name="Settings_Model_SelectedModelDefinition_Description" xml:space="preserve">
+        <value>Select the large language model (LLM) provided by model provider.</value>
+    </data>
+    <data name="Settings_Model_SelectedModelDefinition_Header" xml:space="preserve">
+        <value>Model</value>
+    </data>
+    <data name="Settings_Model_SelectedModelProvider_Endpoint_Header" xml:space="preserve">
+        <value>API Url</value>
+    </data>
+    <data name="Settings_Model_SelectedModelProvider_Endpoint_Description" xml:space="preserve">
+        <value>Leaving this to default if you dont't know what to do. Must starts with "http(s)://".</value>
+    </data>
+    <data name="Settings_Model_SelectedModelProvider_ApiKey_Header" xml:space="preserve">
+        <value>API Key</value>
+    </data>
+    <data name="Settings_Model_SelectedModelProvider_ApiKey_Description" xml:space="preserve">
+        <value>In case of online models, you need to get them from the corresponding official, please refer to the guide for details.</value>
+    </data>
+    <data name="Settings_Model_SelectedModelDefinition_IsImageInputSupported_Header" xml:space="preserve">
+        <value>Support Image Input</value>
+    </data>
+    <data name="Settings_Model_SelectedModelDefinition_IsImageInputSupported_Description" xml:space="preserve">
+        <value>You can upload images in chat context. If you're not sure what you're doing, keep the default value. If the model doesn’t support image inputs, enabling this may cause failures.</value>
+    </data>
+    <data name="Settings_Model_SelectedModelDefinition_IsFunctionCallingSupported_Header" xml:space="preserve">
+        <value>Support Tools Usage</value>
+    </data>
+    <data name="Settings_Model_SelectedModelDefinition_IsFunctionCallingSupported_Description" xml:space="preserve">
+        <value>Model can use tools you configured in chat context. If you're not sure what you're doing, keep the default value. If the model doesn’t support function calling, enabling this may cause failures.</value>
+    </data>
+    <data name="Settings_Model_SelectedModelDefinition_IsDeepThinkingSupported_Description" xml:space="preserve">
+        <value>Model can think before replies. If you're not sure what you're doing, keep the default value. If the model doesn’t support deep thinking, enabling this may cause failures.</value>
+    </data>
+    <data name="Settings_Model_SelectedModelDefinition_IsDeepThinkingSupported_Header" xml:space="preserve">
+        <value>Support Deep Thinking</value>
+    </data>
+    <data name="Settings_Model_SelectedModelDefinition_IsWebSearchSupported_Header" xml:space="preserve">
+        <value>Support Web Search</value>
+    </data>
+    <data name="Settings_Model_SelectedModelDefinition_IsWebSearchSupported_Description" xml:space="preserve">
+        <value>Model can search web before replies. If you're not sure what you're doing, keep the default value. If the model doesn’t support deep thinking, enabling this may cause failures.</value>
+    </data>
+    <data name="Settings_Model_SelectedModelDefinition_MaxTokens_Description" xml:space="preserve">
+        <value>The maximum context length of single chat. If you're not sure what you're doing, keep the default value. Setting this larger than the default value may cause failures.</value>
+    </data>
+    <data name="Settings_Model_SelectedModelDefinition_MaxTokens_Header" xml:space="preserve">
+        <value>Maximum Context Length (max_tokens)</value>
+    </data>
+    <data name="SettingsPage_RestoreDefault_Button_ToolTip" xml:space="preserve">
+        <value>Restore Default</value>
     </data>
 </root>

@@ -212,7 +212,7 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
                     }
                 }
             }
-            else if (Settings.Model.IsImageSupported)
+            else if (Settings.Model.SelectedModelDefinition?.IsImageInputSupported.ActualValue is true)
             {
                 if (await nativeHelper.GetClipboardBitmapAsync() is not { } bitmap) return;
 
@@ -301,7 +301,7 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
         var ext = Path.GetExtension(filePath).ToLower();
         if (ext is ".png" or ".jpg" or ".jpeg" or ".gif" or ".bmp" or ".webp")
         {
-            if (Settings.Model.IsImageSupported)
+            if (Settings.Model.SelectedModelDefinition?.IsImageInputSupported.ActualValue is true)
             {
                 try
                 {

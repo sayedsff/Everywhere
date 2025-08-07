@@ -54,24 +54,6 @@ public partial class DynamicResourceKey(object key) : DynamicResourceKeyBase
 }
 
 /// <summary>
-/// Wrapper for dynamic resource keys that also holds a value.
-/// </summary>
-/// <param name="key"></param>
-/// <param name="value"></param>
-/// <typeparam name="T"></typeparam>
-public class DynamicResourceKeyWrapper<T>(object key, T value) : DynamicResourceKey(key)
-{
-    public T Value { get; } = value;
-
-    public override bool Equals(object? obj)
-    {
-        return obj is DynamicResourceKeyWrapper<T> other && EqualityComparer<T>.Default.Equals(Value, other.Value);
-    }
-
-    public override int GetHashCode() => Value?.GetHashCode() ?? 0;
-}
-
-/// <summary>
 /// Directly wraps a raw string for use in axaml.
 /// This is useful for cases where you want to use a string as a resource key without any formatting or dynamic behavior.
 /// </summary>
@@ -160,6 +142,52 @@ public partial class AggregateDynamicResourceKey(params DynamicResourceKeyBase[]
         }
 
         return string.Join(", ", resolvedKeys);
+    }
+}
+
+/// <summary>
+/// This can be deserialized from JSON and used as a dynamic resource key.
+/// </summary>
+/// <remarks>
+/// JSON example:
+/// "Key": {
+///     "default": "Hello, World!",
+///     "zh-hans": "你好，世界！",
+///     "jp": "こんにちは、世界！"
+/// }
+/// </remarks>
+public class JsonDynamicResourceKey : Dictionary<string, string>, IObservable<object?>
+{
+    public IDisposable Subscribe(IObserver<object?> observer)
+    {
+        LocaleManager.LocaleChanged += HandleLocaleChanged;
+        PostValue(LocaleManager.CurrentLocale ?? "default");
+
+        return new AnonymousDisposable(() =>
+        {
+            LocaleManager.LocaleChanged -= HandleLocaleChanged;
+        });
+
+        void PostValue(string locale)
+        {
+            if (TryGetValue(locale, out var value))
+            {
+                observer.OnNext(value);
+            }
+            else if (TryGetValue("default", out var defaultValue))
+            {
+                observer.OnNext(defaultValue);
+            }
+            else
+            {
+                observer.OnNext(Values.FirstOrDefault());
+            }
+        }
+
+        void HandleLocaleChanged(string? oldLocale, string newLocale)
+        {
+            PostValue(newLocale);
+        }
     }
 }
 

@@ -67,7 +67,7 @@ public class I18NSourceGenerator : IIncrementalGenerator
             context.AddSource("LocaleKey.g.cs", SourceText.From(localeKeySource, Encoding.UTF8));
 
             // Generate default locale file
-            var defaultLocaleSource = GenerateLocaleClass(defaultResxFile.Path, "@default", defaultEntries);
+            var defaultLocaleSource = GenerateLocaleClass(defaultResxFile.Path, "default", defaultEntries);
             context.AddSource("default.g.cs", SourceText.From(defaultLocaleSource, Encoding.UTF8));
 
             // Generate locale files for each language-specific RESX
@@ -185,9 +185,9 @@ public class I18NSourceGenerator : IIncrementalGenerator
 
               namespace Everywhere.I18N;
 
-              public class {{escapedLocaleName}} : global::Avalonia.Controls.ResourceDictionary
+              public class __{{escapedLocaleName}} : global::Avalonia.Controls.ResourceDictionary
               {
-                  public {{escapedLocaleName}}()
+                  public __{{escapedLocaleName}}()
                   {
               """);
 
@@ -239,18 +239,22 @@ public class I18NSourceGenerator : IIncrementalGenerator
 
                   static LocaleManager()
                   {
-                      Locales.Add("default", new @default());
+                      Locales.Add("default", new __default());
               """);
 
         foreach (var localeName in localeNames)
         {
             var escapedLocaleName = localeName.Replace("-", "_");
-            sb.AppendLine($"        Locales.Add(\"{localeName}\", new {escapedLocaleName}());");
+            sb.AppendLine($"        Locales.Add(\"{localeName}\", new __{escapedLocaleName}());");
         }
 
         sb.AppendLine(
             """
                 }
+                
+                public delegate void LocaleChangedEventHandler(string? oldLocale, string newLocale);
+                
+                public static event LocaleChangedEventHandler? LocaleChanged;
 
                 public static string? CurrentLocale
                 {
@@ -265,12 +269,15 @@ public class I18NSourceGenerator : IIncrementalGenerator
                             app.Resources.MergedDictionaries.Remove(oldLocale);
                         }
                         
+                        var oldLocaleName = field;
                         field = value;
                         if (value is null || !Locales.TryGetValue(value, out var newLocale))
                         {
                             (field, newLocale) = Locales.First();
                         }
+                        
                         app.Resources.MergedDictionaries.Add(newLocale);
+                        LocaleChanged?.Invoke(oldLocaleName, field!);
                     }
                 }
             }

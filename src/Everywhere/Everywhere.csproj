@@ -8,6 +8,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="Anthropic.SDK" />
         <PackageReference Include="Avalonia"/>
         <PackageReference Include="Avalonia.Themes.Fluent"/>
         <PackageReference Include="Avalonia.Fonts.Inter"/>
@@ -25,6 +26,7 @@
         <PackageReference Include="Microsoft.KernelMemory.Core"/>
         <!--        <PackageReference Include="Microsoft.ML.OnnxRuntime"/>-->
         <PackageReference Include="Microsoft.SemanticKernel"/>
+        <PackageReference Include="Microsoft.SemanticKernel.Connectors.Ollama" />
         <PackageReference Include="Microsoft.SemanticKernel.Connectors.OpenAI"/>
         <PackageReference Include="Microsoft.SemanticKernel.Plugins.Web"/>
         <PackageReference Include="ObservableCollections"/>

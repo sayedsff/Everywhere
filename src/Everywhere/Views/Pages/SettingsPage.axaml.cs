@@ -1,5 +1,4 @@
-﻿using Everywhere.Models;
-using Lucide.Avalonia;
+﻿using Lucide.Avalonia;
 
 namespace Everywhere.Views.Pages;
 

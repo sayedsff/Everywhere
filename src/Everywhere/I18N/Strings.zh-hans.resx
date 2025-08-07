@@ -47,11 +47,11 @@
     <data name="SettingsGroup_Behavior_Header" xml:space="preserve">
         <value>行为</value>
     </data>
-    <data name="Settings_Behavior_AssistantHotkey_Header" xml:space="preserve">
-        <value>助手快捷键</value>
+    <data name="Settings_Behavior_ChatHotkey_Header" xml:space="preserve">
+        <value>聊天快捷键</value>
     </data>
-    <data name="Settings_Behavior_AssistantHotkey_Description" xml:space="preserve">
-        <value>设置一个快捷键，在任何时候按下即可唤出助手。</value>
+    <data name="Settings_Behavior_ChatHotkey_Description" xml:space="preserve">
+        <value>设置一个快捷键，在任何时候按下即可唤出对话窗口。</value>
     </data>
     <data name="SettingsGroup_Model_Header" xml:space="preserve">
         <value>模型</value>
@@ -62,35 +62,17 @@
     <data name="Settings_Model_ModelName_Description" xml:space="preserve">
         <value>指定助手调用的模型名称。</value>
     </data>
-    <data name="Settings_Model_Endpoint_Header" xml:space="preserve">
-        <value>模型API接口地址</value>
-    </data>
-    <data name="Settings_Model_Endpoint_Description" xml:space="preserve">
-        <value>指定助手使用的 API 端点 URL，仅填写根路径，不要包含具体接口路径（例如：https://openai.com/api/v1）</value>
-    </data>
-    <data name="Settings_Model_ApiKey_Header" xml:space="preserve">
-        <value>模型 API Key</value>
-    </data>
-    <data name="Settings_Model_ApiKey_Description" xml:space="preserve">
-        <value>指定用于访问模型 API 的密钥，可在模型提供方的 API 网站获取；对于无需验证的本地模型（如 Ollama 或 LM Studio），请留空。</value>
-    </data>
     <data name="Settings_Model_Temperature_Header" xml:space="preserve">
-        <value>创意活跃度（Temperature）</value>
+        <value>创意活跃度（temperature）</value>
     </data>
     <data name="Settings_Model_Temperature_Description" xml:space="preserve">
         <value>数值越高，回答越具创造力和想象力；数值越低，则越趋严谨；部分模型数值超过 1.0 可能导致输出乱码。</value>
     </data>
     <data name="Settings_Model_TopP_Header" xml:space="preserve">
-        <value>思维开放度（Top p）</value>
+        <value>思维开放度（top_p）</value>
     </data>
     <data name="Settings_Model_TopP_Description" xml:space="preserve">
         <value>数值越高，模型会接受更多潜在回答；数值越低，则更倾向于最可能的回答；不建议与创意活跃度同时调整。</value>
-    </data>
-    <data name="Settings_Model_IsImageSupported_Header" xml:space="preserve">
-        <value>开启图像多模态</value>
-    </data>
-    <data name="Settings_Model_IsImageSupported_Description" xml:space="preserve">
-        <value>启用此功能后，在支持图像输入的大模型（如 GPT-4o）调用时，助手会在适当时机传递视觉信息以增强上下文理解；若模型不支持图像上传，开启后可能导致调用失败。</value>
     </data>
     <data name="Settings_Model_IsToolCallSupported_Header" xml:space="preserve">
         <value>开启工具调用</value>
@@ -530,5 +512,74 @@
     </data>
     <data name="FriendlyExceptionMessage_ClientResult" xml:space="preserve">
         <value>客户端错误 {0}</value>
+    </data>
+    <data name="Settings_Model_PresencePenalty_Description" xml:space="preserve">
+        <value>值越大，越倾向不同的表达方式，避免概念重复；值越小，越倾向使用重复的概念或叙述，表达更具一致性。</value>
+    </data>
+    <data name="Settings_Model_PresencePenalty_Header" xml:space="preserve">
+        <value>表述发散度 (presence_penalty)</value>
+    </data>
+    <data name="Settings_Model_FrequencyPenalty_Header" xml:space="preserve">
+        <value>词汇丰富度 (frequency_penalty)</value>
+    </data>
+    <data name="Settings_Model_FrequencyPenalty_Description" xml:space="preserve">
+        <value>值越大，用词越丰富多样；值越低，用词更朴实简单。</value>
+    </data>
+    <data name="Settings_Model_SelectedModelProvider_Header" xml:space="preserve">
+        <value>模型提供商</value>
+    </data>
+    <data name="Settings_Model_SelectedModelProvider_Description" xml:space="preserve">
+        <value>选择大语言模型 (LLM) 服务提供商。</value>
+    </data>
+    <data name="Settings_Model_SelectedModelDefinition_Header" xml:space="preserve">
+        <value>模型</value>
+    </data>
+    <data name="Settings_Model_SelectedModelDefinition_Description" xml:space="preserve">
+        <value>选择模型提供商的大语言模型 (LLM)。</value>
+    </data>
+    <data name="Settings_Model_SelectedModelProvider_Endpoint_Header" xml:space="preserve">
+        <value>API 调用地址</value>
+    </data>
+    <data name="Settings_Model_SelectedModelProvider_Endpoint_Description" xml:space="preserve">
+        <value>如果你不确定这是什么，请保持默认值。必须以“http(s)://”开头。</value>
+    </data>
+    <data name="Settings_Model_SelectedModelProvider_ApiKey_Header" xml:space="preserve">
+        <value>API 密钥</value>
+    </data>
+    <data name="Settings_Model_SelectedModelProvider_ApiKey_Description" xml:space="preserve">
+        <value>如果是在线模型，需要从对应的官方获取，详情请参考指南。</value>
+    </data>
+    <data name="Settings_Model_SelectedModelDefinition_IsImageInputSupported_Header" xml:space="preserve">
+        <value>支持图像输入</value>
+    </data>
+    <data name="Settings_Model_SelectedModelDefinition_IsImageInputSupported_Description" xml:space="preserve">
+        <value>你可以在聊天上下文中上传图像。如果你不确定这是什么，请保持默认值。如果模型不支持，开启此选项可能会导致调用失败。</value>
+    </data>
+    <data name="Settings_Model_SelectedModelDefinition_IsFunctionCallingSupported_Header" xml:space="preserve">
+        <value>支持使用工具</value>
+    </data>
+    <data name="Settings_Model_SelectedModelDefinition_IsFunctionCallingSupported_Description" xml:space="preserve">
+        <value>模型会在聊天上下文中使用你配置的工具。如果你不确定这是什么，请保持默认值。如果模型不支持，开启此选项可能会导致调用失败。</value>
+    </data>
+    <data name="Settings_Model_SelectedModelDefinition_IsDeepThinkingSupported_Header" xml:space="preserve">
+        <value>支持深度思考</value>
+    </data>
+    <data name="Settings_Model_SelectedModelDefinition_IsDeepThinkingSupported_Description" xml:space="preserve">
+        <value>模型会先思考再回答。如果你不确定这是什么，请保持默认值。如果模型不支持，开启此选项可能会导致调用失败。</value>
+    </data>
+    <data name="Settings_Model_SelectedModelDefinition_IsWebSearchSupported_Header" xml:space="preserve">
+        <value>支持网络搜索</value>
+    </data>
+    <data name="Settings_Model_SelectedModelDefinition_IsWebSearchSupported_Description" xml:space="preserve">
+        <value>模型会先搜索网络再回答。如果你不确定这是什么，请保持默认值。如果模型不支持，开启此选项可能会导致调用失败。</value>
+    </data>
+    <data name="Settings_Model_SelectedModelDefinition_MaxTokens_Description" xml:space="preserve">
+        <value>单个对话的最大上下文长度。如果你不确定在做什么，请保持默认值。设为大于默认值可能导致调用失败。</value>
+    </data>
+    <data name="Settings_Model_SelectedModelDefinition_MaxTokens_Header" xml:space="preserve">
+        <value>最大上下文长度 (max_tokens)</value>
+    </data>
+    <data name="SettingsPage_RestoreDefault_Button_ToolTip" xml:space="preserve">
+        <value>恢复默认</value>
     </data>
 </root>

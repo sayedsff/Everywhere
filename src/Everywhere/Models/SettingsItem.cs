@@ -1,130 +1,247 @@
 ﻿using System.Reflection;
-using CommunityToolkit.Mvvm.ComponentModel;
+using System.Windows.Input;
+using Avalonia.Data;
+using ZLinq;
 
 namespace Everywhere.Models;
 
-public class SettingsItemGroup(string name, IReadOnlyList<SettingsItemBase> items)
+public class SettingsItemGroup(string name, IReadOnlyList<SettingsItem> items)
 {
     public DynamicResourceKey HeaderKey => $"SettingsGroup_{name}_Header";
-    public IReadOnlyList<SettingsItemBase> Items => items;
+
+    public IReadOnlyList<SettingsItem> Items => items;
 }
 
-public abstract class SettingsItemBase(string name) : ObservableObject
+public abstract class SettingsItem(string name) : AvaloniaObject
 {
     public DynamicResourceKey HeaderKey => $"Settings_{name}_Header";
+
     public DynamicResourceKey DescriptionKey => $"Settings_{name}_Description";
-    public IValueProxy<bool>? IsEnabledProxy { get; set; }
-    public List<SettingsItemBase> Items { get; } = [];
-}
 
-public interface IValueProxy<T>
-{
-    public T Value { get; set; }
-}
+    public static readonly StyledProperty<object?> ValueProperty = AvaloniaProperty.Register<SettingsItem, object?>(nameof(Value));
 
-public abstract class SettingsItemBase<T>(string name, IValueProxy<T> valueProxy) : SettingsItemBase(name)
-{
-    public IValueProxy<T> ValueProxy => valueProxy;
-}
-
-public class SettingsBooleanItem(
-    string name,
-    IValueProxy<bool?> valueProxy,
-    bool canBeNull
-) : SettingsItemBase<bool?>(name, valueProxy)
-{
-    public bool CanBeNull => canBeNull;
-}
-
-public class SettingsStringItem(
-    string name,
-    IValueProxy<string> valueProxy,
-    string? watermark,
-    int maxLength,
-    bool isMultiline,
-    bool isPassword
-) : SettingsItemBase<string>(name, valueProxy)
-{
-    public string? Watermark => watermark;
-
-    public int MaxLength => maxLength;
-
-    public bool IsMultiline => isMultiline;
-
-    public char PasswordChar => isPassword ? '*' : '\0';
-}
-
-public class SettingsIntegerItem(
-    string name,
-    IValueProxy<int> valueProxy,
-    int minValue,
-    int maxValue
-) : SettingsItemBase<int>(name, valueProxy)
-{
-    public int MinValue => minValue;
-
-    public int MaxValue => maxValue;
-}
-
-public class SettingsDoubleItem(
-    string name,
-    IValueProxy<double> valueProxy,
-    double minValue,
-    double maxValue,
-    double step
-) : SettingsItemBase<double>(name, valueProxy)
-{
-    public double MinValue => minValue;
-
-    public double MaxValue => maxValue;
-
-    public double Step => step;
-}
-
-public class SettingsSelectionItem(
-    string name,
-    IValueProxy<object?> valueProxy,
-    Func<IEnumerable<DynamicResourceKeyWrapper<object?>>> itemsSource
-) : SettingsItemBase<object?>(name, valueProxy)
-{
-    public IEnumerable<DynamicResourceKeyWrapper<object?>> ItemsSource => itemsSource();
-
-    /// <summary>
-    /// ComboBox.SelectedValue is not working correctly!
-    /// </summary>
-    public DynamicResourceKeyWrapper<object?> SelectedItem
+    public object? Value
     {
-        get => ItemsSource.First(i => Equals(i.Value, ValueProxy.Value));
-        set => ValueProxy.Value = value.Value;
+        get => GetValue(ValueProperty);
+        set => SetValue(ValueProperty, value);
     }
 
-    public static SettingsSelectionItem FromEnum(Type enumType, string name, IValueProxy<object?> valueProxy)
+    public static readonly StyledProperty<bool> IsEnabledProperty = AvaloniaProperty.Register<SettingsItem, bool>(nameof(IsEnabled), true);
+
+    public bool IsEnabled
+    {
+        get => GetValue(IsEnabledProperty);
+        set => SetValue(IsEnabledProperty, value);
+    }
+
+    public static readonly StyledProperty<bool> IsExpandedProperty = AvaloniaProperty.Register<SettingsItem, bool>(nameof(IsExpanded));
+
+    public bool IsExpanded
+    {
+        get => GetValue(IsExpandedProperty);
+        set => SetValue(IsExpandedProperty, value);
+    }
+
+    public static readonly StyledProperty<bool> IsExpandableProperty = AvaloniaProperty.Register<SettingsItem, bool>(nameof(IsExpandable));
+
+    public bool IsExpandable
+    {
+        get => GetValue(IsExpandableProperty);
+        set => SetValue(IsExpandableProperty, value);
+    }
+
+    public List<SettingsItem> Items { get; } = [];
+}
+
+public class SettingsBooleanItem(string name) : SettingsItem(name)
+{
+    public static readonly StyledProperty<bool> IsNullableProperty = AvaloniaProperty.Register<SettingsBooleanItem, bool>(nameof(IsNullable));
+
+    public bool IsNullable
+    {
+        get => GetValue(IsNullableProperty);
+        set => SetValue(IsNullableProperty, value);
+    }
+}
+
+public class SettingsStringItem(string name) : SettingsItem(name)
+{
+    public static readonly StyledProperty<string?> WatermarkProperty = AvaloniaProperty.Register<SettingsStringItem, string?>(nameof(Watermark));
+
+    public string? Watermark
+    {
+        get => GetValue(WatermarkProperty);
+        set => SetValue(WatermarkProperty, value);
+    }
+
+    public static readonly StyledProperty<int> MaxLengthProperty = AvaloniaProperty.Register<SettingsStringItem, int>(nameof(MaxLength));
+
+    public int MaxLength
+    {
+        get => GetValue(MaxLengthProperty);
+        set => SetValue(MaxLengthProperty, value);
+    }
+
+    public static readonly StyledProperty<bool> IsMultilineProperty = AvaloniaProperty.Register<SettingsStringItem, bool>(nameof(IsMultiline));
+
+    public bool IsMultiline
+    {
+        get => GetValue(IsMultilineProperty);
+        set => SetValue(IsMultilineProperty, value);
+    }
+
+    public static readonly StyledProperty<char> PasswordCharProperty = AvaloniaProperty.Register<SettingsStringItem, char>(nameof(PasswordChar));
+
+    public char PasswordChar
+    {
+        get => GetValue(PasswordCharProperty);
+        set => SetValue(PasswordCharProperty, value);
+    }
+}
+
+public class SettingsIntegerItem(string name) : SettingsItem(name)
+{
+    public static readonly StyledProperty<int> MinValueProperty = AvaloniaProperty.Register<SettingsIntegerItem, int>(nameof(MinValue));
+
+    public int MinValue
+    {
+        get => GetValue(MinValueProperty);
+        set => SetValue(MinValueProperty, value);
+    }
+
+    public static readonly StyledProperty<int> MaxValueProperty = AvaloniaProperty.Register<SettingsIntegerItem, int>(nameof(MaxValue));
+
+    public int MaxValue
+    {
+        get => GetValue(MaxValueProperty);
+        set => SetValue(MaxValueProperty, value);
+    }
+
+    public static readonly StyledProperty<bool> IsSliderVisibleProperty =
+        AvaloniaProperty.Register<SettingsIntegerItem, bool>(nameof(IsSliderVisible));
+
+    public bool IsSliderVisible
+    {
+        get => GetValue(IsSliderVisibleProperty);
+        set => SetValue(IsSliderVisibleProperty, value);
+    }
+}
+
+public class SettingsDoubleItem(string name) : SettingsItem(name)
+{
+    public static readonly StyledProperty<double> MinValueProperty = AvaloniaProperty.Register<SettingsDoubleItem, double>(nameof(MinValue));
+
+    public double MinValue
+    {
+        get => GetValue(MinValueProperty);
+        set => SetValue(MinValueProperty, value);
+    }
+
+    public static readonly StyledProperty<double> MaxValueProperty = AvaloniaProperty.Register<SettingsDoubleItem, double>(nameof(MaxValue));
+
+    public double MaxValue
+    {
+        get => GetValue(MaxValueProperty);
+        set => SetValue(MaxValueProperty, value);
+    }
+
+    public static readonly StyledProperty<double> StepProperty = AvaloniaProperty.Register<SettingsDoubleItem, double>(nameof(Step));
+
+    public double Step
+    {
+        get => GetValue(StepProperty);
+        set => SetValue(StepProperty, value);
+    }
+
+    public static readonly StyledProperty<bool> IsSliderVisibleProperty =
+        AvaloniaProperty.Register<SettingsDoubleItem, bool>(nameof(IsSliderVisible));
+
+    public bool IsSliderVisible
+    {
+        get => GetValue(IsSliderVisibleProperty);
+        set => SetValue(IsSliderVisibleProperty, value);
+    }
+}
+
+public class SettingsSelectionItem(string name) : SettingsItem(name)
+{
+    public record Item(DynamicResourceKey Key, object Value);
+
+    public static readonly StyledProperty<IEnumerable<Item>> ItemsSourceProperty =
+        AvaloniaProperty.Register<SettingsSelectionItem, IEnumerable<Item>>(nameof(ItemsSource));
+
+    public IEnumerable<Item> ItemsSource
+    {
+        get => GetValue(ItemsSourceProperty);
+        set => SetValue(ItemsSourceProperty, value);
+    }
+
+    public static readonly DirectProperty<SettingsSelectionItem, Item?> SelectedItemProperty =
+        AvaloniaProperty.RegisterDirect<SettingsSelectionItem, Item?>(
+        nameof(SelectedItem),
+        o => o.SelectedItem,
+        (o, v) => o.SelectedItem = v);
+
+    public Item? SelectedItem
+    {
+        get => ItemsSource.FirstOrDefault(i => Equals(i.Value, Value));
+        set
+        {
+            if (Equals(Value, value?.Value)) return;
+            var oldValue = SelectedItem;
+            Value = value?.Value;
+            RaisePropertyChanged(SelectedItemProperty, oldValue, value);
+        }
+    }
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+
+        if (change.Property == ValueProperty)
+        {
+            var oldValue = ItemsSource.FirstOrDefault(i => Equals(i.Value, change.OldValue));
+            var newValue = SelectedItem;
+            RaisePropertyChanged(SelectedItemProperty, oldValue, newValue);
+        }
+    }
+
+    public static SettingsSelectionItem FromEnum(Type enumType, string name, IBinding valueBinding)
     {
         if (!enumType.IsEnum)
         {
             throw new ArgumentException("Type is not an enum", nameof(enumType));
         }
 
-        return new SettingsSelectionItem(
-            name,
-            valueProxy,
-            () =>
+        return new SettingsSelectionItem(name)
+        {
+            [!ValueProperty] = valueBinding,
+            ItemsSource = Enum.GetValues(enumType).AsValueEnumerable().Cast<object>().Select(x =>
             {
-                return Enum.GetValues(enumType).Cast<object>().Select(x =>
+                if (Enum.GetName(enumType, x) is { } enumName &&
+                    enumType.GetField(enumName)?.GetCustomAttribute<DynamicResourceKeyAttribute>() is { } ppAttribute)
                 {
-                    if (Enum.GetName(enumType, x) is { } enumName &&
-                        enumType.GetField(enumName)?.GetCustomAttribute<DynamicResourceKeyAttribute>() is { } ppAttribute)
-                    {
-                        return new DynamicResourceKeyWrapper<object?>(ppAttribute.Key, x);
-                    }
+                    return new Item(new DynamicResourceKey(ppAttribute.Key), x);
+                }
 
-                    return new DynamicResourceKeyWrapper<object?>($"{enumType}_{x}", x);
-                });
-            });
+                return new Item(new DirectResourceKey(x), x);
+            }).ToArray()
+        };
     }
 }
 
-public class SettingsKeyboardHotkeyItem(
-    string name,
-    IValueProxy<KeyboardHotkey> valueProxy
-) : SettingsItemBase<KeyboardHotkey>(name, valueProxy);
+public class SettingsCustomizableItem(string name, SettingsItem customValueItem) : SettingsItem(name)
+{
+    public SettingsItem CustomValueItem => customValueItem;
+
+    public static readonly StyledProperty<ICommand?> ResetCommandProperty =
+        AvaloniaProperty.Register<SettingsCustomizableItem, ICommand?>(nameof(ResetCommand));
+
+    public ICommand? ResetCommand
+    {
+        get => GetValue(ResetCommandProperty);
+        set => SetValue(ResetCommandProperty, value);
+    }
+}
+
+public class SettingsKeyboardHotkeyItem(string name) : SettingsItem(name);

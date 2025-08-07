@@ -670,12 +670,12 @@
             Command="{Binding SendMessageCommand}"
             Focusable="True"
             IsImageEnabled="{Binding Settings.Internal.IsImageEnabled, Mode=TwoWay}"
-            IsImageSupported="{Binding Settings.Model.IsImageSupported}"
+            IsImageSupported="{Binding Settings.Model.SelectedModelDefinition.IsImageInputSupported, FallbackValue=false}"
             IsSendButtonEnabled="{Binding !IsBusy}"
             IsToolCallEnabled="{Binding Settings.Internal.IsToolCallEnabled, Mode=TwoWay}"
-            IsToolCallSupported="{Binding Settings.Model.IsToolCallSupported}"
+            IsToolCallSupported="{Binding Settings.Model.SelectedModelDefinition.IsFunctionCallingSupported, FallbackValue=false}"
             IsWebSearchEnabled="{Binding Settings.Internal.IsWebSearchEnabled, Mode=TwoWay}"
-            IsWebSearchSupported="{Binding Settings.Model.IsWebSearchSupported}"
+            IsWebSearchSupported="{Binding Settings.Model.SelectedModelDefinition.IsImageInputSupported, FallbackValue=false}"
             MaxChatAttachmentCount="{Binding Settings.Internal.MaxChatAttachmentCount}"
             TextWrapping="Wrap">
             <v:ChatInputBox.AddChatAttachmentMenuItems>

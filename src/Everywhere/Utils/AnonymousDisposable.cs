@@ -1,4 +1,6 @@
-﻿namespace Everywhere.Utils;
+﻿using System.ComponentModel;
+
+namespace Everywhere.Utils;
 
 public class AnonymousDisposable(Action disposeAction) : IDisposable
 {
@@ -6,5 +8,11 @@ public class AnonymousDisposable(Action disposeAction) : IDisposable
     {
         GC.SuppressFinalize(this);
         disposeAction();
+    }
+
+    public static AnonymousDisposable FromNotifyPropertyCHanged(INotifyPropertyChanged source, PropertyChangedEventHandler handler)
+    {
+        source.PropertyChanged += handler;
+        return new AnonymousDisposable(() => source.PropertyChanged -= handler);
     }
 }

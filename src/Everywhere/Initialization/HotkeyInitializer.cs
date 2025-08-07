@@ -19,12 +19,12 @@ public class HotkeyInitializer(
         // initialize hotkey listener
         settings.Behavior.PropertyChanged += (_, args) =>
         {
-            if (args.PropertyName == nameof(settings.Behavior.AssistantHotkey))
+            if (args.PropertyName == nameof(settings.Behavior.ChatHotkey))
             {
-                hotkeyListener.KeyboardHotkey = settings.Behavior.AssistantHotkey;
+                hotkeyListener.KeyboardHotkey = settings.Behavior.ChatHotkey;
             }
         };
-        hotkeyListener.KeyboardHotkey = settings.Behavior.AssistantHotkey;
+        hotkeyListener.KeyboardHotkey = settings.Behavior.ChatHotkey;
         hotkeyListener.KeyboardHotkeyActivated += () =>
         {
             ThreadPool.QueueUserWorkItem(_ =>

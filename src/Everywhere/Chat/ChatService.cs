@@ -2,13 +2,13 @@
 using Everywhere.Models;
 using Lucide.Avalonia;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.KernelMemory.AI;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using Microsoft.SemanticKernel.Plugins.Web;
 using Microsoft.SemanticKernel.Plugins.Web.Bing;
 using Microsoft.SemanticKernel.Plugins.Web.Brave;
-using Microsoft.SemanticKernel.TextGeneration;
 
 namespace Everywhere.Chat;
 
@@ -22,8 +22,8 @@ public class ChatService(
     {
         var chatContext = chatContextManager.Current;
         chatContext.Add(userMessage);
-        var kernelMixin = kernelMixinFactory.Create();
-        await ProcessUserChatMessageAsync(kernelMixin, chatContext, userMessage, cancellationToken);
+        var kernelMixin = kernelMixinFactory.GetOrCreate();
+        await ProcessUserChatMessageAsync(kernelMixin.TextGenerator, chatContext, userMessage, cancellationToken);
         var assistantChatMessage = new AssistantChatMessage { IsBusy = true };
         chatContext.Add(assistantChatMessage);
         await GenerateAsync(kernelMixin, chatContext, assistantChatMessage, cancellationToken);
@@ -38,7 +38,7 @@ public class ChatService(
 
         var assistantChatMessage = new AssistantChatMessage { IsBusy = true };
         node.Context.CreateBranchOn(node, assistantChatMessage);
-        return GenerateAsync(kernelMixinFactory.Create(), node.Context, assistantChatMessage, cancellationToken);
+        return GenerateAsync(kernelMixinFactory.GetOrCreate(), node.Context, assistantChatMessage, cancellationToken);
     }
 
     public Task EditAsync(ChatMessageNode node, CancellationToken cancellationToken)
@@ -47,7 +47,7 @@ public class ChatService(
     }
 
     private async static Task ProcessUserChatMessageAsync(
-        IKernelMixin kernelMixin,
+        ITextGenerator textGenerator,
         ChatContext chatContext,
         UserChatMessage userChatMessage,
         CancellationToken cancellationToken)
@@ -74,8 +74,8 @@ public class ChatService(
 
             var xmlBuilder = new VisualElementXmlBuilder(
                 elements,
-                kernelMixin,
-                kernelMixin.MaxTokenTotal / 20);
+                textGenerator,
+                textGenerator.MaxTokenTotal / 20);
             var renderedVisualTreePrompt = await Task.Run(
                 () =>
                     Prompts.RenderPrompt(
@@ -94,6 +94,40 @@ public class ChatService(
         }
     }
 
+    /// <summary>
+    /// Kernel is very cheap to create, so we can create a new kernel for each request.
+    /// This method builds the kernel based on the current settings.
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    /// <exception cref="NotSupportedException"></exception>
+    private Kernel BuildKernel(IKernelMixin kernelMixin)
+    {
+        var builder = Kernel.CreateBuilder();
+        builder.Services.AddSingleton(kernelMixin.ChatCompletionService);
+        builder.Services.AddSingleton(kernelMixin.TextGenerationService);
+
+        var modelSettings = settings.Model;
+        if (modelSettings.SelectedModelDefinition?.IsFunctionCallingSupported.ActualValue is true && settings.Internal.IsWebSearchEnabled)
+        {
+            var webSearchApiKey = modelSettings.WebSearchApiKey;
+            Uri.TryCreate(modelSettings.WebSearchEndpoint, UriKind.Absolute, out var webSearchEndPoint);
+            builder.Plugins.AddFromObject(
+                new WebSearchEnginePlugin(
+                    modelSettings.WebSearchProvider switch
+                    {
+                        // TODO: "google" => new GoogleConnector(webSearchApiKey, webSearchEndPoint),
+                        "brave" => new BraveConnector(webSearchApiKey, webSearchEndPoint),
+                        "bocha" => new BoChaConnector(webSearchApiKey, webSearchEndPoint),
+                        "bing" => new BingConnector(webSearchApiKey, webSearchEndPoint),
+                        _ => throw new NotSupportedException($"Web search provider '{modelSettings.WebSearchProvider}' is not supported.")
+                    }),
+                "web_search");
+        }
+
+        return builder.Build();
+    }
+
     private async Task GenerateAsync(
         IKernelMixin kernelMixin,
         ChatContext chatContext,
@@ -104,40 +138,7 @@ public class ChatService(
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            // todo: maybe I need to move this builder to a better place (using DI)
-            var modelSettings = settings.Model;
-            var builder = Kernel.CreateBuilder();
-            builder.Services.AddSingleton<IChatCompletionService>(kernelMixin);
-            builder.Services.AddSingleton<ITextGenerationService>(kernelMixin);
-
-            if (modelSettings.IsWebSearchSupported && settings.Internal.IsWebSearchEnabled)
-            {
-                var webSearchApiKey = modelSettings.WebSearchApiKey;
-                Uri.TryCreate(modelSettings.WebSearchEndpoint, UriKind.Absolute, out var webSearchEndPoint);
-                builder.Plugins.AddFromObject(
-                    new WebSearchEnginePlugin(
-                        modelSettings.WebSearchProvider switch
-                        {
-                            // TODO: "google" => new GoogleConnector(webSearchApiKey, webSearchEndPoint),
-                            "brave" => new BraveConnector(webSearchApiKey, webSearchEndPoint),
-                            "bocha" => new BoChaConnector(webSearchApiKey, webSearchEndPoint),
-                            "bing" => new BingConnector(webSearchApiKey, webSearchEndPoint),
-                            _ => throw new NotSupportedException($"Web search provider '{modelSettings.WebSearchProvider}' is not supported.")
-                        }),
-                    "web_search");
-            }
-
-            var kernel = builder.Build();
-            cancellationToken.ThrowIfCancellationRequested();
-
-            var openAIPromptExecutionSettings = new OpenAIPromptExecutionSettings
-            {
-                Temperature = modelSettings.Temperature,
-                TopP = modelSettings.TopP,
-                FunctionChoiceBehavior = FunctionChoiceBehavior.Auto(autoInvoke: false)
-            };
-            var chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
-
+            var kernel = BuildKernel(kernelMixin);
             var chatHistory = new ChatHistory(
                 chatContext
                     .Select(n => n.Message)
@@ -153,9 +154,9 @@ public class ChatService(
                 var assistantContentBuilder = new StringBuilder();
                 var functionCallContentBuilder = new FunctionCallContentBuilder();
 
-                await foreach (var streamingContent in chatCompletionService.GetStreamingChatMessageContentsAsync(
+                await foreach (var streamingContent in kernelMixin.ChatCompletionService.GetStreamingChatMessageContentsAsync(
                                    chatHistory,
-                                   openAIPromptExecutionSettings,
+                                   kernelMixin.PromptExecutionSettings,
                                    kernel,
                                    cancellationToken))
                 {
@@ -175,7 +176,7 @@ public class ChatService(
                 if (functionCalls.Count == 0) break;
 
                 // TODO: tool calling
-                var functionCallContent = new ChatMessageContent(authorRole ?? default, content: null);
+                var functionCallContent = new ChatMessageContent(AuthorRole.Tool, content: null);
                 chatHistory.Add(functionCallContent);
 
                 foreach (var functionCall in functionCalls)
@@ -223,7 +224,7 @@ public class ChatService(
                 // If the chat history only contains one user message and one assistant message,
                 // we can generate a title for the chat context.
                 GenerateTitleAsync(
-                    chatCompletionService,
+                    kernelMixin.ChatCompletionService,
                     userMessage,
                     assistantMessage,
                     chatContext.Metadata,

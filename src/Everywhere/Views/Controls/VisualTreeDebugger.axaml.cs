@@ -9,7 +9,6 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Everywhere.Models;
 
 namespace Everywhere.Views;
 
@@ -202,7 +201,7 @@ internal class DebuggerVisualElement(IVisualElement element) : ObservableObject
     }
 }
 
-internal class VisualElementProperty(PropertyInfo propertyInfo) : ObservableObject, IValueProxy<object?>
+internal class VisualElementProperty(PropertyInfo propertyInfo) : ObservableObject
 {
     public DebuggerVisualElement? Target
     {
