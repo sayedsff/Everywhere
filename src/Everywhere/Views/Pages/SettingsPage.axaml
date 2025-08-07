@@ -82,30 +82,35 @@
           <ComboBox
             MinWidth="320" MinHeight="32"
             HorizontalAlignment="Left"
-            DisplayMemberBinding="{Binding Key^}"
             ItemsSource="{Binding ItemsSource}"
             SelectedItem="{Binding SelectedItem, Mode=TwoWay}">
-            <ComboBox.DataTemplates>
-              <DataTemplate x:DataType="m:ModelProvider">
-                <StackPanel
-                  Margin="4" Orientation="Horizontal"
-                  Spacing="8">
-                  <Border
-                    Width="20" Height="20"
-                    ClipToBounds="True" CornerRadius="4">
-                    <Image asyncImageLoader:ImageLoader.Source="{Binding IconUrl.ActualValue, FallbackValue={x:Null}}"/>
-                  </Border>
+            <ComboBox.ItemTemplate>
+              <DataTemplate DataType="m:SettingsSelectionItem+Item">
+                <ContentControl Content="{Binding Key^}">
+                  <ContentControl.DataTemplates>
+                    <DataTemplate x:DataType="m:ModelProvider">
+                      <StackPanel
+                        Margin="4" Orientation="Horizontal"
+                        Spacing="8">
+                        <Border
+                          Width="20" Height="20"
+                          ClipToBounds="True" CornerRadius="4">
+                          <Image asyncImageLoader:ImageLoader.Source="{Binding IconUrl.ActualValue, FallbackValue={x:Null}}"/>
+                        </Border>
 
-                  <TextBlock
-                    VerticalAlignment="Center"
-                    Text="{Binding DisplayName.ActualValue, FallbackValue={x:Null}}"/>
-                </StackPanel>
-              </DataTemplate>
+                        <TextBlock
+                          VerticalAlignment="Center"
+                          Text="{Binding DisplayName.ActualValue, FallbackValue={x:Null}}"/>
+                      </StackPanel>
+                    </DataTemplate>
 
-              <DataTemplate x:DataType="m:ModelDefinition">
-                <TextBlock Text="{Binding DisplayName.ActualValue, FallbackValue={x:Null}}"/>
+                    <DataTemplate x:DataType="m:ModelDefinition">
+                      <TextBlock Text="{Binding DisplayName.ActualValue, FallbackValue={x:Null}}"/>
+                    </DataTemplate>
+                  </ContentControl.DataTemplates>
+                </ContentControl>
               </DataTemplate>
-            </ComboBox.DataTemplates>
+            </ComboBox.ItemTemplate>
           </ComboBox>
         </DataTemplate>
 
