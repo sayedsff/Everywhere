@@ -174,7 +174,10 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
         {
             this.settings = settings;
             this.definition = definition;
-            chatClient = new AnthropicClient(new APIAuthentication(provider.ApiKey)).Messages;
+            chatClient = new AnthropicClient(new APIAuthentication(provider.ApiKey))
+            {
+                ApiUrlFormat = provider.Endpoint + "/{0}/{1}"
+            }.Messages;
             ChatCompletionService = chatClient.AsChatCompletionService();
         }
 
