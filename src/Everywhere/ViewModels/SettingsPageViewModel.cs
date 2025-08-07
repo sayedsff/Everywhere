@@ -197,7 +197,7 @@ public class SettingsPageViewModel : ReactiveViewModelBase
             {
                 Id = "openai",
                 DisplayName = "OpenAI",
-                Endpoint = "https://api.openai.com",
+                Endpoint = "https://api.openai.com/v1",
                 IconUrl = "https://openai.com/favicon.ico",
                 Schema = ModelProviderSchema.OpenAI,
                 ModelDefinitions =
@@ -469,6 +469,48 @@ public class SettingsPageViewModel : ReactiveViewModelBase
                     },
                 ]
             },
+            new ModelProvider
+            {
+                Id = "ollama",
+                DisplayName = "Ollama",
+                Endpoint = "http://127.0.0.1:11434",
+                IconUrl = "https://ollama.com/public/ollama.png",
+                Schema = ModelProviderSchema.Ollama,
+                ModelDefinitions =
+                [
+                    new ModelDefinition
+                    {
+                        Id = "gpt-oss:20b",
+                        DisplayName = "GPT-OSS 20B",
+                        MaxTokens = 32_768,
+                        IsImageInputSupported = false,
+                        IsFunctionCallingSupported = true,
+                        IsDeepThinkingSupported = true,
+                        IsWebSearchSupported = false,
+                        ReleasedAt = new DateOnly(2025, 08, 05),
+                    },
+                    new ModelDefinition
+                    {
+                        Id = "deepseek-r1:8b",
+                        DisplayName = "DeepSeek R1 7B",
+                        MaxTokens = 65_536,
+                        IsImageInputSupported = false,
+                        IsFunctionCallingSupported = false,
+                        IsDeepThinkingSupported = true,
+                        IsWebSearchSupported = false,
+                    },
+                    new ModelDefinition
+                    {
+                        Id = "qwen3:8b",
+                        DisplayName = "Qwen 3 8B",
+                        MaxTokens = 64_000,
+                        IsImageInputSupported = false,
+                        IsFunctionCallingSupported = true,
+                        IsDeepThinkingSupported = true,
+                        IsWebSearchSupported = false
+                    }
+                ]
+            }
         ];
         settings.Model.SelectedModelProviderId = "openai";
         settings.Model.SelectedModelDefinitionId = "gpt-4.1";

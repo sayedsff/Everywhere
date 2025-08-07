@@ -6,8 +6,10 @@ using Microsoft.KernelMemory;
 using Microsoft.KernelMemory.AI;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
+using Microsoft.SemanticKernel.Connectors.Ollama;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using Microsoft.SemanticKernel.TextGeneration;
+using OllamaSharp;
 using TextContent = Microsoft.SemanticKernel.TextContent;
 
 namespace Everywhere.Chat;
@@ -39,6 +41,7 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
             return cachedKernelMixin.KernelMixin;
         }
 
+        cachedKernelMixin?.KernelMixin.Dispose();
         cachedKernelMixin = new CachedKernelMixin(
             modelProvider.Schema,
             modelDefinition.Id,
@@ -48,7 +51,7 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
             {
                 ModelProviderSchema.OpenAI => new OpenAIKernelMixin(settings.Model, modelProvider, modelDefinition),
                 ModelProviderSchema.Anthropic => new AnthropicKernelMixin(settings.Model, modelProvider, modelDefinition),
-                // ModelProviderSchema.Ollama => new OllamaKernelMixin(settings.Model, modelProvider, modelDefinition),
+                ModelProviderSchema.Ollama => new OllamaKernelMixin(settings.Model, modelProvider, modelDefinition),
                 _ => throw new NotSupportedException($"Model provider schema '{modelProvider.Schema}' is not supported.")
             });
         return cachedKernelMixin.KernelMixin;
@@ -134,6 +137,8 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
                 yield return new GeneratedTextContent(content.Text);
             }
         }
+
+        public void Dispose() { }
     }
 
     private class AnthropicKernelMixin : IKernelMixin, ITextGenerationService, ITextGenerator
@@ -222,6 +227,74 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
                     StopSequences = options.StopSequences,
                 },
                 cancellationToken).Select(update => new GeneratedTextContent(update.Text));
+        }
+
+        public void Dispose()
+        {
+            chatClient.Dispose();
+        }
+    }
+
+    private class OllamaKernelMixin : IKernelMixin, ITextGenerator
+    {
+        public PromptExecutionSettings PromptExecutionSettings => new OllamaPromptExecutionSettings
+        {
+            Temperature = (float)settings.Temperature,
+            TopP = (float)settings.TopP,
+            FunctionChoiceBehavior = FunctionChoiceBehavior.Auto(autoInvoke: false)
+        };
+
+        public ITextGenerationService TextGenerationService { get; }
+
+        public IChatCompletionService ChatCompletionService { get; }
+
+        public ITextGenerator TextGenerator => this;
+
+        public int MaxTokenTotal => definition.MaxTokens;
+
+        private readonly ModelSettings settings;
+        private readonly ModelDefinition definition;
+        private readonly OllamaApiClient client;
+
+        public OllamaKernelMixin(ModelSettings settings, ModelProvider provider, ModelDefinition definition)
+        {
+            this.settings = settings;
+            this.definition = definition;
+            client = new OllamaApiClient(provider.Endpoint, definition.Id);
+
+            TextGenerationService = new OllamaTextGenerationService(client);
+            ChatCompletionService = client
+                .To<IChatClient>()
+                .AsBuilder()
+                .Build()
+                .AsChatCompletionService();
+        }
+
+        public int CountTokens(string text) => text.Length / 4;
+
+        public IReadOnlyList<string> GetTokens(string text) => throw new NotSupportedException("Ollama does not support tokenization.");
+
+        public IAsyncEnumerable<GeneratedTextContent> GenerateTextAsync(
+            string prompt,
+            TextGenerationOptions options,
+            CancellationToken cancellationToken = default)
+        {
+            return client.GetStreamingResponseAsync(
+                prompt,
+                new ChatOptions
+                {
+                    Temperature = (float)options.Temperature,
+                    TopP = (float)options.NucleusSampling,
+                    PresencePenalty = (float)options.PresencePenalty,
+                    FrequencyPenalty = (float)options.FrequencyPenalty,
+                    StopSequences = options.StopSequences,
+                },
+                cancellationToken).Select(update => new GeneratedTextContent(update.Text));
+        }
+
+        public void Dispose()
+        {
+            client.Dispose();
         }
     }
 }
