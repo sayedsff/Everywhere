@@ -92,69 +92,72 @@
 ### 🛠️ 技术特点
 
 <table>
-  <tr>
-    <th width="20%">类别</th>
-    <th width="40%">✅ 当前支持</th>
-    <th width="40%">🚧 计划中</th>
-  </tr>
-  <tr>
-    <td><b>LLM 支持</b></td>
-    <td>
-      • OpenAI (ChatGPT)<br>
-      • Azure OpenAI
-    </td>
-    <td>
-      • Claude<br>
-      • Gemini<br>
-      • Ollama<br>
-      • Grok
-    </td>
-  </tr>
-  <tr>
-    <td><b>工具集成</b></td>
-    <td>
-      • 网页搜索
-    </td>
-    <td>
-      • 模型上下文协议 (MCP) 工具<br>
-      • 系统 API<br>
-      • 文件操作
-    </td>
-  </tr>
-  <tr>
-    <td><b>界面</b></td>
-    <td>
-      • 键盘快捷键<br>
-      • Markdown 渲染<br>
-      • 代码语法高亮
-    </td>
-    <td>
-      • LaTeX 支持<br>
-      • 语音输入<br>
-      • 高级格式选项
-    </td>
-  </tr>
-  <tr>
-    <td><b>平台支持</b></td>
-    <td>
-      • Windows
-    </td>
-    <td>
-      • macOS<br>
-      • Linux
-    </td>
-  </tr>
-  <tr>
-    <td><b>语言支持</b></td>
-    <td>
-      • 简体中文<br>
-      • English
-    </td>
-    <td>
-      • 更多语言<br>
-      <i>（欢迎贡献）</i>
-    </td>
-  </tr>
+  <thead>
+    <tr>
+      <th width="25%">类别</th>
+      <th width="40%">✅ 当前支持</th>
+      <th width="40%">🚧 进行中</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><b>🤖 LLM 支持</b></td>
+      <td>
+        • OpenAI (ChatGPT)<br>
+        • Azure OpenAI
+      </td>
+      <td>
+        • Claude<br>
+        • Gemini<br>
+        • Ollama<br>
+        • Grok
+      </td>
+    </tr>
+    <tr>
+      <td><b>⚙️ 工具集成</b></td>
+      <td>
+        • 网页搜索
+      </td>
+      <td>
+        • 模型上下文协议 (MCP) 工具<br>
+        • 系统 API
+      </td>
+    </tr>
+    <tr>
+      <td><b>🫧 界面</b></td>
+      <td>
+        • 键盘快捷键<br>
+        • Markdown 渲染<br>
+        • 代码语法高亮
+      </td>
+      <td>
+        • LaTeX 支持<br>
+        • 语音输入<br>
+        • 高级格式选项
+      </td>
+    </tr>
+    <tr>
+      <td><b>🖥️ 平台支持</b></td>
+      <td>
+        • Windows
+      </td>
+      <td>
+        • macOS<br>
+        • Linux
+      </td>
+    </tr>
+    <tr>
+      <td><b>🌐 语言支持</b></td>
+      <td>
+        • 简体中文<br>
+        • English
+      </td>
+      <td>
+        <i>(欢迎贡献)</i>
+        <a href="https://crowdin.com/project/everywhere" rel="nofollow" target="_blank"><img style="width:140;height:40px" src="https://badges.crowdin.net/badge/dark/crowdin-on-light.png" srcset="https://badges.crowdin.net/badge/dark/crowdin-on-light.png 1x,https://badges.crowdin.net/badge/dark/crowdin-on-light@2x.png 2x" alt="Crowdin | Everywhere" /></a>
+      </td>
+    </tr>
+  </tbody>
 </table>
 
 ### 🛠 构建工具
