@@ -19,7 +19,7 @@ public class App : Application
 {
     public TopLevel TopLevel { get; } = new Window();
 
-    private TransientWindow? mainWindow, debugWindow;
+    private TransientWindow? _mainWindow, _debugWindow;
 
     public override void Initialize()
     {
@@ -115,30 +115,30 @@ public class App : Application
         var settings = ServiceLocator.Resolve<Settings>();
         if (settings.Internal.PreviousLaunchVersion == version) return;
 
-        ShowWindow<MainView>(ref mainWindow);
+        ShowWindow<MainView>(ref _mainWindow);
     }
 
     private void HandleOpenMainWindowMenuItemClicked(object? sender, EventArgs e)
     {
-        ShowWindow<MainView>(ref mainWindow);
+        ShowWindow<MainView>(ref _mainWindow);
     }
 
     private void HandleOpenDebugWindowMenuItemClicked(object? sender, EventArgs e)
     {
-        ShowWindow<VisualTreeDebugger>(ref debugWindow);
+        ShowWindow<VisualTreeDebugger>(ref _debugWindow);
     }
 
     /// <summary>
     /// Flag to prevent multiple calls to ShowWindow method from event loop.
     /// </summary>
-    private static bool isShowWindowBusy;
+    private static bool _isShowWindowBusy;
 
     private static void ShowWindow<TContent>(ref TransientWindow? window) where TContent : Control
     {
-        if (isShowWindowBusy) return;
+        if (_isShowWindowBusy) return;
         try
         {
-            isShowWindowBusy = true;
+            _isShowWindowBusy = true;
             if (window is { IsVisible: true })
             {
                 var topmost = window.Topmost;
@@ -160,7 +160,7 @@ public class App : Application
         }
         finally
         {
-            isShowWindowBusy = false;
+            _isShowWindowBusy = false;
         }
     }
 

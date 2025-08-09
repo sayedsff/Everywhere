@@ -140,11 +140,11 @@ public partial class ChatInputBox : TextBox
         set => SetValue(IsSendButtonEnabledProperty, value);
     }
 
-    private IDisposable? sendButtonClickSubscription;
-    private IDisposable? chatAttachmentItemsControlPointerMovedSubscription;
-    private IDisposable? chatAttachmentItemsControlPointerExitedSubscription;
+    private IDisposable? _sendButtonClickSubscription;
+    private IDisposable? _chatAttachmentItemsControlPointerMovedSubscription;
+    private IDisposable? _chatAttachmentItemsControlPointerExitedSubscription;
 
-    private readonly Lazy<OverlayWindow> visualElementAttachmentOverlayWindow;
+    private readonly Lazy<OverlayWindow> _visualElementAttachmentOverlayWindow;
 
     static ChatInputBox()
     {
@@ -153,7 +153,7 @@ public partial class ChatInputBox : TextBox
 
     public ChatInputBox()
     {
-        visualElementAttachmentOverlayWindow = new Lazy<OverlayWindow>(() => new OverlayWindow(TopLevel.GetTopLevel(this) as WindowBase)
+        _visualElementAttachmentOverlayWindow = new Lazy<OverlayWindow>(() => new OverlayWindow(TopLevel.GetTopLevel(this) as WindowBase)
         {
             Content = new Border
             {
@@ -169,14 +169,14 @@ public partial class ChatInputBox : TextBox
     {
         base.OnApplyTemplate(e);
 
-        sendButtonClickSubscription?.Dispose();
-        chatAttachmentItemsControlPointerMovedSubscription?.Dispose();
-        chatAttachmentItemsControlPointerExitedSubscription?.Dispose();
+        _sendButtonClickSubscription?.Dispose();
+        _chatAttachmentItemsControlPointerMovedSubscription?.Dispose();
+        _chatAttachmentItemsControlPointerExitedSubscription?.Dispose();
 
         // We handle the click event of the SendButton here instead of using Command binding,
         // because we need to clear the text after sending the message.
         var sendButton = e.NameScope.Find<Button>("PART_SendButton").NotNull();
-        sendButtonClickSubscription = sendButton.AddDisposableHandler(
+        _sendButtonClickSubscription = sendButton.AddDisposableHandler(
             Button.ClickEvent,
             (_, args) =>
             {
@@ -188,7 +188,7 @@ public partial class ChatInputBox : TextBox
             handledEventsToo: true);
 
         var chatAttachmentItemsControl = e.NameScope.Find<ItemsControl>("PART_ChatAttachmentItemsControl").NotNull();
-        chatAttachmentItemsControlPointerMovedSubscription = chatAttachmentItemsControl.AddDisposableHandler(
+        _chatAttachmentItemsControlPointerMovedSubscription = chatAttachmentItemsControl.AddDisposableHandler(
             PointerMovedEvent,
             (_, args) =>
             {
@@ -197,15 +197,15 @@ public partial class ChatInputBox : TextBox
                 {
                     element = element.Parent;
                     if (element is not { DataContext: ChatVisualElementAttachment attachment }) continue;
-                    visualElementAttachmentOverlayWindow.Value.UpdateForVisualElement(attachment.Element);
+                    _visualElementAttachmentOverlayWindow.Value.UpdateForVisualElement(attachment.Element);
                     return;
                 }
-                visualElementAttachmentOverlayWindow.Value.UpdateForVisualElement(null);
+                _visualElementAttachmentOverlayWindow.Value.UpdateForVisualElement(null);
             },
             handledEventsToo: true);
-        chatAttachmentItemsControlPointerExitedSubscription = chatAttachmentItemsControl.AddDisposableHandler(
+        _chatAttachmentItemsControlPointerExitedSubscription = chatAttachmentItemsControl.AddDisposableHandler(
             PointerExitedEvent,
-            (_, _) => visualElementAttachmentOverlayWindow.Value.UpdateForVisualElement(null),
+            (_, _) => _visualElementAttachmentOverlayWindow.Value.UpdateForVisualElement(null),
             handledEventsToo: true);
     }
 

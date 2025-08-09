@@ -156,6 +156,7 @@ public partial class AggregateDynamicResourceKey(params DynamicResourceKeyBase[]
 ///     "jp": "こんにちは、世界！"
 /// }
 /// </remarks>
+[Serializable]
 public class JsonDynamicResourceKey : Dictionary<string, string>, IObservable<object?>
 {
     public IDisposable Subscribe(IObserver<object?> observer)

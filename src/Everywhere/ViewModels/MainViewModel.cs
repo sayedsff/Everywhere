@@ -14,17 +14,17 @@ public partial class MainViewModel(IServiceProvider serviceProvider, Settings se
 {
     [field: AllowNull, MaybeNull]
     public NotifyCollectionChangedSynchronizedViewList<SidebarItem> Pages =>
-        field ??= pages.ToNotifyCollectionChangedSlim(SynchronizationContextCollectionEventDispatcher.Current);
+        field ??= _pages.ToNotifyCollectionChangedSlim(SynchronizationContextCollectionEventDispatcher.Current);
 
     [ObservableProperty] public partial SidebarItem? SelectedPage { get; set; }
 
     public Settings Settings => settings;
 
-    private readonly ObservableList<SidebarItem> pages = [];
+    private readonly ObservableList<SidebarItem> _pages = [];
 
     protected internal override Task ViewLoaded(CancellationToken cancellationToken)
     {
-        pages.Reset(
+        _pages.Reset(
             serviceProvider.GetServices<IMainViewPage>().Select(p => new SidebarItem
             {
                 [ContentControl.ContentProperty] = new TextBlock
@@ -35,7 +35,7 @@ public partial class MainViewModel(IServiceProvider serviceProvider, Settings se
                 [SidebarItem.RouteProperty] = p,
                 Icon = new LucideIcon { Kind = p.Icon, Size = 20 }
             }));
-        SelectedPage = pages.FirstOrDefault();
+        SelectedPage = _pages.FirstOrDefault();
 
         ShowWelcomeDialogOnDemand();
 

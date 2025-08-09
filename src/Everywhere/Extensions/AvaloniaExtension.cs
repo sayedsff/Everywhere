@@ -1,6 +1,5 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Threading;
-using Everywhere.Models;
 
 namespace Everywhere.Extensions;
 

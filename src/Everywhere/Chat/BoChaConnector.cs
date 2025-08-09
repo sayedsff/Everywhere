@@ -12,9 +12,9 @@ namespace Everywhere.Chat;
 
 public partial class BoChaConnector : IWebSearchEngineConnector
 {
-    private readonly ILogger logger;
-    private readonly HttpClient httpClient;
-    private readonly Uri? uri;
+    private readonly ILogger _logger;
+    private readonly HttpClient _httpClient;
+    private readonly Uri? _uri;
     private const string DefaultUri = "https://api.bochaai.com/v1/web-search";
 
     /// <summary>
@@ -37,10 +37,10 @@ public partial class BoChaConnector : IWebSearchEngineConnector
     /// <param name="loggerFactory">The <see cref="ILoggerFactory"/> to use for logging. If null, no logging will be performed.</param>
     public BoChaConnector(string apiKey, HttpClient httpClient, Uri? uri = null, ILoggerFactory? loggerFactory = null)
     {
-        logger = loggerFactory?.CreateLogger(typeof(BoChaConnector)) ?? NullLogger.Instance;
-        this.httpClient = httpClient;
-        this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
-        this.uri = uri ?? new Uri(DefaultUri);
+        _logger = loggerFactory?.CreateLogger(typeof(BoChaConnector)) ?? NullLogger.Instance;
+        _httpClient = httpClient;
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
+        _uri = uri ?? new Uri(DefaultUri);
     }
 
     /// <inheritdoc/>
@@ -51,10 +51,10 @@ public partial class BoChaConnector : IWebSearchEngineConnector
             throw new ArgumentOutOfRangeException(nameof(count), count, $"{nameof(count)} value must be greater than 0 and less than 50.");
         }
 
-        logger.LogDebug("Sending request: {Uri}", uri);
+        _logger.LogDebug("Sending request: {Uri}", _uri);
 
-        using var responseMessage = await httpClient.PostAsync(
-            uri,
+        using var responseMessage = await _httpClient.PostAsync(
+            _uri,
             JsonContent.Create(new
             {
                 query,
@@ -63,12 +63,12 @@ public partial class BoChaConnector : IWebSearchEngineConnector
             }),
             cancellationToken).ConfigureAwait(false);
 
-        logger.LogDebug("Response received: {StatusCode}", responseMessage.StatusCode);
+        _logger.LogDebug("Response received: {StatusCode}", responseMessage.StatusCode);
 
         var json = await responseMessage.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 
         // Sensitive data, logging as trace, disabled by default
-        logger.LogTrace("Response content received: {Data}", json);
+        _logger.LogTrace("Response content received: {Data}", json);
 
         var response = JsonSerializer.Deserialize(json, ResponseJsonSerializationContext.Default.Response);
         if (response is not { Data: { } data })

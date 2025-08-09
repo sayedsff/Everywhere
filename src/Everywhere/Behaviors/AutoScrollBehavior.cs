@@ -21,7 +21,7 @@ public class AutoScrollBehavior : Behavior<ScrollViewer>
         set => SetValue(ModeProperty, value);
     }
 
-    private bool isAtEnd = true;
+    private bool _isAtEnd = true;
 
     protected override void OnAttached()
     {
@@ -43,10 +43,10 @@ public class AutoScrollBehavior : Behavior<ScrollViewer>
 
         if (e.Property == ScrollViewer.OffsetProperty)
         {
-            isAtEnd = e.NewValue.To<Vector>().Y >= scrollViewer.Extent.Height - scrollViewer.Viewport.Height;
+            _isAtEnd = e.NewValue.To<Vector>().Y >= scrollViewer.Extent.Height - scrollViewer.Viewport.Height;
         }
 
-        if (Mode == AutoScrollBehaviorMode.Always || Mode == AutoScrollBehaviorMode.WhenAtEnd && isAtEnd)
+        if (Mode == AutoScrollBehaviorMode.Always || Mode == AutoScrollBehaviorMode.WhenAtEnd && _isAtEnd)
         {
             scrollViewer.Offset = new Vector(scrollViewer.Offset.X, double.PositiveInfinity);
         }

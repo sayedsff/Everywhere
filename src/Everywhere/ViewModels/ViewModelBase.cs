@@ -91,8 +91,8 @@ public abstract partial class BusyViewModelBase : ReactiveViewModelBase
 
     public bool IsNotBusy => !IsBusy;
 
-    private Task? currentTask;
-    private readonly SemaphoreSlim executionLock = new(1, 1);
+    private Task? _currentTask;
+    private readonly SemaphoreSlim _executionLock = new(1, 1);
 
     protected async Task ExecuteBusyTaskAsync(
         Func<CancellationToken, Task> task,
@@ -100,17 +100,17 @@ public abstract partial class BusyViewModelBase : ReactiveViewModelBase
         ExecutionFlags flags = ExecutionFlags.None,
         CancellationToken cancellationToken = default)
     {
-        await executionLock.WaitAsync(cancellationToken);
+        await _executionLock.WaitAsync(cancellationToken);
         try
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (!flags.HasFlag(ExecutionFlags.EnqueueIfBusy) && IsBusy) return;
 
             Task taskToWait;
-            if (currentTask is { IsCompleted: false })
+            if (_currentTask is { IsCompleted: false })
             {
-                taskToWait = currentTask;
-                currentTask = currentTask.ContinueWith(
+                taskToWait = _currentTask;
+                _currentTask = _currentTask.ContinueWith(
                     async _ =>
                     {
                         try { await task(cancellationToken); }
@@ -120,7 +120,7 @@ public abstract partial class BusyViewModelBase : ReactiveViewModelBase
             }
             else
             {
-                taskToWait = currentTask = task(cancellationToken);
+                taskToWait = _currentTask = task(cancellationToken);
             }
 
             try
@@ -135,7 +135,7 @@ public abstract partial class BusyViewModelBase : ReactiveViewModelBase
             }
             finally
             {
-                IsBusy = currentTask is
+                IsBusy = _currentTask is
                 {
                     Status: TaskStatus.WaitingToRun or TaskStatus.Running or TaskStatus.WaitingForChildrenToComplete
                 };
@@ -143,7 +143,7 @@ public abstract partial class BusyViewModelBase : ReactiveViewModelBase
         }
         finally
         {
-            executionLock.Release();
+            _executionLock.Release();
         }
     }
 

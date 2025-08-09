@@ -7,7 +7,7 @@ using Windows.Win32.Foundation;
 using Avalonia;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
-using Everywhere.Windows.Services;
+using Everywhere.Windows.Interop;
 using Vortice.Direct3D;
 using Vortice.Direct3D11;
 using Vortice.DXGI;
@@ -18,14 +18,14 @@ namespace Everywhere.Windows.Utils;
 
 public class Direct3D11ScreenCaptureHelper
 {
-    private readonly StrategyBasedComWrappers comWrappers = new();
-    private readonly Interop.IGraphicsCaptureItemInterop interop;
+    private readonly StrategyBasedComWrappers _comWrappers = new();
+    private readonly IGraphicsCaptureItemInterop _interop;
 
     public Direct3D11ScreenCaptureHelper()
     {
         var factory = ActivationFactory.Get("Windows.Graphics.Capture.GraphicsCaptureItem");
-        Marshal.QueryInterface(factory.ThisPtr, typeof(Interop.IGraphicsCaptureItemInterop).GUID, out var pInterop);
-        interop = (Interop.IGraphicsCaptureItemInterop)comWrappers.GetOrCreateObjectForComInstance(pInterop, CreateObjectFlags.None);
+        Marshal.QueryInterface(factory.ThisPtr, typeof(IGraphicsCaptureItemInterop).GUID, out var pInterop);
+        _interop = (IGraphicsCaptureItemInterop)_comWrappers.GetOrCreateObjectForComInstance(pInterop, CreateObjectFlags.None);
     }
 
     public async Task<Bitmap> CaptureAsync(nint hWnd, PixelRect relativeRect)
@@ -35,7 +35,7 @@ public class Direct3D11ScreenCaptureHelper
         CreateDirect3D11DeviceFromDXGIDevice(dxgiDevice.NativePointer, out var pD3d11Device).ThrowOnFailure();
         using var direct3dDevice = MarshalInterface<IDirect3DDevice>.FromAbi(pD3d11Device);
 
-        var pItem = interop.CreateForWindow(hWnd, new Guid("79C3F95B-31F7-4EC2-A464-632EF5D30760"));
+        var pItem = _interop.CreateForWindow(hWnd, new Guid("79C3F95B-31F7-4EC2-A464-632EF5D30760"));
         var item = GraphicsCaptureItem.FromAbi(pItem);
         var size = item.Size;
 

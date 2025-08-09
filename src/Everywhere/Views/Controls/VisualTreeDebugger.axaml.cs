@@ -14,20 +14,20 @@ namespace Everywhere.Views;
 
 public partial class VisualTreeDebugger : UserControl
 {
-    private readonly IVisualElementContext visualElementContext;
-    private readonly ObservableCollection<IVisualElement> rootElements = [];
-    private readonly IReadOnlyList<VisualElementProperty> properties = typeof(DebuggerVisualElement)
+    private readonly IVisualElementContext _visualElementContext;
+    private readonly ObservableCollection<IVisualElement> _rootElements = [];
+    private readonly IReadOnlyList<VisualElementProperty> _properties = typeof(DebuggerVisualElement)
         .GetProperties(BindingFlags.Instance | BindingFlags.Public)
         .Select(p => new VisualElementProperty(p))
         .ToReadOnlyList();
-    private readonly OverlayWindow treeViewPointerOverOverlayWindow;
+    private readonly OverlayWindow _treeViewPointerOverOverlayWindow;
 
 #if DEBUG
     [Obsolete("This constructor is for design time only.", true)]
     public VisualTreeDebugger()
     {
-        visualElementContext = ServiceLocator.Resolve<IVisualElementContext>();
-        treeViewPointerOverOverlayWindow = new OverlayWindow();
+        _visualElementContext = ServiceLocator.Resolve<IVisualElementContext>();
+        _treeViewPointerOverOverlayWindow = new OverlayWindow();
     }
 #endif
 
@@ -35,25 +35,25 @@ public partial class VisualTreeDebugger : UserControl
         IHotkeyListener hotkeyListener,
         IVisualElementContext visualElementContext)
     {
-        this.visualElementContext = visualElementContext;
+        this._visualElementContext = visualElementContext;
 
         InitializeComponent();
 
-        VisualTreeView.ItemsSource = rootElements;
-        PropertyItemsControl.ItemsSource = properties;
+        VisualTreeView.ItemsSource = _rootElements;
+        PropertyItemsControl.ItemsSource = _properties;
 
         hotkeyListener.KeyboardHotkeyActivated += () =>
         {
-            rootElements.Clear();
+            _rootElements.Clear();
             var element = visualElementContext.PointerOverElement;
             if (element == null) return;
             element = element
                 .GetAncestors()
                 .LastOrDefault() ?? element;
-            rootElements.Add(element);
+            _rootElements.Add(element);
         };
 
-        treeViewPointerOverOverlayWindow = new OverlayWindow
+        _treeViewPointerOverOverlayWindow = new OverlayWindow
         {
             Content = new Border
             {
@@ -99,13 +99,13 @@ public partial class VisualTreeDebugger : UserControl
             }
         }
 
-        treeViewPointerOverOverlayWindow.UpdateForVisualElement(visualElement);
+        _treeViewPointerOverOverlayWindow.UpdateForVisualElement(visualElement);
     }
 
     private void HandleVisualTreeViewSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
         var debuggerElement = VisualTreeView.SelectedItem is not IVisualElement selectedItem ? null : new DebuggerVisualElement(selectedItem);
-        foreach (var property in properties)
+        foreach (var property in _properties)
         {
             property.Target = debuggerElement;
         }
@@ -125,10 +125,10 @@ public partial class VisualTreeDebugger : UserControl
     {
         try
         {
-            rootElements.Clear();
-            if (await visualElementContext.PickElementAsync(PickElementMode.Element) is { } element)
+            _rootElements.Clear();
+            if (await _visualElementContext.PickElementAsync(PickElementMode.Element) is { } element)
             {
-                rootElements.Add(element);
+                _rootElements.Add(element);
             }
         }
         catch

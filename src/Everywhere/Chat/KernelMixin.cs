@@ -16,7 +16,7 @@ namespace Everywhere.Chat;
 
 public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
 {
-    private CachedKernelMixin? cachedKernelMixin;
+    private CachedKernelMixin? _cachedKernelMixin;
 
     public IKernelMixin GetOrCreate()
     {
@@ -32,17 +32,17 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
             throw new InvalidOperationException("No model definition found with the selected ID.");
         }
 
-        if (cachedKernelMixin is not null &&
-            cachedKernelMixin.Schema == modelProvider.Schema &&
-            cachedKernelMixin.ModelId == modelDefinition.Id &&
-            cachedKernelMixin.Endpoint == modelProvider.Endpoint &&
-            cachedKernelMixin.ApiKey == modelProvider.ApiKey)
+        if (_cachedKernelMixin is not null &&
+            _cachedKernelMixin.Schema == modelProvider.Schema &&
+            _cachedKernelMixin.ModelId == modelDefinition.Id &&
+            _cachedKernelMixin.Endpoint == modelProvider.Endpoint &&
+            _cachedKernelMixin.ApiKey == modelProvider.ApiKey)
         {
-            return cachedKernelMixin.KernelMixin;
+            return _cachedKernelMixin.KernelMixin;
         }
 
-        cachedKernelMixin?.KernelMixin.Dispose();
-        cachedKernelMixin = new CachedKernelMixin(
+        _cachedKernelMixin?.KernelMixin.Dispose();
+        _cachedKernelMixin = new CachedKernelMixin(
             modelProvider.Schema,
             modelDefinition.Id,
             modelProvider.Endpoint,
@@ -54,7 +54,7 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
                 ModelProviderSchema.Ollama => new OllamaKernelMixin(settings.Model, modelProvider, modelDefinition),
                 _ => throw new NotSupportedException($"Model provider schema '{modelProvider.Schema}' is not supported.")
             });
-        return cachedKernelMixin.KernelMixin;
+        return _cachedKernelMixin.KernelMixin;
     }
 
     private record CachedKernelMixin(
@@ -76,20 +76,20 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
             FunctionChoiceBehavior = FunctionChoiceBehavior.Auto(autoInvoke: false)
         };
 
-        public ITextGenerationService TextGenerationService => chatCompletionService;
+        public ITextGenerationService TextGenerationService => _chatCompletionService;
 
-        public IChatCompletionService ChatCompletionService => chatCompletionService;
+        public IChatCompletionService ChatCompletionService => _chatCompletionService;
 
         public ITextGenerator TextGenerator => this;
 
         public int MaxTokenTotal => Math.Max(16_000, definition.MaxTokens);
 
-        private readonly OpenAIChatCompletionService chatCompletionService = new(
+        private readonly OpenAIChatCompletionService _chatCompletionService = new(
             definition.Id,
             new Uri(provider.Endpoint, UriKind.Absolute),
             provider.ApiKey);
 
-        private readonly TiktokenTokenizer tokenizer = GetTokenizer(definition.Id);
+        private readonly TiktokenTokenizer _tokenizer = GetTokenizer(definition.Id);
 
         private static TiktokenTokenizer GetTokenizer(string modelId)
         {
@@ -105,12 +105,12 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
 
         public int CountTokens(string text)
         {
-            return tokenizer.CountTokens(text);
+            return _tokenizer.CountTokens(text);
         }
 
         public IReadOnlyList<string> GetTokens(string text)
         {
-            return tokenizer.GetTokens(text);
+            return _tokenizer.GetTokens(text);
         }
 
         public async IAsyncEnumerable<GeneratedTextContent> GenerateTextAsync(
@@ -118,7 +118,7 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
             TextGenerationOptions options,
             [EnumeratorCancellation] CancellationToken cancellationToken = new())
         {
-            await foreach (var content in chatCompletionService.GetStreamingTextContentsAsync(
+            await foreach (var content in _chatCompletionService.GetStreamingTextContentsAsync(
                                prompt,
                                new OpenAIPromptExecutionSettings
                                {
@@ -145,13 +145,13 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
     {
         public PromptExecutionSettings PromptExecutionSettings => new()
         {
-            ModelId = definition.Id,
+            ModelId = _definition.Id,
             ExtensionData = new Dictionary<string, object>
             {
-                { "temperature", settings.Temperature },
-                { "top_p", settings.TopP },
-                { "presence_penalty", settings.PresencePenalty },
-                { "frequency_penalty", settings.FrequencyPenalty },
+                { "temperature", _settings.Temperature },
+                { "top_p", _settings.TopP },
+                { "presence_penalty", _settings.PresencePenalty },
+                { "frequency_penalty", _settings.FrequencyPenalty },
             },
             FunctionChoiceBehavior = FunctionChoiceBehavior.Auto(autoInvoke: false)
         };
@@ -164,21 +164,21 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
 
         public IReadOnlyDictionary<string, object?> Attributes => ChatCompletionService.Attributes;
 
-        public int MaxTokenTotal => definition.MaxTokens;
+        public int MaxTokenTotal => _definition.MaxTokens;
 
-        private readonly ModelSettings settings;
-        private readonly ModelDefinition definition;
-        private readonly IChatClient chatClient;
+        private readonly ModelSettings _settings;
+        private readonly ModelDefinition _definition;
+        private readonly IChatClient _chatClient;
 
         public AnthropicKernelMixin(ModelSettings settings, ModelProvider provider, ModelDefinition definition)
         {
-            this.settings = settings;
-            this.definition = definition;
-            chatClient = new AnthropicClient(new APIAuthentication(provider.ApiKey))
+            _settings = settings;
+            _definition = definition;
+            _chatClient = new AnthropicClient(new APIAuthentication(provider.ApiKey))
             {
                 ApiUrlFormat = provider.Endpoint + "/{0}/{1}"
             }.Messages;
-            ChatCompletionService = chatClient.AsChatCompletionService();
+            ChatCompletionService = _chatClient.AsChatCompletionService();
         }
 
         public async Task<IReadOnlyList<TextContent>> GetTextContentsAsync(
@@ -187,7 +187,7 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
             Kernel? kernel = null,
             CancellationToken cancellationToken = default)
         {
-            var response = await chatClient.GetResponseAsync(
+            var response = await _chatClient.GetResponseAsync(
                 prompt,
                 executionSettings?.ToChatOptions(kernel),
                 cancellationToken: cancellationToken);
@@ -204,7 +204,7 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
             [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             var chatOptions = executionSettings?.ToChatOptions(kernel) ?? new ChatOptions();
-            await foreach (var update in chatClient.GetStreamingResponseAsync(prompt, chatOptions, cancellationToken))
+            await foreach (var update in _chatClient.GetStreamingResponseAsync(prompt, chatOptions, cancellationToken))
             {
                 yield return new StreamingTextContent(update.Text, modelId: update.ModelId);
             }
@@ -219,7 +219,7 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
             TextGenerationOptions options,
             CancellationToken cancellationToken = default)
         {
-            return chatClient.GetStreamingResponseAsync(
+            return _chatClient.GetStreamingResponseAsync(
                 prompt,
                 new ChatOptions
                 {
@@ -234,7 +234,7 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
 
         public void Dispose()
         {
-            chatClient.Dispose();
+            _chatClient.Dispose();
         }
     }
 
@@ -242,8 +242,8 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
     {
         public PromptExecutionSettings PromptExecutionSettings => new OllamaPromptExecutionSettings
         {
-            Temperature = (float)settings.Temperature,
-            TopP = (float)settings.TopP,
+            Temperature = (float)_settings.Temperature,
+            TopP = (float)_settings.TopP,
             FunctionChoiceBehavior = FunctionChoiceBehavior.Auto(autoInvoke: false)
         };
 
@@ -253,20 +253,20 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
 
         public ITextGenerator TextGenerator => this;
 
-        public int MaxTokenTotal => definition.MaxTokens;
+        public int MaxTokenTotal => _definition.MaxTokens;
 
-        private readonly ModelSettings settings;
-        private readonly ModelDefinition definition;
-        private readonly OllamaApiClient client;
+        private readonly ModelSettings _settings;
+        private readonly ModelDefinition _definition;
+        private readonly OllamaApiClient _client;
 
         public OllamaKernelMixin(ModelSettings settings, ModelProvider provider, ModelDefinition definition)
         {
-            this.settings = settings;
-            this.definition = definition;
-            client = new OllamaApiClient(provider.Endpoint, definition.Id);
+            _settings = settings;
+            _definition = definition;
+            _client = new OllamaApiClient(provider.Endpoint, definition.Id);
 
-            TextGenerationService = new OllamaTextGenerationService(client);
-            ChatCompletionService = client
+            TextGenerationService = new OllamaTextGenerationService(_client);
+            ChatCompletionService = _client
                 .To<IChatClient>()
                 .AsBuilder()
                 .Build()
@@ -282,7 +282,7 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
             TextGenerationOptions options,
             CancellationToken cancellationToken = default)
         {
-            return client.GetStreamingResponseAsync(
+            return _client.GetStreamingResponseAsync(
                 prompt,
                 new ChatOptions
                 {
@@ -297,7 +297,7 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
 
         public void Dispose()
         {
-            client.Dispose();
+            _client.Dispose();
         }
     }
 }

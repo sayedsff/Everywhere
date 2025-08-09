@@ -15,17 +15,17 @@ internal abstract class LowLevelHook<T> : IDisposable where T : unmanaged
 {
     public event LowLevelHookHandler<T>? Callback;
 
-    private readonly UnhookWindowsHookExSafeHandle hookHandle;
-    private GCHandle hookProcHandle;
+    private readonly UnhookWindowsHookExSafeHandle _hookHandle;
+    private GCHandle _hookProcHandle;
 
-    public LowLevelHook(WINDOWS_HOOK_ID id, LowLevelHookHandler<T>? callback = null)
+    protected LowLevelHook(WINDOWS_HOOK_ID id, LowLevelHookHandler<T>? callback = null)
     {
         Callback = callback;
 
         using var hModule = PInvoke.GetModuleHandle(null);
         var hookProc = new HOOKPROC(HookProc);
-        hookProcHandle = GCHandle.Alloc(hookProc);
-        hookHandle = PInvoke.SetWindowsHookEx(
+        _hookProcHandle = GCHandle.Alloc(hookProc);
+        _hookHandle = PInvoke.SetWindowsHookEx(
             id,
             hookProc,
             hModule,
@@ -51,8 +51,8 @@ internal abstract class LowLevelHook<T> : IDisposable where T : unmanaged
     {
         GC.SuppressFinalize(this);
 
-        hookHandle.Dispose();
-        hookProcHandle.Free();
+        _hookHandle.Dispose();
+        _hookProcHandle.Free();
     }
 }
 

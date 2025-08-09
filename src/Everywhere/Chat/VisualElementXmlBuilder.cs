@@ -39,34 +39,34 @@ public class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreElements,
         public override int GetHashCode() => Element.Id.GetHashCode();
     }
 
-    private readonly Dictionary<string, int> idMap = [];
-    private readonly HashSet<XmlVisualElement> rootElements = [];
-    private StringBuilder? visualTreeXmlBuilder;
+    private readonly Dictionary<string, int> _idMap = [];
+    private readonly HashSet<XmlVisualElement> _rootElements = [];
+    private StringBuilder? _visualTreeXmlBuilder;
 
     public string BuildXml(CancellationToken cancellationToken)
     {
         EnsureBuilt(cancellationToken);
-        return visualTreeXmlBuilder.ToString();
+        return _visualTreeXmlBuilder.ToString();
     }
 
     public IReadOnlyDictionary<string, int> GetIdMap(CancellationToken cancellationToken)
     {
         EnsureBuilt(cancellationToken);
-        return idMap;
+        return _idMap;
     }
 
     public IEnumerable<IVisualElement> GetRootElements(CancellationToken cancellationToken)
     {
         EnsureBuilt(cancellationToken);
-        return rootElements.Select(e => e.Element);
+        return _rootElements.Select(e => e.Element);
     }
 
-    [MemberNotNull(nameof(visualTreeXmlBuilder))]
+    [MemberNotNull(nameof(_visualTreeXmlBuilder))]
     private void EnsureBuilt(CancellationToken cancellationToken)
     {
         if (coreElements.Count == 0) throw new InvalidOperationException("No core elements to build XML from.");
 
-        if (visualTreeXmlBuilder != null) return;
+        if (_visualTreeXmlBuilder != null) return;
         cancellationToken.ThrowIfCancellationRequested();
 
 #if DEBUG
@@ -172,12 +172,12 @@ public class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreElements,
         {
             var current = visitedElement;
             while (current.Parent != null) current = current.Parent;
-            rootElements.Add(current);
+            _rootElements.Add(current);
         }
 
-        visualTreeXmlBuilder = new StringBuilder();
-        foreach (var rootElement in rootElements) InternalBuildXml(rootElement, 0);
-        visualTreeXmlBuilder.TrimEnd();
+        _visualTreeXmlBuilder = new StringBuilder();
+        foreach (var rootElement in _rootElements) InternalBuildXml(rootElement, 0);
+        _visualTreeXmlBuilder.TrimEnd();
 
 #if DEBUG
         MeasureProfiler.SaveData();
@@ -201,37 +201,37 @@ public class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreElements,
             var element = xmlElement.Element;
 
             // Start tag
-            visualTreeXmlBuilder.Append(indent).Append('<').Append(element.Type);
+            _visualTreeXmlBuilder.Append(indent).Append('<').Append(element.Type);
 
             // Add ID
-            var id = idMap.Count;
-            idMap[element.Id] = id;
-            visualTreeXmlBuilder.Append(" id=\"").Append(id).Append('"');
+            var id = _idMap.Count;
+            _idMap[element.Id] = id;
+            _visualTreeXmlBuilder.Append(" id=\"").Append(id).Append('"');
 
             if (xmlElement.Description != null)
             {
-                visualTreeXmlBuilder.Append(" description=\"").Append(SecurityElement.Escape(xmlElement.Description)).Append('"');
+                _visualTreeXmlBuilder.Append(" description=\"").Append(SecurityElement.Escape(xmlElement.Description)).Append('"');
             }
 
             if (xmlElement.Contents.Count == 1)
             {
-                visualTreeXmlBuilder.Append(" content=\"").Append(SecurityElement.Escape(xmlElement.Contents[0])).Append('"');
+                _visualTreeXmlBuilder.Append(" content=\"").Append(SecurityElement.Escape(xmlElement.Contents[0])).Append('"');
             }
 
             if (xmlElement.Children.Count == 0 && xmlElement.Contents.Count == 0)
             {
                 // Self-closing tag if no children and no content
-                visualTreeXmlBuilder.Append("/>").AppendLine();
+                _visualTreeXmlBuilder.Append("/>").AppendLine();
                 return;
             }
 
-            visualTreeXmlBuilder.Append('>').AppendLine();
+            _visualTreeXmlBuilder.Append('>').AppendLine();
 
             // Add contents
             foreach (var contentLine in xmlElement.Contents)
             {
                 if (string.IsNullOrWhiteSpace(contentLine)) continue;
-                visualTreeXmlBuilder
+                _visualTreeXmlBuilder
                     .Append(indent)
                     .Append("  ")
                     .Append(SecurityElement.Escape(contentLine))
@@ -242,7 +242,7 @@ public class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreElements,
             foreach (var child in xmlElement.Children) InternalBuildXml(child, indentLevel + 1);
 
             // End tag
-            visualTreeXmlBuilder.Append(indent).Append("</").Append(element.Type).Append('>').AppendLine();
+            _visualTreeXmlBuilder.Append(indent).Append("</").Append(element.Type).Append('>').AppendLine();
         }
     }
 }
