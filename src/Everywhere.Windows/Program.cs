@@ -1,11 +1,9 @@
-﻿using System.Text.Json;
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input.Platform;
 using Avalonia.Platform.Storage;
 using Everywhere.Chat;
 using Everywhere.Database;
-using Everywhere.Enums;
 using Everywhere.Extensions;
 using Everywhere.Initialization;
 using Everywhere.Interfaces;
@@ -14,11 +12,9 @@ using Everywhere.ViewModels;
 using Everywhere.Views;
 using Everywhere.Views.Pages;
 using Everywhere.Windows.Services;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using ShadUI;
-using WritableJsonConfiguration;
 
 namespace Everywhere.Windows;
 
@@ -79,15 +75,14 @@ public static class Program
 
                 #region Database
 
-                .AddDbContext<IChatDatabase, ChatDbContext>(ServiceLifetime.Singleton)
+                .AddChatDbContextAndStorage()
 
                 #endregion
 
                 #region Initialize
 
-                .AddSingleton<IAsyncInitializer, HotkeyInitializer>()
-                .AddSingleton<IAsyncInitializer>(xx => xx.GetRequiredService<ChatContextManager>())
-                .AddSingleton<IAsyncInitializer>(xx => xx.GetRequiredService<ChatDbContext>())
+                .AddTransient<IAsyncInitializer, HotkeyInitializer>()
+                .AddTransient<IAsyncInitializer>(xx => xx.GetRequiredService<ChatContextManager>())
 
                 #endregion
 

@@ -508,17 +508,39 @@
                             </ItemsControl.ItemsPanel>
 
                             <ItemsControl.DataTemplates>
-                              <DataTemplate DataType="m:ChatImageAttachment">
-                                <Border
-                                  ClipToBounds="True" CornerRadius="4">
-                                  <Image
-                                    MaxWidth="64" MaxHeight="64"
-                                    Source="{Binding Image}">
-                                    <ToolTip.Tip>
-                                      <Image Source="{Binding Image}"/>
-                                    </ToolTip.Tip>
-                                  </Image>
-                                </Border>
+                              <DataTemplate DataType="m:ChatFileAttachment">
+                                <Panel>
+                                  <Border
+                                    ClipToBounds="True" CornerRadius="4"
+                                    IsVisible="{Binding IsImage}">
+                                    <Image
+                                      MaxWidth="64" MaxHeight="64"
+                                      Source="{Binding Image}">
+                                      <ToolTip.Tip>
+                                        <Image Source="{Binding Image}"/>
+                                      </ToolTip.Tip>
+                                    </Image>
+                                  </Border>
+
+                                  <Border
+                                    Height="24"
+                                    Background="{DynamicResource CardBackgroundColor}"
+                                    CornerRadius="4"
+                                    IsVisible="{Binding !IsImage}"
+                                    ToolTip.Tip="{Binding FilePath}">
+                                    <StackPanel
+                                      Margin="6,0" Orientation="Horizontal"
+                                      Spacing="4">
+                                      <LucideIcon
+                                        VerticalAlignment="Center"
+                                        Kind="{Binding Icon}"
+                                        Size="14"/>
+                                      <TextBlock
+                                        VerticalAlignment="Center" FontSize="12"
+                                        Text="{Binding HeaderKey^}"/>
+                                    </StackPanel>
+                                  </Border>
+                                </Panel>
                               </DataTemplate>
 
                               <DataTemplate DataType="m:ChatAttachment">

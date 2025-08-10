@@ -50,6 +50,7 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
 
     private readonly IVisualElementContext _visualElementContext;
     private readonly INativeHelper _nativeHelper;
+    private readonly IRuntimeConstantProvider _runtimeConstantProvider;
     private readonly ILogger<ChatFloatingWindowViewModel> _logger;
 
     private readonly ObservableList<ChatAttachment> _chatAttachments = [];
@@ -61,6 +62,7 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
         Settings settings,
         IVisualElementContext visualElementContext,
         INativeHelper nativeHelper,
+        IRuntimeConstantProvider runtimeConstantProvider,
         ILogger<ChatFloatingWindowViewModel> logger)
     {
         ChatContextManager = chatContextManager;
@@ -69,6 +71,7 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
 
         _visualElementContext = visualElementContext;
         _nativeHelper = nativeHelper;
+        _runtimeConstantProvider = runtimeConstantProvider;
         _logger = logger;
 
         InitializeCommands();
@@ -188,7 +191,7 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
 
     [RelayCommand(CanExecute = nameof(IsNotBusy))]
     private Task AddClipboardAsync() => ExecuteBusyTaskAsync(
-        async _ =>
+        async cancellationToken =>
         {
             if (_chatAttachments.Count >= Settings.Internal.MaxChatAttachmentCount) return;
 
@@ -201,6 +204,8 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
 
             if (formats.Contains(DataFormats.Files))
             {
+                return; // TODO: 0.3.0
+
                 var files = await Clipboard.GetDataAsync(DataFormats.Files);
                 if (files is IEnumerable enumerable)
                 {
@@ -217,7 +222,40 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
             {
                 if (await _nativeHelper.GetClipboardBitmapAsync() is not { } bitmap) return;
 
-                _chatAttachments.Add(new ChatImageAttachment(DynamicResourceKey.Empty, await ResizeImageOnDemandAsync(bitmap)));
+                await Task.Run(async () =>
+                {
+                    var imageCachePath = Path.Combine(
+                        _runtimeConstantProvider.Get<string>(RuntimeConstantType.WritableDataPath),
+                        "cache",
+                        "img");
+                    Directory.CreateDirectory(imageCachePath);
+
+                    using var ms = new MemoryStream();
+                    bitmap.Save(ms, 100);
+
+                    ms.Position = 0;
+                    var sha256 = await SHA256.HashDataAsync(ms, cancellationToken);
+                    var sha256String = Convert.ToHexString(sha256).ToLowerInvariant();
+                    var cacheFilePath = Path.Combine(imageCachePath, $"{sha256String}.png");
+
+                    var fileInfo = new FileInfo(Path.Combine(imageCachePath, $"{sha256String}.png"));
+                    if (!fileInfo.Exists || fileInfo.Length == 0)
+                    {
+                        ms.Position = 0;
+                        await using var fs = fileInfo.Open(FileMode.Create, FileAccess.Write, FileShare.None);
+                        await ms.CopyToAsync(fs, cancellationToken);
+                    }
+
+                    var attachment = await ChatFileAttachment.CreateAsync(fileInfo.FullName);
+                    if (!attachment.IsImage)
+                    {
+                        _logger.LogWarning("The cached file is not an image: {CacheFilePath}", cacheFilePath);
+                        return;
+                    }
+
+                    _chatAttachments.Add(attachment);
+                },
+                cancellationToken);
             }
 
             // TODO: add as text attachment when text is too long
@@ -230,20 +268,6 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
             // }
         },
         _logger.ToExceptionHandler());
-
-    private async static ValueTask<Bitmap> ResizeImageOnDemandAsync(Bitmap image, int maxWidth = 2560, int maxHeight = 2560)
-    {
-        if (image.PixelSize.Width <= maxWidth && image.PixelSize.Height <= maxHeight)
-        {
-            return image;
-        }
-
-        var scale = Math.Min(maxWidth / (double)image.PixelSize.Width, maxHeight / (double)image.PixelSize.Height);
-        var newWidth = (int)(image.PixelSize.Width * scale);
-        var newHeight = (int)(image.PixelSize.Height * scale);
-
-        return await Task.Run(() => image.CreateScaledBitmap(new PixelSize(newWidth, newHeight)));
-    }
 
     [RelayCommand(CanExecute = nameof(IsNotBusy))]
     private async Task AddFileAsync()
@@ -293,34 +317,27 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
     private async ValueTask AddFileUncheckAsync(string filePath)
     {
         if (string.IsNullOrWhiteSpace(filePath)) return;
-        if (!File.Exists(filePath))
-        {
-            _logger.LogInformation("File not found: {FilePath}", filePath);
-            return;
-        }
 
-        var ext = Path.GetExtension(filePath).ToLower();
-        if (ext is ".png" or ".jpg" or ".jpeg" or ".gif" or ".bmp" or ".webp")
+        try
         {
-            if (Settings.Model.SelectedModelDefinition?.IsImageInputSupported.ActualValue is true)
+            var attachment = await ChatFileAttachment.CreateAsync(filePath);
+
+            if (!attachment.IsImage)
             {
-                try
-                {
-                    var bitmap = await Task.Run(() => new Bitmap(filePath));
-                    _chatAttachments.Add(
-                        new ChatImageAttachment(
-                            new DirectResourceKey(Path.GetFileName(filePath)),
-                            await ResizeImageOnDemandAsync(bitmap)));
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Failed to load image from file: {FilePath}", filePath);
-                }
+                return; // TODO: 0.3.0
             }
-        }
 
-        // TODO: 0.3.0
-        // chatAttachments.Add(new ChatFileAttachment(new DirectResourceKey(Path.GetFileName(filePath)), filePath));
+            if (Settings.Model.SelectedModelDefinition?.IsImageInputSupported.ActualValue is not true)
+            {
+                return;
+            }
+
+            _chatAttachments.Add(attachment);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to load image from file: {FilePath}", filePath);
+        }
     }
 
     private static ChatVisualElementAttachment CreateFromVisualElement(IVisualElement element)

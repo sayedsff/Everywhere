@@ -198,7 +198,7 @@ public class SettingsPageViewModel : ReactiveViewModelBase
                 Id = "openai",
                 DisplayName = "OpenAI",
                 Endpoint = "https://api.openai.com/v1",
-                IconUrl = "https://openai.com/favicon.ico",
+                IconUrl = "https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/openai.svg",
                 Schema = ModelProviderSchema.OpenAI,
                 ModelDefinitions =
                 [
@@ -272,9 +272,9 @@ public class SettingsPageViewModel : ReactiveViewModelBase
             new ModelProvider
             {
                 Id = "anthropic",
-                DisplayName = "Anthropic",
+                DisplayName = "Anthropic (Claude)",
                 Endpoint = "https://api.anthropic.com",
-                IconUrl = "https://www.anthropic.com/favicon.ico",
+                IconUrl = "https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/anthropic.svg",
                 Schema = ModelProviderSchema.Anthropic,
                 ModelDefinitions =
                 [
@@ -334,10 +334,60 @@ public class SettingsPageViewModel : ReactiveViewModelBase
             },
             new ModelProvider
             {
+                Id = "gemini",
+                DisplayName = "Gemini (Google)",
+                Endpoint = "https://generativelanguage.googleapis.com/v1beta/openai",
+                IconUrl = "https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/gemini-color.svg",
+                Schema = ModelProviderSchema.OpenAI,
+                ModelDefinitions =
+                [
+                    new ModelDefinition
+                    {
+                        Id = "gemini-2.5-pro",
+                        DisplayName = "Gemini 2.5 Pro",
+                        MaxTokens = 1_048_576,
+                        IsImageInputSupported = true,
+                        IsFunctionCallingSupported = true,
+                        IsDeepThinkingSupported = true,
+                        IsWebSearchSupported = true,
+                        ReleasedAt = new DateOnly(2025, 06, 01),
+                        InputPrice = "$1.25/M",
+                        OutputPrice = "$10.00/M"
+                    },
+                    new ModelDefinition
+                    {
+                        Id = "gemini-2.5-flash",
+                        DisplayName = "Gemini 2.5 Flash",
+                        MaxTokens = 1_048_576,
+                        IsImageInputSupported = true,
+                        IsFunctionCallingSupported = true,
+                        IsDeepThinkingSupported = true,
+                        IsWebSearchSupported = true,
+                        ReleasedAt = new DateOnly(2025, 06, 01),
+                        InputPrice = "$0.30/M",
+                        OutputPrice = "$2.50/M"
+                    },
+                    new ModelDefinition
+                    {
+                        Id = "gemini-2.5-flash0lite",
+                        DisplayName = "Gemini 2.5 Flash-Lite",
+                        MaxTokens = 1_048_576,
+                        IsImageInputSupported = true,
+                        IsFunctionCallingSupported = true,
+                        IsDeepThinkingSupported = true,
+                        IsWebSearchSupported = true,
+                        ReleasedAt = new DateOnly(2025, 07, 01),
+                        InputPrice = "$0.1/M",
+                        OutputPrice = "$0.4/M"
+                    },
+                ]
+            },
+            new ModelProvider
+            {
                 Id = "deepseek",
                 DisplayName = "DeepSeek",
                 Endpoint = "https://api.deepseek.com",
-                IconUrl = "https://www.deepseek.com/favicon.ico",
+                IconUrl = "https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/deepseek-color.svg",
                 Schema = ModelProviderSchema.OpenAI,
                 ModelDefinitions =
                 [
@@ -374,7 +424,7 @@ public class SettingsPageViewModel : ReactiveViewModelBase
                 Id = "moonshot",
                 DisplayName = "Moonshot",
                 Endpoint = "https://api.moonshot.cn/v1",
-                IconUrl = "https://statics.moonshot.cn/moonshot-ai/favicon.ico",
+                IconUrl = "https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/moonshot.svg",
                 Schema = ModelProviderSchema.OpenAI,
                 ModelDefinitions =
                 [
@@ -424,7 +474,7 @@ public class SettingsPageViewModel : ReactiveViewModelBase
                 Id = "xai",
                 DisplayName = "xAI (Grok)",
                 Endpoint = "https://api.x.ai/v1",
-                IconUrl = "https://x.ai/favicon.ico",
+                IconUrl = "https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/grok.svg",
                 Schema = ModelProviderSchema.OpenAI,
                 ModelDefinitions =
                 [
@@ -474,7 +524,7 @@ public class SettingsPageViewModel : ReactiveViewModelBase
                 Id = "ollama",
                 DisplayName = "Ollama",
                 Endpoint = "http://127.0.0.1:11434",
-                IconUrl = "https://ollama.com/public/ollama.png",
+                IconUrl = "https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/ollama.svg",
                 Schema = ModelProviderSchema.Ollama,
                 ModelDefinitions =
                 [

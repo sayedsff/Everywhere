@@ -1,17 +1,16 @@
-﻿using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Everywhere.Database;
 using Everywhere.Enums;
 using Everywhere.Models;
+using Everywhere.Utilities;
 using Microsoft.SemanticKernel.ChatCompletion;
 using ObservableCollections;
 using ZLinq;
 
 namespace Everywhere.Chat;
 
-public partial class ChatContextManager(Settings settings, IChatDatabase chatDatabase) : ObservableObject, IChatContextManager, IAsyncInitializer
+public partial class ChatContextManager : ObservableObject, IChatContextManager, IAsyncInitializer
 {
     public NotifyCollectionChangedSynchronizedViewList<ChatMessageNode> ChatMessageNodes =>
         Current.ToNotifyCollectionChanged(
@@ -22,16 +21,22 @@ public partial class ChatContextManager(Settings settings, IChatDatabase chatDat
     {
         get
         {
-            if (current is not null) return current;
-            CreateNew();
-            return current;
+            if (_current is null) CreateNew();
+            _current.Changed += HandleChatContextChanged;
+            return _current;
         }
         set
         {
-            Debug.Assert(history.ContainsKey(value), "The value must be part of the history.");
+            if (value.Metadata.Id == Guid.Empty)
+                throw new ArgumentException("The provided chat context does not have a valid ID.", nameof(value));
 
-            var previous = current;
-            if (!SetProperty(ref current, value)) return;
+            if (!_history.ContainsKey(value.Metadata.Id))
+                throw new ArgumentException("The provided chat context is not part of the history.", nameof(value));
+
+            var previous = _current;
+            if (!SetProperty(ref _current, value)) return;
+
+            if (previous is not null) previous.Changed -= HandleChatContextChanged;
             if (IsEmptyContext(previous)) Remove(previous);
 
             OnPropertyChanged();
@@ -44,7 +49,7 @@ public partial class ChatContextManager(Settings settings, IChatDatabase chatDat
         get
         {
             var currentDate = DateTimeOffset.UtcNow;
-            return history.Keys.GroupBy(c => (currentDate - c.Metadata.DateModified).TotalDays switch
+            return _history.Values.GroupBy(c => (currentDate - c.Metadata.DateModified).TotalDays switch
             {
                 < 1 => HumanizedDate.Today,
                 < 2 => HumanizedDate.Yesterday,
@@ -61,16 +66,46 @@ public partial class ChatContextManager(Settings settings, IChatDatabase chatDat
 
     [field: AllowNull, MaybeNull]
     public IRelayCommand CreateNewCommand =>
-        field ??= new RelayCommand(CreateNew, () => !IsEmptyContext(current));
+        field ??= new RelayCommand(CreateNew, () => !IsEmptyContext(_current));
 
-    private readonly Dictionary<ChatContext, ChatContextDbItem> history = [];
+    private ChatContext? _current;
 
-    private ChatContext? current;
+    private readonly Dictionary<Guid, ChatContext> _history = [];
+    private readonly HashSet<ChatContext> _saveBuffer = [];
+    private readonly Settings _settings;
+    private readonly IChatContextStorage _chatContextStorage;
+    private readonly DebounceExecutor<ChatContextManager> _saveDebounceExecutor;
 
-    [MemberNotNull(nameof(current))]
+    public ChatContextManager(Settings settings, IChatContextStorage chatContextStorage)
+    {
+        _settings = settings;
+        _chatContextStorage = chatContextStorage;
+        _saveDebounceExecutor = new DebounceExecutor<ChatContextManager>(
+            () => this,
+            static that =>
+            {
+                ChatContext[] toSave;
+                lock (that._saveBuffer)
+                {
+                    toSave = that._saveBuffer.ToArray();
+                    that._saveBuffer.Clear();
+                }
+                Task.WhenAll(toSave.AsValueEnumerable().Select(c => that._chatContextStorage.SaveChatContextAsync(c)).ToArray()).Detach();
+            },
+            TimeSpan.FromSeconds(0.5)
+        );
+    }
+
+    private void HandleChatContextChanged(ChatContext sender)
+    {
+        lock (_saveBuffer) _saveBuffer.Add(sender);
+        _saveDebounceExecutor.Trigger();
+    }
+
+    [MemberNotNull(nameof(_current))]
     private void CreateNew()
     {
-        if (IsEmptyContext(current)) return;
+        if (IsEmptyContext(_current)) return;
 
         var renderedSystemPrompt = Prompts.RenderPrompt(
             Prompts.DefaultSystemPrompt,
@@ -78,13 +113,12 @@ public partial class ChatContextManager(Settings settings, IChatDatabase chatDat
             {
                 { "OS", () => Environment.OSVersion.ToString() },
                 { "Time", () => DateTime.Now.ToString("F") },
-                { "SystemLanguage", () => settings.Common.Language },
+                { "SystemLanguage", () => _settings.Common.Language },
             });
 
-        current = new ChatContext(renderedSystemPrompt);
-        var dbItem = new ChatContextDbItem(current);
-        history.Add(current, dbItem);
-        Task.Run(() => chatDatabase.AddChatContext(dbItem)).Detach();
+        _current = new ChatContext(renderedSystemPrompt);
+        _history.Add(_current.Metadata.Id, _current);
+        Task.Run(() => _chatContextStorage.AddChatContextAsync(_current)).Detach();
 
         OnPropertyChanged(nameof(History));
         OnPropertyChanged(nameof(Current));
@@ -94,14 +128,14 @@ public partial class ChatContextManager(Settings settings, IChatDatabase chatDat
     [RelayCommand]
     private void Remove(ChatContext chatContext)
     {
-        if (!history.Remove(chatContext, out var dbItem)) return;
+        if (!_history.Remove(chatContext.Metadata.Id)) return;
 
-        Task.Run(() => chatDatabase.RemoveChatContext(dbItem)).Detach();
+        Task.Run(() => _chatContextStorage.DeleteChatContextAsync(chatContext.Metadata.Id)).Detach();
 
         // If the current chat context is being removed, we need to set a new current context
-        if (ReferenceEquals(chatContext, current))
+        if (ReferenceEquals(chatContext, _current))
         {
-            if (history.Keys.OrderByDescending(c => c.Metadata.DateModified).FirstOrDefault() is { } historyItem)
+            if (_history.Values.OrderByDescending(c => c.Metadata.DateModified).FirstOrDefault() is { } historyItem)
             {
                 Current = historyItem;
             }
@@ -118,25 +152,35 @@ public partial class ChatContextManager(Settings settings, IChatDatabase chatDat
     [RelayCommand]
     private void Rename(ChatContext chatContext)
     {
-        foreach (var other in history.Keys) other.IsRenamingMetadataTitle = false;
+        foreach (var other in _history.Values) other.IsRenamingMetadataTitle = false;
         chatContext.IsRenamingMetadataTitle = true;
     }
 
     public void UpdateHistory()
     {
-        OnPropertyChanged(nameof(History));
+        UpdateHistoryAsync(int.MaxValue).Detach();
     }
+
+    private Task UpdateHistoryAsync(int count) => Task.Run(async () =>
+    {
+        await foreach (var metadata in _chatContextStorage.QueryChatContextsAsync(count, ChatContextOrderBy.UpdatedAt, true))
+        {
+            if (_history.ContainsKey(metadata.Id))
+            {
+                continue;
+            }
+
+            var chatContext = await _chatContextStorage.GetChatContextAsync(metadata.Id);
+            _current ??= chatContext;
+            _history.Add(metadata.Id, chatContext);
+        }
+
+        OnPropertyChanged(nameof(History));
+    });
 
     public int Priority => 10;
 
-    public Task InitializeAsync() => Task.Run(() =>
-    {
-        foreach (var chatContext in chatDatabase.QueryChatContexts(q => q.OrderByDescending(c => c.DateModified)))
-        {
-            current ??= chatContext.Value;
-            history.Add(chatContext.Value, chatContext);
-        }
-    });
+    public Task InitializeAsync() => UpdateHistoryAsync(8);
 
     private static bool IsEmptyContext([NotNullWhen(true)] ChatContext? chatContext) => chatContext is { MessageCount: 1 };
 }

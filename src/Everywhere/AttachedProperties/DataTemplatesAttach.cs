@@ -10,17 +10,17 @@ namespace Everywhere.AttachedProperties;
 /// </summary>
 public class DataTemplatesAttach : AvaloniaObject
 {
-    static DataTemplatesAttach()
-    {
-        DataTemplatesProperty.Changed.AddClassHandler<Control>(HandleDataTemplatesChanges);
-    }
-
     public static readonly AttachedProperty<DataTemplates> DataTemplatesProperty =
         AvaloniaProperty.RegisterAttached<DataTemplatesAttach, Control, DataTemplates>("DataTemplates");
 
     public static void SetDataTemplates(Control obj, DataTemplates value) => obj.SetValue(DataTemplatesProperty, value);
 
     public static DataTemplates GetDataTemplates(Control obj) => obj.GetValue(DataTemplatesProperty);
+
+    static DataTemplatesAttach()
+    {
+        DataTemplatesProperty.Changed.AddClassHandler<Control>(HandleDataTemplatesChanges);
+    }
 
     private static void HandleDataTemplatesChanges(Control sender, AvaloniaPropertyChangedEventArgs args)
     {

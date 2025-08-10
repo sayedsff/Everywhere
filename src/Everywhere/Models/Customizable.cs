@@ -37,7 +37,7 @@ public partial class Customizable<T> : ObservableObject where T : notnull
     [JsonIgnore]
     public T? BindableValue
     {
-        get => CustomValue is null ? DefaultValue : (T?)CustomValue;
+        get => CustomValue is null ? typeof(T).IsClass ? default : DefaultValue : (T?)CustomValue;
         set
         {
             if (value is string { Length: 0 }) value = default; // Treat empty string as null for string types

@@ -92,21 +92,39 @@
               </ItemsControl.ItemsPanel>
 
               <ItemsControl.DataTemplates>
-                <DataTemplate DataType="m:ChatImageAttachment">
+                <DataTemplate DataType="m:ChatFileAttachment">
                   <Border
                     Height="24"
                     Background="{DynamicResource CardBackgroundColor}"
                     CornerRadius="4">
-                    <ToolTip.Tip>
-                      <Image Source="{Binding Image}"/>
-                    </ToolTip.Tip>
 
                     <StackPanel
                       Margin="6,0,4,0" Orientation="Horizontal"
                       Spacing="4">
                       <Image
+                        MaxWidth="24" MaxHeight="24"
                         Margin="0,4" VerticalAlignment="Center"
-                        Source="{Binding Image}"/>
+                        IsVisible="{Binding IsImage}"
+                        Source="{Binding Image}">
+                        <ToolTip.Tip>
+                          <Image Source="{Binding Image}"/>
+                        </ToolTip.Tip>
+                      </Image>
+
+                      <StackPanel
+                        Margin="6,0"
+                        IsVisible="{Binding !IsImage}"
+                        Orientation="Horizontal" Spacing="4"
+                        ToolTip.Tip="{Binding FilePath}">
+                        <LucideIcon
+                          VerticalAlignment="Center"
+                          Kind="{Binding Icon}"
+                          Size="14"/>
+                        <TextBlock
+                          VerticalAlignment="Center" FontSize="12"
+                          Text="{Binding HeaderKey^}"/>
+                      </StackPanel>
+
                       <Button
                         Padding="1" VerticalAlignment="Center"
                         Background="Transparent" BorderThickness="0"

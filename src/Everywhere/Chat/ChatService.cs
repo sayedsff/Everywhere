@@ -140,11 +140,13 @@ public class ChatService(
 
             var kernel = BuildKernel(kernelMixin);
             var chatHistory = new ChatHistory(
-                chatContext
+                await chatContext
                     .Select(n => n.Message)
                     .Where(m => !Equals(m, assistantChatMessage)) // exclude the current assistant message
                     .Where(m => m.Role.Label is "system" or "assistant" or "user" or "tool")
-                    .Select(CreateChatMessageContent));
+                    .ToAsyncEnumerable()
+                    .SelectAwait(CreateChatMessageContentAsync)
+                    .ToArrayAsync(cancellationToken: cancellationToken));
 
             while (true)
             {
@@ -241,7 +243,7 @@ public class ChatService(
             assistantChatMessage.IsBusy = false;
         }
 
-        ChatMessageContent CreateChatMessageContent(ChatMessage chatMessage)
+        async ValueTask<ChatMessageContent> CreateChatMessageContentAsync(ChatMessage chatMessage)
         {
             ChatMessageContent? content;
             switch (chatMessage)
@@ -250,11 +252,13 @@ public class ChatService(
                 {
                     content = new ChatMessageContent(chatMessage.Role, user.UserPrompt);
 
-                    if (user.Attachments.OfType<ChatImageAttachment>().ToArray() is not { Length: > 0 } imageAttachments) break;
-                    foreach (var imageAttachment in imageAttachments)
+                    foreach (var imageAttachment in user.Attachments.OfType<ChatFileAttachment>().Where(a => a.IsImage))
                     {
+                        using var image = await imageAttachment.GetImageAsync();
+                        if (image is null) continue;
+
                         using var ms = new MemoryStream();
-                        imageAttachment.Image.Save(ms, 100);
+                        image.Save(ms, 100);
                         ms.Position = 0;
                         content.Items.Add(new ImageContent(ms.ToArray(), "image/png"));
                     }
