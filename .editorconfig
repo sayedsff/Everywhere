@@ -330,7 +330,7 @@ indent_style = space
 indent_size = 4
 tab_width = 4
 
-[*.{appxmanifest,axaml,build,dtd,nuspec,paml,uxml,xaml,xamlx,xoml,xsd}]
+[*.{appxmanifest,axaml,build,dtd,nuspec,paml,uxml,xaml,xamlx,xoml,xsd,md}]
 indent_style = space
 indent_size = 2
 tab_width = 2

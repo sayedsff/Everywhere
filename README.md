@@ -7,6 +7,7 @@
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]][license-url]
+[![.NET Core][.NET Core]][.NET-url][![Avalonia][Avalonia]][Avalonia-url]
 
 ---
 
@@ -15,7 +16,7 @@
 
   <h1>
 
-  Every moment, Every place. Your AI - `Everywhere`
+Every moment, Every place. Your AI - `Everywhere`
 
   </h1>
 
@@ -33,7 +34,7 @@
 
 ## About Everywhere
 
-**Everywhere** is a context-aware, interactive AI assistant built with .NET and Avalonia. Unlike traditional chat interfaces, Everywhere integrates directly with your desktop environment, perceiving your screen, understanding application context, and taking actions on your behalf.
+**Everywhere** is an interactive AI assistant with context-aware capabilities. Unlike common tools such as ChatGPT and Claude Desktop, Everywhere is directly integrated into your desktop environment, perceiving your screen content and providing accurate and efficient responses. Additionally, Everywhere supports integration with multiple large language models (LLMs) and tools, offering a wealth of additional functionalities.
 
 ### 🌟 Experience Examples
 
@@ -94,23 +95,25 @@
 <table>
   <thead>
     <tr>
-      <th width="28%">Category</th>
-      <th width="35%">✅ Currently Supported</th>
-      <th width="41%">🚧 Work in Progress</th>
+      <th style="width:28%">Category</th>
+      <th style="width:35%">✅ Currently Supported</th>
+      <th style="width:41%">🚧 Work in Progress</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <td><b>🤖 LLM Support</b></td>
       <td>
-        • OpenAI (ChatGPT)<br>
-        • Azure OpenAI
+        • <img style="margin-top:3px;margin-bottom:-3px;" alt="OpenAI logo" src="https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/openai.svg"> OpenAI (ChatGPT)<br>
+        • <img style="margin-top:3px;margin-bottom:-3px;" alt="Anthropic logo" src="https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/anthropic.svg"> Anthropic (Claude)<br>
+        • <img style="margin-top:3px;margin-bottom:-3px;" alt="Google logo" src="https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/gemini-color.svg"> Google (Gemini)<br>
+        • <img style="margin-top:3px;margin-bottom:-3px;" alt="DeepSeek logo" src="https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/deepseek-color.svg"> DeepSeek<br>
+        • <img style="margin-top:3px;margin-bottom:-3px;" alt="Moonshot logo" src="https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/moonshot.svg"> Moonshot (Kimi)<br>
+        • <img style="margin-top:3px;margin-bottom:-3px;" alt="Grok logo" src="https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/grok.svg"> xAI (Grok)<br>
+        • <img style="margin-top:3px;margin-bottom:-3px;" alt="ollama logo" src="https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/ollama.svg"> ollama<br>
       </td>
       <td>
-        • Claude<br>
-        • Gemini<br>
-        • Ollama<br>
-        • Grok
+        • Official API support<br>
       </td>
     </tr>
     <tr>
@@ -119,21 +122,20 @@
         • Web Search
       </td>
       <td>
-        • Model Context Protocol (MCP) tools<br>
-        • System APIs
+        • System APIs<br>
+        • MCP tools<br>
       </td>
     </tr>
     <tr>
       <td><b>🫧 Interface</b></td>
       <td>
+        • Modern Frosted Glass UI<br>
+        • Context-aware invocation<br>
         • Keyboard shortcuts<br>
         • Markdown rendering<br>
-        • Code syntax highlighting
       </td>
       <td>
-        • LaTeX support<br>
         • Voice input<br>
-        • Advanced formatting options
       </td>
     </tr>
     <tr>
@@ -153,26 +155,29 @@
         • English
       </td>
       <td>
-        <i>(contributions welcome)</i>
-        <a href="https://crowdin.com/project/everywhere" rel="nofollow" target="_blank"><img style="width:140;height:40px" src="https://badges.crowdin.net/badge/dark/crowdin-on-light.png" srcset="https://badges.crowdin.net/badge/dark/crowdin-on-light.png 1x,https://badges.crowdin.net/badge/dark/crowdin-on-light@2x.png 2x" alt="Crowdin | Everywhere" /></a>
+        • Deutsch<br>
+        • Español<br>
+        • Français<br>
+        • Italiano<br>
+        • 日本語<br>
+        • 한국어<br>
+        • Русский<br>
+        • 中文 (繁體)<br>
+        • 中文 (繁體 香港特別行政區)<br><br>
+        <b>Contributions Welcome</b><br>
+        <a href="https://crowdin.com/project/everywhere" rel="nofollow" target="_blank"><img style="width:140px;height:40px" src="https://badges.crowdin.net/badge/dark/crowdin-on-light.png" srcset="https://badges.crowdin.net/badge/dark/crowdin-on-light.png 1x,https://badges.crowdin.net/badge/dark/crowdin-on-light@2x.png 2x" alt="Crowdin | Everywhere" /></a>
       </td>
     </tr>
   </tbody>
 </table>
-
-### 🛠 Built With
-
-[![.NET Core][.NET Core]][.NET-url][![Avalonia][Avalonia]][Avalonia-url]
-
----
 
 ## 📋 System Requirements
 
 | Platform | Minimum Version |
 |----------|-----------------|
 | Windows  | 10.0.19041.0    |
-| macOS    | **Comming soon**|
-| Linux    | **Comming soon**|
+| macOS    | **Coming soon** |
+| Linux    | **Coming soon** |
 
 ---
 
@@ -181,13 +186,14 @@
 ### Installation
 
 - Windows
-  
+
   Download here: [Latest Release](https://github.com/DearVa/Everywhere/releases/latest)
 
-  Where the `Everywhere-Windows-x64-Setup-vx.x.x.exe` is installer package and the `Everywhere-Windows-x64-vx.x.x.zip` is install-free package. Their content are in the same.
+  Where the `Everywhere-Windows-x64-Setup-vx.x.x.exe` is installer package and the `Everywhere-Windows-x64-vx.x.x.zip`
+  is install-free package. Their content are in the same.
 
-- Mac OS and Linux
-  
+- macOS and Linux
+
   Currently not supported but **coming soon**.
 
 ### Documents
@@ -196,7 +202,7 @@ Visit here: [Official Docs](https://everywhere.nekora.dev)
 
 Document is in development. Contributions are welcomed.
 
-### Support
+### Community
 
 [![](https://dcbadge.limes.pink/api/server/5fyg6nE3yn)](https://discord.gg/5fyg6nE3yn)
 
@@ -222,7 +228,7 @@ We welcome issues, feature ideas, and PRs! See [CONTRIBUTING.md](CONTRIBUTING.md
 
 Distributed under the Apache 2.0 License. See [LICENSE](LICENSE) for more information.
 
-Third-Party Licenses See [ThirdPartyNotices.txt](ThirdPartyNotices.txt) for details.
+Third-Party Licenses: See [ThirdPartyNotices.txt](ThirdPartyNotices.txt) for details.
 
 ---
 

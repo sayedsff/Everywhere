@@ -6,7 +6,8 @@
 [![Fork 数][forks-shield]][forks-url]
 [![Star 数][stars-shield]][stars-url]
 [![问题数][issues-shield]][issues-url]
-[![MIT 许可证][license-shield]][license-url]<a id="readme-top"></a>
+[![MIT 许可证][license-shield]][license-url]
+[![.NET Core][.NET Core]][.NET-url][![Avalonia][Avalonia]][Avalonia-url]
 
 ---
 
@@ -33,7 +34,7 @@
 
 ## 关于 Everywhere
 
-**Everywhere** 是一款基于 .NET 和 Avalonia 构建的具有上下文感知能力的交互式 AI 助手。与传统的聊天界面不同，Everywhere 直接集成到您的桌面环境中，感知您的屏幕内容，理解应用程序上下文，并代表您采取行动。
+**Everywhere** 是一款具有上下文感知能力的交互式 AI 助手。与常见的 ChatGPT、Claude Desktop 等不同，Everywhere 直接集成到您的桌面环境中，感知您的屏幕内容，做出准确高效的回答。同时，Everywhere 还支持多种 LLM 和工具集成，提供更丰富的功能。
 
 ### 🌟 使用场景示例
 
@@ -94,23 +95,25 @@
 <table>
   <thead>
     <tr>
-      <th width="25%">类别</th>
-      <th width="40%">✅ 当前支持</th>
-      <th width="40%">🚧 进行中</th>
+      <th style="width:28%">类别</th>
+      <th style="width:35%">✅ 当前支持</th>
+      <th style="width:41%">🚧 进行中</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <td><b>🤖 LLM 支持</b></td>
       <td>
-        • OpenAI (ChatGPT)<br>
-        • Azure OpenAI
+        • <img style="margin-top:3px;margin-bottom:-3px;" alt="OpenAI logo" src="https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/openai.svg"> OpenAI (ChatGPT)<br>
+        • <img style="margin-top:3px;margin-bottom:-3px;" alt="Anthropic logo" src="https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/anthropic.svg"> Anthropic (Claude)<br>
+        • <img style="margin-top:3px;margin-bottom:-3px;" alt="Google logo" src="https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/gemini-color.svg"> Google (Gemini)<br>
+        • <img style="margin-top:3px;margin-bottom:-3px;" alt="DeepSeek logo" src="https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/deepseek-color.svg"> DeepSeek<br>
+        • <img style="margin-top:3px;margin-bottom:-3px;" alt="Moonshot logo" src="https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/moonshot.svg"> Moonshot (Kimi)<br>
+        • <img style="margin-top:3px;margin-bottom:-3px;" alt="Grok logo" src="https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/grok.svg"> xAI (Grok)<br>
+        • <img style="margin-top:3px;margin-bottom:-3px;" alt="ollama logo" src="https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/ollama.svg"> ollama<br>
       </td>
       <td>
-        • Claude<br>
-        • Gemini<br>
-        • Ollama<br>
-        • Grok
+        • 官方 API 支持<br>
       </td>
     </tr>
     <tr>
@@ -119,21 +122,20 @@
         • 网页搜索
       </td>
       <td>
-        • 模型上下文协议 (MCP) 工具<br>
-        • 系统 API
+        • 系统 API<br>
+        • MCP 工具
       </td>
     </tr>
     <tr>
       <td><b>🫧 界面</b></td>
       <td>
+        • 现代化磨砂玻璃界面<br>
+        • 上下文感知<br>
         • 键盘快捷键<br>
-        • Markdown 渲染<br>
-        • 代码语法高亮
+        • Markdown 渲染
       </td>
       <td>
-        • LaTeX 支持<br>
         • 语音输入<br>
-        • 高级格式选项
       </td>
     </tr>
     <tr>
@@ -153,26 +155,29 @@
         • English
       </td>
       <td>
-        <i>(欢迎贡献)</i>
-        <a href="https://crowdin.com/project/everywhere" rel="nofollow" target="_blank"><img style="width:140;height:40px" src="https://badges.crowdin.net/badge/dark/crowdin-on-light.png" srcset="https://badges.crowdin.net/badge/dark/crowdin-on-light.png 1x,https://badges.crowdin.net/badge/dark/crowdin-on-light@2x.png 2x" alt="Crowdin | Everywhere" /></a>
+        • Deutsch<br>
+        • Español<br>
+        • Français<br>
+        • Italiano<br>
+        • 日本語<br>
+        • 한국어<br>
+        • Русский<br>
+        • 中文 (繁體)<br>
+        • 中文 (繁體 香港特別行政區)<br><br>
+        <b>欢迎贡献</b><br>
+        <a href="https://crowdin.com/project/everywhere" rel="nofollow" target="_blank"><img style="width:140px;height:40px" src="https://badges.crowdin.net/badge/dark/crowdin-on-light.png" srcset="https://badges.crowdin.net/badge/dark/crowdin-on-light.png 1x,https://badges.crowdin.net/badge/dark/crowdin-on-light@2x.png 2x" alt="Crowdin | Everywhere" /></a>
       </td>
     </tr>
   </tbody>
 </table>
-
-### 🛠 构建工具
-
-[![.NET Core][.NET Core]][.NET-url][![Avalonia][Avalonia]][Avalonia-url]
-
----
 
 ## 📋 系统要求
 
 | 平台      | 最低版本         |
 |---------|--------------|
 | Windows | 10.0.19041.0 |
-| macOS   | **即将到来**       |
-| Linux   | **即将到来**       |
+| macOS   | **即将到来**     |
+| Linux   | **即将到来**     |
 
 ---
 
@@ -187,7 +192,7 @@
 
   其中 `Everywhere-Windows-x64-Setup-vx.x.x.exe` 是安装包，`Everywhere-Windows-x64-vx.x.x.zip` 是免安装版。它们的内容完全一样。
 
-- Mac OS 和 Linux
+- macOS 和 Linux
   
   目前尚不支持，但**即将到来**。
 
@@ -223,7 +228,7 @@
 
 本项目基于 Apache 2.0 许可证发布，详情请查阅 [LICENSE](LICENSE)。
 
-第三方许可证请参见 [ThirdPartyNotices.txt](ThirdPartyNotices.txt)。
+第三方许可证：参见 [ThirdPartyNotices.txt](ThirdPartyNotices.txt)。
 
 ---
 
