@@ -7,7 +7,7 @@ using Avalonia.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Everywhere.Attributes;
 using Everywhere.Enums;
-using Everywhere.Utils;
+using Everywhere.Utilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using WritableJsonConfiguration;
@@ -29,11 +29,24 @@ public class Settings : ObservableObject
     [HiddenSettingsItem]
     public InternalSettings Internal { get; } = new();
 
-    private readonly DebounceHelper saveDebounceHelper = new(TimeSpan.FromSeconds(0.5));
-    private readonly Dictionary<string, object?> saveBuffer = new();
+    private readonly Dictionary<string, object?> _saveBuffer = new();
+    private readonly DebounceExecutor<Dictionary<string, object?>> _saveDebounceExecutor;
 
     public Settings(IConfiguration configuration)
     {
+        _saveDebounceExecutor = new DebounceExecutor<Dictionary<string, object?>>(
+            () => _saveBuffer,
+            saveBuffer =>
+            {
+                lock (saveBuffer)
+                {
+                    if (saveBuffer.Count == 0) return;
+                    foreach (var (key, value) in saveBuffer) configuration.Set(key, value);
+                    saveBuffer.Clear();
+                }
+            },
+            TimeSpan.FromSeconds(0.5));
+
         new ObjectObserver(HandleSettingsChanges)
             .Observe(Common, nameof(Common))
             .Observe(Behavior, nameof(Behavior))
@@ -42,17 +55,8 @@ public class Settings : ObservableObject
 
         void HandleSettingsChanges(in ObjectObserverChangedEventArgs e)
         {
-            lock (saveBuffer) saveBuffer[e.Path] = e.Value;
-
-            saveDebounceHelper.Execute(() =>
-            {
-                lock (saveBuffer)
-                {
-                    if (saveBuffer.Count == 0) return;
-                    foreach (var (key, value) in saveBuffer) configuration.Set(key, value);
-                    saveBuffer.Clear();
-                }
-            });
+            lock (_saveBuffer) _saveBuffer[e.Path] = e.Value;
+            _saveDebounceExecutor.Trigger();
         }
     }
 }

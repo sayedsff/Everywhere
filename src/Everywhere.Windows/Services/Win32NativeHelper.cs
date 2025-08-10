@@ -149,7 +149,7 @@ public class Win32NativeHelper : INativeHelper
         PInvoke.SetLayeredWindowAttributes(hWnd, new COLORREF(), 255, LAYERED_WINDOW_ATTRIBUTES_FLAGS.LWA_ALPHA);
     }
 
-    private readonly Dictionary<nint, CompositionContext> compositionContexts = [];
+    private readonly Dictionary<nint, CompositionContext> _compositionContexts = [];
 
     // Modify from WPF source code
     // https://referencesource.microsoft.com/#PresentationFramework/src/Framework/System/Windows/Shell/WindowChromeWorker.cs,de42dddb12b0ad8f
@@ -163,7 +163,7 @@ public class Win32NativeHelper : INativeHelper
 
         Compositor compositor;
         Visual rootVisual;
-        if (!compositionContexts.TryGetValue(hWnd, out var compositionContext))
+        if (!_compositionContexts.TryGetValue(hWnd, out var compositionContext))
         {
             // we will need lots of hacks, let's go
             if (window.PlatformImpl?.GetType().GetField("_glSurface", BindingFlags.Instance | BindingFlags.NonPublic) is not { } glSurfaceField) return;
@@ -179,7 +179,7 @@ public class Win32NativeHelper : INativeHelper
 
             compositor = Compositor.FromAbi(avaloniaCompositor.NativePointer);
             var target = DesktopWindowTarget.FromAbi(avaloniaTarget.NativePointer);
-            compositionContexts[hWnd] = compositionContext = new CompositionContext(compositor, rootVisual = target.Root);
+            _compositionContexts[hWnd] = compositionContext = new CompositionContext(compositor, rootVisual = target.Root);
 
             window.ScalingChanged += delegate
             {
@@ -194,7 +194,7 @@ public class Win32NativeHelper : INativeHelper
             window.Closed += delegate
             {
                 compositionContext.Clip?.Dispose();
-                compositionContexts.Remove(hWnd);
+                _compositionContexts.Remove(hWnd);
             };
         }
         else
@@ -272,11 +272,11 @@ public class Win32NativeHelper : INativeHelper
         }
     }
 
-    private readonly Lock clipboardLock = new();
+    private readonly Lock _clipboardLock = new();
 
     public unsafe Task<WriteableBitmap?> GetClipboardBitmapAsync() => Task.Run(() =>
     {
-        using var _ = clipboardLock.EnterScope();
+        using var _ = _clipboardLock.EnterScope();
 
         if (!PInvoke.OpenClipboard(HWND.Null)) return null;
 

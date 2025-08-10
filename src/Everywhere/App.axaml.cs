@@ -6,7 +6,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Media.Imaging;
 using Everywhere.Enums;
 using Everywhere.Models;
-using Everywhere.Utils;
+using Everywhere.Utilities;
 using Everywhere.Views;
 using Everywhere.Views.Pages;
 using Microsoft.Extensions.DependencyInjection;

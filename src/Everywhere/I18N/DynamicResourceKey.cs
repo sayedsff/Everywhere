@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Avalonia.Controls;
 using Avalonia.Reactive;
-using Everywhere.Utils;
+using Everywhere.Utilities;
 using MessagePack;
 
 namespace Everywhere.I18N;

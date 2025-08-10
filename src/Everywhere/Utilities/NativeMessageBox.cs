@@ -1,4 +1,4 @@
-﻿namespace Everywhere.Utils;
+﻿namespace Everywhere.Utilities;
 
 public enum NativeMessageBoxResult
 {

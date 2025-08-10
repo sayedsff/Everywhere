@@ -3,7 +3,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Reflection;
 using System.Text.Json.Serialization;
-using Everywhere.Utils;
+using Everywhere.Utilities;
 using ZLinq;
 
 namespace Everywhere.Models;

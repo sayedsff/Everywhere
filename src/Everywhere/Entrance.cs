@@ -1,5 +1,5 @@
 ﻿#if !DEBUG
-using Everywhere.Utils;
+using Everywhere.Utilities;
 #endif
 
 using Serilog;

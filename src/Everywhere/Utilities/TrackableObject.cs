@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using MessagePack;
 
-namespace Everywhere.Utils;
+namespace Everywhere.Utilities;
 
 public delegate void TrackableObjectPropertyChangedEventHandler<in TScope>(TScope sender, PropertyChangedEventArgs e);
 
@@ -29,7 +29,7 @@ public class TrackableObject<TScope>(bool isTrackingEnabled = false) : Observabl
 
     [JsonIgnore]
     [IgnoreMember]
-    protected bool isTrackingEnabled = isTrackingEnabled;
+    public bool IsTrackingEnabled { get; set; } = isTrackingEnabled;
 
     protected override void OnPropertyChanged(PropertyChangedEventArgs e)
     {
@@ -39,13 +39,13 @@ public class TrackableObject<TScope>(bool isTrackingEnabled = false) : Observabl
 
     protected void NotifyHandlers(string propertyName)
     {
-        if (!isTrackingEnabled) return;
+        if (!IsTrackingEnabled) return;
         NotifyHandlers(new PropertyChangedEventArgs(propertyName));
     }
 
     protected void NotifyHandlers(PropertyChangedEventArgs e)
     {
-        if (!isTrackingEnabled) return;
+        if (!IsTrackingEnabled) return;
 
         lock (ScopeHandlers)
         {

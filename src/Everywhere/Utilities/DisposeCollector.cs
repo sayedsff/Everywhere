@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Everywhere.Utils;
+namespace Everywhere.Utilities;
 
 public class DisposeCollector<T>(bool enableDisposeOnFinalize = false) : IReadOnlyList<T>, IDisposable where T : IDisposable
 {
@@ -8,7 +8,7 @@ public class DisposeCollector<T>(bool enableDisposeOnFinalize = false) : IReadOn
 
     public bool EnableDisposeOnFinalize { get; set; } = enableDisposeOnFinalize;
 
-    protected readonly List<T> disposables = [];
+    protected readonly List<T> _disposables = [];
 
     ~DisposeCollector()
     {
@@ -18,7 +18,7 @@ public class DisposeCollector<T>(bool enableDisposeOnFinalize = false) : IReadOn
     public T Add(T disposable)
     {
         if (IsDisposed) throw new ObjectDisposedException(nameof(DisposeCollector<>));
-        disposables.Add(disposable);
+        _disposables.Add(disposable);
         return disposable;
     }
 
@@ -26,7 +26,7 @@ public class DisposeCollector<T>(bool enableDisposeOnFinalize = false) : IReadOn
     {
         if (IsDisposed) throw new ObjectDisposedException(nameof(DisposeCollector<>));
         var disposable = factory();
-        disposables.Add(disposable);
+        _disposables.Add(disposable);
         return disposable;
     }
 
@@ -35,7 +35,7 @@ public class DisposeCollector<T>(bool enableDisposeOnFinalize = false) : IReadOn
         if (IsDisposed) throw new ObjectDisposedException(nameof(DisposeCollector<>));
         if (disposable == null) return;
         disposable.Dispose();
-        if (!disposables.Remove(disposable)) return;
+        if (!_disposables.Remove(disposable)) return;
         disposable = default;
     }
 
@@ -45,8 +45,8 @@ public class DisposeCollector<T>(bool enableDisposeOnFinalize = false) : IReadOn
     public void DisposeAndClear()
     {
         // 逆序释放，防止释放后的对象被再次使用
-        foreach (var disposable in disposables.Reversed()) disposable.Dispose();
-        disposables.Clear();
+        foreach (var disposable in _disposables.Reversed()) disposable.Dispose();
+        _disposables.Clear();
     }
 
     public void Dispose()
@@ -68,16 +68,16 @@ public class DisposeCollector<T>(bool enableDisposeOnFinalize = false) : IReadOn
 
     public IEnumerator<T> GetEnumerator()
     {
-        return disposables.GetEnumerator();
+        return _disposables.GetEnumerator();
     }
 
     IEnumerator IEnumerable.GetEnumerator()
     {
-        return ((IEnumerable)disposables).GetEnumerator();
+        return ((IEnumerable)_disposables).GetEnumerator();
     }
 
-    public int Count => disposables.Count;
-    public T this[int index] => disposables[index];
+    public int Count => _disposables.Count;
+    public T this[int index] => _disposables[index];
 }
 
 public class DisposeCollector(bool enableDisposeOnFinalize = false) : DisposeCollector<IDisposable>(enableDisposeOnFinalize)
@@ -94,7 +94,7 @@ public class DisposeCollector(bool enableDisposeOnFinalize = false) : DisposeCol
     {
         if (IsDisposed) throw new ObjectDisposedException(nameof(DisposeCollector<>));
         if (disposable == null) return;
-        disposables.Remove(disposable);
+        _disposables.Remove(disposable);
         disposable.Dispose();
         disposable = default;
     }
@@ -105,12 +105,12 @@ public class DisposeCollector(bool enableDisposeOnFinalize = false) : DisposeCol
         if (oldDisposable != null)
         {
             oldDisposable.Dispose();
-            disposables.Remove(oldDisposable);
+            _disposables.Remove(oldDisposable);
         }
         
         oldDisposable = newDisposable;
         if (oldDisposable == null) return;
-        disposables.Add(oldDisposable);
+        _disposables.Add(oldDisposable);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

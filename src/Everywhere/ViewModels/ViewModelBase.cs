@@ -2,7 +2,7 @@
 using Avalonia.Input.Platform;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Everywhere.Utils;
+using Everywhere.Utilities;
 using ShadUI;
 
 namespace Everywhere.ViewModels;
