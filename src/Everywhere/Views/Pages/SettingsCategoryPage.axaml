@@ -133,12 +133,12 @@
               <TextBlock
                 Classes="Large" IsHitTestVisible="False"
                 Text="{Binding HeaderKey^}"
-                TextWrapping="WrapWithOverflow"/>
+                TextWrapping="Wrap"/>
               <TextBlock
                 Classes="Small" Margin="0,8"
                 IsHitTestVisible="False"
                 Text="{Binding DescriptionKey^}"
-                TextWrapping="WrapWithOverflow"/>
+                TextWrapping="Wrap"/>
               <ContentControl
                 Classes="SettingsItemContentPresenter"
                 Content="{Binding}"/>

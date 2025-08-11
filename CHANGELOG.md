@@ -1,3 +1,15 @@
+## [v0.2.2](https://github.com/DearVa/Everywhere/releases/tag/v0.2.2) - 2025-08-11
+
+### ✨ New Features
+- **Model Support**: Added support for `Claude Opus 4.1`
+
+### 🔄️ Changed
+- Split settings into separate sidebar items
+
+**Full Changelog**: https://github.com/DearVa/Everywhere/compare/v0.2.1...v0.2.2
+
+
+
 ## [v0.2.1](https://github.com/DearVa/Everywhere/releases/tag/v0.2.1) - 2025-08-11
 
 ### ✨ New Features
