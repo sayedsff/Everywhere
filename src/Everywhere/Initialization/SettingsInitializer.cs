@@ -146,6 +146,19 @@ public class SettingsInitializer(Settings settings) : IAsyncInitializer
                     [
                         new ModelDefinition
                         {
+                            Id = "claude-opus-4-1-20250805",
+                            DisplayName = "Claude Opus 4.1",
+                            MaxTokens = 200_000,
+                            IsImageInputSupported = true,
+                            IsFunctionCallingSupported = true,
+                            IsDeepThinkingSupported = true,
+                            IsWebSearchSupported = true,
+                            ReleasedAt = new DateOnly(2025, 08, 05),
+                            InputPrice = "$15.00/M",
+                            OutputPrice = "$75.00/M"
+                        },
+                        new ModelDefinition
+                        {
                             Id = "claude-opus-4-20250514",
                             DisplayName = "Claude Opus 4",
                             MaxTokens = 200_000,
