@@ -30,17 +30,15 @@
     <PackageVersion Include="Serilog.Sinks.Console" Version="6.0.0" />
     <PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />
     <PackageVersion Include="System.Drawing.Common" Version="$(MicrosoftPackageVersion)" />
+    <PackageVersion Include="System.Linq.Async" Version="6.0.3" />
     <PackageVersion Include="System.Text.Json" Version="$(MicrosoftPackageVersion)" />
     <PackageVersion Include="ObservableCollections" Version="3.3.4" />
     <PackageVersion Include="ZLinq" Version="1.5.2" />
     <!-- LLM packages -->
-    <PackageVersion Include="Microsoft.KernelMemory.Core" Version="0.98.250508.3" />
     <PackageVersion Include="Microsoft.ML.OnnxRuntime" Version="1.22.0" />
     <PackageVersion Include="Microsoft.SemanticKernel" Version="$(SemanticKernelVersion)" />
     <PackageVersion Include="Microsoft.SemanticKernel.Connectors.OpenAI" Version="$(SemanticKernelVersion)" />
     <PackageVersion Include="Microsoft.SemanticKernel.Plugins.Web" Version="$(SemanticKernelVersion)-alpha" />
-    <PackageVersion Include="Tokenizers.DotNet" Version="$(TokenizersVersion)" />
-    <PackageVersion Include="Tokenizers.DotNet.runtime.win-x64" Version="$(TokenizersVersion)" />
     <!-- Avalonia packages -->
     <PackageVersion Include="Avalonia" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Skia" Version="$(AvaloniaVersion)" />

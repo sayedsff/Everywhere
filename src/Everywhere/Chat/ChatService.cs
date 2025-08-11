@@ -2,7 +2,6 @@
 using Everywhere.Models;
 using Lucide.Avalonia;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.KernelMemory.AI;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
@@ -23,7 +22,7 @@ public class ChatService(
         var chatContext = chatContextManager.Current;
         chatContext.Add(userMessage);
         var kernelMixin = kernelMixinFactory.GetOrCreate();
-        await ProcessUserChatMessageAsync(kernelMixin.TextGenerator, chatContext, userMessage, cancellationToken);
+        await ProcessUserChatMessageAsync(kernelMixin, chatContext, userMessage, cancellationToken);
         var assistantChatMessage = new AssistantChatMessage { IsBusy = true };
         chatContext.Add(assistantChatMessage);
         await GenerateAsync(kernelMixin, chatContext, assistantChatMessage, cancellationToken);
@@ -47,7 +46,7 @@ public class ChatService(
     }
 
     private async static Task ProcessUserChatMessageAsync(
-        ITextGenerator textGenerator,
+        IKernelMixin kernelMixin,
         ChatContext chatContext,
         UserChatMessage userChatMessage,
         CancellationToken cancellationToken)
@@ -74,8 +73,7 @@ public class ChatService(
 
             var xmlBuilder = new VisualElementXmlBuilder(
                 elements,
-                textGenerator,
-                textGenerator.MaxTokenTotal / 20);
+                kernelMixin.MaxTokenTotal / 20);
             var renderedVisualTreePrompt = await Task.Run(
                 () =>
                     Prompts.RenderPrompt(
@@ -155,10 +153,11 @@ public class ChatService(
                 AuthorRole? authorRole = null;
                 var assistantContentBuilder = new StringBuilder();
                 var functionCallContentBuilder = new FunctionCallContentBuilder();
+                var promptExecutionSettings = kernelMixin.GetPromptExecutionSettings();
 
                 await foreach (var streamingContent in kernelMixin.ChatCompletionService.GetStreamingChatMessageContentsAsync(
                                    chatHistory,
-                                   kernelMixin.PromptExecutionSettings,
+                                   promptExecutionSettings,
                                    kernel,
                                    cancellationToken))
                 {

@@ -697,7 +697,7 @@
             IsToolCallEnabled="{Binding Settings.Internal.IsToolCallEnabled, Mode=TwoWay}"
             IsToolCallSupported="{Binding Settings.Model.SelectedModelDefinition.IsFunctionCallingSupported, FallbackValue=false}"
             IsWebSearchEnabled="{Binding Settings.Internal.IsWebSearchEnabled, Mode=TwoWay}"
-            IsWebSearchSupported="{Binding Settings.Model.SelectedModelDefinition.IsImageInputSupported, FallbackValue=false}"
+            IsWebSearchSupported="{Binding Settings.Model.SelectedModelDefinition.IsFunctionCallingSupported, FallbackValue=false}"
             MaxChatAttachmentCount="{Binding Settings.Internal.MaxChatAttachmentCount}"
             TextWrapping="Wrap">
             <v:ChatInputBox.AddChatAttachmentMenuItems>

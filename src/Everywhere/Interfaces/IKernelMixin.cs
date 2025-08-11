@@ -1,5 +1,4 @@
-﻿using Microsoft.KernelMemory.AI;
-using Microsoft.SemanticKernel;
+﻿using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.TextGeneration;
 
@@ -10,13 +9,16 @@ namespace Everywhere.Interfaces;
 /// </summary>
 public interface IKernelMixin : IDisposable
 {
-    PromptExecutionSettings PromptExecutionSettings { get; }
-
     ITextGenerationService TextGenerationService { get; }
 
     IChatCompletionService ChatCompletionService { get; }
 
-    ITextGenerator TextGenerator { get; }
+    /// <summary>
+    /// Gets the maximum number of tokens allowed in a single request to the model.
+    /// </summary>
+    int MaxTokenTotal { get; }
+
+    PromptExecutionSettings GetPromptExecutionSettings();
 }
 
 public interface IKernelMixinFactory

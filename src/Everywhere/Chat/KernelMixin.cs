@@ -2,8 +2,6 @@
 using Everywhere.Enums;
 using Everywhere.Models;
 using Microsoft.Extensions.AI;
-using Microsoft.KernelMemory;
-using Microsoft.KernelMemory.AI;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.Ollama;
@@ -65,22 +63,19 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
         IKernelMixin KernelMixin
     );
 
-    private class OpenAIKernelMixin(ModelSettings settings, ModelProvider provider, ModelDefinition definition) : IKernelMixin, ITextGenerator
+    private class OpenAIKernelMixin(ModelSettings settings, ModelProvider provider, ModelDefinition definition) : IKernelMixin
     {
-        public PromptExecutionSettings PromptExecutionSettings => new OpenAIPromptExecutionSettings
-        {
-            Temperature = settings.Temperature,
-            TopP = settings.TopP,
-            PresencePenalty = settings.PresencePenalty,
-            FrequencyPenalty = settings.FrequencyPenalty,
-            FunctionChoiceBehavior = FunctionChoiceBehavior.Auto(autoInvoke: false)
-        };
-
         public ITextGenerationService TextGenerationService => _chatCompletionService;
 
         public IChatCompletionService ChatCompletionService => _chatCompletionService;
 
-        public ITextGenerator TextGenerator => this;
+        public PromptExecutionSettings GetPromptExecutionSettings() => new OpenAIPromptExecutionSettings
+        {
+            Temperature = settings.Temperature,
+            PresencePenalty = settings.PresencePenalty,
+            FrequencyPenalty = settings.FrequencyPenalty,
+            FunctionChoiceBehavior = FunctionChoiceBehavior.Auto(autoInvoke: false)
+        };
 
         public int MaxTokenTotal => Math.Max(16_000, definition.MaxTokens);
 
@@ -89,61 +84,20 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
             new Uri(provider.Endpoint, UriKind.Absolute),
             provider.ApiKey);
 
-        private readonly TiktokenTokenizer _tokenizer = GetTokenizer(definition.Id);
-
-        private static TiktokenTokenizer GetTokenizer(string modelId)
-        {
-            try
-            {
-                return new TiktokenTokenizer(modelId);
-            }
-            catch
-            {
-                return new TiktokenTokenizer("gpt-4o");
-            }
-        }
-
-        public int CountTokens(string text)
-        {
-            return _tokenizer.CountTokens(text);
-        }
-
-        public IReadOnlyList<string> GetTokens(string text)
-        {
-            return _tokenizer.GetTokens(text);
-        }
-
-        public async IAsyncEnumerable<GeneratedTextContent> GenerateTextAsync(
-            string prompt,
-            TextGenerationOptions options,
-            [EnumeratorCancellation] CancellationToken cancellationToken = new())
-        {
-            await foreach (var content in _chatCompletionService.GetStreamingTextContentsAsync(
-                               prompt,
-                               new OpenAIPromptExecutionSettings
-                               {
-                                   Temperature = options.Temperature,
-                                   TopP = options.NucleusSampling,
-                                   PresencePenalty = options.PresencePenalty,
-                                   FrequencyPenalty = options.FrequencyPenalty,
-                                   MaxTokens = options.MaxTokens,
-                                   StopSequences = options.StopSequences,
-                                   TokenSelectionBiases = options.TokenSelectionBiases.ToDictionary(p => p.Key, p => (int)p.Value),
-                               },
-                               null,
-                               cancellationToken))
-            {
-                if (content.Text == null) continue;
-                yield return new GeneratedTextContent(content.Text);
-            }
-        }
-
         public void Dispose() { }
     }
 
-    private class AnthropicKernelMixin : IKernelMixin, ITextGenerationService, ITextGenerator
+    private class AnthropicKernelMixin : IKernelMixin, ITextGenerationService
     {
-        public PromptExecutionSettings PromptExecutionSettings => new()
+        public ITextGenerationService TextGenerationService => this;
+
+        public IChatCompletionService ChatCompletionService { get; }
+
+        public IReadOnlyDictionary<string, object?> Attributes => ChatCompletionService.Attributes;
+
+        public int MaxTokenTotal => _definition.MaxTokens;
+
+        public PromptExecutionSettings GetPromptExecutionSettings() => new()
         {
             ModelId = _definition.Id,
             ExtensionData = new Dictionary<string, object>
@@ -155,16 +109,6 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
             },
             FunctionChoiceBehavior = FunctionChoiceBehavior.Auto(autoInvoke: false)
         };
-
-        public ITextGenerationService TextGenerationService => this;
-
-        public IChatCompletionService ChatCompletionService { get; }
-
-        public ITextGenerator TextGenerator => this;
-
-        public IReadOnlyDictionary<string, object?> Attributes => ChatCompletionService.Attributes;
-
-        public int MaxTokenTotal => _definition.MaxTokens;
 
         private readonly ModelSettings _settings;
         private readonly ModelDefinition _definition;
@@ -210,50 +154,26 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
             }
         }
 
-        public int CountTokens(string text) => text.Length / 4;
-
-        public IReadOnlyList<string> GetTokens(string text) => throw new NotSupportedException("Anthropic does not support tokenization.");
-
-        public IAsyncEnumerable<GeneratedTextContent> GenerateTextAsync(
-            string prompt,
-            TextGenerationOptions options,
-            CancellationToken cancellationToken = default)
-        {
-            return _chatClient.GetStreamingResponseAsync(
-                prompt,
-                new ChatOptions
-                {
-                    Temperature = (float)options.Temperature,
-                    TopP = (float)options.NucleusSampling,
-                    PresencePenalty = (float)options.PresencePenalty,
-                    FrequencyPenalty = (float)options.FrequencyPenalty,
-                    StopSequences = options.StopSequences,
-                },
-                cancellationToken).Select(update => new GeneratedTextContent(update.Text));
-        }
-
         public void Dispose()
         {
             _chatClient.Dispose();
         }
     }
 
-    private class OllamaKernelMixin : IKernelMixin, ITextGenerator
+    private class OllamaKernelMixin : IKernelMixin
     {
-        public PromptExecutionSettings PromptExecutionSettings => new OllamaPromptExecutionSettings
+        public ITextGenerationService TextGenerationService { get; }
+
+        public IChatCompletionService ChatCompletionService { get; }
+
+        public int MaxTokenTotal => _definition.MaxTokens;
+
+        public PromptExecutionSettings GetPromptExecutionSettings() => new OllamaPromptExecutionSettings
         {
             Temperature = (float)_settings.Temperature,
             TopP = (float)_settings.TopP,
             FunctionChoiceBehavior = FunctionChoiceBehavior.Auto(autoInvoke: false)
         };
-
-        public ITextGenerationService TextGenerationService { get; }
-
-        public IChatCompletionService ChatCompletionService { get; }
-
-        public ITextGenerator TextGenerator => this;
-
-        public int MaxTokenTotal => _definition.MaxTokens;
 
         private readonly ModelSettings _settings;
         private readonly ModelDefinition _definition;
@@ -271,28 +191,6 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
                 .AsBuilder()
                 .Build()
                 .AsChatCompletionService();
-        }
-
-        public int CountTokens(string text) => text.Length / 4;
-
-        public IReadOnlyList<string> GetTokens(string text) => throw new NotSupportedException("Ollama does not support tokenization.");
-
-        public IAsyncEnumerable<GeneratedTextContent> GenerateTextAsync(
-            string prompt,
-            TextGenerationOptions options,
-            CancellationToken cancellationToken = default)
-        {
-            return _client.GetStreamingResponseAsync(
-                prompt,
-                new ChatOptions
-                {
-                    Temperature = (float)options.Temperature,
-                    TopP = (float)options.NucleusSampling,
-                    PresencePenalty = (float)options.PresencePenalty,
-                    FrequencyPenalty = (float)options.FrequencyPenalty,
-                    StopSequences = options.StopSequences,
-                },
-                cancellationToken).Select(update => new GeneratedTextContent(update.Text));
         }
 
         public void Dispose()

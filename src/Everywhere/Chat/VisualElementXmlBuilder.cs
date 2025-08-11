@@ -2,10 +2,11 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Security;
 using System.Text;
+using System.Text.RegularExpressions;
+using ZLinq;
 #if DEBUG
 using JetBrains.Profiler.Api;
 #endif
-using Microsoft.KernelMemory.AI;
 
 namespace Everywhere.Chat;
 
@@ -13,9 +14,8 @@ namespace Everywhere.Chat;
 ///     This class builds an XML representation of the core elements, which is limited by the soft token limit and finally used by a LLM.
 /// </summary>
 /// <param name="coreElements"></param>
-/// <param name="tokenizer"></param>
 /// <param name="softTokenLimit"></param>
-public class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreElements, ITextTokenizer tokenizer, int softTokenLimit)
+public partial class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreElements, int softTokenLimit)
 {
     private enum QueueOrigin
     {
@@ -103,7 +103,7 @@ public class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreElements,
                 else if (!isTextElement || name != text)
                 {
                     // If the element is not a text element, or the name is different from the text, add the name as a description
-                    // because some text elements' name is the same as text.
+                    // because the name of some text elements is the same as the text.
                     description = TruncateIfNeeded(name, remainingTokenCount);
                 }
             }
@@ -111,11 +111,11 @@ public class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreElements,
             var contents = content?.Split('\n') ?? [];
 
             var tokenCount = 8; // estimated token count for the indentation, start tag and id
-            if (description != null) tokenCount += tokenizer.CountTokens(description) + 3;
+            if (description != null) tokenCount += EstimateTokenCount(description) + 3;
             tokenCount += contents.Length switch
             {
-                1 => contents.Sum(tokenizer.CountTokens),
-                > 1 => contents.Sum(line => tokenizer.CountTokens(line) + 4) + 8, // > 1, +4 for the indentation, +8 for the end tag
+                1 => contents.Sum(EstimateTokenCount),
+                > 1 => contents.Sum(line => EstimateTokenCount(line) + 4) + 8, // > 1, +4 for the indentation, +8 for the end tag
                 _ => 0
             };
 
@@ -187,7 +187,7 @@ public class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreElements,
 
         string TruncateIfNeeded(string text, int maxLength)
         {
-            var tokenCount = tokenizer.CountTokens(text);
+            var tokenCount = EstimateTokenCount(text);
             if (maxLength <= 0 || tokenCount <= maxLength)
                 return text;
 
@@ -245,4 +245,80 @@ public class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreElements,
             _visualTreeXmlBuilder.Append(indent).Append("</").Append(element.Type).Append('>').AppendLine();
         }
     }
+
+    // The token-to-word ratio for English/Latin-based text.
+    private const double EnglishTokenRatio = 2.0;
+
+    // The token-to-character ratio for CJK-based text.
+    private const double CjkTokenRatio = 1.0;
+
+    /// <summary>
+    ///     Approximates the number of LLM tokens for a given string.
+    ///     This method first detects the language family of the string and then applies the corresponding heuristic.
+    /// </summary>
+    /// <param name="text">The input string to calculate the token count for.</param>
+    /// <returns>An approximate number of tokens.</returns>
+    private static int EstimateTokenCount(string text)
+    {
+        if (string.IsNullOrEmpty(text))
+        {
+            return 0;
+        }
+
+        return IsCjkLanguage(text)
+            ? (int)Math.Ceiling(text.Length * CjkTokenRatio)
+            : (int)Math.Ceiling(CountWords(text) * EnglishTokenRatio);
+    }
+
+    /// <summary>
+    ///     Detects if a string is predominantly composed of CJK characters.
+    ///     This method makes a judgment by calculating the proportion of CJK characters.
+    /// </summary>
+    /// <param name="text">The string to be checked.</param>
+    /// <returns>True if the string is mainly CJK, false otherwise.</returns>
+    private static bool IsCjkLanguage(string text)
+    {
+        var cjkCount = 0;
+        var totalChars = 0;
+
+        foreach (var c in text.AsValueEnumerable().Where(c => !char.IsWhiteSpace(c) && !char.IsPunctuation(c)))
+        {
+            totalChars++;
+            // Use regex to match CJK characters
+            if (CjkRegex().IsMatch(c.ToString()))
+            {
+                cjkCount++;
+            }
+        }
+
+        // Set a threshold: if the proportion of CJK characters exceeds 10%, it is considered a CJK language.
+        return totalChars > 0 && (double)cjkCount / totalChars > 0.1;
+    }
+
+    /// <summary>
+    ///     Counts the number of words in a string using a regular expression.
+    ///     This method matches sequences of non-whitespace characters to provide a more accurate word count than simple splitting.
+    /// </summary>
+    /// <param name="s">The string in which to count words.</param>
+    /// <returns>The number of words.</returns>
+    private static int CountWords(string s)
+    {
+        // Matches one or more non-whitespace characters, considered as a single word.
+        var collection = WordCountRegex().Matches(s);
+        return collection.Count;
+    }
+
+    /// <summary>
+    ///     Regex to match CJK characters, including Chinese, Japanese, and Korean.
+    /// </summary>
+    /// <returns></returns>
+    [GeneratedRegex(@"\p{IsCJKUnifiedIdeographs}|\p{IsCJKCompatibility}|\p{IsHangulJamo}|\p{IsHangulSyllables}|\p{IsHangulCompatibilityJamo}")]
+    private static partial Regex CjkRegex();
+
+    /// <summary>
+    ///     Regex to match words (sequences of non-whitespace characters).
+    /// </summary>
+    /// <returns></returns>
+    [GeneratedRegex(@"\S+")]
+    private static partial Regex WordCountRegex();
 }
