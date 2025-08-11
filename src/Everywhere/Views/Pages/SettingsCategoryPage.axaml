@@ -1,9 +1,9 @@
 ﻿<UserControl
-  x:Class="Everywhere.Views.Pages.SettingsPage" xmlns="https://github.com/avaloniaui"
+  x:Class="Everywhere.Views.Pages.SettingsCategoryPage" xmlns="https://github.com/avaloniaui"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ap="clr-namespace:Everywhere.AttachedProperties"
   xmlns:m="clr-namespace:Everywhere.Models" xmlns:markdown="clr-namespace:LiveMarkdown.Avalonia;assembly=LiveMarkdown.Avalonia"
-  xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI" xmlns:v="clr-namespace:Everywhere.Views"
-  xmlns:vm="clr-namespace:Everywhere.ViewModels" x:DataType="vm:SettingsPageViewModel">
+  xmlns:p="clr-namespace:Everywhere.Views.Pages" xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI"
+  xmlns:v="clr-namespace:Everywhere.Views">
   <ScrollViewer
     HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
     <ScrollViewer.Resources>
@@ -256,29 +256,14 @@
     </ScrollViewer.Styles>
 
     <ItemsControl
-      Padding="64,32"
-      ItemsSource="{Binding Groups}">
-      <ItemsControl.ItemTemplate>
-        <DataTemplate DataType="m:SettingsItemGroup">
-          <StackPanel
-            Margin="0,16" Spacing="16">
-            <TextBlock
-              Classes="h3"
-              Text="{Binding HeaderKey^}"
-              TextWrapping="WrapWithOverflow"/>
-
-            <ItemsControl
-              Classes="SettingsItemItemsControl" HorizontalAlignment="Stretch"
-              ItemsSource="{Binding Items}">
-              <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                  <StackPanel Spacing="8"/>
-                </ItemsPanelTemplate>
-              </ItemsControl.ItemsPanel>
-            </ItemsControl>
-          </StackPanel>
-        </DataTemplate>
-      </ItemsControl.ItemTemplate>
+      Classes="SettingsItemItemsControl" Margin="64,32"
+      HorizontalAlignment="Stretch"
+      ItemsSource="{Binding $parent[p:SettingsCategoryPage].Items}">
+      <ItemsControl.ItemsPanel>
+        <ItemsPanelTemplate>
+          <StackPanel Spacing="8"/>
+        </ItemsPanelTemplate>
+      </ItemsControl.ItemsPanel>
     </ItemsControl>
   </ScrollViewer>
 </UserControl>

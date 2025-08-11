@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using System.ComponentModel;
+using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Everywhere.Models;
@@ -8,32 +9,40 @@ namespace Everywhere.Views;
 
 public partial class MainView : ReactiveUserControl<MainViewModel>
 {
-    private readonly Settings settings;
+    private readonly Settings _settings;
 
     public MainView(Settings settings)
     {
-        this.settings = settings;
+        _settings = settings;
 
         InitializeComponent();
+    }
 
-        settings.Common.PropertyChanged += (_, e) =>
-        {
-            if (e.PropertyName != nameof(CommonSettings.Theme)) return;
-            Dispatcher.UIThread.InvokeOnDemand(ApplyTheme);
-        };
+    private void HandleCommonPropertyChanged(object? _, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(CommonSettings.Theme)) return;
+        Dispatcher.UIThread.InvokeOnDemand(ApplyTheme);
     }
 
     protected override void OnLoaded(RoutedEventArgs e)
     {
         base.OnLoaded(e);
 
+        _settings.Common.PropertyChanged += HandleCommonPropertyChanged;
         ApplyTheme();
+    }
+
+    protected override void OnUnloaded(RoutedEventArgs e)
+    {
+        base.OnUnloaded(e);
+
+        _settings.Common.PropertyChanged -= HandleCommonPropertyChanged;
     }
 
     private void ApplyTheme()
     {
         if (TopLevel.GetTopLevel(this) is not { } topLevel) return;
-        topLevel.RequestedThemeVariant = settings.Common.Theme switch
+        topLevel.RequestedThemeVariant = _settings.Common.Theme switch
         {
             "Dark" => ThemeVariants.Dark,
             "Light" => ThemeVariants.Light,

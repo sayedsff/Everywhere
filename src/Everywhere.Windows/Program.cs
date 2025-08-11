@@ -59,8 +59,7 @@ public static class Program
                 .AddSingleton<VisualTreeDebugger>()
                 .AddSingleton<ChatFloatingWindowViewModel>()
                 .AddSingleton<ChatFloatingWindow>()
-                .AddSingleton<SettingsPageViewModel>()
-                .AddSingleton<IMainViewPage, SettingsPage>()
+                .AddTransient<IMainViewPageFactory, SettingsCategoryPageFactory>()
                 .AddSingleton<AboutPageViewModel>()
                 .AddSingleton<IMainViewPage, AboutPage>()
                 .AddSingleton<WelcomeViewModel>(xx =>
@@ -82,6 +81,7 @@ public static class Program
                 #region Initialize
 
                 .AddTransient<IAsyncInitializer, HotkeyInitializer>()
+                .AddTransient<IAsyncInitializer, SettingsInitializer>()
                 .AddTransient<IAsyncInitializer>(xx => xx.GetRequiredService<ChatContextManager>())
 
                 #endregion

@@ -8,25 +8,48 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Everywhere.Attributes;
 using Everywhere.Enums;
 using Everywhere.Utilities;
+using Lucide.Avalonia;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using WritableJsonConfiguration;
 
 namespace Everywhere.Models;
 
-public abstract class SettingsBase : ObservableObject;
+/// <summary>
+/// Represents an attribute that defines a settings category.
+/// </summary>
+[AttributeUsage(AttributeTargets.Property)]
+public class SettingsCategoryAttribute : Attribute
+{
+    /// <summary>
+    /// The display name of the settings category.
+    /// </summary>
+    public required string Header { get; set; }
 
+    /// <summary>
+    /// The Icon of the settings category.
+    /// </summary>
+    public required LucideIconKind Icon { get; set; }
+}
+
+/// <summary>
+/// Represents the application settings.
+/// A singleton that holds all the settings categories.
+/// And automatically saves the settings to a JSON file when any setting is changed.
+/// </summary>
 [Serializable]
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
 public class Settings : ObservableObject
 {
-    public CommonSettings Common { get; } = new();
-
-    public BehaviorSettings Behavior { get; } = new();
-
+    [SettingsCategory(Header = "Model", Icon = LucideIconKind.Brain)]
     public ModelSettings Model { get; } = new();
 
-    [HiddenSettingsItem]
+    [SettingsCategory(Header = "Behavior", Icon = LucideIconKind.Keyboard)]
+    public BehaviorSettings Behavior { get; } = new();
+
+    [SettingsCategory(Header = "Appearance", Icon = LucideIconKind.Palette)]
+    public CommonSettings Common { get; } = new();
+
     public InternalSettings Internal { get; } = new();
 
     private readonly Dictionary<string, object?> _saveBuffer = new();
@@ -61,7 +84,7 @@ public class Settings : ObservableObject
     }
 }
 
-public partial class CommonSettings : SettingsBase
+public partial class CommonSettings : ObservableObject
 {
     [SettingsSelectionItem(ItemsSource = nameof(LanguageSource), I18N = true)]
     public string Language
@@ -104,7 +127,7 @@ public partial class CommonSettings : SettingsBase
     public static IEnumerable<string> ThemeSource => ["System", "Dark", "Light"];
 }
 
-public partial class BehaviorSettings : SettingsBase
+public partial class BehaviorSettings : ObservableObject
 {
     [ObservableProperty]
     public partial KeyboardHotkey ChatHotkey { get; set; } = new(Key.E, KeyModifiers.Control | KeyModifiers.Shift);
@@ -113,7 +136,7 @@ public partial class BehaviorSettings : SettingsBase
     public partial ChatFloatingWindowPinMode ChatFloatingWindowPinMode { get; set; }
 }
 
-public partial class ModelSettings : SettingsBase
+public partial class ModelSettings : ObservableObject
 {
     [HiddenSettingsItem]
     [ObservableProperty]
@@ -155,19 +178,19 @@ public partial class ModelSettings : SettingsBase
 
     [ObservableProperty]
     [SettingsDoubleItem(Min = 0.0, Max = 2.0, Step = 0.1)]
-    public partial double Temperature { get; set; } = 1.0;
+    public partial Customizable<double> Temperature { get; set; } = 1.0;
 
     [ObservableProperty]
     [SettingsDoubleItem(Min = 0.0, Max = 1.0, Step = 0.1)]
-    public partial double TopP { get; set; } = 0.9;
+    public partial Customizable<double> TopP { get; set; } = 0.9;
 
     [ObservableProperty]
     [SettingsDoubleItem(Min = -2.0, Max = 2.0, Step = 0.1)]
-    public partial double PresencePenalty { get; set; } = 0.0;
+    public partial Customizable<double> PresencePenalty { get; set; } = 0.0;
 
     [ObservableProperty]
     [SettingsDoubleItem(Min = -2.0, Max = 2.0, Step = 0.1)]
-    public partial double FrequencyPenalty { get; set; } = 0.0;
+    public partial Customizable<double> FrequencyPenalty { get; set; } = 0.0;
 
     [ObservableProperty]
     [SettingsSelectionItem(ItemsSource = nameof(WebSearchProviders))]
@@ -185,7 +208,7 @@ public partial class ModelSettings : SettingsBase
 }
 
 [HiddenSettingsItem]
-public partial class InternalSettings : SettingsBase
+public partial class InternalSettings : ObservableObject
 {
     /// <summary>
     /// Used to popup welcome dialog on first launch and update.

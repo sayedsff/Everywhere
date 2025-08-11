@@ -5,13 +5,10 @@ using ZLinq;
 
 namespace Everywhere.Models;
 
-public class SettingsItemGroup(string name, IReadOnlyList<SettingsItem> items)
-{
-    public DynamicResourceKey HeaderKey => $"SettingsGroup_{name}_Header";
-
-    public IReadOnlyList<SettingsItem> Items => items;
-}
-
+/// <summary>
+/// Represents a single settings item for View.
+/// </summary>
+/// <param name="name"></param>
 public abstract class SettingsItem(string name) : AvaloniaObject
 {
     public DynamicResourceKey HeaderKey => $"Settings_{name}_Header";

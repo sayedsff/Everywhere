@@ -8,6 +8,7 @@ using Avalonia.LogicalTree;
 using Avalonia.Media;
 using CommunityToolkit.Mvvm.Input;
 using Everywhere.Models;
+using Everywhere.Utilities;
 
 namespace Everywhere.Views;
 
@@ -169,9 +170,9 @@ public partial class ChatInputBox : TextBox
     {
         base.OnApplyTemplate(e);
 
-        _sendButtonClickSubscription?.Dispose();
-        _chatAttachmentItemsControlPointerMovedSubscription?.Dispose();
-        _chatAttachmentItemsControlPointerExitedSubscription?.Dispose();
+        DisposeCollector.DisposeToDefault(ref _sendButtonClickSubscription);
+        DisposeCollector.DisposeToDefault(ref _chatAttachmentItemsControlPointerMovedSubscription);
+        DisposeCollector.DisposeToDefault(ref _chatAttachmentItemsControlPointerExitedSubscription);
 
         // We handle the click event of the SendButton here instead of using Command binding,
         // because we need to clear the text after sending the message.

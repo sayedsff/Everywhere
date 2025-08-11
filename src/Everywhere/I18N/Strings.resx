@@ -25,17 +25,14 @@
             PublicKeyToken=b77a5c561934e089
         </value>
     </resheader>
-    <data name="SettingsPage_Title" xml:space="preserve">
-        <value>Settings</value>
-    </data>
     <data name="SettingsPage_Saved_Toast_Title" xml:space="preserve">
         <value>Settings Saved</value>
     </data>
     <data name="Settings_Common_Language_Header" xml:space="preserve">
         <value>Language</value>
     </data>
-    <data name="SettingsGroup_Common_Header" xml:space="preserve">
-        <value>Common</value>
+    <data name="SettingsCategory_Appearance_Header" xml:space="preserve">
+        <value>Appearance Settings</value>
     </data>
     <data name="Settings_Common_Language_Description" xml:space="preserve">
         <value>Select the display language for the software.</value>
@@ -58,8 +55,8 @@
     <data name="SettingsSelectionItem_Common_Theme_Light" xml:space="preserve">
         <value>Light</value>
     </data>
-    <data name="SettingsGroup_Behavior_Header" xml:space="preserve">
-        <value>Behavior</value>
+    <data name="SettingsCategory_Behavior_Header" xml:space="preserve">
+        <value>Behavior Settings</value>
     </data>
     <data name="Settings_Behavior_ChatHotkey_Header" xml:space="preserve">
         <value>Chat Hotkey</value>
@@ -67,8 +64,8 @@
     <data name="Settings_Behavior_ChatHotkey_Description" xml:space="preserve">
         <value>Set a hotkey to invoke the chat window at any time.</value>
     </data>
-    <data name="SettingsGroup_Model_Header" xml:space="preserve">
-        <value>Model</value>
+    <data name="SettingsCategory_Model_Header" xml:space="preserve">
+        <value>AI Settings</value>
     </data>
     <data name="Settings_Model_ModelName_Header" xml:space="preserve">
         <value>Model Name</value>
@@ -613,5 +610,11 @@ Tip: You can reopen this message by clicking “About - Welcome Page”.</value>
     </data>
     <data name="SettingsPage_RestoreDefault_Button_ToolTip" xml:space="preserve">
         <value>Restore Default</value>
+    </data>
+    <data name="Settings_Model_SelectedModelProvider_Schema_Header" xml:space="preserve">
+        <value>API Schema</value>
+    </data>
+    <data name="Settings_Model_SelectedModelProvider_Schema_Description" xml:space="preserve">
+        <value>Select API schema. Leaving this to default if you dont't know what to do.</value>
     </data>
 </root>

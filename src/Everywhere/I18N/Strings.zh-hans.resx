@@ -11,14 +11,11 @@
     <resheader name="writer">
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
-    <data name="SettingsGroup_Common_Header" xml:space="preserve">
-        <value>基础</value>
+    <data name="SettingsCategory_Appearance_Header" xml:space="preserve">
+        <value>外观设置</value>
     </data>
     <data name="SettingsPage_Saved_Toast_Title" xml:space="preserve">
         <value>设置已保存</value>
-    </data>
-    <data name="SettingsPage_Title" xml:space="preserve">
-        <value>设置</value>
     </data>
     <data name="Settings_Common_Language_Header" xml:space="preserve">
         <value>语言</value>
@@ -44,8 +41,8 @@
     <data name="SettingsSelectionItem_Common_Theme_Light" xml:space="preserve">
         <value>浅色</value>
     </data>
-    <data name="SettingsGroup_Behavior_Header" xml:space="preserve">
-        <value>行为</value>
+    <data name="SettingsCategory_Behavior_Header" xml:space="preserve">
+        <value>行为设置</value>
     </data>
     <data name="Settings_Behavior_ChatHotkey_Header" xml:space="preserve">
         <value>聊天快捷键</value>
@@ -53,8 +50,8 @@
     <data name="Settings_Behavior_ChatHotkey_Description" xml:space="preserve">
         <value>设置一个快捷键，在任何时候按下即可唤出对话窗口。</value>
     </data>
-    <data name="SettingsGroup_Model_Header" xml:space="preserve">
-        <value>模型</value>
+    <data name="SettingsCategory_Model_Header" xml:space="preserve">
+        <value>AI 设置</value>
     </data>
     <data name="Settings_Model_ModelName_Header" xml:space="preserve">
         <value>模型名称</value>
@@ -390,10 +387,10 @@
         <value>无法解析 Json 数据</value>
     </data>
     <data name="FriendlyExceptionMessage_Format" xml:space="preserve">
-        <value>格式错误</value>
+        <value>格式错误 {0}</value>
     </data>
     <data name="FriendlyExceptionMessage_Argument" xml:space="preserve">
-        <value>参数错误</value>
+        <value>参数错误 {0}</value>
     </data>
     <data name="Settings_Common_Theme_Header" xml:space="preserve">
         <value>主题</value>
@@ -581,5 +578,11 @@
     </data>
     <data name="SettingsPage_RestoreDefault_Button_ToolTip" xml:space="preserve">
         <value>恢复默认</value>
+    </data>
+    <data name="Settings_Model_SelectedModelProvider_Schema_Header" xml:space="preserve">
+        <value>API 模式</value>
+    </data>
+    <data name="Settings_Model_SelectedModelProvider_Schema_Description" xml:space="preserve">
+        <value>选择 API 的模式。如果你不确定这是什么，请保持默认值。</value>
     </data>
 </root>

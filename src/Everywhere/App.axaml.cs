@@ -8,7 +8,6 @@ using Everywhere.Enums;
 using Everywhere.Models;
 using Everywhere.Utilities;
 using Everywhere.Views;
-using Everywhere.Views.Pages;
 using Microsoft.Extensions.DependencyInjection;
 using ShadUI;
 using Window = Avalonia.Controls.Window;
@@ -52,8 +51,6 @@ public class App : Application
                     .AddSingleton<VisualTreeDebugger>()
                     .AddSingleton<ChatFloatingWindowViewModel>()
                     .AddSingleton<ChatFloatingWindow>()
-                    .AddSingleton<SettingsPageViewModel>()
-                    .AddSingleton<IMainViewPage, SettingsPage>()
                     .AddSingleton<MainViewModel>()
                     .AddSingleton<MainView>()
 

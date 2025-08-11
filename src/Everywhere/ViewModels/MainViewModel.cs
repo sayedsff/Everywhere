@@ -24,17 +24,24 @@ public partial class MainViewModel(IServiceProvider serviceProvider, Settings se
 
     protected internal override Task ViewLoaded(CancellationToken cancellationToken)
     {
+        if (_pages.Count > 0) return base.ViewLoaded(cancellationToken);
+
         _pages.Reset(
-            serviceProvider.GetServices<IMainViewPage>().Select(p => new SidebarItem
-            {
-                [ContentControl.ContentProperty] = new TextBlock
+            serviceProvider
+                .GetServices<IMainViewPageFactory>()
+                .SelectMany(f => f.CreatePages())
+                .Concat(serviceProvider.GetServices<IMainViewPage>())
+                .OrderBy(p => p.Index)
+                .Select(p => new SidebarItem
                 {
-                    Classes = { "p" },
-                    [!TextBlock.TextProperty] = p.Title.ToBinding()
-                },
-                [SidebarItem.RouteProperty] = p,
-                Icon = new LucideIcon { Kind = p.Icon, Size = 20 }
-            }));
+                    [ContentControl.ContentProperty] = new TextBlock
+                    {
+                        Classes = { "p" },
+                        [!TextBlock.TextProperty] = p.Title.ToBinding()
+                    },
+                    [SidebarItem.RouteProperty] = p,
+                    Icon = new LucideIcon { Kind = p.Icon, Size = 20 }
+                }));
         SelectedPage = _pages.FirstOrDefault();
 
         ShowWelcomeDialogOnDemand();

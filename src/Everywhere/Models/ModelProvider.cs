@@ -72,7 +72,6 @@ public partial class ModelProvider : ObservableObject
     /// The schema used by the model provider.
     /// </summary>
     [ObservableProperty]
-    [HiddenSettingsItem]
     public required partial Customizable<ModelProviderSchema> Schema { get; set; }
 
     /// <summary>
