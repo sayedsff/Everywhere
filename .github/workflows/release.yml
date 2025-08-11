@@ -39,6 +39,32 @@ jobs:
         $version = $env:GITHUB_REF -replace 'refs/tags/v', ''
         echo "VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
+    - name: Extract Release Notes from CHANGELOG.md
+      id: get_release_notes
+      shell: pwsh
+      run: |
+        $changelog = Get-Content -Path CHANGELOG.md -Raw
+        $version = "${{ env.VERSION }}"
+        # Use regex to match the content from the current version's header
+        # to the next version's header or the end of the file.
+        # (?s) makes . match newlines, (?m) makes ^ match the start of a line.
+        $pattern = "(?sm)(^##\s+\[v$([regex]::Escape($version))\].*?)(?=^##\s+\[v|\z)"
+        $match = [regex]::Match($changelog, $pattern)
+        
+        if (-not $match.Success) {
+          Write-Error "Could not find release notes for v${version} in CHANGELOG.md"
+          exit 1
+        }
+        
+        # Remove the first line (the version header)
+        $releaseBody = $match.Value.Split([System.Environment]::NewLine, 2)[1].Trim()
+        
+        # Set the multi-line output for the step
+        $delimiter = "EOF_$(Get-Random)"
+        echo "body<<$delimiter" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+        echo $releaseBody | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+        echo "$delimiter" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
     - name: Publish Everywhere.Windows
       shell: pwsh
       run: |
@@ -61,9 +87,9 @@ jobs:
       uses: softprops/action-gh-release@v2
       with:
         name: Everywhere v${{env.VERSION}}
+        body: ${{ steps.get_release_notes.outputs.body }}
         draft: false
         prerelease: false
         files: |
           ./Everywhere-Windows-x64-v${{env.VERSION}}.zip
           ./Everywhere-Windows-x64-Setup-v${{env.VERSION}}.exe
-        generate_release_notes: true

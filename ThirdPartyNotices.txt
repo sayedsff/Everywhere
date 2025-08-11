@@ -2,16 +2,6 @@ This product bundles the following components under the described licenses:
 
 --------------------------------------------------------------------------------
 
-AsyncImageLoader.Avalonia
-
-Id:        AsyncImageLoader.Avalonia
-Version:   3.3.0
-Project:   https://github.com/AvaloniaUtils/AsyncImageLoader.Avalonia
-Copyright: 
-License:   MIT (https://github.com/AvaloniaUtils/AsyncImageLoader.Avalonia/blob/master/LICENSE) 
-
---------------------------------------------------------------------------------
-
 Avalonia
 
 Id:        Avalonia
