@@ -182,5 +182,5 @@ public partial class ChatContextManager : ObservableObject, IChatContextManager,
 
     public Task InitializeAsync() => UpdateHistoryAsync(8);
 
-    private static bool IsEmptyContext([NotNullWhen(true)] ChatContext? chatContext) => chatContext is { MessageCount: 1 };
+    private static bool IsEmptyContext([NotNullWhen(true)] ChatContext? chatContext) => chatContext is { Count: 1 };
 }

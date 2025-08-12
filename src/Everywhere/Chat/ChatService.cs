@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.Json;
 using Everywhere.Models;
 using Lucide.Avalonia;
 using Microsoft.Extensions.DependencyInjection;
@@ -126,6 +127,13 @@ public class ChatService(
         return builder.Build();
     }
 
+    /// <summary>
+    /// Represents a record of a function call and its result.
+    /// </summary>
+    /// <param name="FunctionCall"></param>
+    /// <param name="Result"></param>
+    private record FunctionCallRecord(FunctionCallContent FunctionCall, FunctionResultContent Result);
+
     private async Task GenerateAsync(
         IKernelMixin kernelMixin,
         ChatContext chatContext,
@@ -143,7 +151,8 @@ public class ChatService(
                     .Where(m => !Equals(m, assistantChatMessage)) // exclude the current assistant message
                     .Where(m => m.Role.Label is "system" or "assistant" or "user" or "tool")
                     .ToAsyncEnumerable()
-                    .SelectAwait(CreateChatMessageContentAsync)
+                    .SelectMany(CreateChatMessageContentsAsync)
+                    .OfType<ChatMessageContent>()
                     .ToArrayAsync(cancellationToken: cancellationToken));
 
             while (true)
@@ -171,22 +180,17 @@ public class ChatService(
                     functionCallContentBuilder.Append(streamingContent);
                 }
 
-                chatHistory.AddAssistantMessage(assistantContentBuilder.ToString());
+                if (assistantContentBuilder.Length > 0) chatHistory.AddAssistantMessage(assistantContentBuilder.ToString());
 
-                var functionCalls = functionCallContentBuilder.Build();
-                if (functionCalls.Count == 0) break;
+                var functionCallContents = functionCallContentBuilder.Build();
+                if (functionCallContents.Count == 0) break;
 
-                // TODO: tool calling
-                var functionCallContent = new ChatMessageContent(AuthorRole.Tool, content: null);
-                chatHistory.Add(functionCallContent);
-
-                foreach (var functionCall in functionCalls)
+                // Group function calls by plugin name, and create ActionChatMessages for each group.
+                foreach (var functionCallContentGroup in functionCallContents.GroupBy(f => f.PluginName))
                 {
                     cancellationToken.ThrowIfCancellationRequested();
 
-                    functionCallContent.Items.Add(functionCall);
-
-                    var actionChatMessage = functionCall.PluginName switch
+                    var actionChatMessage = functionCallContentGroup.Key switch
                     {
                         "web_search" => new ActionChatMessage(
                             AuthorRole.Tool,
@@ -195,24 +199,42 @@ public class ChatService(
                         _ => throw new NotImplementedException()
                     };
                     actionChatMessage.IsBusy = true;
-                    chatContext.Insert(chatContext.MessageCount - 1, actionChatMessage);
+                    assistantChatMessage.Actions.Add(actionChatMessage);
 
-                    try
+                    // Add call message to the chat history.
+                    var functionCallMessage = new ChatMessageContent(AuthorRole.Assistant, content: null);
+                    chatHistory.Add(functionCallMessage);
+
+                    // Iterate through the function call contents in the group.
+                    var functionCallRecords = new List<FunctionCallRecord>(functionCallContentGroup.Count());
+                    foreach (var functionCallContent in functionCallContentGroup)
                     {
-                        var resultContent = await functionCall.InvokeAsync(kernel, cancellationToken);
-                        var resultChatMessage = resultContent.ToChatMessage();
-                        chatHistory.Add(resultChatMessage);
-                        actionChatMessage.Content = resultChatMessage.Content;
+                        functionCallMessage.Items.Add(functionCallContent);
+
+                        FunctionResultContent resultContent;
+                        try
+                        {
+                            resultContent = await functionCallContent.InvokeAsync(kernel, cancellationToken);
+                        }
+                        catch (Exception ex)
+                        {
+                            resultContent = new FunctionResultContent(functionCallContent, $"Error: {ex.Message}");
+                            actionChatMessage.ErrorMessageKey = ex.GetFriendlyMessage();
+                        }
+
+                        // Add result content to the chat history and the function result contents list.
+                        functionCallRecords.Add(new FunctionCallRecord(functionCallContent, resultContent));
+                        chatHistory.Add(resultContent.ToChatMessage());
+
+                        if (actionChatMessage.ErrorMessageKey is not null)
+                        {
+                            break; // If an error occurs, we stop processing further function calls.
+                        }
                     }
-                    catch (Exception ex)
-                    {
-                        chatHistory.Add(new FunctionResultContent(functionCall, $"Error: {ex.Message}").ToChatMessage());
-                        actionChatMessage.ErrorMessageKey = ex.GetFriendlyMessage();
-                    }
-                    finally
-                    {
-                        actionChatMessage.IsBusy = false;
-                    }
+
+                    // Serialize the function calls and results to JSON.
+                    actionChatMessage.Content = JsonSerializer.Serialize(functionCallRecords);
+                    actionChatMessage.IsBusy = false;
                 }
             }
 
@@ -242,14 +264,32 @@ public class ChatService(
             assistantChatMessage.IsBusy = false;
         }
 
-        async ValueTask<ChatMessageContent> CreateChatMessageContentAsync(ChatMessage chatMessage)
+        async IAsyncEnumerable<ChatMessageContent> CreateChatMessageContentsAsync(ChatMessage chatMessage)
         {
-            ChatMessageContent? content;
             switch (chatMessage)
             {
+                case SystemChatMessage system:
+                {
+                    yield return new ChatMessageContent(chatMessage.Role, system.SystemPrompt);
+                    break;
+                }
+                case AssistantChatMessage assistant:
+                {
+                    // If the assistant message has actions, we need to yield them first.
+                    foreach (var actionChatMessage in assistant.Actions)
+                    {
+                        await foreach (var actionChatMessageContent in CreateChatMessageContentsAsync(actionChatMessage))
+                        {
+                            yield return actionChatMessageContent;
+                        }
+                    }
+
+                    yield return new ChatMessageContent(chatMessage.Role, assistant.MarkdownBuilder.ToString());
+                    break;
+                }
                 case UserChatMessage user:
                 {
-                    content = new ChatMessageContent(chatMessage.Role, user.UserPrompt);
+                    var content = new ChatMessageContent(chatMessage.Role, user.UserPrompt);
 
                     foreach (var imageAttachment in user.Attachments.OfType<ChatFileAttachment>().Where(a => a.IsImage))
                     {
@@ -262,25 +302,43 @@ public class ChatService(
                         content.Items.Add(new ImageContent(ms.ToArray(), "image/png"));
                     }
 
+                    yield return content;
+
                     break;
                 }
-                case AssistantChatMessage assistant:
+                case ActionChatMessage { Role.Label: "tool", Content: { } json }:
                 {
-                    content = new ChatMessageContent(chatMessage.Role, assistant.MarkdownBuilder.ToString());
+                    var functionCallRecords = DeserializeFunctionCallRecords(json);
+
+                    var functionCallMessage = new ChatMessageContent(AuthorRole.Assistant, content: null);
+                    functionCallMessage.Items.AddRange(functionCallRecords.Select(f => f.FunctionCall));
+                    yield return functionCallMessage;
+
+                    foreach (var (_, result) in functionCallRecords)
+                    {
+                        yield return result.ToChatMessage();
+                    }
+
                     break;
                 }
-                case SystemChatMessage system:
+                case { Role.Label: "system" or "user" or "developer" or "tool" }:
                 {
-                    content = new ChatMessageContent(chatMessage.Role, system.SystemPrompt);
-                    break;
-                }
-                default:
-                {
-                    content = new ChatMessageContent(chatMessage.Role, chatMessage.ToString());
+                    yield return new ChatMessageContent(chatMessage.Role, chatMessage.ToString());
                     break;
                 }
             }
-            return content;
+
+            static List<FunctionCallRecord> DeserializeFunctionCallRecords(string json)
+            {
+                try
+                {
+                    return JsonSerializer.Deserialize<List<FunctionCallRecord>>(json) ?? [];
+                }
+                catch (JsonException)
+                {
+                    return [];
+                }
+            }
         }
     }
 

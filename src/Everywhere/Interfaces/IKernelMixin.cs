@@ -18,7 +18,7 @@ public interface IKernelMixin : IDisposable
     /// </summary>
     int MaxTokenTotal { get; }
 
-    PromptExecutionSettings GetPromptExecutionSettings();
+    PromptExecutionSettings GetPromptExecutionSettings(bool isToolRequired = false);
 }
 
 public interface IKernelMixinFactory

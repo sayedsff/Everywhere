@@ -69,12 +69,13 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
 
         public IChatCompletionService ChatCompletionService => _chatCompletionService;
 
-        public PromptExecutionSettings GetPromptExecutionSettings() => new OpenAIPromptExecutionSettings
+        public PromptExecutionSettings GetPromptExecutionSettings(bool isToolRequired = false) => new OpenAIPromptExecutionSettings
         {
             Temperature = settings.Temperature,
             PresencePenalty = settings.PresencePenalty,
             FrequencyPenalty = settings.FrequencyPenalty,
-            FunctionChoiceBehavior = FunctionChoiceBehavior.Auto(autoInvoke: false)
+            FunctionChoiceBehavior =
+                isToolRequired ? FunctionChoiceBehavior.Required(autoInvoke: false) : FunctionChoiceBehavior.Auto(autoInvoke: false)
         };
 
         public int MaxTokenTotal => Math.Max(16_000, definition.MaxTokens);
@@ -97,7 +98,7 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
 
         public int MaxTokenTotal => _definition.MaxTokens;
 
-        public PromptExecutionSettings GetPromptExecutionSettings() => new()
+        public PromptExecutionSettings GetPromptExecutionSettings(bool isToolRequired = false) => new()
         {
             ModelId = _definition.Id,
             ExtensionData = new Dictionary<string, object>
@@ -107,7 +108,8 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
                 { "presence_penalty", _settings.PresencePenalty },
                 { "frequency_penalty", _settings.FrequencyPenalty },
             },
-            FunctionChoiceBehavior = FunctionChoiceBehavior.Auto(autoInvoke: false)
+            FunctionChoiceBehavior =
+                isToolRequired ? FunctionChoiceBehavior.Required(autoInvoke: false) : FunctionChoiceBehavior.Auto(autoInvoke: false)
         };
 
         private readonly ModelSettings _settings;
@@ -168,11 +170,12 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
 
         public int MaxTokenTotal => _definition.MaxTokens;
 
-        public PromptExecutionSettings GetPromptExecutionSettings() => new OllamaPromptExecutionSettings
+        public PromptExecutionSettings GetPromptExecutionSettings(bool isToolRequired = false) => new OllamaPromptExecutionSettings
         {
             Temperature = (float)_settings.Temperature,
             TopP = (float)_settings.TopP,
-            FunctionChoiceBehavior = FunctionChoiceBehavior.Auto(autoInvoke: false)
+            FunctionChoiceBehavior =
+                isToolRequired ? FunctionChoiceBehavior.Required(autoInvoke: false) : FunctionChoiceBehavior.Auto(autoInvoke: false)
         };
 
         private readonly ModelSettings _settings;

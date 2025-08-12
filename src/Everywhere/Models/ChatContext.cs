@@ -13,7 +13,7 @@ public delegate void ChatContextChangedEventHandler(ChatContext context);
 /// The current branch is derived by following each node's <see cref="ChatMessageNode.ChoiceIndex"/>.
 /// </summary>
 [MessagePackObject(AllowPrivate = true)]
-public partial class ChatContext : ObservableObject, IEnumerable<ChatMessageNode>
+public partial class ChatContext : ObservableObject, IReadOnlyList<ChatMessageNode>
 {
     [Key(0)]
     public ChatContextMetadata Metadata { get; }
@@ -22,8 +22,13 @@ public partial class ChatContext : ObservableObject, IEnumerable<ChatMessageNode
     [ObservableProperty]
     public partial bool IsRenamingMetadataTitle { get; set; }
 
+    /// <summary>
+    /// Messages in the current branch.
+    /// </summary>
     [IgnoreMember]
-    public int MessageCount => _branchNodes.Count;
+    public int Count => _branchNodes.Count;
+
+    public ChatMessageNode this[int index] => _branchNodes[index];
 
     /// <summary>
     /// Event raised when the chat context is modified, e.g., a new message is added or a node is updated.
@@ -63,7 +68,7 @@ public partial class ChatContext : ObservableObject, IEnumerable<ChatMessageNode
     {
         Metadata = metadata;
         _messageNodeMap.AddRange(messageNodes.Select(v => new KeyValuePair<Guid, ChatMessageNode>(v.Id, v)));
-        this._rootNode = rootNode;
+        _rootNode = rootNode;
         _branchNodes.Add(rootNode);
 
         foreach (var node in messageNodes.Append(rootNode))
@@ -112,10 +117,25 @@ public partial class ChatContext : ObservableObject, IEnumerable<ChatMessageNode
     public void CreateBranchOn(ChatMessageNode siblingNode, ChatMessage chatMessage)
     {
         var index = _branchNodes.IndexOf(siblingNode);
-        if (index < 0)
-            throw new ArgumentException("The specified node is not in the current branch.", nameof(siblingNode));
+        var afterNode = index switch
+        {
+            < 0 => throw new ArgumentException("The specified node is not in the current branch.", nameof(siblingNode)),
+            0 => _rootNode,
+            _ => _branchNodes[index - 1]
+        };
 
-        Insert(index, chatMessage);
+        var newNode = new ChatMessageNode(chatMessage)
+        {
+            Context = this,
+            Parent = afterNode,
+        };
+        newNode.PropertyChanged += HandleNodePropertyChanged;
+        _messageNodeMap[newNode.Id] = newNode;
+
+        afterNode.Children.Add(newNode.Id);
+        afterNode.ChoiceIndex = afterNode.Children.Count - 1;
+
+        UpdateBranchAfter(index - 1, afterNode);
     }
 
     public void Insert(int index, ChatMessage chatMessage) => Insert(index, new ChatMessageNode(chatMessage) { Context = this });
@@ -188,16 +208,30 @@ public partial class ChatContext : ObservableObject, IEnumerable<ChatMessageNode
         if (newNode.Id == Guid.Empty)
             throw new ArgumentException("New node must have a non-empty ID.", nameof(newNode));
 
+        _messageNodeMap[newNode.Id] = newNode;
+        newNode.PropertyChanged += HandleNodePropertyChanged;
+
         var afterNode = index switch
         {
             0 => _rootNode,
             _ => _branchNodes[index - 1]
         };
-        afterNode.Children.Add(newNode.Id);
+
+        if (afterNode.Children.Count > 0)
+        {
+            newNode.Children.AddRange(afterNode.Children);
+            newNode.ChoiceIndex = afterNode.ChoiceIndex;
+            foreach (var afterNodeChildId in afterNode.Children)
+            {
+                _messageNodeMap[afterNodeChildId].Parent = newNode;
+            }
+
+            afterNode.Children.Clear();
+        }
+
         newNode.Parent = afterNode;
-        _messageNodeMap[newNode.Id] = newNode;
-        newNode.PropertyChanged += HandleNodePropertyChanged;
-        afterNode.ChoiceIndex = afterNode.Children.Count - 1;
+        afterNode.Children.Add(newNode.Id);
+
         UpdateBranchAfter(index - 1, afterNode);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Collections.ObjectModel;
 using System.Text.Json.Serialization;
 using Avalonia.Controls.Documents;
 using Avalonia.Threading;
@@ -61,6 +62,12 @@ public partial class AssistantChatMessage : ChatMessage
     [Key(3)]
     public DateTimeOffset FinishedAt { get; set; } = DateTimeOffset.UtcNow;
 
+    /// <summary>
+    /// A collection of actions that the assistant can perform. Such as function calling.
+    /// </summary>
+    [Key(4)]
+    public ObservableCollection<ActionChatMessage> Actions { get; set; } = [];
+
     public AssistantChatMessage()
     {
         MarkdownBuilder = new ObservableStringBuilder();
@@ -109,6 +116,9 @@ public partial class UserChatMessage(string userPrompt, IReadOnlyList<ChatAttach
     public override string ToString() => UserPrompt;
 }
 
+/// <summary>
+/// Represents an action message in the chat.
+/// </summary>
 [MessagePackObject(AllowPrivate = true, OnlyIncludeKeyedMembers = true)]
 public partial class ActionChatMessage : ChatMessage
 {
