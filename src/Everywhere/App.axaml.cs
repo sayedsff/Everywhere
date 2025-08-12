@@ -192,6 +192,10 @@ file class DesignTimeHotkeyListener : IHotkeyListener
 
 file class DesignTimeNativeHelper : INativeHelper
 {
+    public bool IsAdministrator => false;
+    public bool IsUserStartupEnabled { get; set; }
+    public bool IsAdministratorStartupEnabled { get; set; }
+    public void RestartAsAdministrator() { }
     public void SetWindowNoFocus(Window window) { }
     public void SetWindowAutoHide(Window window) { }
     public void SetWindowHitTestInvisible(Window window) { }

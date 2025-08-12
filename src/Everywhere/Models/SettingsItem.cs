@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using System.Windows.Input;
+using Avalonia.Controls;
 using Avalonia.Data;
 using ZLinq;
 
@@ -29,6 +30,14 @@ public abstract class SettingsItem(string name) : AvaloniaObject
     {
         get => GetValue(IsEnabledProperty);
         set => SetValue(IsEnabledProperty, value);
+    }
+
+    public static readonly StyledProperty<bool> IsVisibleProperty = AvaloniaProperty.Register<SettingsItem, bool>(nameof(IsVisible), true);
+
+    public bool IsVisible
+    {
+        get => GetValue(IsVisibleProperty);
+        set => SetValue(IsVisibleProperty, value);
     }
 
     public static readonly StyledProperty<bool> IsExpandedProperty = AvaloniaProperty.Register<SettingsItem, bool>(nameof(IsExpanded));
@@ -203,7 +212,7 @@ public class SettingsSelectionItem(string name) : SettingsItem(name)
         }
     }
 
-    public static SettingsSelectionItem FromEnum(Type enumType, string name, IBinding valueBinding)
+    public static SettingsSelectionItem FromEnum(Type enumType, string name)
     {
         if (!enumType.IsEnum)
         {
@@ -212,7 +221,6 @@ public class SettingsSelectionItem(string name) : SettingsItem(name)
 
         return new SettingsSelectionItem(name)
         {
-            [!ValueProperty] = valueBinding,
             ItemsSource = Enum.GetValues(enumType).AsValueEnumerable().Cast<object>().Select(x =>
             {
                 if (Enum.GetName(enumType, x) is { } enumName &&
@@ -242,3 +250,8 @@ public class SettingsCustomizableItem(string name, SettingsItem customValueItem)
 }
 
 public class SettingsKeyboardHotkeyItem(string name) : SettingsItem(name);
+
+public class SettingsControlItem(string name, Control control) : SettingsItem(name)
+{
+    public Control Control => control;
+}

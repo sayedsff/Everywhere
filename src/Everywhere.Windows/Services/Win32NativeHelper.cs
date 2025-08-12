@@ -1,6 +1,8 @@
-﻿using System.Numerics;
+﻿using System.Diagnostics;
+using System.Numerics;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Security.Principal;
 using Windows.Data.Xml.Dom;
 using Windows.UI.Composition;
 using Windows.UI.Composition.Desktop;
@@ -16,6 +18,7 @@ using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Threading;
+using Everywhere.Extensions;
 using Everywhere.Interfaces;
 using Everywhere.Windows.Interop;
 using MicroCom.Runtime;
@@ -27,12 +30,110 @@ namespace Everywhere.Windows.Services;
 
 public class Win32NativeHelper : INativeHelper
 {
+    private const string AppName = nameof(Everywhere);
+    private const string RegistryRunKey = @"Software\Microsoft\Windows\CurrentVersion\Run";
+    private static string AppPath => $"\"{Environment.ProcessPath}\" --autorun";
+
     // ReSharper disable InconsistentNaming
     // ReSharper disable IdentifierTypo
     private const uint EVENT_SYSTEM_FOREGROUND = 0x0003;
     private const uint WINEVENT_OUTOFCONTEXT = 0x0000;
     // ReSharper restore InconsistentNaming
     // ReSharper restore IdentifierTypo
+
+    public bool IsAdministrator
+    {
+        get
+        {
+            var identity = WindowsIdentity.GetCurrent();
+            var principal = new WindowsPrincipal(identity);
+            return principal.IsInRole(WindowsBuiltInRole.Administrator);
+        }
+    }
+
+    public bool IsUserStartupEnabled
+    {
+        get
+        {
+            try
+            {
+                using var key = Registry.CurrentUser.OpenSubKey(RegistryRunKey);
+                return key?.GetValue(AppName) != null;
+            }
+            catch
+            {
+                // If the registry key cannot be accessed, assume it is not enabled.
+                return false;
+            }
+        }
+        set
+        {
+            if (value)
+            {
+                using var key = Registry.CurrentUser.OpenSubKey(RegistryRunKey, true);
+                key?.SetValue(AppName, AppPath);
+            }
+            else
+            {
+                using var key = Registry.CurrentUser.OpenSubKey(RegistryRunKey, true);
+                key?.DeleteValue(AppName, false);
+            }
+        }
+    }
+
+    public bool IsAdministratorStartupEnabled
+    {
+        get
+        {
+            try
+            {
+                return TaskSchedulerHelper.IsTaskScheduled(AppName);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        set
+        {
+            if (!IsAdministrator) throw new UnauthorizedAccessException("The current user is not an administrator.");
+
+            if (value)
+            {
+                TaskSchedulerHelper.CreateScheduledTask(AppName, AppPath);
+            }
+            else
+            {
+                TaskSchedulerHelper.DeleteScheduledTask(AppName);
+            }
+        }
+    }
+
+    public void RestartAsAdministrator()
+    {
+        if (IsAdministrator)
+        {
+            throw new InvalidOperationException("The application is already running as an administrator.");
+        }
+
+        var startInfo = new ProcessStartInfo
+        {
+            FileName = Environment.ProcessPath.NotNull(),
+            Arguments = "--autorun",
+            UseShellExecute = true,
+            Verb = "runas" // This will prompt for elevation
+        };
+
+        try
+        {
+            Process.Start(startInfo);
+            Environment.Exit(0); // Exit the current process
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException("Failed to restart as administrator.", ex);
+        }
+    }
 
     public void SetWindowNoFocus(Window window)
     {
@@ -129,6 +230,7 @@ public class Win32NativeHelper : INativeHelper
     public void SetWindowHitTestInvisible(Window window)
     {
         Win32Properties.AddWindowStylesCallback(window, WindowStylesCallback);
+
         static (uint style, uint exStyle) WindowStylesCallback(uint style, uint exStyle)
         {
             return (style, exStyle |
@@ -166,8 +268,10 @@ public class Win32NativeHelper : INativeHelper
         if (!_compositionContexts.TryGetValue(hWnd, out var compositionContext))
         {
             // we will need lots of hacks, let's go
-            if (window.PlatformImpl?.GetType().GetField("_glSurface", BindingFlags.Instance | BindingFlags.NonPublic) is not { } glSurfaceField) return;
-            if (glSurfaceField.GetValue(window.PlatformImpl) is not { } glSurface) return; // Avalonia.Win32.WinRT.Composition.WinUiCompositedWindowSurface
+            if (window.PlatformImpl?.GetType().GetField("_glSurface", BindingFlags.Instance | BindingFlags.NonPublic) is not
+                { } glSurfaceField) return;
+            if (glSurfaceField.GetValue(window.PlatformImpl) is not { } glSurface)
+                return; // Avalonia.Win32.WinRT.Composition.WinUiCompositedWindowSurface
             if (glSurface.GetType().GetField("_window", BindingFlags.Instance | BindingFlags.NonPublic) is not { } windowField) return;
             if (windowField.GetValue(glSurface) is not { } compositedWindow) return; // Avalonia.Win32.WinRT.Composition.WinUiCompositedWindow
             if (glSurface.GetType().GetField("_shared", BindingFlags.Instance | BindingFlags.NonPublic) is not { } sharedField) return;

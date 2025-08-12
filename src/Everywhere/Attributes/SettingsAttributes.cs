@@ -1,12 +1,42 @@
-﻿namespace Everywhere.Attributes;
+﻿using Lucide.Avalonia;
+
+namespace Everywhere.Attributes;
+
+/// <summary>
+/// Represents an attribute that defines a settings category.
+/// </summary>
+[AttributeUsage(AttributeTargets.Property)]
+public class SettingsCategoryAttribute : Attribute
+{
+    /// <summary>
+    /// The display name of the settings category.
+    /// </summary>
+    public required string Header { get; set; }
+
+    /// <summary>
+    /// The Icon of the settings category.
+    /// </summary>
+    public required LucideIconKind Icon { get; set; }
+}
 
 /// <summary>
 /// This attribute is used to mark properties that should not be serialized or displayed in the UI.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Field)]
-public class HiddenSettingsItemAttribute : Attribute
+public class HiddenSettingsItemAttribute : Attribute;
+
+[AttributeUsage(AttributeTargets.Property)]
+public class SettingsItemAttribute : Attribute
 {
-    public string? Condition { get; set; }
+    /// <summary>
+    /// Sets a binding path that will be used to determine if this item is visible in the UI.
+    /// </summary>
+    public string? IsVisibleBindingPath { get; set; }
+
+    /// <summary>
+    /// Sets a binding path that will be used to determine if this item is enabled in the UI.
+    /// </summary>
+    public string? IsEnabledBindingPath { get; set; }
 }
 
 [AttributeUsage(AttributeTargets.Property)]
@@ -39,9 +69,9 @@ public class SettingsDoubleItemAttribute : Attribute
 public class SettingsSelectionItemAttribute : Attribute
 {
     /// <summary>
-    /// this can be a binding path
+    /// A binding path to the property that contains the items to select from.
     /// </summary>
-    public required string ItemsSource { get; set; }
+    public required string ItemsSourceBindingPath { get; set; }
 
     /// <summary>
     /// Should look for i18n keys in the items source

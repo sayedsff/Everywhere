@@ -6,6 +6,25 @@ namespace Everywhere.Interfaces;
 public interface INativeHelper
 {
     /// <summary>
+    /// Check if the current user is an administrator (aka UAC on Windows).
+    /// </summary>
+    bool IsAdministrator { get; }
+
+    /// <summary>
+    /// Check if the application is set to start with the system as User.
+    /// </summary>
+    bool IsUserStartupEnabled { get; set; }
+
+    /// <summary>
+    /// Check if the application is set to start with the system as Administrator (aka UAC on Windows).
+    /// This can only be set if the current user is an administrator.
+    /// </summary>
+    /// <exception cref="UnauthorizedAccessException">Thrown if the current user is not an administrator.</exception>
+    bool IsAdministratorStartupEnabled { get; set; }
+
+    void RestartAsAdministrator();
+
+    /// <summary>
     /// Make the window cannot be focused by the system.
     /// </summary>
     /// <param name="window"></param>

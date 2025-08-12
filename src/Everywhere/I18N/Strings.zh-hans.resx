@@ -11,8 +11,8 @@
     <resheader name="writer">
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
-    <data name="SettingsCategory_Appearance_Header" xml:space="preserve">
-        <value>外观设置</value>
+    <data name="SettingsCategory_Common_Header" xml:space="preserve">
+        <value>通用设置</value>
     </data>
     <data name="SettingsPage_Saved_Toast_Title" xml:space="preserve">
         <value>设置已保存</value>
@@ -584,5 +584,26 @@
     </data>
     <data name="Settings_Model_SelectedModelProvider_Schema_Description" xml:space="preserve">
         <value>选择 API 的模式。如果你不确定这是什么，请保持默认值。</value>
+    </data>
+    <data name="Settings_Common_IsStartupEnabled_Header" xml:space="preserve">
+        <value>开机启动</value>
+    </data>
+    <data name="Settings_Common_IsStartupEnabled_Description" xml:space="preserve">
+        <value>Everywhere 会在开机后自动运行。如果开启了“以管理员方式启动”，则只有在管理员模式下才能关闭当前选项。</value>
+    </data>
+    <data name="Settings_Common_IsAdministratorStartupEnabled_Header" xml:space="preserve">
+        <value>以管理员方式启动</value>
+    </data>
+    <data name="Settings_Common_IsAdministratorStartupEnabled_Description" xml:space="preserve">
+        <value>Everywhere 会以管理员方式自启动。只有在管理员模式下才能开关当前选项。</value>
+    </data>
+    <data name="Settings_Common_RestartAsAdministrator_Header" xml:space="preserve">
+        <value>以管理员身份重启</value>
+    </data>
+    <data name="Settings_Common_RestartAsAdministrator_Description" xml:space="preserve">
+        <value>由于操作系统限制，当以管理员身份运行任何应用程序（也称为提升权限）时，如果提升权限的应用程序处于活动状态或试图与 Everywhere 的某个功能（如“选择元素”）交互，Everywhere 可能无法正常工作。可以通过同时以管理员身份运行 Everywhere 来解决此问题。</value>
+    </data>
+    <data name="Settings_Common_RestartAsAdministrator_Button_Content" xml:space="preserve">
+        <value>重启</value>
     </data>
 </root>

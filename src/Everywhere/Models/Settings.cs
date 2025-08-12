@@ -3,34 +3,22 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Layout;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Everywhere.Attributes;
 using Everywhere.Enums;
 using Everywhere.Utilities;
 using Lucide.Avalonia;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using ShadUI;
 using WritableJsonConfiguration;
 
 namespace Everywhere.Models;
-
-/// <summary>
-/// Represents an attribute that defines a settings category.
-/// </summary>
-[AttributeUsage(AttributeTargets.Property)]
-public class SettingsCategoryAttribute : Attribute
-{
-    /// <summary>
-    /// The display name of the settings category.
-    /// </summary>
-    public required string Header { get; set; }
-
-    /// <summary>
-    /// The Icon of the settings category.
-    /// </summary>
-    public required LucideIconKind Icon { get; set; }
-}
 
 /// <summary>
 /// Represents the application settings.
@@ -47,7 +35,7 @@ public class Settings : ObservableObject
     [SettingsCategory(Header = "Behavior", Icon = LucideIconKind.Keyboard)]
     public BehaviorSettings Behavior { get; } = new();
 
-    [SettingsCategory(Header = "Appearance", Icon = LucideIconKind.Palette)]
+    [SettingsCategory(Header = "Common", Icon = LucideIconKind.Box)]
     public CommonSettings Common { get; } = new();
 
     public InternalSettings Internal { get; } = new();
@@ -86,7 +74,10 @@ public class Settings : ObservableObject
 
 public partial class CommonSettings : ObservableObject
 {
-    [SettingsSelectionItem(ItemsSource = nameof(LanguageSource), I18N = true)]
+    [HiddenSettingsItem]
+    public static IEnumerable<string> LanguageSource => LocaleManager.AvailableLocaleNames;
+
+    [SettingsSelectionItem(ItemsSourceBindingPath = nameof(LanguageSource), I18N = true)]
     public string Language
     {
         get
@@ -117,14 +108,105 @@ public partial class CommonSettings : ObservableObject
         }
     }
 
-    [JsonIgnore]
-    public static IEnumerable<string> LanguageSource => LocaleManager.AvailableLocaleNames;
+    [HiddenSettingsItem]
+    public static IEnumerable<string> ThemeSource => ["System", "Dark", "Light"];
 
     [ObservableProperty]
-    [SettingsSelectionItem(ItemsSource = nameof(ThemeSource), I18N = true)]
+    [SettingsSelectionItem(ItemsSourceBindingPath = nameof(ThemeSource), I18N = true)]
     public partial string Theme { get; set; } = ThemeSource.First();
 
-    public static IEnumerable<string> ThemeSource => ["System", "Dark", "Light"];
+    private static INativeHelper NativeHelper => ServiceLocator.Resolve<INativeHelper>();
+    private static ILogger Logger => ServiceLocator.Resolve<ILogger<CommonSettings>>();
+
+    [JsonIgnore]
+    [HiddenSettingsItem]
+    public static bool IsAdministrator => NativeHelper.IsAdministrator;
+
+    [JsonIgnore]
+    [SettingsItem(IsVisibleBindingPath = $"!{nameof(IsAdministrator)}")]
+    public static Button RestartAsAdministrator => new()
+    {
+        Classes = { "Outline" },
+        [!ContentControl.ContentProperty] = new DynamicResourceKey("Settings_Common_RestartAsAdministrator_Button_Content").ToBinding(),
+        Command = new RelayCommand(() =>
+        {
+            try
+            {
+                NativeHelper.RestartAsAdministrator();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Failed to restart as administrator.");
+            }
+        }),
+        HorizontalAlignment = HorizontalAlignment.Left,
+        [ButtonAssist.IconProperty] = new LucideIcon
+        {
+            Kind = LucideIconKind.Shield,
+            Size = 18,
+            Width = 18,
+            Height = 18,
+            Margin = new Thickness(0, 0, 6, 0)
+        },
+    };
+
+    [JsonIgnore]
+    [SettingsItem(IsEnabledBindingPath = $"{nameof(IsAdministrator)} || !{nameof(IsAdministratorStartupEnabled)}")]
+    public bool IsStartupEnabled
+    {
+        get => NativeHelper.IsUserStartupEnabled || NativeHelper.IsAdministratorStartupEnabled;
+        set
+        {
+            try
+            {
+                // If disabling user startup while admin startup is enabled, also disable admin startup.
+                if (!value && NativeHelper.IsAdministratorStartupEnabled)
+                {
+                    if (IsAdministrator)
+                    {
+                        NativeHelper.IsAdministratorStartupEnabled = false;
+                        OnPropertyChanged(nameof(IsAdministratorStartupEnabled));
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
+
+                NativeHelper.IsUserStartupEnabled = value;
+                OnPropertyChanged();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Failed to set user startup enabled.");
+            }
+        }
+    }
+
+    [JsonIgnore]
+    [SettingsItem(IsVisibleBindingPath = nameof(IsStartupEnabled), IsEnabledBindingPath = nameof(IsAdministrator))]
+    public bool IsAdministratorStartupEnabled
+    {
+        get => NativeHelper.IsAdministratorStartupEnabled;
+        set
+        {
+            try
+            {
+                if (!IsAdministrator) return;
+
+                // If enabling admin startup while user startup is disabled, also enable user startup.
+                NativeHelper.IsUserStartupEnabled = !value;
+                NativeHelper.IsAdministratorStartupEnabled = value;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Failed to set administrator startup enabled.");
+            }
+
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(IsStartupEnabled));
+        }
+    }
 }
 
 public partial class BehaviorSettings : ObservableObject
@@ -150,7 +232,7 @@ public partial class ModelSettings : ObservableObject
 
     [JsonIgnore]
     [SettingsItems(IsExpanded = true)]
-    [SettingsSelectionItem(ItemsSource = nameof(ModelProviders))]
+    [SettingsSelectionItem(ItemsSourceBindingPath = nameof(ModelProviders))]
     public ModelProvider? SelectedModelProvider
     {
         get => ModelProviders.FirstOrDefault(p => p.Id == SelectedModelProviderId);
@@ -169,7 +251,7 @@ public partial class ModelSettings : ObservableObject
 
     [JsonIgnore]
     [SettingsItems]
-    [SettingsSelectionItem(ItemsSource = $"{nameof(SelectedModelProvider)}.{nameof(ModelProvider.ModelDefinitions)}")]
+    [SettingsSelectionItem(ItemsSourceBindingPath = $"{nameof(SelectedModelProvider)}.{nameof(ModelProvider.ModelDefinitions)}")]
     public ModelDefinition? SelectedModelDefinition
     {
         get => SelectedModelProvider?.ModelDefinitions.FirstOrDefault(m => m.Id == SelectedModelDefinitionId);
@@ -193,7 +275,7 @@ public partial class ModelSettings : ObservableObject
     public partial Customizable<double> FrequencyPenalty { get; set; } = 0.0;
 
     [ObservableProperty]
-    [SettingsSelectionItem(ItemsSource = nameof(WebSearchProviders))]
+    [SettingsSelectionItem(ItemsSourceBindingPath = nameof(WebSearchProviders))]
     public partial string WebSearchProvider { get; set; } = "bing";
 
     [JsonIgnore]

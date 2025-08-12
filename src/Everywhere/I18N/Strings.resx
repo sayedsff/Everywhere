@@ -31,8 +31,8 @@
     <data name="Settings_Common_Language_Header" xml:space="preserve">
         <value>Language</value>
     </data>
-    <data name="SettingsCategory_Appearance_Header" xml:space="preserve">
-        <value>Appearance Settings</value>
+    <data name="SettingsCategory_Common_Header" xml:space="preserve">
+        <value>Common Settings</value>
     </data>
     <data name="Settings_Common_Language_Description" xml:space="preserve">
         <value>Select the display language for the software.</value>
@@ -72,18 +72,6 @@
     </data>
     <data name="Settings_Model_ModelName_Description" xml:space="preserve">
         <value>Specify the name of the model the assistant will use.</value>
-    </data>
-    <data name="Settings_Model_Endpoint_Header" xml:space="preserve">
-        <value>Model API Endpoint</value>
-    </data>
-    <data name="Settings_Model_Endpoint_Description" xml:space="preserve">
-        <value>Specify the base API endpoint URL for the assistant; supply only the root path without including specific endpoint routes (e.g., https://openai.com/api/v1).</value>
-    </data>
-    <data name="Settings_Model_ApiKey_Header" xml:space="preserve">
-        <value>Model API Key</value>
-    </data>
-    <data name="Settings_Model_ApiKey_Description" xml:space="preserve">
-        <value>Specify the API access key for the model, obtainable from the provider’s API site; leave blank for local models (e.g., Ollama or LM Studio) that do not require authentication.</value>
     </data>
     <data name="Settings_Model_Temperature_Header" xml:space="preserve">
         <value>Creativity (temperature)</value>
@@ -616,5 +604,26 @@ Tip: You can reopen this message by clicking “About - Welcome Page”.</value>
     </data>
     <data name="Settings_Model_SelectedModelProvider_Schema_Description" xml:space="preserve">
         <value>Select API schema. Leaving this to default if you dont't know what to do.</value>
+    </data>
+    <data name="Settings_Common_IsStartupEnabled_Header" xml:space="preserve">
+        <value>Run at Startup</value>
+    </data>
+    <data name="Settings_Common_IsStartupEnabled_Description" xml:space="preserve">
+        <value>Everywhere will run automatically after startup. If “Startup as administrator” is enabled, the current option can only be disabled in administrator mode.</value>
+    </data>
+    <data name="Settings_Common_IsAdministratorStartupEnabled_Header" xml:space="preserve">
+        <value>Startup as Administrator</value>
+    </data>
+    <data name="Settings_Common_IsAdministratorStartupEnabled_Description" xml:space="preserve">
+        <value>Everywhere will start automatically as administrator. You can only turn this option on or off in administrator mode.</value>
+    </data>
+    <data name="Settings_Common_RestartAsAdministrator_Description" xml:space="preserve">
+        <value>Due to operating system restrictions, when running any application as an administrator (also referred to as elevated permissions), Everywhere may not work correctly when the elevated applications are in focus or trying to interact with a Everywhere feature like "Pick Element". This can be addressed by also running Everywhere as administrator.</value>
+    </data>
+    <data name="Settings_Common_RestartAsAdministrator_Header" xml:space="preserve">
+        <value>Restart as Administrator</value>
+    </data>
+    <data name="Settings_Common_RestartAsAdministrator_Button_Content" xml:space="preserve">
+        <value>Restart</value>
     </data>
 </root>

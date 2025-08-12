@@ -55,9 +55,9 @@ public partial class SettingsCategoryPage : UserControl, IMainViewPage
     private SettingsItem[] CreateItems(string bindingPath, string groupName, Type ownerType)
     {
         return ownerType
-            .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+            .GetProperties(BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public)
             .AsValueEnumerable()
-            .Where(p => p is { CanRead: true, CanWrite: true })
+            .Where(p => p is { CanRead: true })
             .Where(p => p.GetCustomAttribute<HiddenSettingsItemAttribute>() is null)
             .Select(p => CreateItem(bindingPath, groupName, p))
             .OfType<SettingsItem>()
@@ -79,9 +79,8 @@ public partial class SettingsCategoryPage : UserControl, IMainViewPage
         {
             result = new SettingsSelectionItem(name)
             {
-                [!SettingsItem.ValueProperty] = MakeBinding($"{bindingPath}.{itemPropertyInfo.Name}"),
                 [!SettingsSelectionItem.ItemsSourceProperty] = MakeBinding(
-                    $"{bindingPath}.{selectionAttribute.ItemsSource}",
+                    selectionAttribute.ItemsSourceBindingPath,
                     BindingMode.OneWay,
                     new FuncValueConverter<object?, IEnumerable<SettingsSelectionItem.Item>?>(x =>
                     {
@@ -107,7 +106,6 @@ public partial class SettingsCategoryPage : UserControl, IMainViewPage
         {
             result = new SettingsBooleanItem(name)
             {
-                [!SettingsItem.ValueProperty] = MakeBinding($"{bindingPath}.{itemPropertyInfo.Name}"),
                 IsNullable = false
             };
         }
@@ -115,7 +113,6 @@ public partial class SettingsCategoryPage : UserControl, IMainViewPage
         {
             result = new SettingsBooleanItem(name)
             {
-                [!SettingsItem.ValueProperty] = MakeBinding($"{bindingPath}.{itemPropertyInfo.Name}"),
                 IsNullable = true
             };
         }
@@ -124,7 +121,6 @@ public partial class SettingsCategoryPage : UserControl, IMainViewPage
             var attribute = attributeOwner.GetCustomAttribute<SettingsStringItemAttribute>();
             result = new SettingsStringItem(name)
             {
-                [!SettingsItem.ValueProperty] = MakeBinding($"{bindingPath}.{itemPropertyInfo.Name}"),
                 Watermark = attribute?.Watermark,
                 MaxLength = attribute?.MaxLength ?? int.MaxValue,
                 IsMultiline = attribute?.IsMultiline ?? false,
@@ -136,7 +132,6 @@ public partial class SettingsCategoryPage : UserControl, IMainViewPage
             var attribute = attributeOwner.GetCustomAttribute<SettingsIntegerItemAttribute>();
             result = new SettingsIntegerItem(name)
             {
-                [!SettingsItem.ValueProperty] = MakeBinding($"{bindingPath}.{itemPropertyInfo.Name}"),
                 MinValue = attribute?.Min ?? int.MinValue,
                 MaxValue = attribute?.Max ?? int.MaxValue,
                 IsSliderVisible = attribute?.IsSliderVisible ?? true
@@ -147,7 +142,6 @@ public partial class SettingsCategoryPage : UserControl, IMainViewPage
             var attribute = attributeOwner.GetCustomAttribute<SettingsDoubleItemAttribute>();
             result = new SettingsDoubleItem(name)
             {
-                [!SettingsItem.ValueProperty] = MakeBinding($"{bindingPath}.{itemPropertyInfo.Name}"),
                 MinValue = attribute?.Min ?? double.NegativeInfinity,
                 MaxValue = attribute?.Max ?? double.PositiveInfinity,
                 Step = attribute?.Step ?? 0.1d,
@@ -172,48 +166,198 @@ public partial class SettingsCategoryPage : UserControl, IMainViewPage
                 if (bindingValueItem is SettingsStringItem settingsStringItem)
                 {
                     settingsStringItem[!SettingsStringItem.WatermarkProperty] =
-                        MakeBinding($"{bindingPath}.{itemPropertyInfo.Name}.{nameof(Customizable<>.DefaultValue)}", BindingMode.OneWay);
+                        MakeBinding($"{itemPropertyInfo.Name}.{nameof(Customizable<>.DefaultValue)}", BindingMode.OneWay);
                 }
 
                 result = new SettingsCustomizableItem(name, bindingValueItem)
                 {
                     [!SettingsCustomizableItem.ResetCommandProperty] =
-                        MakeBinding($"{bindingPath}.{itemPropertyInfo.Name}.{nameof(Customizable<>.ResetCommand)}"),
+                        MakeBinding($"{itemPropertyInfo.Name}.{nameof(Customizable<>.ResetCommand)}"),
                 };
             }
         }
         else if (itemPropertyInfo.PropertyType == typeof(KeyboardHotkey))
         {
-            result = new SettingsKeyboardHotkeyItem(name)
-            {
-                [!SettingsItem.ValueProperty] = MakeBinding($"{bindingPath}.{itemPropertyInfo.Name}"),
-            };
+            result = new SettingsKeyboardHotkeyItem(name);
         }
         else if (itemPropertyInfo.PropertyType.IsEnum)
         {
-            result = SettingsSelectionItem.FromEnum(itemPropertyInfo.PropertyType, name, MakeBinding($"{bindingPath}.{itemPropertyInfo.Name}"));
+            result = SettingsSelectionItem.FromEnum(itemPropertyInfo.PropertyType, name);
+        }
+        else if (itemPropertyInfo.PropertyType.IsAssignableTo(typeof(Control)))
+        {
+            var control = itemPropertyInfo.GetValue(null).NotNull<Control>();
+            control.DataContext = _settings;
+            result = new SettingsControlItem(name, control);
         }
 
         if (result is null) return null;
+
+        result[!SettingsItem.ValueProperty] = MakeBinding(itemPropertyInfo.Name);
+
+        if (itemPropertyInfo.GetCustomAttribute<SettingsItemAttribute>() is { } settingsItemAttribute)
+        {
+            if (settingsItemAttribute.IsEnabledBindingPath is { } isEnabledBindingPath)
+            {
+                result[!SettingsItem.IsEnabledProperty] = MakeBinding(isEnabledBindingPath, BindingMode.OneWay);
+            }
+
+            if (settingsItemAttribute.IsVisibleBindingPath is { } isVisibleBindingPath)
+            {
+                result[!SettingsItem.IsVisibleProperty] = MakeBinding(isVisibleBindingPath, BindingMode.OneWay);
+            }
+        }
 
         if (itemPropertyInfo.GetCustomAttribute<SettingsItemsAttribute>() is { } settingsItemsAttribute)
         {
             result.IsExpanded = settingsItemsAttribute.IsExpanded;
             result[!SettingsItem.IsExpandableProperty] = MakeBinding(
-                $"{bindingPath}.{itemPropertyInfo.Name}",
+                itemPropertyInfo.Name,
                 BindingMode.OneWay,
                 ObjectConverters.IsNotNull);
             result.Items.AddRange(CreateItems($"{bindingPath}.{itemPropertyInfo.Name}", name, itemPropertyInfo.PropertyType));
         }
 
         return result;
-    }
 
-    private Binding MakeBinding(string path, BindingMode mode = BindingMode.TwoWay, IValueConverter? converter = null) => new(path, mode)
-    {
-        Source = _settings,
-        Converter = converter
-    };
+        IBinding MakeBinding(string relativePath, BindingMode mode = BindingMode.TwoWay, IValueConverter? converter = null)
+        {
+            IBinding MakeSimpleBinding(string path, BindingMode bindingMode, IValueConverter? valueConverter)
+            {
+                string finalPath;
+                if (path.StartsWith("!!")) finalPath = $"!!{bindingPath}.{path[2..]}";
+                else if (path.StartsWith('!')) finalPath = $"!{bindingPath}.{path[1..]}";
+                else finalPath = $"{bindingPath}.{path}";
+
+                return new Binding(finalPath, bindingMode)
+                {
+                    Source = _settings,
+                    Converter = valueConverter
+                };
+            }
+
+            IBinding ParseExpression(string expression)
+            {
+                while (true)
+                {
+                    expression = expression.Trim();
+
+                    // 1. Handle bracketed expressions
+                    if (expression.StartsWith('(') && expression.EndsWith(')'))
+                    {
+                        var parenthesisCount = 0;
+                        var isWrapped = true;
+                        for (var i = 0; i < expression.Length - 1; i++)
+                        {
+                            parenthesisCount += expression[i] switch
+                            {
+                                '(' => 1,
+                                ')' => -1,
+                                _ => 0
+                            };
+                            if (parenthesisCount == 0)
+                            {
+                                isWrapped = false;
+                                break;
+                            }
+                        }
+                        if (isWrapped)
+                        {
+                            expression = expression.Substring(1, expression.Length - 2);
+                            continue;
+                        }
+                    }
+
+                    // 2. Find the highest priority operator: ||
+                    var parenCountOr = 0;
+                    for (var i = expression.Length - 1; i >= 0; i--)
+                    {
+                        var c = expression[i];
+                        switch (c)
+                        {
+                            case ')':
+                                parenCountOr++;
+                                break;
+                            case '(':
+                                parenCountOr--;
+                                break;
+                            case '|' when i > 0 && expression[i - 1] == '|' && parenCountOr == 0:
+                            {
+                                var multiBinding = new MultiBinding
+                                {
+                                    Converter = BoolConverters.Or,
+                                    Mode = BindingMode.OneWay
+                                };
+                                multiBinding.Bindings.Add(ParseExpression(expression.Substring(0, i - 1)));
+                                multiBinding.Bindings.Add(ParseExpression(expression.Substring(i + 1)));
+                                return multiBinding;
+                            }
+                        }
+                    }
+
+                    // 3. Find the next highest priority operator: &&
+                    var parenCountAnd = 0;
+                    for (var i = expression.Length - 1; i >= 0; i--)
+                    {
+                        var c = expression[i];
+                        switch (c)
+                        {
+                            case ')':
+                                parenCountAnd++;
+                                break;
+                            case '(':
+                                parenCountAnd--;
+                                break;
+                            case '&' when i > 0 && expression[i - 1] == '&' && parenCountAnd == 0:
+                            {
+                                var multiBinding = new MultiBinding
+                                {
+                                    Converter = BoolConverters.And,
+                                    Mode = BindingMode.OneWay
+                                };
+                                multiBinding.Bindings.Add(ParseExpression(expression.Substring(0, i - 1)));
+                                multiBinding.Bindings.Add(ParseExpression(expression.Substring(i + 1)));
+                                return multiBinding;
+                            }
+                        }
+                    }
+
+                    // 4. Handle logical NOT operator
+                    expression = expression.Trim();
+                    if (!expression.StartsWith('!')) return MakeSimpleBinding(expression, BindingMode.OneWay, null);
+
+                    var innerExpression = expression[1..];
+                    var innerBinding = ParseExpression(innerExpression);
+
+                    var notBinding = new MultiBinding
+                    {
+                        // Not converter: returns true if any of the values are false
+                        Converter = new FuncMultiValueConverter<bool, bool>(values => values.Any(y => !y)),
+                        Mode = BindingMode.OneWay
+                    };
+                    notBinding.Bindings.Add(innerBinding);
+                    return notBinding;
+                }
+            }
+
+            var path = relativePath.Trim('.');
+
+            if (!path.Contains("||") && !path.Contains("&&")) return MakeSimpleBinding(path, mode, converter);
+            var logicalBinding = ParseExpression(path);
+
+            if (converter != null)
+            {
+                return new Binding
+                {
+                    Source = logicalBinding,
+                    Converter = converter,
+                    Mode = mode
+                };
+            }
+
+            return logicalBinding;
+        }
+    }
 }
 
 public class SettingsCategoryPageFactory(Settings settings) : IMainViewPageFactory

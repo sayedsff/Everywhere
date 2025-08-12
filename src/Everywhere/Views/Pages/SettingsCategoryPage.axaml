@@ -118,6 +118,10 @@
             HorizontalAlignment="Left"
             Hotkey="{Binding Value, Mode=TwoWay}"/>
         </DataTemplate>
+
+        <DataTemplate DataType="m:SettingsControlItem">
+          <ContentControl Content="{Binding Control}"/>
+        </DataTemplate>
       </DataTemplates>
 
       <DataTemplate
@@ -127,7 +131,8 @@
           Classes.NotExpandable="{Binding !IsExpandable}"
           CornerRadius="4"
           IsEnabled="{Binding IsEnabled}"
-          IsExpanded="{Binding IsExpanded, Mode=TwoWay}">
+          IsExpanded="{Binding IsExpanded, Mode=TwoWay}"
+          IsVisible="{Binding IsVisible}">
           <Expander.Header>
             <StackPanel>
               <TextBlock

@@ -14,21 +14,25 @@ public static class Entrance
 
     public static void Initialize(string[] args)
     {
-        InitializeApplicationMutex();
+        InitializeApplicationMutex(args);
         InitializeErrorHandling();
     }
 
-    private static void InitializeApplicationMutex()
+    private static void InitializeApplicationMutex(string[] args)
     {
 #if !DEBUG  // axaml designer may launch this code, so we need to set it to null.
         AppMutex = new Mutex(true, "EverywhereAppMutex", out var createdNew);
         if (!createdNew)
         {
-            NativeMessageBox.Show(
-                "Info",
-                "Everywhere is already running. Please check your system tray for the application window.",
-                NativeMessageBoxButtons.Ok,
-                NativeMessageBoxIcon.Information);
+            if (!args.Contains("--autorun"))
+            {
+                NativeMessageBox.Show(
+                    "Info",
+                    "Everywhere is already running. Please check your system tray for the application window.",
+                    NativeMessageBoxButtons.Ok,
+                    NativeMessageBoxIcon.Information);
+            }
+
             Environment.Exit(0);
         }
 #endif
