@@ -6,6 +6,11 @@ namespace Everywhere.Interfaces;
 public interface INativeHelper
 {
     /// <summary>
+    /// Check if the application is installed in the system.
+    /// </summary>
+    bool IsInstalled { get; }
+
+    /// <summary>
     /// Check if the current user is an administrator (aka UAC on Windows).
     /// </summary>
     bool IsAdministrator { get; }
@@ -29,8 +34,6 @@ public interface INativeHelper
     /// </summary>
     /// <param name="window"></param>
     void SetWindowNoFocus(Window window);
-
-    void SetWindowAutoHide(Window window);
 
     void SetWindowHitTestInvisible(Window window);
 

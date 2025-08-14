@@ -626,4 +626,46 @@ Tip: You can reopen this message by clicking “About - Welcome Page”.</value>
     <data name="Settings_Common_RestartAsAdministrator_Button_Content" xml:space="preserve">
         <value>Restart</value>
     </data>
+    <data name="Common_Error" xml:space="preserve">
+        <value>Error</value>
+    </data>
+    <data name="Settings_Common_SoftwareUpdate_CheckForUpdatesButton_Content" xml:space="preserve">
+        <value>Check for updates</value>
+    </data>
+    <data name="Settings_Common_SoftwareUpdate_TextBlock_Run1_Text" xml:space="preserve">
+        <value>Current version: v{0}</value>
+    </data>
+    <data name="Settings_Common_SoftwareUpdate_TextBlock_Run2_Text" xml:space="preserve">
+        <value>Last check time: </value>
+    </data>
+    <data name="Settings_Common_SoftwareUpdate_TextBlock_ReleaseNotes_Text" xml:space="preserve">
+        <value>Release notes</value>
+    </data>
+    <data name="Settings_Common_SoftwareUpdate_PerformUpdateButton_Content" xml:space="preserve">
+        <value>Update to v</value>
+    </data>
+    <data name="Common_Unknown" xml:space="preserve">
+        <value>Unknown</value>
+    </data>
+    <data name="Settings_Common_SoftwareUpdate_Toast_AlreadyLatestVersion" xml:space="preserve">
+        <value>Everywhere is already the latest version.</value>
+    </data>
+    <data name="Settings_Common_SoftwareUpdate_Toast_NewVersionFound" xml:space="preserve">
+        <value>New version v{0} found.</value>
+    </data>
+    <data name="Settings_Common_SoftwareUpdate_Header" xml:space="preserve">
+        <value>Software Update</value>
+    </data>
+    <data name="Settings_Common_SoftwareUpdate_Description" xml:space="preserve">
+        <value>Manage software updates for Everywhere. If an update is available, click Update and Everywhere will automatically download and install the latest version. You may need to select “Yes” in the pop-up window during the process.</value>
+    </data>
+    <data name="Settings_Common_IsAutomaticUpdateCheckEnabled_Header" xml:space="preserve">
+        <value>Automatic Update</value>
+    </data>
+    <data name="Settings_Common_IsAutomaticUpdateCheckEnabled_Description" xml:space="preserve">
+        <value>If enabled, Everywhere will periodically check for updates (only when Everywhere is running, without adding extra load to the system).</value>
+    </data>
+    <data name="Settings_Common_SoftwareUpdate_Toast_DownloadingUpdate" xml:space="preserve">
+        <value>Downloading update...</value>
+    </data>
 </root>

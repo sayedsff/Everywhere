@@ -1,4 +1,5 @@
 ﻿!define APP_NAME "Everywhere"
+!define PUBLISHER "DearVa"
 !define EXE_NAME "Everywhere.Windows.exe"
 !define UNINSTALLER_EXE "Uninstall.exe"
 !define MAIN_ICON "Everywhere.ico"
@@ -95,10 +96,14 @@ Section "$(Section_Core_Name)" SecCore
   WriteRegStr HKCU64 "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "UninstallString" "$INSTDIR\${UNINSTALLER_EXE}"
   WriteRegStr HKCU64 "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "DisplayIcon" "$INSTDIR\${EXE_NAME}"
   WriteRegStr HKCU64 "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "DisplayVersion" "${VERSION}"
-  WriteRegStr HKCU64 "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "Publisher" "${APP_NAME}"
+  WriteRegStr HKCU64 "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "Publisher" "${PUBLISHER}"
+  WriteRegStr HKCU64 "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "Publisher" "${PUBLISHER}"
+  WriteRegStr HKCU64 "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "NoModify" "1"
+  WriteRegStr HKCU64 "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "NoRepair" "1"
+  WriteRegStr HKCU64 "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "Identifier" "D66EA41B-8DEB-4E5A-9D32-AB4F8305F664"
 SectionEnd
 
-Section /o "$(Section_StartMenu_Name)" SecStartMenu
+Section "$(Section_StartMenu_Name)" SecStartMenu
   CreateDirectory "$SMPROGRAMS\${APP_NAME}"
   CreateShortCut "$SMPROGRAMS\${APP_NAME}\${APP_NAME}.lnk" "$INSTDIR\${EXE_NAME}"
   CreateShortCut "$SMPROGRAMS\${APP_NAME}\$(Uninstaller_Name).lnk" "$INSTDIR\${UNINSTALLER_EXE}"

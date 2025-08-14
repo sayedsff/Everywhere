@@ -4,13 +4,20 @@ using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Avalonia.Controls;
+using Avalonia.Controls.Documents;
+using Avalonia.Controls.Primitives;
+using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Layout;
+using Avalonia.Markup.Xaml.MarkupExtensions;
+using Avalonia.Media;
+using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Everywhere.Attributes;
 using Everywhere.Enums;
 using Everywhere.Utilities;
+using Everywhere.ValueConverters;
 using Lucide.Avalonia;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,11 +39,11 @@ public class Settings : ObservableObject
     [SettingsCategory(Header = "Model", Icon = LucideIconKind.Brain)]
     public ModelSettings Model { get; } = new();
 
-    [SettingsCategory(Header = "Behavior", Icon = LucideIconKind.Keyboard)]
-    public BehaviorSettings Behavior { get; } = new();
-
     [SettingsCategory(Header = "Common", Icon = LucideIconKind.Box)]
     public CommonSettings Common { get; } = new();
+
+    [SettingsCategory(Header = "Behavior", Icon = LucideIconKind.Keyboard)]
+    public BehaviorSettings Behavior { get; } = new();
 
     public InternalSettings Internal { get; } = new();
 
@@ -74,6 +81,183 @@ public class Settings : ObservableObject
 
 public partial class CommonSettings : ObservableObject
 {
+    private static INativeHelper NativeHelper => ServiceLocator.Resolve<INativeHelper>();
+    private static ISoftwareUpdater SoftwareUpdater => ServiceLocator.Resolve<ISoftwareUpdater>();
+    private static ILogger Logger => ServiceLocator.Resolve<ILogger<CommonSettings>>();
+
+    [ObservableProperty]
+    [HiddenSettingsItem]
+    public partial DateTimeOffset? LastUpdateCheckTime { get; set; }
+
+    public static StackPanel SoftwareUpdate => new()
+    {
+        Spacing = 8,
+        Children =
+        {
+            new TextBlock
+            {
+                Inlines =
+                [
+                    new Run
+                    {
+                        [!Run.TextProperty] = new FormattedDynamicResourceKey(
+                            LocaleKey.Settings_Common_SoftwareUpdate_TextBlock_Run1_Text,
+                            new DirectResourceKey(SoftwareUpdater.CurrentVersion.ToString(3))).ToBinding()
+                    },
+                    new LineBreak(),
+                    new Run
+                    {
+                        [!Run.TextProperty] = new DynamicResourceKey(LocaleKey.Settings_Common_SoftwareUpdate_TextBlock_Run2_Text).ToBinding()
+                    },
+                    new Run
+                    {
+                        [!Run.TextProperty] = new Binding
+                        {
+                            Path = $"{nameof(Settings.Common)}.{nameof(LastUpdateCheckTime)}",
+                            Source = ServiceLocator.Resolve<Settings>(),
+                            Converter = CommonConverters.DateTimeOffsetToString,
+                            ConverterParameter = "G",
+                            Mode = BindingMode.OneWay
+                        }
+                    },
+                    new LineBreak(),
+                    new InlineUIContainer
+                    {
+                        Child = new Button
+                        {
+                            Classes = { "Ghost" },
+                            Content = new TextBlock
+                            {
+                                Inlines =
+                                [
+                                    new Run
+                                    {
+                                        TextDecorations = TextDecorations.Underline,
+                                        [!TextElement.ForegroundProperty] = new DynamicResourceExtension("InfoColor"),
+                                        [!Run.TextProperty] = new DynamicResourceKey(
+                                            LocaleKey.Settings_Common_SoftwareUpdate_TextBlock_ReleaseNotes_Text).ToBinding()
+                                    }
+                                ]
+                            },
+                            Command = new AsyncRelayCommand(() =>
+                                ServiceLocator.Resolve<ILauncher>()
+                                    .LaunchUriAsync(new Uri("https://github.com/DearVa/Everywhere/releases", UriKind.Absolute))
+                            ),
+                            CornerRadius = new CornerRadius(1),
+                            Height = double.NaN,
+                            MinHeight = 0,
+                            Padding = new Thickness(),
+                        }
+                    }
+                ],
+                VerticalAlignment = VerticalAlignment.Center,
+            },
+            new Button
+            {
+                [!ButtonAssist.ShowProgressProperty] = new Binding
+                {
+                    Path = "Command.IsRunning",
+                    RelativeSource = new RelativeSource(RelativeSourceMode.Self)
+                },
+                [!ContentControl.ContentProperty] =
+                    new DynamicResourceKey(LocaleKey.Settings_Common_SoftwareUpdate_CheckForUpdatesButton_Content).ToBinding(),
+                [!Visual.IsVisibleProperty] = new Binding
+                {
+                    Path = $"!{nameof(ISoftwareUpdater.LatestVersion)}",
+                    Source = SoftwareUpdater
+                },
+                Classes = { "Outline" },
+                Command = new AsyncRelayCommand(async () =>
+                {
+                    var softwareUpdater = SoftwareUpdater;
+
+                    try
+                    {
+                        await softwareUpdater.CheckForUpdatesAsync();
+
+                        var toastMessage = softwareUpdater.LatestVersion is null ?
+                            new DynamicResourceKey(LocaleKey.Settings_Common_SoftwareUpdate_Toast_AlreadyLatestVersion) :
+                            new FormattedDynamicResourceKey(
+                                LocaleKey.Settings_Common_SoftwareUpdate_Toast_NewVersionFound,
+                                new DirectResourceKey(softwareUpdater.LatestVersion));
+                        ServiceLocator.Resolve<ToastManager>()
+                            .CreateToast(LocaleKey.Common_Info.I18N())
+                            .WithContent(toastMessage)
+                            .DismissOnClick()
+                            .OnBottomRight()
+                            .ShowInfo();
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogError(ex, "Failed to check for updates.");
+                        ShowErrorToast(ex);
+                    }
+                }),
+                Margin = new Thickness(32, 0, 0, 0),
+                VerticalAlignment = VerticalAlignment.Center,
+            },
+            new Button
+            {
+                [!ButtonAssist.ShowProgressProperty] = new Binding
+                {
+                    Path = "Command.IsRunning",
+                    RelativeSource = new RelativeSource(RelativeSourceMode.Self)
+                },
+                [!TemplatedControl.BackgroundProperty] = new DynamicResourceExtension("SuccessColor60"),
+                [!Visual.IsVisibleProperty] = new Binding
+                {
+                    Path = $"!!{nameof(ISoftwareUpdater.LatestVersion)}",
+                    Source = SoftwareUpdater
+                },
+                Classes = { "Outline" },
+                Content = new TextBlock
+                {
+                    Inlines =
+                    [
+                        new Run
+                        {
+                            [!Run.TextProperty] = new DynamicResourceKey(LocaleKey.Settings_Common_SoftwareUpdate_PerformUpdateButton_Content)
+                                .ToBinding(),
+                        },
+                        new Run
+                        {
+                            [!Run.TextProperty] = new Binding
+                            {
+                                Path = nameof(ISoftwareUpdater.LatestVersion),
+                                Source = SoftwareUpdater
+                            }
+                        }
+                    ]
+                },
+                Command = new AsyncRelayCommand(async () =>
+                {
+                    try
+                    {
+                        var progress = new Progress<double>();
+                        ServiceLocator.Resolve<ToastManager>()
+                            .CreateToast(LocaleKey.Common_Info.I18N())
+                            .WithContent(LocaleKey.Settings_Common_SoftwareUpdate_Toast_DownloadingUpdate.I18N())
+                            .WithProgress(progress)
+                            .WithDelay(0d)
+                            .OnBottomRight()
+                            .ShowInfo();
+                        await SoftwareUpdater.PerformUpdateAsync(progress);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogError(ex, "Failed to perform update.");
+                        ShowErrorToast(ex);
+                    }
+                }),
+                VerticalAlignment = VerticalAlignment.Center,
+            },
+        },
+        Orientation = Orientation.Horizontal
+    };
+
+    [ObservableProperty]
+    public partial bool IsAutomaticUpdateCheckEnabled { get; set; } = true;
+
     [HiddenSettingsItem]
     public static IEnumerable<string> LanguageSource => LocaleManager.AvailableLocaleNames;
 
@@ -115,9 +299,6 @@ public partial class CommonSettings : ObservableObject
     [SettingsSelectionItem(ItemsSourceBindingPath = nameof(ThemeSource), I18N = true)]
     public partial string Theme { get; set; } = ThemeSource.First();
 
-    private static INativeHelper NativeHelper => ServiceLocator.Resolve<INativeHelper>();
-    private static ILogger Logger => ServiceLocator.Resolve<ILogger<CommonSettings>>();
-
     [JsonIgnore]
     [HiddenSettingsItem]
     public static bool IsAdministrator => NativeHelper.IsAdministrator;
@@ -127,7 +308,7 @@ public partial class CommonSettings : ObservableObject
     public static Button RestartAsAdministrator => new()
     {
         Classes = { "Outline" },
-        [!ContentControl.ContentProperty] = new DynamicResourceKey("Settings_Common_RestartAsAdministrator_Button_Content").ToBinding(),
+        [!ContentControl.ContentProperty] = new DynamicResourceKey(LocaleKey.Settings_Common_RestartAsAdministrator_Button_Content).ToBinding(),
         Command = new RelayCommand(() =>
         {
             try
@@ -137,6 +318,7 @@ public partial class CommonSettings : ObservableObject
             catch (Exception ex)
             {
                 Logger.LogError(ex, "Failed to restart as administrator.");
+                ShowErrorToast(ex);
             }
         }),
         HorizontalAlignment = HorizontalAlignment.Left,
@@ -179,6 +361,7 @@ public partial class CommonSettings : ObservableObject
             catch (Exception ex)
             {
                 Logger.LogError(ex, "Failed to set user startup enabled.");
+                ShowErrorToast(ex);
             }
         }
     }
@@ -201,12 +384,20 @@ public partial class CommonSettings : ObservableObject
             catch (Exception ex)
             {
                 Logger.LogError(ex, "Failed to set administrator startup enabled.");
+                ShowErrorToast(ex);
             }
 
             OnPropertyChanged();
             OnPropertyChanged(nameof(IsStartupEnabled));
         }
     }
+
+    private static void ShowErrorToast(Exception ex) => ServiceLocator.Resolve<ToastManager>()
+        .CreateToast(LocaleKey.Common_Error.I18N())
+        .WithContent(ex.GetFriendlyMessage())
+        .DismissOnClick()
+        .OnBottomRight()
+        .ShowError();
 }
 
 public partial class BehaviorSettings : ObservableObject

@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Numerics;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Security.Principal;
 using Windows.Data.Xml.Dom;
 using Windows.UI.Composition;
@@ -11,7 +10,6 @@ using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Dwm;
 using Windows.Win32.Graphics.Gdi;
-using Windows.Win32.UI.Accessibility;
 using Windows.Win32.UI.WindowsAndMessaging;
 using Avalonia;
 using Avalonia.Controls;
@@ -31,15 +29,18 @@ namespace Everywhere.Windows.Services;
 public class Win32NativeHelper : INativeHelper
 {
     private const string AppName = nameof(Everywhere);
+    private const string RegistryInstallKey = @"Software\Microsoft\Windows\CurrentVersion\Uninstall\Everywhere";
     private const string RegistryRunKey = @"Software\Microsoft\Windows\CurrentVersion\Run";
     private static string AppPath => $"\"{Environment.ProcessPath}\" --autorun";
 
-    // ReSharper disable InconsistentNaming
-    // ReSharper disable IdentifierTypo
-    private const uint EVENT_SYSTEM_FOREGROUND = 0x0003;
-    private const uint WINEVENT_OUTOFCONTEXT = 0x0000;
-    // ReSharper restore InconsistentNaming
-    // ReSharper restore IdentifierTypo
+    public bool IsInstalled
+    {
+        get
+        {
+            using var key = Registry.CurrentUser.OpenSubKey(RegistryInstallKey);
+            return key?.GetValue("Identifier")?.ToString() == "D66EA41B-8DEB-4E5A-9D32-AB4F8305F664";
+        }
+    }
 
     public bool IsAdministrator
     {
@@ -172,61 +173,6 @@ public class Win32NativeHelper : INativeHelper
         }
     }
 
-    public void SetWindowAutoHide(Window window)
-    {
-        var thisHWnd = window.TryGetPlatformHandle()?.Handle ?? 0;
-        if (thisHWnd == 0)
-        {
-            throw new InvalidOperationException("Failed to get platform handle for the top-level window.");
-        }
-
-        var targetHWnd = HWND.Null;
-        window.Loaded += delegate
-        {
-            targetHWnd = PInvoke.GetForegroundWindow();
-            if (targetHWnd == 0)
-            {
-                throw new InvalidOperationException("Failed to get platform handle for the target window.");
-            }
-        };
-        window.Unloaded += delegate
-        {
-            targetHWnd = HWND.Null;
-        };
-
-        var lpWinEventProc = new WINEVENTPROC(WinEventProc);
-        var handle = GCHandle.Alloc(lpWinEventProc);
-        var winEventHook = PInvoke.SetWinEventHook(
-            EVENT_SYSTEM_FOREGROUND,
-            EVENT_SYSTEM_FOREGROUND,
-            HMODULE.Null,
-            lpWinEventProc,
-            0,
-            0,
-            WINEVENT_OUTOFCONTEXT);
-        window.Closed += delegate
-        {
-            PInvoke.UnhookWinEvent(winEventHook);
-            handle.Free();
-        };
-
-        void WinEventProc(
-            HWINEVENTHOOK hWinEventHook,
-            uint eventType,
-            HWND hWnd,
-            int idObject,
-            int idChild,
-            uint dwEventThread,
-            uint dwmsEventTime)
-        {
-            var foregroundWindow = PInvoke.GetForegroundWindow();
-            if (foregroundWindow != targetHWnd && foregroundWindow != thisHWnd)
-            {
-                window.IsVisible = false;
-            }
-        }
-    }
-
     public void SetWindowHitTestInvisible(Window window)
     {
         Win32Properties.AddWindowStylesCallback(window, WindowStylesCallback);
@@ -260,7 +206,7 @@ public class Win32NativeHelper : INativeHelper
         // Ensure dispatcher queue
         Dispatcher.UIThread.VerifyAccess();
 
-        var hWnd = window.TryGetPlatformHandle()?.Handle ?? 0;
+        var hWnd = window.TryGetPlatformHandle()?.Handle ?? IntPtr.Zero;
         if (hWnd == 0) return;
 
         Compositor compositor;
@@ -355,7 +301,7 @@ public class Win32NativeHelper : INativeHelper
     public unsafe void HideWindowWithoutAnimation(Window window)
     {
         BOOL disableTransitions = true;
-        var hWnd = window.TryGetPlatformHandle()?.Handle ?? 0;
+        var hWnd = window.TryGetPlatformHandle()?.Handle ?? IntPtr.Zero;
         if (hWnd != 0)
         {
             PInvoke.DwmSetWindowAttribute(

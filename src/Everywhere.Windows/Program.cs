@@ -34,6 +34,7 @@ public static class Program
                 .AddSingleton<IVisualElementContext, Win32VisualElementContext>()
                 .AddSingleton<IHotkeyListener, Win32HotkeyListener>()
                 .AddSingleton<INativeHelper, Win32NativeHelper>()
+                .AddSingleton<ISoftwareUpdater, SoftwareUpdater>()
                 .AddSettings()
 
                 #endregion
@@ -82,6 +83,7 @@ public static class Program
 
                 .AddTransient<IAsyncInitializer, HotkeyInitializer>()
                 .AddTransient<IAsyncInitializer, SettingsInitializer>()
+                .AddTransient<IAsyncInitializer, UpdaterInitializer>()
                 .AddTransient<IAsyncInitializer>(xx => xx.GetRequiredService<ChatContextManager>())
 
                 #endregion
@@ -92,29 +94,6 @@ public static class Program
                 .AddSingleton<ChatContextManager>()
                 .AddSingleton<IChatContextManager>(xx => xx.GetRequiredService<ChatContextManager>())
                 .AddSingleton<IChatService, ChatService>()
-                // .AddSingleton<IKernelMemory>(xx => new KernelMemoryBuilder()
-                //     .Configure(builder =>
-                //     {
-                //         var baseFolder = Path.Combine(
-                //             Path.GetDirectoryName(Environment.ProcessPath) ?? Environment.CurrentDirectory,
-                //             "Assets",
-                //             "text2vec-chinese-base");
-                //         var generator = new Text2VecTextEmbeddingGenerator(
-                //             Path.Combine(baseFolder, "tokenizer.json"),
-                //             Path.Combine(baseFolder, "model.onnx"));
-                //         builder.AddSingleton<ITextEmbeddingGenerator>(generator);
-                //         builder.AddSingleton<ITextEmbeddingBatchGenerator>(generator);
-                //         builder.AddIngestionEmbeddingGenerator(generator);
-                //         builder.Services.AddSingleton<ITextGenerator>(_ => xx.GetRequiredService<ITextGenerator>());
-                //         builder.AddSingleton(
-                //             new TextPartitioningOptions
-                //             {
-                //                 MaxTokensPerParagraph = generator.MaxTokens,
-                //                 OverlappingTokens = generator.MaxTokens / 20
-                //             });
-                //     })
-                //     .Configure(builder => builder.Services.AddLogging(l => l.AddSimpleConsole()))
-                //     .Build<MemoryServerless>())
 
             #endregion
 

@@ -606,4 +606,46 @@
     <data name="Settings_Common_RestartAsAdministrator_Button_Content" xml:space="preserve">
         <value>重启</value>
     </data>
+    <data name="Common_Error" xml:space="preserve">
+        <value>错误</value>
+    </data>
+    <data name="Settings_Common_SoftwareUpdate_TextBlock_Run1_Text" xml:space="preserve">
+        <value>当前版本: v{0}</value>
+    </data>
+    <data name="Settings_Common_SoftwareUpdate_TextBlock_Run2_Text" xml:space="preserve">
+        <value>上次检查时间: </value>
+    </data>
+    <data name="Settings_Common_SoftwareUpdate_TextBlock_ReleaseNotes_Text" xml:space="preserve">
+        <value>发布说明</value>
+    </data>
+    <data name="Settings_Common_SoftwareUpdate_CheckForUpdatesButton_Content" xml:space="preserve">
+        <value>检查更新</value>
+    </data>
+    <data name="Settings_Common_SoftwareUpdate_PerformUpdateButton_Content" xml:space="preserve">
+        <value>更新到 v</value>
+    </data>
+    <data name="Common_Unknown" xml:space="preserve">
+        <value>未知</value>
+    </data>
+    <data name="Settings_Common_SoftwareUpdate_Toast_AlreadyLatestVersion" xml:space="preserve">
+        <value>Everywhere 已是最新版本。</value>
+    </data>
+    <data name="Settings_Common_SoftwareUpdate_Toast_NewVersionFound" xml:space="preserve">
+        <value>发现新版本: v{0}</value>
+    </data>
+    <data name="Settings_Common_SoftwareUpdate_Header" xml:space="preserve">
+        <value>软件更新</value>
+    </data>
+    <data name="Settings_Common_SoftwareUpdate_Description" xml:space="preserve">
+        <value>管理 Everywhere 的软件更新。如果有更新，点击更新之后 Everywhere 会自动下载并安装最新版本。过程中可能需要你在弹出窗口中选择“是”。</value>
+    </data>
+    <data name="Settings_Common_IsAutomaticUpdateCheckEnabled_Header" xml:space="preserve">
+        <value>自动更新</value>
+    </data>
+    <data name="Settings_Common_IsAutomaticUpdateCheckEnabled_Description" xml:space="preserve">
+        <value>如果开启，Everywhere 会定期检查更新（仅在 Everywhere 运行时，不会给系统增加额外负担）</value>
+    </data>
+    <data name="Settings_Common_SoftwareUpdate_Toast_DownloadingUpdate" xml:space="preserve">
+        <value>下载更新中...</value>
+    </data>
 </root>
