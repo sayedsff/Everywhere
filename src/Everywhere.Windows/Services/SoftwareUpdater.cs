@@ -91,7 +91,7 @@ public sealed partial class SoftwareUpdater(
                     a.Name.EndsWith($"-Windows-x64-Setup-v{versionString}.exe", StringComparison.OrdinalIgnoreCase) :
                     a.Name.EndsWith($"-Windows-x64-v{versionString}.zip", StringComparison.OrdinalIgnoreCase));
 
-            LatestVersion = latestVersion;
+            LatestVersion = latestVersion > CurrentVersion ? latestVersion : null;
         }
         catch (Exception ex)
         {
@@ -110,7 +110,7 @@ public sealed partial class SoftwareUpdater(
             return;
         }
 
-        if (LatestVersion is null || _latestAsset is not { } asset)
+        if (LatestVersion is null || LatestVersion <= CurrentVersion || _latestAsset is not { } asset)
         {
             logger.LogInformation("No new version available to update.");
             return;
