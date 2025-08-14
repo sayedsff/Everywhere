@@ -1,3 +1,16 @@
+## [v0.2.3](https://github.com/DearVa/Everywhere/releases/tag/v0.2.3) - 2025-08-14
+
+### ✨ New Features
+- Added settings for automatically startup
+- Added settings for Software Update
+
+### 🐞 Fixed
+- Fixed markdown rendering issues in the Chat Window
+
+**Full Changelog**: https://github.com/DearVa/Everywhere/compare/v0.2.2...v0.2.3
+
+
+
 ## [v0.2.2](https://github.com/DearVa/Everywhere/releases/tag/v0.2.2) - 2025-08-11
 
 ### ✨ New Features
@@ -22,6 +35,7 @@
 - Fixed markdown rendering issues in the Chat Window
 
 **Full Changelog**: https://github.com/DearVa/Everywhere/compare/v0.2.0...v0.2.1
+
 
 
 ## [v0.2.0](https://github.com/DearVa/Everywhere/releases/tag/v0.2.0) - 2025-08-10
