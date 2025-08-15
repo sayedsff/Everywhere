@@ -72,4 +72,10 @@
         <SubType>Code</SubType>
       </Compile>
     </ItemGroup>
+
+    <ItemGroup>
+      <AvaloniaResource Include="..\..\CHANGELOG.md">
+        <Link>Assets\CHANGELOG.md</Link>
+      </AvaloniaResource>
+    </ItemGroup>
 </Project>

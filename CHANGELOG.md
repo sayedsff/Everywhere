@@ -1,3 +1,19 @@
+## [v0.2.4](https://github.com/DearVa/Everywhere/releases/tag/v0.2.4) - 2025-08-15
+
+### ✨ New Features
+- Added Change Log in Welcome Dialog
+
+### 🔄️ Changed
+- Apply warning level filter to EF Core logging
+
+### 🐞 Fixed
+- Fixed Google Gemini invoking issues
+- Fixed Restart as Administrator may not work on some cases
+
+**Full Changelog**: https://github.com/DearVa/Everywhere/compare/v0.2.3...v0.2.4
+
+
+
 ## [v0.2.3](https://github.com/DearVa/Everywhere/releases/tag/v0.2.3) - 2025-08-14
 
 ### ✨ New Features
@@ -114,4 +130,4 @@ To improve performance and stability, the chat database has been refactored.
 
 ## [v0.1.0](https://github.com/DearVa/Everywhere/releases/tag/v0.1.0) - 2025-07-31
 
-### Features
+### First Release · 万物生于有，有生于无。
