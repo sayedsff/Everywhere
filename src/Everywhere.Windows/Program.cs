@@ -13,7 +13,9 @@ using Everywhere.Views;
 using Everywhere.Views.Pages;
 using Everywhere.Windows.Services;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Serilog;
+using Serilog.Extensions.Logging;
 using ShadUI;
 
 namespace Everywhere.Windows;
@@ -29,7 +31,9 @@ public static class Program
 
                 #region Basic
 
-                .AddLogging(builder => builder.AddSerilog(dispose: true))
+                .AddLogging(builder => builder
+                    .AddSerilog(dispose: true)
+                    .AddFilter<SerilogLoggerProvider>("Microsoft.EntityFrameworkCore", LogLevel.Warning))
                 .AddSingleton<IRuntimeConstantProvider, RuntimeConstantProvider>()
                 .AddSingleton<IVisualElementContext, Win32VisualElementContext>()
                 .AddSingleton<IHotkeyListener, Win32HotkeyListener>()
