@@ -12,6 +12,20 @@ public static class Entrance
     private static Mutex? AppMutex;
 #endif
 
+    /// <summary>
+    /// Releases the application mutex. Only call this method when the application is exiting.
+    /// </summary>
+    public static void ReleaseMutex()
+    {
+#if !DEBUG
+        if (AppMutex == null) return;
+
+        AppMutex.ReleaseMutex();
+        AppMutex.Dispose();
+        AppMutex = null;
+#endif
+    }
+
     public static void Initialize(string[] args)
     {
         InitializeApplicationMutex(args);

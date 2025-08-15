@@ -108,6 +108,13 @@ public class App : Application
     /// </summary>
     private void ShowMainWindowOnNeeded()
     {
+        // If the --ui command line argument is present, show the main window.
+        if (Environment.GetCommandLineArgs().Contains("--ui"))
+        {
+            ShowWindow<MainView>(ref _mainWindow);
+            return;
+        }
+
         var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString();
         var settings = ServiceLocator.Resolve<Settings>();
         if (settings.Internal.PreviousLaunchVersion == version) return;

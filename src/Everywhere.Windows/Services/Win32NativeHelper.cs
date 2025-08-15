@@ -31,7 +31,7 @@ public class Win32NativeHelper : INativeHelper
     private const string AppName = nameof(Everywhere);
     private const string RegistryInstallKey = @"Software\Microsoft\Windows\CurrentVersion\Uninstall\Everywhere";
     private const string RegistryRunKey = @"Software\Microsoft\Windows\CurrentVersion\Run";
-    private static string AppPath => $"\"{Environment.ProcessPath}\" --autorun";
+    private static string ProcessPathWithArgument => $"\"{Environment.ProcessPath}\" --autorun";
 
     public bool IsInstalled
     {
@@ -72,7 +72,7 @@ public class Win32NativeHelper : INativeHelper
             if (value)
             {
                 using var key = Registry.CurrentUser.OpenSubKey(RegistryRunKey, true);
-                key?.SetValue(AppName, AppPath);
+                key?.SetValue(AppName, ProcessPathWithArgument);
             }
             else
             {
@@ -101,7 +101,7 @@ public class Win32NativeHelper : INativeHelper
 
             if (value)
             {
-                TaskSchedulerHelper.CreateScheduledTask(AppName, AppPath);
+                TaskSchedulerHelper.CreateScheduledTask(AppName, ProcessPathWithArgument);
             }
             else
             {
@@ -120,13 +120,14 @@ public class Win32NativeHelper : INativeHelper
         var startInfo = new ProcessStartInfo
         {
             FileName = Environment.ProcessPath.NotNull(),
-            Arguments = "--autorun",
+            Arguments = "--ui",
             UseShellExecute = true,
             Verb = "runas" // This will prompt for elevation
         };
 
         try
         {
+            Entrance.ReleaseMutex();
             Process.Start(startInfo);
             Environment.Exit(0); // Exit the current process
         }
