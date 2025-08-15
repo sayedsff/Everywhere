@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Runtime.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Everywhere.Attributes;
 using Everywhere.Enums;
@@ -77,6 +78,7 @@ public partial class ModelProvider : ObservableObject
     /// <summary>
     /// The API key used to authenticate requests to the model provider.
     /// </summary>
+    [IgnoreDataMember]
     [ObservableProperty]
     [SettingsStringItem(IsPassword = true)]
     public partial string? ApiKey { get; set; }
@@ -84,6 +86,7 @@ public partial class ModelProvider : ObservableObject
     /// <summary>
     /// A list of model definitions provided by this model provider.
     /// </summary>
+    [IgnoreDataMember]
     [ObservableProperty]
     public required partial ObservableCollection<ModelDefinition> ModelDefinitions { get; set; } = [];
 

@@ -1,4 +1,7 @@
-﻿using Everywhere.Enums;
+﻿using System.Collections.ObjectModel;
+using System.Reflection;
+using System.Runtime.Serialization;
+using Everywhere.Enums;
 using Everywhere.Models;
 
 namespace Everywhere.Initialization;
@@ -16,9 +19,7 @@ public class SettingsInitializer(Settings settings) : IAsyncInitializer
 
     private void InitializeModelProviders()
     {
-        if (settings.Model.ModelProviders.Count == 0)
-        {
-            settings.Model.ModelProviders =
+        ApplyModelProviders(
             [
                 new ModelProvider
                 {
@@ -214,10 +215,10 @@ public class SettingsInitializer(Settings settings) : IAsyncInitializer
                 new ModelProvider
                 {
                     Id = "gemini",
-                    DisplayName = "Gemini (Google)",
-                    Endpoint = "https://generativelanguage.googleapis.com/v1beta/openai",
-                    IconUrl = "https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/gemini-color.svg",
-                    Schema = ModelProviderSchema.OpenAI,
+                    DisplayName = "Google (Gemini)",
+                    Endpoint = "https://generativelanguage.googleapis.com/v1beta",
+                    IconUrl = "https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/google-color.svg",
+                    Schema = ModelProviderSchema.Google,
                     ModelDefinitions =
                     [
                         new ModelDefinition
@@ -440,10 +441,98 @@ public class SettingsInitializer(Settings settings) : IAsyncInitializer
                         }
                     ]
                 }
-            ];
-        }
+            ],
+            settings.Model.ModelProviders);
 
         settings.Model.SelectedModelProviderId ??= settings.Model.ModelProviders.FirstOrDefault()?.Id;
         settings.Model.SelectedModelDefinitionId ??= settings.Model.ModelProviders.FirstOrDefault()?.ModelDefinitions.FirstOrDefault()?.Id;
+    }
+
+    /// <summary>
+    /// Applies the model providers from the source list to the destination list, without override custom properties.
+    /// </summary>
+    /// <param name="src"></param>
+    /// <param name="dst"></param>
+    private static void ApplyModelProviders(IList<ModelProvider> src, ObservableCollection<ModelProvider> dst)
+    {
+        var propertyCache = new Dictionary<Type, PropertyInfo[]>();
+
+        foreach (var srcModelProvider in src)
+        {
+            var dstModelProvider = dst.FirstOrDefault(p => p.Id == srcModelProvider.Id);
+            if (dstModelProvider is null)
+            {
+                dst.Add(srcModelProvider);
+            }
+            else
+            {
+                ApplyProperties(srcModelProvider, dstModelProvider, propertyCache);
+                ApplyModelDefinitions(srcModelProvider.ModelDefinitions, dstModelProvider.ModelDefinitions, propertyCache);
+            }
+        }
+    }
+
+    private static void ApplyModelDefinitions(
+        IList<ModelDefinition> src,
+        ObservableCollection<ModelDefinition> dst,
+        Dictionary<Type, PropertyInfo[]> propertyCache)
+    {
+        foreach (var srcModelDefinition in src)
+        {
+            var dstModelDefinition = dst.FirstOrDefault(d => d.Id == srcModelDefinition.Id);
+            if (dstModelDefinition is null)
+            {
+                dst.Add(srcModelDefinition);
+            }
+            else
+            {
+                ApplyProperties(srcModelDefinition, dstModelDefinition, propertyCache);
+            }
+        }
+    }
+
+    private static void ApplyProperties(object src, object dst, Dictionary<Type, PropertyInfo[]> propertyCache)
+    {
+        var srcType = src.GetType();
+        var dstType = dst.GetType();
+
+        if (srcType != dstType) throw new InvalidOperationException("Source and destination types must be the same.");
+
+        if (!propertyCache.TryGetValue(srcType, out var properties))
+        {
+            properties = srcType
+                .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .Where(p => p is { CanRead: true, CanWrite: true })
+                .Where(p => p.GetCustomAttribute<IgnoreDataMemberAttribute>() is null)
+                .ToArray();
+            propertyCache[srcType] = properties;
+        }
+
+        foreach (var property in properties)
+        {
+            var srcValue = property.GetValue(src);
+            if (srcValue is null)
+            {
+                property.SetValue(dst, null);
+            }
+            else if (IsSimpleType(property.PropertyType))
+            {
+                property.SetValue(dst, srcValue);
+            }
+            else
+            {
+                var dstValue = property.GetValue(dst);
+                if (dstValue is null)
+                {
+                    property.SetValue(dst, srcValue);
+                }
+                else
+                {
+                    ApplyProperties(srcValue, dstValue, propertyCache);
+                }
+            }
+        }
+
+        static bool IsSimpleType(Type type) => type.IsPrimitive || type.IsEnum || type.IsValueType || type == typeof(string);
     }
 }

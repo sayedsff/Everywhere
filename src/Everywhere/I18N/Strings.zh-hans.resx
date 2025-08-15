@@ -69,7 +69,7 @@
         <value>思维开放度（top_p）</value>
     </data>
     <data name="Settings_Model_TopP_Description" xml:space="preserve">
-        <value>数值越高，模型会接受更多潜在回答；数值越低，则更倾向于最可能的回答；不建议与创意活跃度同时调整。</value>
+        <value>数值越高，模型会接受更多潜在回答；数值越低，则更倾向于最可能的回答；不建议与创意活跃度同时调整。该设置仅对部分模型有效，如果遇到错误，请尝试还原默认值。</value>
     </data>
     <data name="Settings_Model_IsToolCallSupported_Header" xml:space="preserve">
         <value>开启工具调用</value>
@@ -511,7 +511,7 @@
         <value>客户端错误 {0}</value>
     </data>
     <data name="Settings_Model_PresencePenalty_Description" xml:space="preserve">
-        <value>值越大，越倾向不同的表达方式，避免概念重复；值越小，越倾向使用重复的概念或叙述，表达更具一致性。</value>
+        <value>值越大，越倾向不同的表达方式，避免概念重复；值越小，越倾向使用重复的概念或叙述，表达更具一致性。该设置仅对部分模型有效，如果遇到错误，请尝试还原默认值。</value>
     </data>
     <data name="Settings_Model_PresencePenalty_Header" xml:space="preserve">
         <value>表述发散度 (presence_penalty)</value>
@@ -520,7 +520,7 @@
         <value>词汇丰富度 (frequency_penalty)</value>
     </data>
     <data name="Settings_Model_FrequencyPenalty_Description" xml:space="preserve">
-        <value>值越大，用词越丰富多样；值越低，用词更朴实简单。</value>
+        <value>值越大，用词越丰富多样；值越低，用词更朴实简单。该设置仅对部分模型有效，如果遇到错误，请尝试还原默认值。</value>
     </data>
     <data name="Settings_Model_SelectedModelProvider_Header" xml:space="preserve">
         <value>模型提供商</value>

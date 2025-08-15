@@ -104,7 +104,6 @@ public class ChatService(
     {
         var builder = Kernel.CreateBuilder();
         builder.Services.AddSingleton(kernelMixin.ChatCompletionService);
-        builder.Services.AddSingleton(kernelMixin.TextGenerationService);
 
         var modelSettings = settings.Model;
         if (modelSettings.SelectedModelDefinition?.IsFunctionCallingSupported.ActualValue is true && settings.Internal.IsWebSearchEnabled)

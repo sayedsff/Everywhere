@@ -83,7 +83,7 @@
         <value>Thought Openness (top_p)</value>
     </data>
     <data name="Settings_Model_TopP_Description" xml:space="preserve">
-        <value>Higher values allow a wider range of possible responses; lower values favor the most probable answers; it’s not recommended to modify this alongside the temperature.</value>
+        <value>Higher values allow a wider range of possible responses; lower values favor the most probable answers; it’s not recommended to modify this alongside the temperature. This setting is only effective for some models. If you encounter an error, try restoring the default value.</value>
     </data>
     <data name="Settings_Model_IsToolCallSupported_Header" xml:space="preserve">
         <value>Enable Tool Calling</value>
@@ -533,14 +533,14 @@ Tip: You can reopen this message by clicking “About - Welcome Page”.</value>
         <value>Expression Divergence (presence_penalty)</value>
     </data>
     <data name="Settings_Model_PresencePenalty_Description" xml:space="preserve">
-        <value>The higher the value, the more inclined to use different expressions and avoid concept repetition; the lower the value, the more inclined to use repeated concepts or narratives, resulting in more consistent expression.</value>
+        <value>The higher the value, the more inclined to use different expressions and avoid concept repetition; the lower the value, the more inclined to use repeated concepts or narratives, resulting in more consistent expression. This setting is only effective for some models. If you encounter an error, try restoring the default value.</value>
     </data>
     <data name="Settings_Model_FrequencyPenalty_Header" xml:space="preserve">
         <value>Vocabulary Richness 
 (frequency_penalty)</value>
     </data>
     <data name="Settings_Model_FrequencyPenalty_Description" xml:space="preserve">
-        <value>The higher the value, the more diverse and rich the vocabulary; the lower the value, the simpler and more straightforward the language.</value>
+        <value>The higher the value, the more diverse and rich the vocabulary; the lower the value, the simpler and more straightforward the language. This setting is only effective for some models. If you encounter an error, try restoring the default value.</value>
     </data>
     <data name="Settings_Model_SelectedModelProvider_Description" xml:space="preserve">
         <value>Select the large language model service provider.</value>

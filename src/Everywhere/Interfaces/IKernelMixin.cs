@@ -1,6 +1,5 @@
 ﻿using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
-using Microsoft.SemanticKernel.TextGeneration;
 
 namespace Everywhere.Interfaces;
 
@@ -9,8 +8,6 @@ namespace Everywhere.Interfaces;
 /// </summary>
 public interface IKernelMixin : IDisposable
 {
-    ITextGenerationService TextGenerationService { get; }
-
     IChatCompletionService ChatCompletionService { get; }
 
     /// <summary>

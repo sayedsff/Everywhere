@@ -1,14 +1,14 @@
-﻿using Anthropic.SDK;
+﻿using System.Security.Authentication;
+using Anthropic.SDK;
 using Everywhere.Enums;
 using Everywhere.Models;
 using Microsoft.Extensions.AI;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
+using Microsoft.SemanticKernel.Connectors.Google;
 using Microsoft.SemanticKernel.Connectors.Ollama;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
-using Microsoft.SemanticKernel.TextGeneration;
 using OllamaSharp;
-using TextContent = Microsoft.SemanticKernel.TextContent;
 
 namespace Everywhere.Chat;
 
@@ -50,6 +50,7 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
                 ModelProviderSchema.OpenAI => new OpenAIKernelMixin(settings.Model, modelProvider, modelDefinition),
                 ModelProviderSchema.Anthropic => new AnthropicKernelMixin(settings.Model, modelProvider, modelDefinition),
                 ModelProviderSchema.Ollama => new OllamaKernelMixin(settings.Model, modelProvider, modelDefinition),
+                ModelProviderSchema.Google => new GoogleKernelMixin(settings.Model, modelProvider, modelDefinition),
                 _ => throw new NotSupportedException($"Model provider schema '{modelProvider.Schema}' is not supported.")
             });
         return _cachedKernelMixin.KernelMixin;
@@ -63,22 +64,21 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
         IKernelMixin KernelMixin
     );
 
-    private class OpenAIKernelMixin(ModelSettings settings, ModelProvider provider, ModelDefinition definition) : IKernelMixin
+    private sealed class OpenAIKernelMixin(ModelSettings settings, ModelProvider provider, ModelDefinition definition) : IKernelMixin
     {
-        public ITextGenerationService TextGenerationService => _chatCompletionService;
-
         public IChatCompletionService ChatCompletionService => _chatCompletionService;
 
         public PromptExecutionSettings GetPromptExecutionSettings(bool isToolRequired = false) => new OpenAIPromptExecutionSettings
         {
-            Temperature = settings.Temperature,
-            PresencePenalty = settings.PresencePenalty,
-            FrequencyPenalty = settings.FrequencyPenalty,
+            Temperature = settings.Temperature.IsCustomValueSet ? settings.Temperature.ActualValue : null,
+            TopP = settings.TopP.IsCustomValueSet ? settings.TopP.ActualValue : null,
+            PresencePenalty = settings.PresencePenalty.IsCustomValueSet ? settings.PresencePenalty.ActualValue : null,
+            FrequencyPenalty = settings.FrequencyPenalty.IsCustomValueSet ? settings.FrequencyPenalty.ActualValue : null,
             FunctionChoiceBehavior =
                 isToolRequired ? FunctionChoiceBehavior.Required(autoInvoke: false) : FunctionChoiceBehavior.Auto(autoInvoke: false)
         };
 
-        public int MaxTokenTotal => Math.Max(16_000, definition.MaxTokens);
+        public int MaxTokenTotal => definition.MaxTokens;
 
         private readonly OpenAIChatCompletionService _chatCompletionService = new(
             definition.Id,
@@ -88,13 +88,9 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
         public void Dispose() { }
     }
 
-    private class AnthropicKernelMixin : IKernelMixin, ITextGenerationService
+    private sealed class AnthropicKernelMixin : IKernelMixin
     {
-        public ITextGenerationService TextGenerationService => this;
-
         public IChatCompletionService ChatCompletionService { get; }
-
-        public IReadOnlyDictionary<string, object?> Attributes => ChatCompletionService.Attributes;
 
         public int MaxTokenTotal => _definition.MaxTokens;
 
@@ -127,45 +123,14 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
             ChatCompletionService = _chatClient.AsChatCompletionService();
         }
 
-        public async Task<IReadOnlyList<TextContent>> GetTextContentsAsync(
-            string prompt,
-            PromptExecutionSettings? executionSettings = null,
-            Kernel? kernel = null,
-            CancellationToken cancellationToken = default)
-        {
-            var response = await _chatClient.GetResponseAsync(
-                prompt,
-                executionSettings?.ToChatOptions(kernel),
-                cancellationToken: cancellationToken);
-            return
-            [
-                new TextContent(response.Text, response.ModelId)
-            ];
-        }
-
-        public async IAsyncEnumerable<StreamingTextContent> GetStreamingTextContentsAsync(
-            string prompt,
-            PromptExecutionSettings? executionSettings = null,
-            Kernel? kernel = null,
-            [EnumeratorCancellation] CancellationToken cancellationToken = default)
-        {
-            var chatOptions = executionSettings?.ToChatOptions(kernel) ?? new ChatOptions();
-            await foreach (var update in _chatClient.GetStreamingResponseAsync(prompt, chatOptions, cancellationToken))
-            {
-                yield return new StreamingTextContent(update.Text, modelId: update.ModelId);
-            }
-        }
-
         public void Dispose()
         {
             _chatClient.Dispose();
         }
     }
 
-    private class OllamaKernelMixin : IKernelMixin
+    private sealed class OllamaKernelMixin : IKernelMixin
     {
-        public ITextGenerationService TextGenerationService { get; }
-
         public IChatCompletionService ChatCompletionService { get; }
 
         public int MaxTokenTotal => _definition.MaxTokens;
@@ -187,8 +152,6 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
             _settings = settings;
             _definition = definition;
             _client = new OllamaApiClient(provider.Endpoint, definition.Id);
-
-            TextGenerationService = new OllamaTextGenerationService(_client);
             ChatCompletionService = _client
                 .To<IChatClient>()
                 .AsBuilder()
@@ -201,4 +164,55 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
             _client.Dispose();
         }
     }
+}
+
+public sealed class GoogleKernelMixin : IKernelMixin
+{
+    public IChatCompletionService ChatCompletionService => _googleChatCompletionService;
+
+    public int MaxTokenTotal => _definition.MaxTokens;
+
+    private readonly ModelSettings _settings;
+    private readonly ModelDefinition _definition;
+    private readonly GoogleAIGeminiChatCompletionService _googleChatCompletionService;
+
+    public GoogleKernelMixin(ModelSettings settings, ModelProvider provider, ModelDefinition definition)
+    {
+        _settings = settings;
+        _definition = definition;
+        _googleChatCompletionService = new GoogleAIGeminiChatCompletionService(
+            definition.Id,
+            provider.ApiKey ?? throw new AuthenticationException("API key is required for Google Gemini."));
+
+        if (provider.Endpoint.ActualValue is not { Length: > 0 } endpoint) return;
+
+        // GoogleAIGeminiChatCompletionService sets all internal so we need to set Endpoint via reflection
+        var chatCompletionClientField = _googleChatCompletionService.GetType()
+            .GetField("_chatCompletionClient", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).NotNull();
+        var chatCompletionClient = chatCompletionClientField.GetValue(_googleChatCompletionService).NotNull();
+
+        // this._chatGenerationEndpoint = new Uri($"https://generativelanguage.googleapis.com/{apiVersionSubLink}/models/{this._modelId}:generateContent");
+        // this._chatStreamingEndpoint = new Uri($"https://generativelanguage.googleapis.com/{apiVersionSubLink}/models/{this._modelId}:streamGenerateContent?alt=sse");
+
+        var chatCompletionClientType = chatCompletionClient.GetType();
+        var chatGenerationEndpointField = chatCompletionClientType
+            .GetField("_chatGenerationEndpoint", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).NotNull();
+        var chatStreamingEndpointField = chatCompletionClientType
+            .GetField("_chatStreamingEndpoint", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).NotNull();
+
+        var newChatGenerationEndpoint = $"{endpoint.TrimEnd('/')}/models/{definition.Id}:generateContent";
+        var newChatStreamingEndpoint = $"{endpoint.TrimEnd('/')}/models/{definition.Id}:streamGenerateContent?alt=sse";
+        chatGenerationEndpointField.SetValue(chatCompletionClient, new Uri(newChatGenerationEndpoint, UriKind.Absolute));
+        chatStreamingEndpointField.SetValue(chatCompletionClient, new Uri(newChatStreamingEndpoint, UriKind.Absolute));
+    }
+
+    public PromptExecutionSettings GetPromptExecutionSettings(bool isToolRequired = false) => new GeminiPromptExecutionSettings
+    {
+        Temperature = _settings.Temperature.IsCustomValueSet ? _settings.Temperature.ActualValue : null,
+        TopP = _settings.TopP.IsCustomValueSet ? _settings.TopP.ActualValue : null,
+        FunctionChoiceBehavior =
+            isToolRequired ? FunctionChoiceBehavior.Required(autoInvoke: false) : FunctionChoiceBehavior.Auto(autoInvoke: false)
+    };
+
+    public void Dispose() { }
 }

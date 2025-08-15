@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -19,6 +20,7 @@ public partial class Customizable<T> : ObservableObject where T : notnull
     /// If T is a value type, T? will not be a nullable type.
     /// So we can only use object? to allow null values.
     /// </summary>
+    [IgnoreDataMember]
     public object? CustomValue
     {
         get;
@@ -30,6 +32,9 @@ public partial class Customizable<T> : ObservableObject where T : notnull
             OnPropertyChanged(nameof(BindableValue));
         }
     }
+
+    [JsonIgnore]
+    public bool IsCustomValueSet => CustomValue is not null && !EqualityComparer<T>.Default.Equals((T)CustomValue, DefaultValue);
 
     [JsonIgnore]
     public T ActualValue => CustomValue is T value ? value : DefaultValue;
