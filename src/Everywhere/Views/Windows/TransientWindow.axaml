@@ -7,8 +7,8 @@
 
   <shadui:Window.Hosts>
     <shadui:DialogHost
-      Manager="{ServiceLocator shadui:DialogManager}"
+      x:Name="PART_DialogHost"
       Owner="{Binding RelativeSource={RelativeSource AncestorType=shadui:Window}}"/>
-    <shadui:ToastHost Manager="{ServiceLocator shadui:ToastManager}"/>
+    <shadui:ToastHost x:Name="PART_ToastHost"/>
   </shadui:Window.Hosts>
 </shadui:Window>

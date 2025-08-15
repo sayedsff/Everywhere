@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Everywhere.Views;
 
-public partial class WelcomeView : UserControl
+public partial class WelcomeView : ReactiveUserControl<WelcomeViewModel>
 {
     public static readonly DirectProperty<WelcomeView, ObservableStringBuilder> MarkdownBuilderProperty =
         AvaloniaProperty.RegisterDirect<WelcomeView, ObservableStringBuilder>(

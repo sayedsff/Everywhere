@@ -3,6 +3,7 @@ using System.Reflection;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Everywhere.Models;
+using Everywhere.Views;
 using Lucide.Avalonia;
 using Microsoft.Extensions.DependencyInjection;
 using ObservableCollections;
@@ -58,7 +59,7 @@ public partial class MainViewModel(IServiceProvider serviceProvider, Settings se
         if (settings.Internal.PreviousLaunchVersion == version) return;
 
         DialogManager
-            .CreateDialog(ServiceLocator.Resolve<WelcomeViewModel>())
+            .CreateDialog(ServiceLocator.Resolve<WelcomeView>())
             .Dismissible()
             .Show();
 

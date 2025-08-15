@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using Everywhere.Views;
 using Everywhere.Views.Pages;
 using ShadUI;
 
@@ -9,10 +10,10 @@ public partial class AboutPageViewModel : ReactiveViewModelBase
     public static string Version => typeof(AboutPage).Assembly.GetName().Version?.ToString() ?? "Unknown Version";
 
     [RelayCommand]
-    private static void OpenWelcomeDialog()
+    private void OpenWelcomeDialog()
     {
         DialogManager
-            .CreateDialog(ServiceLocator.Resolve<WelcomeViewModel>())
+            .CreateDialog(ServiceLocator.Resolve<WelcomeView>())
             .Dismissible()
             .Show();
     }

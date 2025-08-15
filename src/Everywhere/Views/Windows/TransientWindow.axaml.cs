@@ -1,10 +1,15 @@
 ﻿using Avalonia.Controls;
+using ShadUI;
 using Window = ShadUI.Window;
 
 namespace Everywhere.Views;
 
-public partial class TransientWindow : Window
+public partial class TransientWindow : Window, IReactiveHost
 {
+    public DialogHost DialogHost => PART_DialogHost;
+
+    public ToastHost ToastHost => PART_ToastHost;
+
     public TransientWindow()
     {
         InitializeComponent();

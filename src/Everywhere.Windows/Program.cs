@@ -16,7 +16,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Extensions.Logging;
-using ShadUI;
 
 namespace Everywhere.Windows;
 
@@ -45,8 +44,7 @@ public static class Program
 
                 #region Avalonia Basic
 
-                .AddSingleton<DialogManager>()
-                .AddSingleton<ToastManager>()
+                .AddDialogManagerAndToastManager()
                 .AddTransient<IClipboard>(_ =>
                     Application.Current.As<App>()?.TopLevel.Clipboard ??
                     throw new InvalidOperationException("Clipboard is not available."))
@@ -67,11 +65,8 @@ public static class Program
                 .AddTransient<IMainViewPageFactory, SettingsCategoryPageFactory>()
                 .AddSingleton<AboutPageViewModel>()
                 .AddSingleton<IMainViewPage, AboutPage>()
-                .AddSingleton<WelcomeViewModel>(xx =>
-                {
-                    xx.GetRequiredService<DialogManager>().Register<WelcomeView, WelcomeViewModel>();
-                    return new WelcomeViewModel();
-                })
+                .AddSingleton<WelcomeViewModel>()
+                .AddSingleton<WelcomeView>()
                 .AddSingleton<MainViewModel>()
                 .AddSingleton<MainView>()
 
