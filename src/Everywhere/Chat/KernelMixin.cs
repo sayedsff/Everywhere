@@ -1,11 +1,9 @@
-﻿using System.Security.Authentication;
-using Anthropic.SDK;
+﻿using Anthropic.SDK;
 using Everywhere.Enums;
 using Everywhere.Models;
 using Microsoft.Extensions.AI;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
-using Microsoft.SemanticKernel.Connectors.Google;
 using Microsoft.SemanticKernel.Connectors.Ollama;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using OllamaSharp;
@@ -50,7 +48,6 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
                 ModelProviderSchema.OpenAI => new OpenAIKernelMixin(settings.Model, modelProvider, modelDefinition),
                 ModelProviderSchema.Anthropic => new AnthropicKernelMixin(settings.Model, modelProvider, modelDefinition),
                 ModelProviderSchema.Ollama => new OllamaKernelMixin(settings.Model, modelProvider, modelDefinition),
-                ModelProviderSchema.Google => new GoogleKernelMixin(settings.Model, modelProvider, modelDefinition),
                 _ => throw new NotSupportedException($"Model provider schema '{modelProvider.Schema}' is not supported.")
             });
         return _cachedKernelMixin.KernelMixin;
@@ -164,55 +161,4 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
             _client.Dispose();
         }
     }
-}
-
-public sealed class GoogleKernelMixin : IKernelMixin
-{
-    public IChatCompletionService ChatCompletionService => _googleChatCompletionService;
-
-    public int MaxTokenTotal => _definition.MaxTokens;
-
-    private readonly ModelSettings _settings;
-    private readonly ModelDefinition _definition;
-    private readonly GoogleAIGeminiChatCompletionService _googleChatCompletionService;
-
-    public GoogleKernelMixin(ModelSettings settings, ModelProvider provider, ModelDefinition definition)
-    {
-        _settings = settings;
-        _definition = definition;
-        _googleChatCompletionService = new GoogleAIGeminiChatCompletionService(
-            definition.Id,
-            provider.ApiKey ?? throw new AuthenticationException("API key is required for Google Gemini."));
-
-        if (provider.Endpoint.ActualValue is not { Length: > 0 } endpoint) return;
-
-        // GoogleAIGeminiChatCompletionService sets all internal so we need to set Endpoint via reflection
-        var chatCompletionClientField = _googleChatCompletionService.GetType()
-            .GetField("_chatCompletionClient", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).NotNull();
-        var chatCompletionClient = chatCompletionClientField.GetValue(_googleChatCompletionService).NotNull();
-
-        // this._chatGenerationEndpoint = new Uri($"https://generativelanguage.googleapis.com/{apiVersionSubLink}/models/{this._modelId}:generateContent");
-        // this._chatStreamingEndpoint = new Uri($"https://generativelanguage.googleapis.com/{apiVersionSubLink}/models/{this._modelId}:streamGenerateContent?alt=sse");
-
-        var chatCompletionClientType = chatCompletionClient.GetType();
-        var chatGenerationEndpointField = chatCompletionClientType
-            .GetField("_chatGenerationEndpoint", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).NotNull();
-        var chatStreamingEndpointField = chatCompletionClientType
-            .GetField("_chatStreamingEndpoint", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).NotNull();
-
-        var newChatGenerationEndpoint = $"{endpoint.TrimEnd('/')}/models/{definition.Id}:generateContent";
-        var newChatStreamingEndpoint = $"{endpoint.TrimEnd('/')}/models/{definition.Id}:streamGenerateContent?alt=sse";
-        chatGenerationEndpointField.SetValue(chatCompletionClient, new Uri(newChatGenerationEndpoint, UriKind.Absolute));
-        chatStreamingEndpointField.SetValue(chatCompletionClient, new Uri(newChatStreamingEndpoint, UriKind.Absolute));
-    }
-
-    public PromptExecutionSettings GetPromptExecutionSettings(bool isToolRequired = false) => new GeminiPromptExecutionSettings
-    {
-        Temperature = _settings.Temperature.IsCustomValueSet ? _settings.Temperature.ActualValue : null,
-        TopP = _settings.TopP.IsCustomValueSet ? _settings.TopP.ActualValue : null,
-        FunctionChoiceBehavior =
-            isToolRequired ? FunctionChoiceBehavior.Required(autoInvoke: false) : FunctionChoiceBehavior.Auto(autoInvoke: false)
-    };
-
-    public void Dispose() { }
 }

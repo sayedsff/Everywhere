@@ -175,6 +175,22 @@ public class ChatService(
                         assistantChatMessage.MarkdownBuilder.Append(streamingContent.Content);
                     }
 
+                    // for those LLM who doesn't implement function calling correctly,
+                    // we need to generate a unique ToolCallId for each tool call update.
+                    for (var i = 0; i < streamingContent.Items.Count; i++)
+                    {
+                        var item = streamingContent.Items[i];
+                        if (item is StreamingFunctionCallUpdateContent { Name.Length: > 0, CallId: null or { Length: 0 } } idiotContent)
+                        {
+                            // Generate a unique ToolCallId for the function call update.
+                            streamingContent.Items[i] = new StreamingFunctionCallUpdateContent(
+                                Guid.NewGuid().ToString("N"),
+                                idiotContent.Name,
+                                idiotContent.Arguments,
+                                idiotContent.FunctionCallIndex);
+                        }
+                    }
+
                     authorRole ??= streamingContent.Role;
                     functionCallContentBuilder.Append(streamingContent);
                 }

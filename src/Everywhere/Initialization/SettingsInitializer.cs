@@ -216,9 +216,9 @@ public class SettingsInitializer(Settings settings) : IAsyncInitializer
                 {
                     Id = "gemini",
                     DisplayName = "Google (Gemini)",
-                    Endpoint = "https://generativelanguage.googleapis.com/v1beta",
+                    Endpoint = "https://generativelanguage.googleapis.com/v1beta/openai",
                     IconUrl = "https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/google-color.svg",
-                    Schema = ModelProviderSchema.Google,
+                    Schema = ModelProviderSchema.OpenAI,
                     ModelDefinitions =
                     [
                         new ModelDefinition
@@ -249,7 +249,7 @@ public class SettingsInitializer(Settings settings) : IAsyncInitializer
                         },
                         new ModelDefinition
                         {
-                            Id = "gemini-2.5-flash0lite",
+                            Id = "gemini-2.5-flash-lite",
                             DisplayName = "Gemini 2.5 Flash-Lite",
                             MaxTokens = 1_048_576,
                             IsImageInputSupported = true,
@@ -470,6 +470,16 @@ public class SettingsInitializer(Settings settings) : IAsyncInitializer
                 ApplyModelDefinitions(srcModelProvider.ModelDefinitions, dstModelProvider.ModelDefinitions, propertyCache);
             }
         }
+
+        for (var i = dst.Count - 1; i >= 0; i--)
+        {
+            var dstModelProvider = dst[i];
+            if (src.All(p => p.Id != dstModelProvider.Id))
+            {
+                // Remove model provider if it does not exist in the source list
+                dst.RemoveAt(i);
+            }
+        }
     }
 
     private static void ApplyModelDefinitions(
@@ -487,6 +497,16 @@ public class SettingsInitializer(Settings settings) : IAsyncInitializer
             else
             {
                 ApplyProperties(srcModelDefinition, dstModelDefinition, propertyCache);
+            }
+        }
+
+        for (var i = dst.Count - 1; i >= 0; i--)
+        {
+            var dstModelDefinition = dst[i];
+            if (src.All(d => d.Id != dstModelDefinition.Id))
+            {
+                // Remove model definition if it does not exist in the source list
+                dst.RemoveAt(i);
             }
         }
     }

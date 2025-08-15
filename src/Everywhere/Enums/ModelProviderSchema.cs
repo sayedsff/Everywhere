@@ -4,6 +4,5 @@ public enum ModelProviderSchema
 {
     OpenAI,
     Anthropic,
-    Ollama,
-    Google
+    Ollama
 }

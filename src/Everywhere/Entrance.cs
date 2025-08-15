@@ -34,7 +34,10 @@ public static class Entrance
 
     private static void InitializeApplicationMutex(string[] args)
     {
-#if !DEBUG  // axaml designer may launch this code, so we need to set it to null.
+#if DEBUG
+        // axaml designer may launch this code, so we need to set it to null.
+        _ = args;
+#else
         AppMutex = new Mutex(true, "EverywhereAppMutex", out var createdNew);
         if (!createdNew)
         {
