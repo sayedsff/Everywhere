@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
@@ -208,6 +209,41 @@ public partial class ChatInputBox : TextBox
             PointerExitedEvent,
             (_, _) => _visualElementAttachmentOverlayWindow.Value.UpdateForVisualElement(null),
             handledEventsToo: true);
+    }
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+
+        if (change.Property == ChatAttachmentItemsSourceProperty)
+        {
+            if (change.OldValue is INotifyCollectionChanged oldValue)
+            {
+                oldValue.CollectionChanged -= HandleChatAttachmentItemsSourceChanged;
+            }
+            if (change.NewValue is INotifyCollectionChanged newValue)
+            {
+                newValue.CollectionChanged += HandleChatAttachmentItemsSourceChanged;
+            }
+        }
+    }
+
+    private void HandleChatAttachmentItemsSourceChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (_visualElementAttachmentOverlayWindow.IsValueCreated)
+        {
+            _visualElementAttachmentOverlayWindow.Value.UpdateForVisualElement(null); // Hide the overlay window when the attachment list changes.
+        }
+    }
+
+    protected override void OnUnloaded(RoutedEventArgs e)
+    {
+        base.OnUnloaded(e);
+
+        if (_visualElementAttachmentOverlayWindow.IsValueCreated)
+        {
+            _visualElementAttachmentOverlayWindow.Value.UpdateForVisualElement(null); // Hide the overlay window when the control is unloaded.
+        }
     }
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)

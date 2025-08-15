@@ -4,10 +4,11 @@ namespace Everywhere.Views;
 
 public class OverlayWindow : Window
 {
-    // todo: make this window don't cover the owner
+    private readonly WindowBase? _owner;
+
     public OverlayWindow(WindowBase? owner = null)
     {
-        Owner = owner;
+        _owner = owner;
 
         CanResize = false;
         ShowInTaskbar = false;
@@ -41,6 +42,12 @@ public class OverlayWindow : Window
             var scaling = DesktopScaling;
             Width = boundingRectangle.Width / scaling;
             Height = boundingRectangle.Height / scaling;
+
+            if (_owner is { Topmost: true })
+            {
+                _owner.Topmost = false;
+                _owner.Topmost = true;
+            }
         }
     }
 }
