@@ -9,6 +9,9 @@
 ### 🐞 Fixed
 - Fixed Google Gemini invoking issues
 - Fixed Restart as Administrator may not work on some cases
+- Fixed Dialog and Toast may crash the app when reopen after closed a window
+- Fixed `ChatElementAttachment`'s overlay window may cover the `ChatFloatingWindow`
+- Fixed `ChatElementAttachment`'s overlay window may not disappear
 
 **Full Changelog**: https://github.com/DearVa/Everywhere/compare/v0.2.3...v0.2.4
 
