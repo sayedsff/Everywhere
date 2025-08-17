@@ -11,7 +11,7 @@ public interface IChatContextManager : INotifyPropertyChanged
 
     ChatContext Current { get; set; }
 
-    IEnumerable<ChatContextHistory> History { get; }
+    IReadOnlyList<ChatContextHistory> History { get; }
 
     IRelayCommand CreateNewCommand { get; }
 

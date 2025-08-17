@@ -41,10 +41,11 @@ public partial class ChatContextManager : ObservableObject, IChatContextManager,
 
             OnPropertyChanged();
             OnPropertyChanged(nameof(ChatMessageNodes));
+            RemoveCommand.NotifyCanExecuteChanged();
         }
     }
 
-    public IEnumerable<ChatContextHistory> History
+    public IReadOnlyList<ChatContextHistory> History
     {
         get
         {
@@ -60,7 +61,7 @@ public partial class ChatContextManager : ObservableObject, IChatContextManager,
             }).Select(g => new ChatContextHistory(
                 g.Key,
                 g.AsValueEnumerable().OrderByDescending(c => c.Metadata.DateModified).ToImmutableArray())
-            );
+            ).ToReadOnlyList();
         }
     }
 
@@ -123,9 +124,12 @@ public partial class ChatContextManager : ObservableObject, IChatContextManager,
         OnPropertyChanged(nameof(History));
         OnPropertyChanged(nameof(Current));
         OnPropertyChanged(nameof(ChatMessageNodes));
+        RemoveCommand.NotifyCanExecuteChanged();
     }
 
-    [RelayCommand]
+    private bool CanRemove => _history.Count > 1 || !IsEmptyContext(_current);
+
+    [RelayCommand(CanExecute = nameof(CanRemove))]
     private void Remove(ChatContext chatContext)
     {
         if (!_history.Remove(chatContext.Metadata.Id)) return;
@@ -147,6 +151,7 @@ public partial class ChatContextManager : ObservableObject, IChatContextManager,
         }
 
         OnPropertyChanged(nameof(History));
+        RemoveCommand.NotifyCanExecuteChanged();
     }
 
     [RelayCommand]
@@ -176,6 +181,7 @@ public partial class ChatContextManager : ObservableObject, IChatContextManager,
         }
 
         OnPropertyChanged(nameof(History));
+        RemoveCommand.NotifyCanExecuteChanged();
     });
 
     public int Priority => 10;
