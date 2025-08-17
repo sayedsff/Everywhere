@@ -47,9 +47,9 @@ public partial class WelcomeView : ReactiveUserControl<WelcomeViewModel>
         }
     }
 
-    private void HandleMarkdownRendererInlineHyperlinkClicked(object? sender, InlineHyperlinkClickedEventArgs e)
+    private void HandleMarkdownRendererInlineHyperlinkClick(object? sender, InlineHyperlinkClickedEventArgs e)
     {
-        if (e.HRef is not { Scheme: "https" or "http" } href) return;
+        if (e.HRef is not { IsAbsoluteUri: true, Scheme: "https" or "http" } href) return;
 
         TopLevel.GetTopLevel(this)?.Launcher.LaunchUriAsync(href);
     }

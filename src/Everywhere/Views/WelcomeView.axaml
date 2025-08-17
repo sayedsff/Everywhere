@@ -32,7 +32,7 @@
       Width="620" MaxHeight="300"
       HorizontalAlignment="Center" HorizontalScrollBarVisibility="Disabled">
       <md:MarkdownRenderer
-        Margin="0,0,4,0" InlineHyperlinkClicked="HandleMarkdownRendererInlineHyperlinkClicked"
+        Margin="0,0,4,0" InlineHyperlinkClick="HandleMarkdownRendererInlineHyperlinkClick"
         MarkdownBuilder="{Binding $parent[views:WelcomeView].MarkdownBuilder}"/>
     </ScrollViewer>
 
