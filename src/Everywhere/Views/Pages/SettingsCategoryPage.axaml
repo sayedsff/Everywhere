@@ -103,7 +103,7 @@
                     </DataTemplate>
 
                     <DataTemplate x:DataType="m:ModelDefinition">
-                      <TextBlock Text="{Binding DisplayName.ActualValue, FallbackValue={x:Null}}"/>
+                      <TextBlock Text="{Binding DisplayName, FallbackValue={x:Null}}"/>
                     </DataTemplate>
                   </ContentControl.DataTemplates>
                 </ContentControl>

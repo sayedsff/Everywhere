@@ -648,4 +648,10 @@
     <data name="Settings_Common_SoftwareUpdate_Toast_DownloadingUpdate" xml:space="preserve">
         <value>下载更新中...</value>
     </data>
+    <data name="Settings_Model_SelectedModelDefinition_ModelId_Header" xml:space="preserve">
+        <value>模型 ID</value>
+    </data>
+    <data name="Settings_Model_SelectedModelDefinition_ModelId_Description" xml:space="preserve">
+        <value>用于 API 调用的模型标识，例如 gpt-4o。如果你不确定这是什么，请保持默认值。</value>
+    </data>
 </root>

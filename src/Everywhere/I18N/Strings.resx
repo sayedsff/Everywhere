@@ -668,4 +668,10 @@ Tip: You can reopen this message by clicking “About - Welcome Page”.</value>
     <data name="Settings_Common_SoftwareUpdate_Toast_DownloadingUpdate" xml:space="preserve">
         <value>Downloading update...</value>
     </data>
+    <data name="Settings_Model_SelectedModelDefinition_ModelId_Header" xml:space="preserve">
+        <value>Model ID</value>
+    </data>
+    <data name="Settings_Model_SelectedModelDefinition_ModelId_Description" xml:space="preserve">
+        <value />
+    </data>
 </root>
