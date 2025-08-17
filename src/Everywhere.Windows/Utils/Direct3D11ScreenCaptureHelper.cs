@@ -3,7 +3,6 @@ using System.Runtime.InteropServices.Marshalling;
 using Windows.Graphics.Capture;
 using Windows.Graphics.DirectX;
 using Windows.Graphics.DirectX.Direct3D11;
-using Windows.Win32.Foundation;
 using Avalonia;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
@@ -16,7 +15,7 @@ using WinRT;
 
 namespace Everywhere.Windows.Utils;
 
-public class Direct3D11ScreenCaptureHelper
+public partial class Direct3D11ScreenCaptureHelper
 {
     private readonly StrategyBasedComWrappers _comWrappers = new();
     private readonly IGraphicsCaptureItemInterop _interop;
@@ -32,7 +31,7 @@ public class Direct3D11ScreenCaptureHelper
     {
         using var device = D3D11.D3D11CreateDevice(DriverType.Hardware, DeviceCreationFlags.BgraSupport);
         using var dxgiDevice = device.QueryInterface<IDXGIDevice>();
-        CreateDirect3D11DeviceFromDXGIDevice(dxgiDevice.NativePointer, out var pD3d11Device).ThrowOnFailure();
+        Marshal.ThrowExceptionForHR(CreateDirect3D11DeviceFromDXGIDevice(dxgiDevice.NativePointer, out var pD3d11Device));
         using var direct3dDevice = MarshalInterface<IDirect3DDevice>.FromAbi(pD3d11Device);
 
         var pItem = _interop.CreateForWindow(hWnd, new Guid("79C3F95B-31F7-4EC2-A464-632EF5D30760"));
@@ -45,12 +44,18 @@ public class Direct3D11ScreenCaptureHelper
             1,
             size);
         var tcs = new TaskCompletionSource<Bitmap>();
-        framePool.FrameArrived += (f, _) => tcs.TrySetResult(ToBitmap(f.TryGetNextFrame(), relativeRect));
+        framePool.FrameArrived += (f, _) =>
+            tcs.TrySetResult(ToBitmap(f.TryGetNextFrame(), relativeRect));
 
         using var session = framePool.CreateCaptureSession(item);
         session.IsCursorCaptureEnabled = false;
+        if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 20348))
+        {
+            session.IsBorderRequired = false;
+        }
+
         session.StartCapture();
-        return await tcs.Task.WaitAsync(TimeSpan.FromMilliseconds(500));
+        return await tcs.Task.WaitAsync(TimeSpan.FromMilliseconds(1000));
     }
 
     private static Bitmap ToBitmap(Direct3D11CaptureFrame frame, PixelRect relativeRect)
@@ -98,11 +103,20 @@ public class Direct3D11ScreenCaptureHelper
 
     private static ID3D11Texture2D CreateTexture2D(IDirect3DSurface surface)
     {
-        using var access = new IDirect3DDxgiInterfaceAccess(Marshal.GetIUnknownForObject(surface));
-        return access.GetInterface<ID3D11Texture2D>();
+        var access = surface.As<IDirect3DDxgiInterfaceAccess>();
+        return new ID3D11Texture2D(access.GetInterface(typeof(ID3D11Texture2D).GUID));
     }
 
-    [DllImport("d3d11.dll", ExactSpelling = true)]
+    [GeneratedComInterface]
+    [Guid("A9B3D012-3DF2-4EE3-B8D1-8695F457D3C1")]
+    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    [ComVisible(true)]
+    internal partial interface IDirect3DDxgiInterfaceAccess
+    {
+        nint GetInterface(in Guid iid);
+    }
+
+    [LibraryImport("d3d11.dll")]
     [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-    private static extern HRESULT CreateDirect3D11DeviceFromDXGIDevice(nint dxgiDevice, out nint graphicsDevice);
+    private static partial int CreateDirect3D11DeviceFromDXGIDevice(nint dxgiDevice, out nint graphicsDevice);
 }
