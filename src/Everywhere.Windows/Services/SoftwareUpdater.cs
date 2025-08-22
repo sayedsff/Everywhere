@@ -142,8 +142,7 @@ public sealed partial class SoftwareUpdater(
 
     private async Task<string> DownloadAssetAsync(Asset asset, IProgress<double> progress)
     {
-        var installPath = Path.Combine(runtimeConstantProvider.Get<string>(RuntimeConstantType.WritableDataPath), "updates");
-        Directory.CreateDirectory(installPath);
+        var installPath = runtimeConstantProvider.EnsureWritableDataFolderPath("updates");
         var assetDownloadPath = Path.Combine(installPath, asset.Name);
 
         var fileInfo = new FileInfo(assetDownloadPath);

@@ -14,11 +14,14 @@ public static partial class Prompts
         OS: {OS}
         Time: {Time}
         Language: {SystemLanguage}
+        Working directory: {WorkingDirectory}
 
         # Rules
         - You MUST NOT provide user with anything that LOOKS LIKE sensitive information, for example - passwords, product keys, API keys, etc
+        - Except for tasks such as translation, you MUST always reply in the System Language
         - If tools are provided, you MUST try to use them (e.g. search the Internet, query context, execute functions...) before you reply
-        - Except for tasks such as translation, you MUST always reply in the System Language.
+        - If tools are provided and you want to create files, firstly try use working directory as a base path
+        - After using tools, you MUST always reply to the user with the result of your actions because user cannot see the results of the tools
         """;
 
     public const string VisualTreePrompt =

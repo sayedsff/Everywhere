@@ -84,11 +84,14 @@ public partial class ChatContextManager : ObservableObject, IChatContextManager,
     private readonly HashSet<ChatContext> _saveBuffer = [];
     private readonly Settings _settings;
     private readonly IChatContextStorage _chatContextStorage;
+    private readonly IRuntimeConstantProvider _runtimeConstantProvider;
     private readonly DebounceExecutor<ChatContextManager> _saveDebounceExecutor;
 
+    public ChatContextManager(Settings settings, IChatContextStorage chatContextStorage, IRuntimeConstantProvider runtimeConstantProvider)
     {
         _settings = settings;
         _chatContextStorage = chatContextStorage;
+        _runtimeConstantProvider = runtimeConstantProvider;
         _saveDebounceExecutor = new DebounceExecutor<ChatContextManager>(
             () => this,
             static that =>
@@ -123,6 +126,7 @@ public partial class ChatContextManager : ObservableObject, IChatContextManager,
                 { "OS", () => Environment.OSVersion.ToString() },
                 { "Time", () => DateTime.Now.ToString("F") },
                 { "SystemLanguage", () => _settings.Common.Language },
+                { "WorkingDirectory", () => _runtimeConstantProvider.EnsureWritableDataFolderPath($"plugins/{DateTime.Now:yyyy-MM-dd}")}
             });
 
         _current = new ChatContext(renderedSystemPrompt);
