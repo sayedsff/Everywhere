@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Everywhere.Enums;
@@ -21,7 +22,9 @@ public partial class ChatContextManager : ObservableObject, IChatContextManager,
     {
         get
         {
-            if (_current is null) CreateNew();
+            if (_current is not null) return _current;
+
+            CreateNew();
             _current.Changed += HandleChatContextChanged;
             return _current;
         }
@@ -36,10 +39,16 @@ public partial class ChatContextManager : ObservableObject, IChatContextManager,
             var previous = _current;
             if (!SetProperty(ref _current, value)) return;
 
-            if (previous is not null) previous.Changed -= HandleChatContextChanged;
-            if (IsEmptyContext(previous)) Remove(previous);
+            // BUG:
+            // IDK why if I remove the previous context immediately,
+            // Avalonia will fuck up and crash immediately with IndexOutOfRangeException.
+            // The whole call stack is inside Avalonia, so I can't do anything about it.
+            // The only workaround is to invoke the removal on the UI thread with a delay.
+            Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                if (IsEmptyContext(previous)) Remove(previous);
+            }, DispatcherPriority.Background);
 
-            OnPropertyChanged();
             OnPropertyChanged(nameof(ChatMessageNodes));
             RemoveCommand.NotifyCanExecuteChanged();
         }
@@ -77,7 +86,6 @@ public partial class ChatContextManager : ObservableObject, IChatContextManager,
     private readonly IChatContextStorage _chatContextStorage;
     private readonly DebounceExecutor<ChatContextManager> _saveDebounceExecutor;
 
-    public ChatContextManager(Settings settings, IChatContextStorage chatContextStorage)
     {
         _settings = settings;
         _chatContextStorage = chatContextStorage;
@@ -118,6 +126,7 @@ public partial class ChatContextManager : ObservableObject, IChatContextManager,
             });
 
         _current = new ChatContext(renderedSystemPrompt);
+        _current.Changed += HandleChatContextChanged;
         _history.Add(_current.Metadata.Id, _current);
         Task.Run(() => _chatContextStorage.AddChatContextAsync(_current)).Detach();
 
@@ -134,6 +143,7 @@ public partial class ChatContextManager : ObservableObject, IChatContextManager,
     {
         if (!_history.Remove(chatContext.Metadata.Id)) return;
 
+        chatContext.Changed -= HandleChatContextChanged;
         Task.Run(() => _chatContextStorage.DeleteChatContextAsync(chatContext.Metadata.Id)).Detach();
 
         // If the current chat context is being removed, we need to set a new current context
@@ -168,16 +178,26 @@ public partial class ChatContextManager : ObservableObject, IChatContextManager,
 
     private Task UpdateHistoryAsync(int count) => Task.Run(async () =>
     {
+        var newItems = new HashSet<Guid>();
         await foreach (var metadata in _chatContextStorage.QueryChatContextsAsync(count, ChatContextOrderBy.UpdatedAt, true))
         {
+            newItems.Add(metadata.Id);
+
             if (_history.ContainsKey(metadata.Id))
             {
                 continue;
             }
 
             var chatContext = await _chatContextStorage.GetChatContextAsync(metadata.Id);
+            chatContext.Changed += HandleChatContextChanged;
             _current ??= chatContext;
             _history.Add(metadata.Id, chatContext);
+        }
+
+        // Remove any chat contexts that are no longer in the storage
+        foreach (var (_, oldItem) in _history.AsValueEnumerable().Where(kv => !newItems.Contains(kv.Key)).ToList())
+        {
+            Remove(oldItem);
         }
 
         OnPropertyChanged(nameof(History));
