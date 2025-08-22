@@ -46,6 +46,17 @@ public sealed class DebounceExecutor<T> : IDisposable
         _timer.Change(_delay, Timeout.InfiniteTimeSpan);
     }
 
+    public void Cancel()
+    {
+        if (_isDisposed)
+        {
+            return;
+        }
+
+        // Cancel the timer by setting the due time to infinite.
+        _timer.Change(Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
+    }
+
     private static void TimerCallback(object? state)
     {
         // The callback runs on a ThreadPool thread.

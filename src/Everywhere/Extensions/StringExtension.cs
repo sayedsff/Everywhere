@@ -53,4 +53,41 @@ public static class StringExtension
         }
         return sb;
     }
+
+    public static string TrimStart(this string str, params ReadOnlySpan<string> trimStrings)
+    {
+        if (string.IsNullOrEmpty(str)) return str;
+
+        var startIndex = 0;
+        foreach (var trimString in trimStrings)
+        {
+            while (startIndex < str.Length && str.AsSpan(startIndex).StartsWith(trimString, StringComparison.Ordinal))
+            {
+                startIndex += trimString.Length;
+            }
+        }
+
+        return str[startIndex..];
+    }
+
+    public static string TrimEnd(this string str, params ReadOnlySpan<string> trimStrings)
+    {
+        if (string.IsNullOrEmpty(str)) return str;
+
+        var endIndex = str.Length;
+        foreach (var trimString in trimStrings)
+        {
+            while (endIndex > 0 && str.AsSpan(0, endIndex).EndsWith(trimString, StringComparison.Ordinal))
+            {
+                endIndex -= trimString.Length;
+            }
+        }
+
+        return str[..endIndex];
+    }
+
+    public static string Trim(this string str, params ReadOnlySpan<string> trimStrings)
+    {
+        return string.IsNullOrEmpty(str) ? str : str.TrimStart(trimStrings).TrimEnd(trimStrings);
+    }
 }

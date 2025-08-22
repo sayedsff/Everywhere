@@ -43,12 +43,6 @@ public partial class ChatInputBox : TextBox
     public static readonly StyledProperty<bool> IsImageEnabledProperty =
         AvaloniaProperty.Register<ChatInputBox, bool>(nameof(IsImageEnabled));
 
-    public static readonly StyledProperty<bool> IsWebSearchSupportedProperty =
-        AvaloniaProperty.Register<ChatInputBox, bool>(nameof(IsWebSearchSupported));
-
-    public static readonly StyledProperty<bool> IsWebSearchEnabledProperty =
-        AvaloniaProperty.Register<ChatInputBox, bool>(nameof(IsWebSearchEnabled));
-
     public static readonly StyledProperty<bool> IsToolCallSupportedProperty =
         AvaloniaProperty.Register<ChatInputBox, bool>(nameof(IsToolCallSupported));
 
@@ -110,18 +104,6 @@ public partial class ChatInputBox : TextBox
     {
         get => GetValue(IsImageEnabledProperty);
         set => SetValue(IsImageEnabledProperty, value);
-    }
-
-    public bool IsWebSearchSupported
-    {
-        get => GetValue(IsWebSearchSupportedProperty);
-        set => SetValue(IsWebSearchSupportedProperty, value);
-    }
-
-    public bool IsWebSearchEnabled
-    {
-        get => GetValue(IsWebSearchEnabledProperty);
-        set => SetValue(IsWebSearchEnabledProperty, value);
     }
 
     public bool IsToolCallSupported

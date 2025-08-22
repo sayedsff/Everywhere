@@ -126,12 +126,12 @@ public partial class ActionChatMessage : ChatMessage
     [MessagePackFormatter(typeof(AuthorRoleMessagePackFormatter))]
     public override AuthorRole Role { get; }
 
-    [ObservableProperty]
     [Key(1)]
+    [ObservableProperty]
     public partial LucideIconKind Icon { get; set; }
 
-    [ObservableProperty]
     [Key(2)]
+    [ObservableProperty]
     public partial DynamicResourceKey? HeaderKey { get; set; }
 
     /// <summary>
@@ -147,6 +147,9 @@ public partial class ActionChatMessage : ChatMessage
     [Key(5)]
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 
+    [Key(6)]
+    public ObservableCollection<ActionChatMessageStep> Steps { get; set; } = [];
+
     [SerializationConstructor]
     private ActionChatMessage() { }
 
@@ -156,4 +159,15 @@ public partial class ActionChatMessage : ChatMessage
         Icon = icon;
         HeaderKey = headerKey;
     }
+}
+
+/// <summary>
+/// Represents a step in an action message. Such as a function call step.
+/// </summary>
+[MessagePackObject]
+public partial class ActionChatMessageStep : ObservableObject
+{
+    [Key(0)]
+    [ObservableProperty]
+    public partial DynamicResourceKeyBase? Header { get; set; }
 }

@@ -60,13 +60,13 @@
         <value>指定助手调用的模型名称。</value>
     </data>
     <data name="Settings_Model_Temperature_Header" xml:space="preserve">
-        <value>创意活跃度（temperature）</value>
+        <value>创意活跃度 (temperature)</value>
     </data>
     <data name="Settings_Model_Temperature_Description" xml:space="preserve">
         <value>数值越高，回答越具创造力和想象力；数值越低，则越趋严谨；部分模型数值超过 1.0 可能导致输出乱码。</value>
     </data>
     <data name="Settings_Model_TopP_Header" xml:space="preserve">
-        <value>思维开放度（top_p）</value>
+        <value>思维开放度 (top_p)</value>
     </data>
     <data name="Settings_Model_TopP_Description" xml:space="preserve">
         <value>数值越高，模型会接受更多潜在回答；数值越低，则更倾向于最可能的回答；不建议与创意活跃度同时调整。该设置仅对部分模型有效，如果遇到错误，请尝试还原默认值。</value>
@@ -75,19 +75,16 @@
         <value>开启工具调用</value>
     </data>
     <data name="Settings_Model_IsToolCallSupported_Description" xml:space="preserve">
-        <value>启用后，在支持工具调用的大模型（如 DeepSeek-V3、GPT-4o）中，助手会在合适时机调用外部工具以扩展能力；若模型不支持此功能，则可能导致调用失败。</value>
+        <value>启用后，在支持工具调用的大模型 (如 DeepSeek-V3、GPT-4o) 中，助手会在合适时机调用外部工具以扩展能力；若模型不支持此功能，则可能导致调用失败。</value>
     </data>
     <data name="Settings_Model_IsWebSearchSupported_Header" xml:space="preserve">
         <value>开启网络搜索</value>
     </data>
     <data name="Settings_Model_IsWebSearchSupported_Description" xml:space="preserve">
-        <value>启用后，在支持工具调用的大模型（如 DeepSeek-V3、GPT-4o）中，助手会先进行网络搜索并整合结果后再生成回复；若模型不支持此功能，则可能导致调用失败。</value>
+        <value>启用后，在支持工具调用的大模型 (如 DeepSeek-V3、GPT-4o) 中，助手会先进行网络搜索并整合结果后再生成回复；若模型不支持此功能，则可能导致调用失败。</value>
     </data>
-    <data name="Settings_Model_WebSearchProvider_Header" xml:space="preserve">
-        <value>网络搜索服务提供方</value>
-    </data>
-    <data name="Settings_Model_WebSearchProvider_Description" xml:space="preserve">
-        <value>选择用于网络搜索的服务提供商。</value>
+    <data name="Settings_Plugin_WebSearchEngine_SelectedWebSearchEngineProvider_Description" xml:space="preserve">
+        <value>选择用于网络搜索引擎的服务提供商。</value>
     </data>
     <data name="SettingsSelectionItem_Model_WebSearchProvider_bing" xml:space="preserve">
         <value>必应</value>
@@ -107,11 +104,11 @@
     <data name="Settings_Model_WebSearchApiKey_Description" xml:space="preserve">
         <value>指定网络搜索服务的 API 访问密钥，可在对应服务提供商的 API 控制台获取。</value>
     </data>
-    <data name="Settings_Model_WebSearchEndpoint_Header" xml:space="preserve">
-        <value>网络搜索服务 API 接口地址</value>
+    <data name="Settings_Plugin_WebSearchEngine_SelectedWebSearchEngineProvider_EndPoint_Header" xml:space="preserve">
+        <value>API 调用地址</value>
     </data>
-    <data name="Settings_Model_WebSearchEndpoint_Description" xml:space="preserve">
-        <value>（可选）如使用官方 API 接口，请留空以使用默认值。</value>
+    <data name="Settings_Plugin_WebSearchEngine_SelectedWebSearchEngineProvider_EndPoint_Description" xml:space="preserve">
+        <value>如果你不确定这是什么，请保持默认值。必须以“http(s)://”开头。</value>
     </data>
     <data name="ChatInputBox_Watermark" xml:space="preserve">
         <value>向 Everywhere 提问，或是随便聊聊</value>
@@ -324,73 +321,73 @@
         <value>HTTP 请求错误 ({0}): {1}</value>
     </data>
     <data name="FriendlyExceptionMessage_HttpRequest_BadRequest" xml:space="preserve">
-        <value>错误的请求</value>
+        <value>错误的请求。</value>
     </data>
     <data name="FriendlyExceptionMessage_HttpRequest_Unauthorized" xml:space="preserve">
-        <value>请求未授权</value>
+        <value>请求未授权。</value>
     </data>
     <data name="FriendlyExceptionMessage_HttpRequest_Forbidden" xml:space="preserve">
-        <value>请求被阻止</value>
+        <value>请求被阻止。</value>
     </data>
     <data name="FriendlyExceptionMessage_HttpRequest_NotFound" xml:space="preserve">
-        <value>未找到结果</value>
+        <value>未找到结果。</value>
     </data>
     <data name="FriendlyExceptionMessage_HttpRequest_InternalServerError" xml:space="preserve">
-        <value>服务器遇到错误，请稍后再试</value>
+        <value>服务器遇到错误，请稍后再试。</value>
     </data>
     <data name="FriendlyExceptionMessage_HttpRequest_ServiceUnavailable" xml:space="preserve">
-        <value>服务器不可用，请稍后再试</value>
+        <value>服务器不可用，请稍后再试。</value>
     </data>
     <data name="FriendlyExceptionMessage_HttpRequest_GatewayTimeout" xml:space="preserve">
-        <value>网关连接超时，请检查网络或稍后再试</value>
+        <value>网关连接超时，请检查网络或稍后再试。</value>
     </data>
     <data name="FriendlyExceptionMessage_HttpRequest_RequestTimeout" xml:space="preserve">
-        <value>请求连接超时，请检查网络或稍后再试</value>
+        <value>请求连接超时，请检查网络或稍后再试。</value>
     </data>
     <data name="FriendlyExceptionMessage_HttpRequest_BadGateway" xml:space="preserve">
-        <value>网关连接错误，请检查网络或稍后再试</value>
+        <value>网关连接错误，请检查网络或稍后再试。</value>
     </data>
     <data name="FriendlyExceptionMessage_HttpRequest_0" xml:space="preserve">
-        <value>未知错误，请稍后再试</value>
+        <value>未知错误，请稍后再试。</value>
     </data>
     <data name="FriendlyExceptionMessage_Socket" xml:space="preserve">
         <value>套接字错误 ({0}): {1}</value>
     </data>
     <data name="FriendlyExceptionMessage_Socket_HostNotFound" xml:space="preserve">
-        <value>无法解析域名，请检查DNS设置或稍后再试</value>
+        <value>无法解析域名，请检查DNS设置或稍后再试。</value>
     </data>
     <data name="FriendlyExceptionMessage_Socket_ConnectionRefused" xml:space="preserve">
-        <value>连接被拒绝，请检查网络或稍后再试</value>
+        <value>连接被拒绝，请检查网络或稍后再试。</value>
     </data>
     <data name="FriendlyExceptionMessage_Socket_ConnectionReset" xml:space="preserve">
-        <value>连接被重置，请检查网络或稍后再试</value>
+        <value>连接被重置，请检查网络或稍后再试。</value>
     </data>
     <data name="FriendlyExceptionMessage_Socket_ConnectionAborted" xml:space="preserve">
-        <value>连接被中止，请检查网络或稍后再试</value>
+        <value>连接被中止，请检查网络或稍后再试。</value>
     </data>
     <data name="FriendlyExceptionMessage_Socket_0" xml:space="preserve">
-        <value>未知错误，请稍后再试</value>
+        <value>未知错误，请稍后再试。</value>
     </data><data name="FriendlyExceptionMessage_Aggregate" xml:space="preserve">
-        <value>发生一个或多个错误
+        <value>发生一个或多个错误。
 {0}</value>
     </data>
     <data name="FriendlyExceptionMessage_TaskCanceled" xml:space="preserve">
-        <value>任务已取消</value>
+        <value>任务已取消。{0}</value>
     </data>
     <data name="FriendlyExceptionMessage_OperationCanceled" xml:space="preserve">
-        <value>操作已取消</value>
+        <value>操作已取消。{0}</value>
     </data>
     <data name="FriendlyExceptionMessage_Timeout" xml:space="preserve">
-        <value>已超过最长等待时间</value>
+        <value>已超过最长等待时间。{0}</value>
     </data>
     <data name="FriendlyExceptionMessage_Json" xml:space="preserve">
-        <value>无法解析 Json 数据</value>
+        <value>无法解析 Json 数据。{0}</value>
     </data>
     <data name="FriendlyExceptionMessage_Format" xml:space="preserve">
-        <value>格式错误 {0}</value>
+        <value>格式错误。{0}</value>
     </data>
     <data name="FriendlyExceptionMessage_Argument" xml:space="preserve">
-        <value>参数错误 {0}</value>
+        <value>参数错误。{0}</value>
     </data>
     <data name="Settings_Common_Theme_Header" xml:space="preserve">
         <value>主题</value>
@@ -508,7 +505,7 @@
         <value>指定聊天浮动窗口打开时的固定模式，当窗口没有固定时，失去焦点会自动隐藏。</value>
     </data>
     <data name="FriendlyExceptionMessage_ClientResult" xml:space="preserve">
-        <value>客户端错误 {0}</value>
+        <value>客户端错误。{0}</value>
     </data>
     <data name="Settings_Model_PresencePenalty_Description" xml:space="preserve">
         <value>值越大，越倾向不同的表达方式，避免概念重复；值越小，越倾向使用重复的概念或叙述，表达更具一致性。该设置仅对部分模型有效，如果遇到错误，请尝试还原默认值。</value>
@@ -643,7 +640,7 @@
         <value>自动更新</value>
     </data>
     <data name="Settings_Common_IsAutomaticUpdateCheckEnabled_Description" xml:space="preserve">
-        <value>如果开启，Everywhere 会定期检查更新（仅在 Everywhere 运行时，不会给系统增加额外负担）</value>
+        <value>如果开启，Everywhere 会定期检查更新 (仅在 Everywhere 运行时，不会给系统增加额外负担)。</value>
     </data>
     <data name="Settings_Common_SoftwareUpdate_Toast_DownloadingUpdate" xml:space="preserve">
         <value>下载更新中...</value>
@@ -653,5 +650,50 @@
     </data>
     <data name="Settings_Model_SelectedModelDefinition_ModelId_Description" xml:space="preserve">
         <value>用于 API 调用的模型标识，例如 gpt-4o。如果你不确定这是什么，请保持默认值。</value>
+    </data>
+    <data name="ChatPluginPage_Title" xml:space="preserve">
+        <value>聊天插件</value>
+    </data>
+    <data name="ChatPluginPage_Description" xml:space="preserve">
+        <value>聊天插件包括内置插件和 MCP 插件，支持工具调用的大语言模型 (LLMs) 会在合适的时机使用这些插件 (如搜索网络、访问本地文件等) 以获得更强大的功能。</value>
+    </data>
+    <data name="Settings_Plugin_WebSearchEngine_SelectedWebSearchEngineProvider_Header" xml:space="preserve">
+        <value>网络搜索引擎提供方</value>
+    </data>
+    <data name="Settings_Plugin_WebSearchEngine_SelectedWebSearchEngineProvider_ApiKey_Header" xml:space="preserve">
+        <value>API 密钥</value>
+    </data>
+    <data name="Settings_Plugin_WebSearchEngine_SelectedWebSearchEngineProvider_ApiKey_Description" xml:space="preserve">
+        <value>需要从对应的官方获取，详情请参考指南。</value>
+    </data>
+    <data name="Settings_Plugin_WebSearchEngine_SelectedWebSearchEngineProvider_SearchEngineId_Header" xml:space="preserve">
+        <value>搜索引擎 ID</value>
+    </data>
+    <data name="Settings_Plugin_WebSearchEngine_SelectedWebSearchEngineProvider_SearchEngineId_Description" xml:space="preserve">
+        <value>(Google 专用) 提供可编程搜索引擎 ID，详情请参考指南。</value>
+    </data>
+    <data name="NativeChatPlugin_WebSearchEngine_Header" xml:space="preserve">
+        <value>网络搜索引擎</value>
+    </data>
+    <data name="NativeChatPlugin_WebSearchEngine_Description" xml:space="preserve">
+        <value>提供网络搜索能力，先搜索后回答，可减少大语言模型幻觉，并提供最新信息。</value>
+    </data>
+    <data name="NativeChatPlugin_Shell_Header" xml:space="preserve">
+        <value>Shell</value>
+    </data>
+    <data name="NativeChatPlugin_Shell_Description" xml:space="preserve">
+        <value>提供执行命令的能力，允许直接和系统交互，提供无限可能。</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_Header" xml:space="preserve">
+        <value>文件系统</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_Description" xml:space="preserve">
+        <value>提供访问系统文件的能力，如枚举、创建、删除、重命名、读取或写入文件等。</value>
+    </data>
+    <data name="FriendlyExceptionMessage_InvalidOperation" xml:space="preserve">
+        <value>无效的操作。{0}</value>
+    </data>
+    <data name="FriendlyExceptionMessage_Win32" xml:space="preserve">
+        <value>Windows 系统错误。{0}</value>
     </data>
 </root>

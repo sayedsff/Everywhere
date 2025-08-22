@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using System.Windows.Input;
 using Avalonia.Controls;
-using Avalonia.Data;
+using Avalonia.Controls.Templates;
 using ZLinq;
 
 namespace Everywhere.Models;
@@ -171,7 +171,7 @@ public class SettingsDoubleItem(string name) : SettingsItem(name)
 
 public class SettingsSelectionItem(string name) : SettingsItem(name)
 {
-    public record Item(DynamicResourceKey Key, object Value);
+    public record Item(DynamicResourceKey Key, object Value, IDataTemplate? ContentTemplate);
 
     public static readonly StyledProperty<IEnumerable<Item>> ItemsSourceProperty =
         AvaloniaProperty.Register<SettingsSelectionItem, IEnumerable<Item>>(nameof(ItemsSource));
@@ -226,10 +226,10 @@ public class SettingsSelectionItem(string name) : SettingsItem(name)
                 if (Enum.GetName(enumType, x) is { } enumName &&
                     enumType.GetField(enumName)?.GetCustomAttribute<DynamicResourceKeyAttribute>() is { } ppAttribute)
                 {
-                    return new Item(new DynamicResourceKey(ppAttribute.Key), x);
+                    return new Item(new DynamicResourceKey(ppAttribute.Key), x, null);
                 }
 
-                return new Item(new DirectResourceKey(x), x);
+                return new Item(new DirectResourceKey(x), x, null);
             }).ToArray()
         };
     }

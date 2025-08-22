@@ -97,11 +97,8 @@
     <data name="Settings_Model_IsWebSearchSupported_Description" xml:space="preserve">
         <value>When enabled, for tool-capable large models (e.g., DeepSeek-V3, GPT-4o), the assistant will perform web searches and integrate results before generating responses; if the model doesn’t support tool calls, enabling this may cause failures.</value>
     </data>
-    <data name="Settings_Model_WebSearchProvider_Header" xml:space="preserve">
-        <value>Web Search Service Provider</value>
-    </data>
-    <data name="Settings_Model_WebSearchProvider_Description" xml:space="preserve">
-        <value>Select the service provider for web searches.</value>
+    <data name="Settings_Plugin_WebSearchEngine_SelectedWebSearchEngineProvider_Description" xml:space="preserve">
+        <value>Select the service provider for web search engines.</value>
     </data>
     <data name="SettingsSelectionItem_Model_WebSearchProvider_bing" xml:space="preserve">
         <value>Bing</value>
@@ -121,11 +118,11 @@
     <data name="Settings_Model_WebSearchApiKey_Description" xml:space="preserve">
         <value>Specify the API access key for the web search service, obtainable from the provider’s API portal.</value>
     </data>
-    <data name="Settings_Model_WebSearchEndpoint_Header" xml:space="preserve">
-        <value>Web Search Service API Endpoint</value>
+    <data name="Settings_Plugin_WebSearchEngine_SelectedWebSearchEngineProvider_EndPoint_Header" xml:space="preserve">
+        <value>API Url</value>
     </data>
-    <data name="Settings_Model_WebSearchEndpoint_Description" xml:space="preserve">
-        <value>(Optional) Leave blank to use the default value when using the official API endpoint.</value>
+    <data name="Settings_Plugin_WebSearchEngine_SelectedWebSearchEngineProvider_EndPoint_Description" xml:space="preserve">
+        <value>Leaving this to default if you dont't know what to do. Must starts with "http(s)://".</value>
     </data>
     <data name="ChatInputBox_Watermark" xml:space="preserve">
         <value>Ask Everywhere, or just chat</value>
@@ -342,74 +339,74 @@
         <value>HTTP request error ({0}): {1}</value>
     </data>
     <data name="FriendlyExceptionMessage_HttpRequest_BadRequest" xml:space="preserve">
-        <value>Bad request</value>
+        <value>Bad request.</value>
     </data>
     <data name="FriendlyExceptionMessage_HttpRequest_Unauthorized" xml:space="preserve">
-        <value>Unauthorized request</value>
+        <value>Unauthorized request.</value>
     </data>
     <data name="FriendlyExceptionMessage_HttpRequest_Forbidden" xml:space="preserve">
-        <value>Request forbidden</value>
+        <value>Request forbidden.</value>
     </data>
     <data name="FriendlyExceptionMessage_HttpRequest_NotFound" xml:space="preserve">
-        <value>Result not found</value>
+        <value>Result not found.</value>
     </data>
     <data name="FriendlyExceptionMessage_HttpRequest_InternalServerError" xml:space="preserve">
-        <value>Server encountered an error, please try again later</value>
+        <value>Server encountered an error, please try again later.</value>
     </data>
     <data name="FriendlyExceptionMessage_HttpRequest_ServiceUnavailable" xml:space="preserve">
-        <value>Server unavailable, please try again later</value>
+        <value>Server unavailable, please try again later.</value>
     </data>
     <data name="FriendlyExceptionMessage_HttpRequest_GatewayTimeout" xml:space="preserve">
-        <value>Gateway connection timed out, please check your network or try again later</value>
+        <value>Gateway connection timed out, please check your network or try again later.</value>
     </data>
     <data name="FriendlyExceptionMessage_HttpRequest_RequestTimeout" xml:space="preserve">
-        <value>Request connection timed out, please check your network or try again later</value>
+        <value>Request connection timed out, please check your network or try again later.</value>
     </data>
     <data name="FriendlyExceptionMessage_HttpRequest_BadGateway" xml:space="preserve">
-        <value>Gateway connection error, please check your network or try again later</value>
+        <value>Gateway connection error, please check your network or try again later.</value>
     </data>
     <data name="FriendlyExceptionMessage_HttpRequest_0" xml:space="preserve">
-        <value>Unknown error, please try again later</value>
+        <value>Unknown error, please try again later.</value>
     </data>
     <data name="FriendlyExceptionMessage_Socket" xml:space="preserve">
         <value>Socket error ({0}): {1}</value>
     </data>
     <data name="FriendlyExceptionMessage_Socket_HostNotFound" xml:space="preserve">
-        <value>Hostname could not be resolved, please check your DNS settings or try again later</value>
+        <value>Hostname could not be resolved, please check your DNS settings or try again later.</value>
     </data>
     <data name="FriendlyExceptionMessage_Socket_ConnectionRefused" xml:space="preserve">
-        <value>Connection refused, please check your network or try again later</value>
+        <value>Connection refused, please check your network or try again later.</value>
     </data>
     <data name="FriendlyExceptionMessage_Socket_ConnectionReset" xml:space="preserve">
-        <value>Connection reset, please check your network or try again later</value>
+        <value>Connection reset, please check your network or try again later.</value>
     </data>
     <data name="FriendlyExceptionMessage_Socket_ConnectionAborted" xml:space="preserve">
-        <value>Connection aborted, please check your network or try again later</value>
+        <value>Connection aborted, please check your network or try again later.</value>
     </data>
     <data name="FriendlyExceptionMessage_Socket_0" xml:space="preserve">
-        <value>Unknown error, please try again later</value>
+        <value>Unknown error, please try again later.</value>
     </data>
     <data name="FriendlyExceptionMessage_Aggregate" xml:space="preserve">
-        <value>One or more errors occurred
+        <value>One or more errors occurred.
 {0}</value>
     </data>
     <data name="FriendlyExceptionMessage_TaskCanceled" xml:space="preserve">
-        <value>Task canceled</value>
+        <value>Task canceled. {0}</value>
     </data>
     <data name="FriendlyExceptionMessage_OperationCanceled" xml:space="preserve">
-        <value>Operation canceled</value>
+        <value>Operation canceled. {0}</value>
     </data>
     <data name="FriendlyExceptionMessage_Timeout" xml:space="preserve">
-        <value>Maximum wait time exceeded</value>
+        <value>Maximum wait time exceeded. {0}</value>
     </data>
     <data name="FriendlyExceptionMessage_Json" xml:space="preserve">
-        <value>Could not parse JSON data</value>
+        <value>Could not parse JSON data. {0}</value>
     </data>
     <data name="FriendlyExceptionMessage_Format" xml:space="preserve">
-        <value>Format error {0}</value>
+        <value>Format error. {0}</value>
     </data>
     <data name="FriendlyExceptionMessage_Argument" xml:space="preserve">
-        <value>Argument error {0}</value>
+        <value>Argument error. {0}</value>
     </data>
     <data name="SettingsSelectionItem_Common_Language_de" xml:space="preserve">
         <value>Deutsch</value>
@@ -527,7 +524,7 @@ Tip: You can reopen this message by clicking “About - Welcome Page”.</value>
         <value>Specifies the pin mode for the chat floating window when it is opened. When the window is not fixed, it will be hidden automatically when it loses focus.</value>
     </data>
     <data name="FriendlyExceptionMessage_ClientResult" xml:space="preserve">
-        <value>Client error {0}</value>
+        <value>Client error. {0}</value>
     </data>
     <data name="Settings_Model_PresencePenalty_Header" xml:space="preserve">
         <value>Expression Divergence (presence_penalty)</value>
@@ -564,7 +561,7 @@ Tip: You can reopen this message by clicking “About - Welcome Page”.</value>
         <value>API Key</value>
     </data>
     <data name="Settings_Model_SelectedModelProvider_ApiKey_Description" xml:space="preserve">
-        <value>In case of online models, you need to get them from the corresponding official, please refer to the guide for details.</value>
+        <value>In case of online models, you need to get from the corresponding official, please refer to the guide for details.</value>
     </data>
     <data name="Settings_Model_SelectedModelDefinition_IsImageInputSupported_Header" xml:space="preserve">
         <value>Support Image Input</value>
@@ -672,6 +669,51 @@ Tip: You can reopen this message by clicking “About - Welcome Page”.</value>
         <value>Model ID</value>
     </data>
     <data name="Settings_Model_SelectedModelDefinition_ModelId_Description" xml:space="preserve">
-        <value />
+        <value>Model identifier used for API calls, such as gpt-4o. If you are unsure what this is, keep the default value.</value>
+    </data>
+    <data name="ChatPluginPage_Title" xml:space="preserve">
+        <value>Chat plugins</value>
+    </data>
+    <data name="ChatPluginPage_Description" xml:space="preserve">
+        <value>Chat plugins include built-in plugins and MCP plugins. LLMs that support tool calls will use these plugins at appropriate times (such as searching the web or accessing local files) to gain more powerful functionality.</value>
+    </data>
+    <data name="Settings_Plugin_WebSearchEngine_SelectedWebSearchEngineProvider_Header" xml:space="preserve">
+        <value>Web Search Engine Provider</value>
+    </data>
+    <data name="Settings_Plugin_WebSearchEngine_SelectedWebSearchEngineProvider_ApiKey_Header" xml:space="preserve">
+        <value>API Key</value>
+    </data>
+    <data name="Settings_Plugin_WebSearchEngine_SelectedWebSearchEngineProvider_ApiKey_Description" xml:space="preserve">
+        <value>You need to get from the corresponding official, please refer to the guide for details.</value>
+    </data>
+    <data name="Settings_Plugin_WebSearchEngine_SelectedWebSearchEngineProvider_SearchEngineId_Header" xml:space="preserve">
+        <value>Search Engine ID</value>
+    </data>
+    <data name="Settings_Plugin_WebSearchEngine_SelectedWebSearchEngineProvider_SearchEngineId_Description" xml:space="preserve">
+        <value>(Google only) Provides a programmable search engine ID. For details, refer to the guide.</value>
+    </data>
+    <data name="NativeChatPlugin_WebSearchEngine_Header" xml:space="preserve">
+        <value>Web Search Engine</value>
+    </data>
+    <data name="NativeChatPlugin_WebSearchEngine_Description" xml:space="preserve">
+        <value>Providing web search capabilities, searching before answering, can reduce large language model hallucinations and provide the latest information.</value>
+    </data>
+    <data name="NativeChatPlugin_Shell_Header" xml:space="preserve">
+        <value>Shell</value>
+    </data>
+    <data name="NativeChatPlugin_Shell_Description" xml:space="preserve">
+        <value>Provides the ability to execute commands, allowing direct interaction with the system and offering unlimited possibilities.</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_Header" xml:space="preserve">
+        <value>File System</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_Description" xml:space="preserve">
+        <value>Provides the ability to access system files, such as enumerating, creating, deleting, renaming, reading, or writing files.</value>
+    </data>
+    <data name="FriendlyExceptionMessage_InvalidOperation" xml:space="preserve">
+        <value>Invalid operation. {0}</value>
+    </data>
+    <data name="FriendlyExceptionMessage_Win32" xml:space="preserve">
+        <value>Windows system error. {0}</value>
     </data>
 </root>

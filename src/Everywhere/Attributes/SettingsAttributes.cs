@@ -1,28 +1,9 @@
-﻿using Lucide.Avalonia;
-
-namespace Everywhere.Attributes;
-
-/// <summary>
-/// Represents an attribute that defines a settings category.
-/// </summary>
-[AttributeUsage(AttributeTargets.Property)]
-public class SettingsCategoryAttribute : Attribute
-{
-    /// <summary>
-    /// The display name of the settings category.
-    /// </summary>
-    public required string Header { get; set; }
-
-    /// <summary>
-    /// The Icon of the settings category.
-    /// </summary>
-    public required LucideIconKind Icon { get; set; }
-}
+﻿namespace Everywhere.Attributes;
 
 /// <summary>
 /// This attribute is used to mark properties that should not be serialized or displayed in the UI.
 /// </summary>
-[AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Field)]
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
 public class HiddenSettingsItemAttribute : Attribute;
 
 [AttributeUsage(AttributeTargets.Property)]
@@ -77,6 +58,11 @@ public class SettingsSelectionItemAttribute : Attribute
     /// Should look for i18n keys in the items source
     /// </summary>
     public bool I18N { get; set; }
+
+    /// <summary>
+    /// An optional key to use for the DataTemplate to display each item.
+    /// </summary>
+    public object? DataTemplateKey { get; set; }
 }
 
 /// <summary>

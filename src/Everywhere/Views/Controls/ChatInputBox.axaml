@@ -216,19 +216,6 @@
 
             <ToggleButton
               Classes="Outline Rounded" Focusable="False"
-              IsChecked="{Binding IsWebSearchEnabled, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
-              IsVisible="{TemplateBinding IsWebSearchSupported}"
-              ToolTip.Tip="{I18N {x:Static LocaleKey.ChatInputBox_WebSearchButton_ToolTip}}">
-              <StackPanel
-                Orientation="Horizontal" Spacing="2">
-                <LucideIcon
-                  Kind="Globe" Size="16"/>
-                <TextBlock Text="{I18N {x:Static LocaleKey.ChatInputBox_WebSearchButton_Text}}"/>
-              </StackPanel>
-            </ToggleButton>
-
-            <ToggleButton
-              Classes="Outline Rounded" Focusable="False"
               IsChecked="{Binding IsToolCallEnabled, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
               IsVisible="{TemplateBinding IsToolCallSupported}"
               ToolTip.Tip="{I18N {x:Static LocaleKey.ChatInputBox_ToolCallButton_ToolTip}}">

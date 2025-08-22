@@ -19,6 +19,19 @@ public abstract partial class DynamicResourceKeyBase : IObservable<object?>
     public abstract IDisposable Subscribe(IObserver<object?> observer);
 }
 
+public class EmptyDynamicResourceKey : DynamicResourceKeyBase
+{
+    public static EmptyDynamicResourceKey Instance { get; } = new();
+
+    public override IDisposable Subscribe(IObserver<object?> observer)
+    {
+        observer.OnNext(null);
+        return new AnonymousDisposable(() => { });
+    }
+
+    public override string ToString() => string.Empty;
+}
+
 /// <summary>
 /// This class is used to create a dynamic resource key for axaml Binding.
 /// </summary>
@@ -26,8 +39,6 @@ public abstract partial class DynamicResourceKeyBase : IObservable<object?>
 [MessagePackObject(OnlyIncludeKeyedMembers = true, AllowPrivate = true)]
 public partial class DynamicResourceKey(object key) : DynamicResourceKeyBase
 {
-    public static DynamicResourceKey Empty { get; } = new(string.Empty);
-
     /// <summary>
     /// so why axaml DOES NOT SUPPORT {Binding .^} ???????
     /// </summary>
@@ -37,7 +48,7 @@ public partial class DynamicResourceKey(object key) : DynamicResourceKeyBase
     protected object Key { get; } = key;
 
     protected IObservable<object?> GetObservable() =>
-        Application.Current!.Resources.GetResourceObservable(Key, NotFoundConverter);
+        Application.Current?.Resources.GetResourceObservable(Key, NotFoundConverter) ?? EmptyDynamicResourceKey.Instance;
 
     private object? NotFoundConverter(object? value) => value is UnsetValueType ? Key : value;
 
@@ -48,7 +59,7 @@ public partial class DynamicResourceKey(object key) : DynamicResourceKeyBase
     public static implicit operator DynamicResourceKey?(string? key) => key == null ? null : new DynamicResourceKey(key);
 
     public static string Resolve(object key) =>
-        (Application.Current!.Resources.TryGetResource(key, null, out var resource) ? resource?.ToString() : key.ToString()) ?? string.Empty;
+        (Application.Current?.Resources.TryGetResource(key, null, out var resource) is true ? resource?.ToString() : key.ToString()) ?? string.Empty;
 
     public override string? ToString() => Resolve(Key);
 }

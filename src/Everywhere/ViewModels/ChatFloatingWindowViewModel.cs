@@ -154,7 +154,7 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
         await ExecuteBusyTaskAsync(
             async token =>
             {
-                if (_chatAttachments.Any(a => a is ChatVisualElementAttachment vea && vea.Element.Equals(targetElement)))
+                if (_chatAttachments.Any(a => a is ChatVisualElementAttachment vea && vea.Element?.Equals(targetElement) is true))
                 {
                     IsOpened = true;
                     return;
@@ -184,7 +184,7 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
             if (_chatAttachments.Count >= Settings.Internal.MaxChatAttachmentCount) return;
 
             if (await _visualElementContext.PickElementAsync(mode) is not { } element) return;
-            if (_chatAttachments.OfType<ChatVisualElementAttachment>().Any(a => a.Element.Id == element.Id)) return;
+            if (_chatAttachments.OfType<ChatVisualElementAttachment>().Any(a => a.Element?.Id == element.Id)) return;
             _chatAttachments.Add(await Task.Run(() => CreateFromVisualElement(element), cancellationToken));
         },
         _logger.ToExceptionHandler());
@@ -224,10 +224,7 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
 
                 await Task.Run(async () =>
                 {
-                    var imageCachePath = Path.Combine(
-                        _runtimeConstantProvider.Get<string>(RuntimeConstantType.WritableDataPath),
-                        "cache",
-                        "img");
+                    var imageCachePath = _runtimeConstantProvider.EnsureWritableDataFolderPath("cache/img");
                     Directory.CreateDirectory(imageCachePath);
 
                     using var ms = new MemoryStream();

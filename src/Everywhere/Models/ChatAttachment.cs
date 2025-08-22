@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Lucide.Avalonia;
@@ -30,9 +29,7 @@ public partial class ChatVisualElementAttachment : ChatAttachment
     /// Ignore this property during serialization because it should already be converted into prompts and shouldn't appear in history.
     /// </summary>
     [IgnoreMember]
-    [field: AllowNull, MaybeNull]
-    public IVisualElement Element =>
-        field ?? throw new InvalidOperationException("Element is not set. This attachment should not be serialized without an element.");
+    public IVisualElement? Element { get; }
 
     [SerializationConstructor]
     private ChatVisualElementAttachment(DynamicResourceKeyBase headerKey, LucideIconKind icon) : base(headerKey)

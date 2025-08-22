@@ -6,14 +6,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
-using Microsoft.SemanticKernel.Plugins.Web;
-using Microsoft.SemanticKernel.Plugins.Web.Bing;
-using Microsoft.SemanticKernel.Plugins.Web.Brave;
+using ZLinq;
 
 namespace Everywhere.Chat;
 
 public class ChatService(
     IChatContextManager chatContextManager,
+    IChatPluginManager chatPluginManager,
     IKernelMixinFactory kernelMixinFactory,
     Settings settings
 ) : IChatService
@@ -54,8 +53,10 @@ public class ChatService(
     {
         var elements = userChatMessage
             .Attachments
+            .AsValueEnumerable()
             .OfType<ChatVisualElementAttachment>()
             .Select(a => a.Element)
+            .OfType<IVisualElement>()
             .ToArray();
 
         if (elements.Length <= 0) return;
@@ -100,27 +101,20 @@ public class ChatService(
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
     /// <exception cref="NotSupportedException"></exception>
-    private Kernel BuildKernel(IKernelMixin kernelMixin)
+    private Kernel BuildKernel(IKernelMixin kernelMixin, ChatContext chatContext)
     {
         var builder = Kernel.CreateBuilder();
+
         builder.Services.AddSingleton(kernelMixin.ChatCompletionService);
 
-        var modelSettings = settings.Model;
-        if (modelSettings.SelectedModelDefinition?.IsFunctionCallingSupported.ActualValue is true && settings.Internal.IsWebSearchEnabled)
+        if (settings.Internal.IsToolCallEnabled)
         {
-            var webSearchApiKey = modelSettings.WebSearchApiKey;
-            Uri.TryCreate(modelSettings.WebSearchEndpoint, UriKind.Absolute, out var webSearchEndPoint);
-            builder.Plugins.AddFromObject(
-                new WebSearchEnginePlugin(
-                    modelSettings.WebSearchProvider switch
-                    {
-                        // TODO: "google" => new GoogleConnector(webSearchApiKey, webSearchEndPoint),
-                        "brave" => new BraveConnector(webSearchApiKey, webSearchEndPoint),
-                        "bocha" => new BoChaConnector(webSearchApiKey, webSearchEndPoint),
-                        "bing" => new BingConnector(webSearchApiKey, webSearchEndPoint),
-                        _ => throw new NotSupportedException($"Web search provider '{modelSettings.WebSearchProvider}' is not supported.")
-                    }),
-                "web_search");
+            var chatPluginScope = chatPluginManager.CreateScope();
+            builder.Services.AddSingleton(chatPluginScope);
+            foreach (var plugin in chatPluginScope.Plugins)
+            {
+                builder.Plugins.Add(plugin);
+            }
         }
 
         return builder.Build();
@@ -143,11 +137,11 @@ public class ChatService(
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var kernel = BuildKernel(kernelMixin);
+            var kernel = BuildKernel(kernelMixin, chatContext);
             var chatHistory = new ChatHistory(
                 await chatContext
                     .Select(n => n.Message)
-                    .Where(m => !Equals(m, assistantChatMessage)) // exclude the current assistant message
+                    .Where(m => !ReferenceEquals(m, assistantChatMessage)) // exclude the current assistant message
                     .Where(m => m.Role.Label is "system" or "assistant" or "user" or "tool")
                     .ToAsyncEnumerable()
                     .SelectMany(CreateChatMessageContentsAsync)
@@ -201,19 +195,26 @@ public class ChatService(
                 if (functionCallContents.Count == 0) break;
 
                 // Group function calls by plugin name, and create ActionChatMessages for each group.
-                foreach (var functionCallContentGroup in functionCallContents.GroupBy(f => f.PluginName))
+                var chatPluginScope = kernel.GetRequiredService<IChatPluginScope>();
+                foreach (var functionCallContentGroup in functionCallContents.GroupBy(f => f.FunctionName))
                 {
                     cancellationToken.ThrowIfCancellationRequested();
 
-                    var actionChatMessage = functionCallContentGroup.Key switch
+                    if (!chatPluginScope.TryGetPluginAndFunction(
+                            functionCallContentGroup.Key,
+                            out var chatPlugin,
+                            out var chatFunction))
                     {
-                        "web_search" => new ActionChatMessage(
-                            AuthorRole.Tool,
-                            LucideIconKind.Globe,
-                            LocaleKey.ActionChatMessage_Header_WebSearching),
-                        _ => throw new NotImplementedException()
+                        throw new InvalidOperationException($"Function '{functionCallContentGroup.Key}' is not available");
+                    }
+
+                    var actionChatMessage = new ActionChatMessage(
+                        AuthorRole.Tool,
+                        chatFunction.Icon ?? chatPlugin.Icon ?? LucideIconKind.Hammer,
+                        chatFunction.KernelFunction.Name)
+                    {
+                        IsBusy = true,
                     };
-                    actionChatMessage.IsBusy = true;
                     assistantChatMessage.Actions.Add(actionChatMessage);
 
                     // Add call message to the chat history.
@@ -239,7 +240,7 @@ public class ChatService(
 
                         // Add result content to the chat history and the function result contents list.
                         functionCallRecords.Add(new FunctionCallRecord(functionCallContent, resultContent));
-                        chatHistory.Add(resultContent.ToChatMessage());
+                        chatHistory.Add(new ChatMessageContent(AuthorRole.Tool, [resultContent]));
 
                         if (actionChatMessage.ErrorMessageKey is not null)
                         {

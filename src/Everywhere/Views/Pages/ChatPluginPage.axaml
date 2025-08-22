@@ -1,0 +1,148 @@
+﻿<UserControl
+  x:Class="Everywhere.Views.Pages.ChatPluginPage" xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:at="clr-namespace:Everywhere.AttachedProperties"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:m="clr-namespace:Everywhere.Models"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:v="clr-namespace:Everywhere.Views"
+  xmlns:vm="clr-namespace:Everywhere.ViewModels" d:DesignHeight="450"
+  d:DesignWidth="800" x:DataType="vm:ChatPluginPageViewModel"
+  mc:Ignorable="d">
+  <UserControl.Styles>
+    <Style Selector="ItemsControl.PluginItemsControl">
+      <Setter Property="ItemsPanel">
+        <ItemsPanelTemplate>
+          <StackPanel Spacing="8"/>
+        </ItemsPanelTemplate>
+      </Setter>
+
+      <Setter Property="at:DataTemplatesAttach.DataTemplates">
+        <DataTemplates>
+          <DataTemplate DataType="m:ChatPlugin">
+            <Expander
+              HorizontalContentAlignment="Stretch" Background="Transparent"
+              CornerRadius="{DynamicResource XlCornerRadius}">
+              <Expander.Header>
+                <Grid
+                  ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto">
+                  <LucideIcon
+                    Grid.Row="0" Grid.RowSpan="2"
+                    Grid.Column="0" Margin="0,0,12,0"
+                    Kind="{Binding Icon}"/>
+
+                  <TextBlock
+                    Classes="p" Grid.Row="0"
+                    Grid.Column="1" Margin="0,-8,0,0"
+                    IsHitTestVisible="False"
+                    Text="{Binding HeaderKey^}"
+                    TextWrapping="Wrap"/>
+                  <TextBlock
+                    Classes="Muted" Grid.Row="1"
+                    Grid.Column="1" IsHitTestVisible="False"
+                    Text="{Binding DescriptionKey^}"
+                    TextWrapping="Wrap"/>
+
+                  <ToggleSwitch
+                    Grid.Row="0" Grid.RowSpan="2"
+                    Grid.Column="2" Margin="16,0,2,0"
+                    IsChecked="{Binding IsEnabled}"/>
+                </Grid>
+              </Expander.Header>
+
+              <StackPanel Spacing="8">
+                <v:SettingsItemsControl
+                  CornerRadius="8"
+                  IsVisible="{Binding !!SettingsItems.Count, FallbackValue=false}"
+                  ItemsSource="{Binding SettingsItems}"/>
+
+                <ItemsControl
+                  Classes="FunctionItemsControl" Padding="12,8"
+                  Background="{DynamicResource CardBackgroundColor}"
+                  BorderBrush="{DynamicResource BorderColor}"
+                  BorderThickness="1" CornerRadius="8"
+                  ItemsSource="{Binding Functions}">
+                  <ItemsControl.DataTemplates>
+                    <DataTemplate DataType="m:ChatFunction">
+                      <Grid
+                        ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto">
+                        <LucideIcon
+                          Grid.Row="0" Grid.RowSpan="2"
+                          Grid.Column="0" Margin="0,0,12,0"
+                          VerticalAlignment="Center"
+                          IsVisible="{Binding !!Icon}"
+                          Kind="{Binding Icon}"
+                          Size="22"/>
+
+                        <TextBlock
+                          Classes="p" Grid.Row="0"
+                          Grid.Column="1" Margin="0,-8,0,0"
+                          Text="{Binding KernelFunction.Name}"
+                          TextWrapping="Wrap"/>
+                        <TextBlock
+                          Classes="Muted" Grid.Row="1"
+                          Grid.Column="1"
+                          Text="{Binding KernelFunction.Description}"
+                          TextWrapping="Wrap"/>
+
+                        <ToggleSwitch
+                          Grid.Row="0" Grid.RowSpan="2"
+                          Grid.Column="2" Margin="16,0,2,0"
+                          IsChecked="{Binding IsEnabled}"/>
+                      </Grid>
+                    </DataTemplate>
+                  </ItemsControl.DataTemplates>
+                </ItemsControl>
+              </StackPanel>
+            </Expander>
+          </DataTemplate>
+        </DataTemplates>
+      </Setter>
+    </Style>
+
+    <Style Selector="ItemsControl.FunctionItemsControl &gt; ContentPresenter:nth-last-child(1n+2)">
+      <Setter Property="Padding" Value="0,0,0,4"/>
+      <Setter Property="BorderThickness" Value="0,0,0,1"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}"/>
+    </Style>
+
+    <Style Selector="ItemsControl.FunctionItemsControl &gt; ContentPresenter:nth-child(1n+2)">
+      <Setter Property="Margin" Value="0,4,0,0"/>
+    </Style>
+  </UserControl.Styles>
+
+  <DockPanel
+    Margin="16,12" LastChildFill="True">
+    <TextBlock
+      Classes="Muted" DockPanel.Dock="Top"
+      Text="{I18N {x:Static LocaleKey.ChatPluginPage_Description}}"/>
+
+    <TabControl
+      Margin="0,8,0,0" ClipToBounds="False">
+      <TabItem Header="Built-in">
+        <ScrollViewer
+          Margin="0,0,-16,0" HorizontalScrollBarVisibility="Disabled">
+          <ItemsControl
+            Classes="PluginItemsControl" Margin="0,0,16,0"
+            ItemsSource="{Binding Manager.BuiltInPlugins}"/>
+        </ScrollViewer>
+      </TabItem>
+
+      <TabItem>
+        <TabItem.Header>
+          <StackPanel
+            Orientation="Horizontal" Spacing="4">
+            <Image
+              Width="14" Height="14"
+              Source="{StaticResource McpDrawingImage}"/>
+            <TextBlock Text="MCP"/>
+          </StackPanel>
+        </TabItem.Header>
+
+        <ScrollViewer
+          Margin="0,0,-16,0" HorizontalScrollBarVisibility="Disabled">
+          <ItemsControl
+            Classes="PluginItemsControl" Margin="0,0,16,0"
+            ItemsSource="{Binding Manager.McpPlugins}"/>
+        </ScrollViewer>
+      </TabItem>
+    </TabControl>
+  </DockPanel>
+</UserControl>

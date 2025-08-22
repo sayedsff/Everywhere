@@ -13,6 +13,7 @@ public class SettingsInitializer(Settings settings) : IAsyncInitializer
     public Task InitializeAsync()
     {
         InitializeModelProviders();
+        InitializeSearchEngineProviders();
 
         return Task.CompletedTask;
     }
@@ -596,6 +597,66 @@ public class SettingsInitializer(Settings settings) : IAsyncInitializer
             if (src.All(d => d.Id != dstModelDefinition.Id))
             {
                 // Remove model definition if it does not exist in the source list
+                dst.RemoveAt(i);
+            }
+        }
+    }
+
+    private void InitializeSearchEngineProviders()
+    {
+        var webSearchEngineSettings = settings.Plugin.WebSearchEngine;
+
+        ApplySearchEngineProviders(
+            [
+                new WebSearchEngineProvider
+                {
+                    Id = "google",
+                    EndPoint = "https://customsearch.googleapis.com"
+                },
+                new WebSearchEngineProvider
+                {
+                    Id = "bing",
+                    EndPoint = "https://api.bing.microsoft.com/v7.0/search?q"
+                },
+                new WebSearchEngineProvider
+                {
+                    Id = "brave",
+                    EndPoint = "https://api.search.brave.com/res/v1/web/search?q"
+                },
+                new WebSearchEngineProvider
+                {
+                    Id = "bocha",
+                    EndPoint = "https://api.bochaai.com/v1/web-search"
+                },
+            ],
+            webSearchEngineSettings.WebSearchEngineProviders);
+
+        webSearchEngineSettings.SelectedWebSearchEngineProviderId ??= webSearchEngineSettings.WebSearchEngineProviders.FirstOrDefault()?.Id;
+    }
+
+    private static void ApplySearchEngineProviders(IList<WebSearchEngineProvider> src, ObservableCollection<WebSearchEngineProvider> dst)
+    {
+        var propertyCache = new Dictionary<Type, PropertyInfo[]>();
+
+        foreach (var srcSearchEngineProvider in src)
+        {
+            var dstSearchEngineProvider = dst.FirstOrDefault(p => p.Id == srcSearchEngineProvider.Id);
+            if (dstSearchEngineProvider is null)
+            {
+                dst.Add(srcSearchEngineProvider);
+            }
+            else
+            {
+                ApplyProperties(srcSearchEngineProvider, dstSearchEngineProvider, propertyCache);
+            }
+        }
+
+        for (var i = dst.Count - 1; i >= 0; i--)
+        {
+            var dstSearchEngineProvider = dst[i];
+            if (src.All(p => p.Id != dstSearchEngineProvider.Id))
+            {
+                // Remove search engine provider if it does not exist in the source list
                 dst.RemoveAt(i);
             }
         }

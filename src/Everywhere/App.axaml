@@ -10,8 +10,10 @@
   <Application.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://Everywhere/Assets/DataTemplates.axaml"/>
         <ResourceInclude Source="avares://Everywhere/Assets/Resources.axaml"/>
         <ResourceInclude Source="avares://Everywhere/Views/Controls/ChatInputBox.axaml"/>
+        <ResourceInclude Source="avares://Everywhere/Views/Controls/SettingsItemsControl.axaml"/>
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </Application.Resources>

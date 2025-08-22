@@ -41,7 +41,7 @@ public class ObjectObserver(ObjectObserverChangedEventHandler handler) : IDispos
         Dispose();
     }
 
-    public ObjectObserver Observe(INotifyPropertyChanged target, string basePath)
+    public ObjectObserver Observe(INotifyPropertyChanged target, string basePath = "")
     {
         _observations.Add(new Observation(basePath, target, this));
         return this;
@@ -65,7 +65,7 @@ public class ObjectObserver(ObjectObserverChangedEventHandler handler) : IDispos
 
         public Observation(string basePath, INotifyPropertyChanged target, ObjectObserver owner)
         {
-            _basePath = basePath;
+            _basePath = (basePath + ':').TrimStart(':');
             _targetType = target.GetType();
             _owner = owner;
             _targetReference = new WeakReference<INotifyPropertyChanged>(target);
@@ -122,7 +122,7 @@ public class ObjectObserver(ObjectObserverChangedEventHandler handler) : IDispos
                 value = null;
             }
 
-            _owner._handler.Invoke(new ObjectObserverChangedEventArgs($"{_basePath}:{e.PropertyName}", value));
+            _owner._handler.Invoke(new ObjectObserverChangedEventArgs(_basePath + e.PropertyName, value));
 
             ObserveObject(e.PropertyName, value);
         }
@@ -130,6 +130,7 @@ public class ObjectObserver(ObjectObserverChangedEventHandler handler) : IDispos
         private void HandleTargetCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             if (_isDisposed) return;
+            if (sender is not IList list) return;
 
             if (e.OldItems is not null)
             {
@@ -149,12 +150,54 @@ public class ObjectObserver(ObjectObserverChangedEventHandler handler) : IDispos
                 }
             }
 
-            if (e.Action == NotifyCollectionChangedAction.Reset)
+            Range changeRange = default;
+
+            switch (e.Action)
             {
-                for (var i = 0; i < sender.NotNull<IList>().Count; i++)
+                case NotifyCollectionChangedAction.Add:
                 {
-                    ObserveObject(i.ToString(), null);
+                    // New items added, shift subsequent indices
+                    changeRange = new Range(e.NewStartingIndex, list.Count);
+                    break;
                 }
+                case NotifyCollectionChangedAction.Remove:
+                {
+                    // Items removed, notify the whole object as changed
+                    _owner._handler.Invoke(new ObjectObserverChangedEventArgs(_basePath.TrimEnd(':'), sender));
+                    break;
+                }
+                case NotifyCollectionChangedAction.Replace:
+                {
+                    // Items replaced, no index shift but need to re-observe
+                    changeRange = new Range(e.NewStartingIndex, e.NewStartingIndex + e.NewItems?.Count ?? 1);
+                    break;
+                }
+                case NotifyCollectionChangedAction.Move:
+                {
+                    // Items moved, re-observe old and new positions
+                    _owner._handler.Invoke(new ObjectObserverChangedEventArgs(_basePath + e.OldStartingIndex, list[e.OldStartingIndex]));
+                    _owner._handler.Invoke(new ObjectObserverChangedEventArgs(_basePath + e.NewStartingIndex, list[e.NewStartingIndex]));
+                    break;
+                }
+                case NotifyCollectionChangedAction.Reset:
+                {
+                    // Reset clears the collection, so we need to re-observe all items
+                    for (var i = 0; i < sender.NotNull<IList>().Count; i++)
+                    {
+                        ObserveObject(i.ToString(), null);
+                    }
+
+                    // Notify the whole object as changed
+                    _owner._handler.Invoke(new ObjectObserverChangedEventArgs(_basePath.TrimEnd(':'), sender));
+                    break;
+                }
+            }
+
+            // Notify changes in the affected range
+            for (var i = changeRange.Start.Value; i < changeRange.End.Value; i++)
+            {
+                if (i < 0 || i >= list.Count) continue; // Skip out of bounds indices
+                _owner._handler.Invoke(new ObjectObserverChangedEventArgs(_basePath + i, list[i]));
             }
         }
 
@@ -169,13 +212,13 @@ public class ObjectObserver(ObjectObserverChangedEventHandler handler) : IDispos
             {
                 _observations.AddOrUpdate(
                     path,
-                    _ => new Observation($"{_basePath}:{path}", notifyPropertyChanged, _owner),
+                    _ => new Observation(_basePath + path, notifyPropertyChanged, _owner),
                     (_, o) =>
                     {
                         if (o._targetReference.TryGetTarget(out var t) && Equals(t, notifyPropertyChanged)) return o;
 
                         o.Dispose();
-                        return new Observation($"{_basePath}:{path}", notifyPropertyChanged, _owner);
+                        return new Observation(_basePath + path, notifyPropertyChanged, _owner);
                     });
             }
         }

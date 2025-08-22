@@ -36,16 +36,17 @@ namespace Everywhere.Models;
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
 public class Settings : ObservableObject
 {
-    [SettingsCategory(Header = "Model", Icon = LucideIconKind.Brain)]
-    public ModelSettings Model { get; } = new();
+    public ModelSettings Model { get; set; } = new();
 
-    [SettingsCategory(Header = "Common", Icon = LucideIconKind.Box)]
-    public CommonSettings Common { get; } = new();
+    public CommonSettings Common { get; set; } = new();
 
-    [SettingsCategory(Header = "Behavior", Icon = LucideIconKind.Keyboard)]
-    public BehaviorSettings Behavior { get; } = new();
+    public BehaviorSettings Behavior { get; set; } = new();
 
-    public InternalSettings Internal { get; } = new();
+    [HiddenSettingsItem]
+    public PluginSettings Plugin { get; set; } = new();
+
+    [HiddenSettingsItem]
+    public InternalSettings Internal { get; set; } = new();
 
     private readonly Dictionary<string, object?> _saveBuffer = new();
     private readonly DebounceExecutor<Dictionary<string, object?>> _saveDebounceExecutor;
@@ -65,11 +66,7 @@ public class Settings : ObservableObject
             },
             TimeSpan.FromSeconds(0.5));
 
-        new ObjectObserver(HandleSettingsChanges)
-            .Observe(Common, nameof(Common))
-            .Observe(Behavior, nameof(Behavior))
-            .Observe(Model, nameof(Model))
-            .Observe(Internal, nameof(Internal));
+        new ObjectObserver(HandleSettingsChanges).Observe(this);
 
         void HandleSettingsChanges(in ObjectObserverChangedEventArgs e)
         {
@@ -79,11 +76,15 @@ public class Settings : ObservableObject
     }
 }
 
-public partial class CommonSettings : ObservableObject
+public partial class CommonSettings : SettingsCategory
 {
     private static INativeHelper NativeHelper => ServiceLocator.Resolve<INativeHelper>();
     private static ISoftwareUpdater SoftwareUpdater => ServiceLocator.Resolve<ISoftwareUpdater>();
     private static ILogger Logger => ServiceLocator.Resolve<ILogger<CommonSettings>>();
+
+    public override string Header => "Common";
+
+    public override LucideIconKind Icon => LucideIconKind.Box;
 
     [ObservableProperty]
     [HiddenSettingsItem]
@@ -400,8 +401,12 @@ public partial class CommonSettings : ObservableObject
         .ShowError();
 }
 
-public partial class BehaviorSettings : ObservableObject
+public partial class BehaviorSettings : SettingsCategory
 {
+    public override string Header => "Behavior";
+
+    public override LucideIconKind Icon => LucideIconKind.Keyboard;
+
     [ObservableProperty]
     public partial KeyboardHotkey ChatHotkey { get; set; } = new(Key.E, KeyModifiers.Control | KeyModifiers.Shift);
 
@@ -409,8 +414,12 @@ public partial class BehaviorSettings : ObservableObject
     public partial ChatFloatingWindowPinMode ChatFloatingWindowPinMode { get; set; }
 }
 
-public partial class ModelSettings : ObservableObject
+public partial class ModelSettings : SettingsCategory
 {
+    public override string Header => "Model";
+
+    public override LucideIconKind Icon => LucideIconKind.Brain;
+
     [HiddenSettingsItem]
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(SelectedModelProvider), nameof(SelectedModelDefinition))]
@@ -423,7 +432,7 @@ public partial class ModelSettings : ObservableObject
 
     [JsonIgnore]
     [SettingsItems(IsExpanded = true)]
-    [SettingsSelectionItem(ItemsSourceBindingPath = nameof(ModelProviders))]
+    [SettingsSelectionItem(ItemsSourceBindingPath = nameof(ModelProviders), DataTemplateKey = typeof(ModelProvider))]
     public ModelProvider? SelectedModelProvider
     {
         get => ModelProviders.FirstOrDefault(p => p.Id == SelectedModelProviderId);
@@ -442,7 +451,9 @@ public partial class ModelSettings : ObservableObject
 
     [JsonIgnore]
     [SettingsItems]
-    [SettingsSelectionItem(ItemsSourceBindingPath = $"{nameof(SelectedModelProvider)}.{nameof(ModelProvider.ModelDefinitions)}")]
+    [SettingsSelectionItem(
+        ItemsSourceBindingPath = $"{nameof(SelectedModelProvider)}.{nameof(ModelProvider.ModelDefinitions)}",
+        DataTemplateKey = typeof(ModelDefinition))]
     public ModelDefinition? SelectedModelDefinition
     {
         get => SelectedModelProvider?.ModelDefinitions.FirstOrDefault(m => m.Id == SelectedModelDefinitionId);
@@ -464,24 +475,42 @@ public partial class ModelSettings : ObservableObject
     [ObservableProperty]
     [SettingsDoubleItem(Min = -2.0, Max = 2.0, Step = 0.1)]
     public partial Customizable<double> FrequencyPenalty { get; set; } = 0.0;
-
-    [ObservableProperty]
-    [SettingsSelectionItem(ItemsSourceBindingPath = nameof(WebSearchProviders))]
-    public partial string WebSearchProvider { get; set; } = "bing";
-
-    [JsonIgnore]
-    public static IEnumerable<string> WebSearchProviders => ["bing", "brave", "bocha"]; // TODO: google
-
-    [ObservableProperty]
-    [SettingsStringItem(IsPassword = true)]
-    public partial string WebSearchApiKey { get; set; } = string.Empty;
-
-    [ObservableProperty]
-    public partial string WebSearchEndpoint { get; set; } = string.Empty;
 }
 
-[HiddenSettingsItem]
-public partial class InternalSettings : ObservableObject
+public class PluginSettings : SettingsCategory
+{
+    public override string Header => "Plugin";
+
+    public WebSearchEngineSettings WebSearchEngine { get; set; } = new();
+}
+
+public partial class WebSearchEngineSettings : SettingsCategory
+{
+    [ObservableProperty]
+    public partial ObservableCollection<WebSearchEngineProvider> WebSearchEngineProviders { get; set; } = [];
+
+    [HiddenSettingsItem]
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(SelectedWebSearchEngineProvider))]
+    public partial string? SelectedWebSearchEngineProviderId { get; set; }
+
+    [JsonIgnore]
+    [SettingsItems(IsExpanded = true)]
+    [SettingsSelectionItem(
+        ItemsSourceBindingPath = nameof(WebSearchEngineProviders),
+        DataTemplateKey = typeof(WebSearchEngineProvider))]
+    public WebSearchEngineProvider? SelectedWebSearchEngineProvider
+    {
+        get => WebSearchEngineProviders.FirstOrDefault(p => p.Id == SelectedWebSearchEngineProviderId);
+        set
+        {
+            if (Equals(SelectedWebSearchEngineProviderId, value?.Id)) return;
+            SelectedWebSearchEngineProviderId = value?.Id;
+        }
+    }
+}
+
+public partial class InternalSettings : SettingsCategory
 {
     /// <summary>
     /// Used to popup welcome dialog on first launch and update.

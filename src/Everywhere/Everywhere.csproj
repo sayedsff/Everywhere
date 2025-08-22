@@ -31,7 +31,9 @@
         <PackageReference Include="Microsoft.SemanticKernel.Connectors.Ollama" />
         <PackageReference Include="Microsoft.SemanticKernel.Connectors.OpenAI"/>
         <PackageReference Include="Microsoft.SemanticKernel.Plugins.Web"/>
+        <PackageReference Include="ModelContextProtocol" />
         <PackageReference Include="ObservableCollections"/>
+        <PackageReference Include="PuppeteerSharp" />
         <PackageReference Include="Serilog" />
         <PackageReference Include="Serilog.Extensions.Logging" />
         <PackageReference Include="Serilog.Sinks.Console" />

@@ -14,6 +14,7 @@
     <ItemGroup>
         <PackageReference Include="Avalonia.Desktop" />
         <PackageReference Include="HotAvalonia" PrivateAssets="All" />
+        <PackageReference Include="Microsoft.PowerShell.SDK" />
         <PackageReference Include="Microsoft.Windows.CsWin32" />
         <PackageReference Include="FlaUI.UIA3" />
         <PackageReference Include="Vortice.Direct3D11" />
@@ -28,5 +29,9 @@
       <None Include="..\..\img\Everywhere.ico">
         <Link>Everywhere.ico</Link>
       </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Assets\powershell.svg" />
     </ItemGroup>
 </Project>
