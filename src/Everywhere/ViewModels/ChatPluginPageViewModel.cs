@@ -1,6 +1,12 @@
-﻿namespace Everywhere.ViewModels;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Everywhere.Models;
 
-public class ChatPluginPageViewModel(IChatPluginManager manager) : ReactiveViewModelBase
+namespace Everywhere.ViewModels;
+
+public partial class ChatPluginPageViewModel(IChatPluginManager manager) : ReactiveViewModelBase
 {
     public IChatPluginManager Manager => manager;
+
+    [ObservableProperty]
+    public partial ChatPlugin? SelectedPlugin { get; set; }
 }

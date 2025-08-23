@@ -696,4 +696,13 @@
     <data name="FriendlyExceptionMessage_Win32" xml:space="preserve">
         <value>Windows 系统错误。{0}</value>
     </data>
+    <data name="ChatPluginPage_TabItem_BuiltIn_Header" xml:space="preserve">
+        <value>内置</value>
+    </data>
+    <data name="ChatPluginPage_TabItem_Settings_Header" xml:space="preserve">
+        <value>设置</value>
+    </data>
+    <data name="ChatPluginPage_TabItem_Functions_Header" xml:space="preserve">
+        <value>功能</value>
+    </data>
 </root>

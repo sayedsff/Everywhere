@@ -1,99 +1,41 @@
 ﻿<UserControl
   x:Class="Everywhere.Views.Pages.ChatPluginPage" xmlns="https://github.com/avaloniaui"
-  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:at="clr-namespace:Everywhere.AttachedProperties"
-  xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:m="clr-namespace:Everywhere.Models"
-  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:v="clr-namespace:Everywhere.Views"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:m="clr-namespace:Everywhere.Models" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:md="clr-namespace:LiveMarkdown.Avalonia;assembly=LiveMarkdown.Avalonia" xmlns:v="clr-namespace:Everywhere.Views"
   xmlns:vm="clr-namespace:Everywhere.ViewModels" d:DesignHeight="450"
   d:DesignWidth="800" x:DataType="vm:ChatPluginPageViewModel"
   mc:Ignorable="d">
   <UserControl.Styles>
-    <Style Selector="ItemsControl.PluginItemsControl">
-      <Setter Property="ItemsPanel">
-        <ItemsPanelTemplate>
-          <StackPanel Spacing="8"/>
-        </ItemsPanelTemplate>
-      </Setter>
+    <Style Selector="ListBox.PluginListBox">
+      <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+      <Setter Property="ItemTemplate">
+        <DataTemplate DataType="m:ChatPlugin">
+          <Grid
+            ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto">
+            <LucideIcon
+              Grid.Row="0" Grid.RowSpan="2"
+              Grid.Column="0" Margin="0,0,12,0"
+              Kind="{Binding Icon}"/>
 
-      <Setter Property="at:DataTemplatesAttach.DataTemplates">
-        <DataTemplates>
-          <DataTemplate DataType="m:ChatPlugin">
-            <Expander
-              HorizontalContentAlignment="Stretch" Background="Transparent"
-              CornerRadius="{DynamicResource XlCornerRadius}">
-              <Expander.Header>
-                <Grid
-                  ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto">
-                  <LucideIcon
-                    Grid.Row="0" Grid.RowSpan="2"
-                    Grid.Column="0" Margin="0,0,12,0"
-                    Kind="{Binding Icon}"/>
+            <TextBlock
+              Classes="p" Grid.Row="0"
+              Grid.Column="1" Margin="0,-8,0,0"
+              IsHitTestVisible="False"
+              Text="{Binding HeaderKey^}"
+              TextTrimming="CharacterEllipsis"/>
+            <TextBlock
+              Classes="Muted" Grid.Row="1"
+              Grid.Column="1" IsHitTestVisible="False"
+              Text="{Binding DescriptionKey^}"
+              TextTrimming="CharacterEllipsis"/>
 
-                  <TextBlock
-                    Classes="p" Grid.Row="0"
-                    Grid.Column="1" Margin="0,-8,0,0"
-                    IsHitTestVisible="False"
-                    Text="{Binding HeaderKey^}"
-                    TextWrapping="Wrap"/>
-                  <TextBlock
-                    Classes="Muted" Grid.Row="1"
-                    Grid.Column="1" IsHitTestVisible="False"
-                    Text="{Binding DescriptionKey^}"
-                    TextWrapping="Wrap"/>
-
-                  <ToggleSwitch
-                    Grid.Row="0" Grid.RowSpan="2"
-                    Grid.Column="2" Margin="16,0,2,0"
-                    IsChecked="{Binding IsEnabled}"/>
-                </Grid>
-              </Expander.Header>
-
-              <StackPanel Spacing="8">
-                <v:SettingsItemsControl
-                  CornerRadius="8"
-                  IsVisible="{Binding !!SettingsItems.Count, FallbackValue=false}"
-                  ItemsSource="{Binding SettingsItems}"/>
-
-                <ItemsControl
-                  Classes="FunctionItemsControl" Padding="12,8"
-                  Background="{DynamicResource CardBackgroundColor}"
-                  BorderBrush="{DynamicResource BorderColor}"
-                  BorderThickness="1" CornerRadius="8"
-                  ItemsSource="{Binding Functions}">
-                  <ItemsControl.DataTemplates>
-                    <DataTemplate DataType="m:ChatFunction">
-                      <Grid
-                        ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto">
-                        <LucideIcon
-                          Grid.Row="0" Grid.RowSpan="2"
-                          Grid.Column="0" Margin="0,0,12,0"
-                          VerticalAlignment="Center"
-                          IsVisible="{Binding !!Icon}"
-                          Kind="{Binding Icon}"
-                          Size="22"/>
-
-                        <TextBlock
-                          Classes="p" Grid.Row="0"
-                          Grid.Column="1" Margin="0,-8,0,0"
-                          Text="{Binding KernelFunction.Name}"
-                          TextWrapping="Wrap"/>
-                        <TextBlock
-                          Classes="Muted" Grid.Row="1"
-                          Grid.Column="1"
-                          Text="{Binding KernelFunction.Description}"
-                          TextWrapping="Wrap"/>
-
-                        <ToggleSwitch
-                          Grid.Row="0" Grid.RowSpan="2"
-                          Grid.Column="2" Margin="16,0,2,0"
-                          IsChecked="{Binding IsEnabled}"/>
-                      </Grid>
-                    </DataTemplate>
-                  </ItemsControl.DataTemplates>
-                </ItemsControl>
-              </StackPanel>
-            </Expander>
-          </DataTemplate>
-        </DataTemplates>
+            <CheckBox
+              Grid.Row="0" Grid.RowSpan="2"
+              Grid.Column="2" Margin="16,0,2,0"
+              IsChecked="{Binding IsEnabled}"/>
+          </Grid>
+        </DataTemplate>
       </Setter>
     </Style>
 
@@ -108,21 +50,18 @@
     </Style>
   </UserControl.Styles>
 
-  <DockPanel
-    Margin="16,12" LastChildFill="True">
-    <TextBlock
-      Classes="Muted" DockPanel.Dock="Top"
-      Text="{I18N {x:Static LocaleKey.ChatPluginPage_Description}}"/>
-
+  <Grid
+    Margin="16,12" ColumnDefinitions="*,1,4*"
+    RowDefinitions="Auto,*">
     <TabControl
-      Margin="0,8,0,0" ClipToBounds="False">
-      <TabItem Header="Built-in">
-        <ScrollViewer
-          Margin="0,0,-16,0" HorizontalScrollBarVisibility="Disabled">
-          <ItemsControl
-            Classes="PluginItemsControl" Margin="0,0,16,0"
-            ItemsSource="{Binding Manager.BuiltInPlugins}"/>
-        </ScrollViewer>
+      Grid.Row="0" Grid.RowSpan="2"
+      Grid.Column="0" Margin="0,8,0,0"
+      ClipToBounds="False">
+      <TabItem Header="{I18N {x:Static LocaleKey.ChatPluginPage_TabItem_BuiltIn_Header}}">
+        <ListBox
+          Classes="PluginListBox" Margin="0,0,16,0"
+          ItemsSource="{Binding Manager.BuiltInPlugins}"
+          SelectedItem="{Binding SelectedPlugin}"/>
       </TabItem>
 
       <TabItem>
@@ -136,13 +75,107 @@
           </StackPanel>
         </TabItem.Header>
 
-        <ScrollViewer
-          Margin="0,0,-16,0" HorizontalScrollBarVisibility="Disabled">
-          <ItemsControl
-            Classes="PluginItemsControl" Margin="0,0,16,0"
-            ItemsSource="{Binding Manager.McpPlugins}"/>
-        </ScrollViewer>
+        <ListBox
+          Classes="PluginListBox" Margin="0,0,16,0"
+          ItemsSource="{Binding Manager.McpPlugins}"
+          SelectedItem="{Binding SelectedPlugin}"/>
       </TabItem>
     </TabControl>
-  </DockPanel>
+
+    <GridSplitter
+      Grid.Row="0" Grid.RowSpan="2"
+      Grid.Column="1" Margin="-2,0"
+      VerticalAlignment="Stretch" Background="Transparent"/>
+
+    <Grid
+      Grid.Row="0" Grid.Column="2"
+      Margin="0,8" ColumnDefinitions="Auto,*"
+      RowDefinitions="Auto,Auto,Auto">
+      <Image
+        Grid.Row="0" Grid.RowSpan="3"
+        Grid.Column="0" Width="128"
+        Height="128" Margin="0,0,16,0"
+        md:AsyncImageLoader.Source="{Binding SelectedPlugin.BeautifulIcon, FallbackValue={x:Null}}"
+        IsVisible="{Binding !!SelectedPlugin.BeautifulIcon, FallbackValue=false}"
+        Stretch="Uniform"/>
+      <LucideIcon
+        Grid.Row="0" Grid.RowSpan="3"
+        Grid.Column="0" Width="128"
+        Height="128" Margin="0,0,16,0"
+        IsVisible="{Binding !SelectedPlugin.BeautifulIcon, FallbackValue=false}"
+        Kind="{Binding SelectedPlugin.Icon, FallbackValue=Hammer}"
+        Size="128"/>
+
+      <TextBlock
+        Classes="h2" Grid.Row="1"
+        Grid.Column="1"
+        Text="{Binding SelectedPlugin.HeaderKey^, FallbackValue={x:Null}}"
+        TextTrimming="CharacterEllipsis"
+        ToolTip.Tip="{Binding $self.Text}"/>
+
+      <TextBlock
+        Grid.Row="2" Grid.Column="1"
+        MaxLines="2"
+        Text="{Binding SelectedPlugin.DescriptionKey^, FallbackValue={x:Null}}"
+        TextTrimming="CharacterEllipsis" TextWrapping="Wrap"
+        ToolTip.Tip="{Binding $self.Text}"/>
+    </Grid>
+
+    <TabControl
+      Grid.Row="1" Grid.Column="2"
+      ClipToBounds="False"
+      IsVisible="{Binding !!SelectedPlugin}">
+      <TabItem Header="{I18N {x:Static LocaleKey.ChatPluginPage_TabItem_Settings_Header}}">
+        <ScrollViewer
+          Margin="0,0,-12,0" Padding="0,0,12,0"
+          CornerRadius="8" HorizontalScrollBarVisibility="Disabled">
+          <v:SettingsItemsControl
+            IsVisible="{Binding !!SelectedPlugin.SettingsItems.Count, FallbackValue=false}"
+            ItemsSource="{Binding SelectedPlugin.SettingsItems, FallbackValue={x:Null}}"/>
+        </ScrollViewer>
+      </TabItem>
+
+      <TabItem Header="{I18N {x:Static LocaleKey.ChatPluginPage_TabItem_Functions_Header}}">
+        <Border
+          Background="{DynamicResource CardBackgroundColor}"
+          BorderBrush="{DynamicResource BorderColor}"
+          BorderThickness="1" CornerRadius="8">
+          <ItemsControl
+            Classes="FunctionItemsControl" Padding="12,8"
+            ItemsSource="{Binding SelectedPlugin.Functions, FallbackValue={x:Null}}">
+            <ItemsControl.DataTemplates>
+              <DataTemplate DataType="m:ChatFunction">
+                <Grid
+                  ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto">
+                  <LucideIcon
+                    Grid.Row="0" Grid.RowSpan="2"
+                    Grid.Column="0" Margin="0,0,12,0"
+                    VerticalAlignment="Center"
+                    IsVisible="{Binding !!Icon}"
+                    Kind="{Binding Icon}"
+                    Size="22"/>
+
+                  <TextBlock
+                    Classes="p" Grid.Row="0"
+                    Grid.Column="1" Margin="0,-8,0,0"
+                    Text="{Binding KernelFunction.Name}"
+                    TextWrapping="Wrap"/>
+                  <TextBlock
+                    Classes="Muted" Grid.Row="1"
+                    Grid.Column="1"
+                    Text="{Binding KernelFunction.Description}"
+                    TextWrapping="Wrap"/>
+
+                  <ToggleSwitch
+                    Grid.Row="0" Grid.RowSpan="2"
+                    Grid.Column="2" Margin="16,0,2,0"
+                    IsChecked="{Binding IsEnabled}"/>
+                </Grid>
+              </DataTemplate>
+            </ItemsControl.DataTemplates>
+          </ItemsControl>
+        </Border>
+      </TabItem>
+    </TabControl>
+  </Grid>
 </UserControl>

@@ -4,10 +4,13 @@ using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Everywhere.Enums;
 using Everywhere.Interfaces;
-using Everywhere.Utilities;
 using Microsoft.Extensions.Logging;
+
+#if !DEBUG
+using Everywhere.Enums;
+using Everywhere.Utilities;
+#endif
 
 namespace Everywhere.Windows.Services;
 
@@ -31,7 +34,10 @@ public sealed partial class SoftwareUpdater(
         }
     };
 
+#if !DEBUG
     private PeriodicTimer? _timer;
+#endif
+
     private Task? _updateTask;
     private Asset? _latestAsset;
 
@@ -43,6 +49,7 @@ public sealed partial class SoftwareUpdater(
 
     public void RunAutomaticCheckInBackground(TimeSpan interval, CancellationToken cancellationToken = default)
     {
+#if !DEBUG
         _timer = new PeriodicTimer(interval);
         cancellationToken.Register(Stop);
 
@@ -62,6 +69,7 @@ public sealed partial class SoftwareUpdater(
         {
             DisposeCollector.DisposeToDefault(ref _timer);
         }
+#endif
     }
 
     public async Task CheckForUpdatesAsync(CancellationToken cancellationToken = default)

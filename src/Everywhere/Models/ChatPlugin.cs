@@ -25,6 +25,12 @@ public abstract partial class ChatPlugin(string name) : KernelPlugin(name)
     [JsonIgnore]
     public virtual LucideIconKind? Icon => null;
 
+    /// <summary>
+    /// Gets the uri or svg data of the icon.
+    /// </summary>
+    [JsonIgnore]
+    public virtual string? BeautifulIcon => null;
+
     [ObservableProperty]
     public partial bool IsEnabled { get; set; } = true;
 

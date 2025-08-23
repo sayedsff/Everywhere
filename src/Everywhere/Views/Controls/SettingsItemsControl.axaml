@@ -30,6 +30,8 @@
       <DataTemplate DataType="m:SettingsItem">
         <Expander
           Background="Transparent"
+          BorderBrush="{Binding $parent[v:SettingsItemsControl].BorderBrush}"
+          BorderThickness="{Binding $parent[v:SettingsItemsControl].BorderThickness}"
           Classes.NotExpandable="{Binding !IsExpandable}"
           CornerRadius="{Binding $parent[v:SettingsItemsControl].CornerRadius}"
           IsEnabled="{Binding IsEnabled}"
