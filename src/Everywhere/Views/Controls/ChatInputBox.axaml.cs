@@ -8,7 +8,7 @@ using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
 using Avalonia.Media;
 using CommunityToolkit.Mvvm.Input;
-using Everywhere.Models;
+using Everywhere.Chat;
 using Everywhere.Utilities;
 
 namespace Everywhere.Views;

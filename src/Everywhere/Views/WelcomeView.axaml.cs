@@ -1,6 +1,7 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform;
+using Everywhere.Common;
 using LiveMarkdown.Avalonia;
 using Microsoft.Extensions.Logging;
 

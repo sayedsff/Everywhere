@@ -1,8 +1,6 @@
 ﻿using System.Reflection;
 using Avalonia.Controls;
-using Everywhere.Attributes;
-using Everywhere.Models;
-using Everywhere.Utilities;
+using Everywhere.Configuration;
 using Lucide.Avalonia;
 
 namespace Everywhere.Views.Pages;

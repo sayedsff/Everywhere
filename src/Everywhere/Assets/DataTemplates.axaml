@@ -1,9 +1,10 @@
 ﻿<ResourceDictionary
   xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-  xmlns:m="clr-namespace:Everywhere.Models" xmlns:md="clr-namespace:LiveMarkdown.Avalonia;assembly=LiveMarkdown.Avalonia">
+  xmlns:ai="clr-namespace:Everywhere.AI" xmlns:md="clr-namespace:LiveMarkdown.Avalonia;assembly=LiveMarkdown.Avalonia"
+  xmlns:plugins="clr-namespace:Everywhere.Chat.Plugins">
   <DataTemplate
-    x:Key="{x:Type m:ModelProvider}"
-    x:DataType="m:ModelProvider">
+    x:Key="{x:Type ai:ModelProvider}"
+    x:DataType="ai:ModelProvider">
     <StackPanel
       Margin="4" Orientation="Horizontal"
       Spacing="8">
@@ -18,14 +19,14 @@
   </DataTemplate>
 
   <DataTemplate
-    x:Key="{x:Type m:ModelDefinition}"
-    x:DataType="m:ModelDefinition">
+    x:Key="{x:Type ai:ModelDefinition}"
+    x:DataType="ai:ModelDefinition">
     <TextBlock Text="{Binding DisplayName, FallbackValue={x:Null}}"/>
   </DataTemplate>
 
   <DataTemplate
-    x:Key="{x:Type m:WebSearchEngineProvider}"
-    x:DataType="m:WebSearchEngineProvider">
+    x:Key="{x:Type plugins:WebSearchEngineProvider}"
+    x:DataType="plugins:WebSearchEngineProvider">
     <TextBlock Text="{Binding Id, FallbackValue={x:Null}}"/>
   </DataTemplate>
 </ResourceDictionary>

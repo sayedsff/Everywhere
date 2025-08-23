@@ -1,0 +1,75 @@
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+
+namespace Everywhere.Configuration;
+
+/// <summary>
+/// This class is used to wrap a customizable property.
+/// </summary>
+/// <typeparam name="T"></typeparam>
+public partial class Customizable<T> : ObservableObject where T : notnull
+{
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ActualValue), nameof(BindableValue))]
+    public required partial T DefaultValue { get; set; }
+
+    /// <summary>
+    /// If T is a value type, T? will not be a nullable type.
+    /// So we can only use object? to allow null values.
+    /// </summary>
+    [IgnoreDataMember]
+    public object? CustomValue
+    {
+        get;
+        set
+        {
+            if (!SetProperty(ref field, value)) return;
+
+            OnPropertyChanged(nameof(ActualValue));
+            OnPropertyChanged(nameof(BindableValue));
+        }
+    }
+
+    [JsonIgnore]
+    public bool IsCustomValueSet => CustomValue is not null && !EqualityComparer<T>.Default.Equals((T)CustomValue, DefaultValue);
+
+    [JsonIgnore]
+    public T ActualValue => CustomValue is T value ? value : DefaultValue;
+
+    [JsonIgnore]
+    public T? BindableValue
+    {
+        get => CustomValue is null ? typeof(T).IsClass ? default : DefaultValue : (T?)CustomValue;
+        set
+        {
+            if (value is string { Length: 0 }) value = default; // Treat empty string as null for string types
+
+            if (EqualityComparer<T>.Default.Equals(ActualValue, value)) return;
+
+            CustomValue = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public Customizable() { }
+
+    [SetsRequiredMembers]
+    public Customizable(T defaultValue, T? customValue = default) : this()
+    {
+        DefaultValue = defaultValue;
+        if (customValue is not null) CustomValue = customValue;
+    }
+
+    [RelayCommand]
+    public void Reset()
+    {
+        CustomValue = null;
+    }
+
+    public static implicit operator Customizable<T>(T value) => new() { DefaultValue = value };
+
+    public static implicit operator T(Customizable<T> customizable) => customizable.ActualValue;
+}

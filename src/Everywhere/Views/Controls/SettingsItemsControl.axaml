@@ -1,6 +1,6 @@
 ﻿<ResourceDictionary
   xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-  xmlns:at="clr-namespace:Everywhere.AttachedProperties" xmlns:m="clr-namespace:Everywhere.Models"
+  xmlns:at="clr-namespace:Everywhere.AttachedProperties" xmlns:configuration="clr-namespace:Everywhere.Configuration"
   xmlns:v="using:Everywhere.Views">
   <Design.PreviewWith>
     <v:SettingsItemsControl/>
@@ -27,7 +27,7 @@
     </Setter>
 
     <Setter Property="ItemTemplate">
-      <DataTemplate DataType="m:SettingsItem">
+      <DataTemplate DataType="configuration:SettingsItem">
         <Expander
           Background="Transparent"
           BorderBrush="{Binding $parent[v:SettingsItemsControl].BorderBrush}"
@@ -41,14 +41,14 @@
             <Style Selector="ContentControl#PART_SettingsItemContentControl">
               <Setter Property="at:DataTemplatesAttach.DataTemplates">
                 <DataTemplates>
-                  <DataTemplate DataType="m:SettingsBooleanItem">
+                  <DataTemplate DataType="configuration:SettingsBooleanItem">
                     <ToggleSwitch
                       Margin="0,0,4,0"
                       IsChecked="{Binding Value, Mode=TwoWay}"
                       IsThreeState="{Binding IsNullable}"/>
                   </DataTemplate>
 
-                  <DataTemplate DataType="m:SettingsStringItem">
+                  <DataTemplate DataType="configuration:SettingsStringItem">
                     <TextBox
                       MinWidth="320" MinHeight="32"
                       HorizontalAlignment="Left"
@@ -59,7 +59,7 @@
                       Watermark="{Binding Watermark}"/>
                   </DataTemplate>
 
-                  <DataTemplate DataType="m:SettingsIntegerItem">
+                  <DataTemplate DataType="configuration:SettingsIntegerItem">
                     <StackPanel
                       HorizontalAlignment="Left" Orientation="Horizontal"
                       Spacing="8">
@@ -75,7 +75,7 @@
                     </StackPanel>
                   </DataTemplate>
 
-                  <DataTemplate DataType="m:SettingsDoubleItem">
+                  <DataTemplate DataType="configuration:SettingsDoubleItem">
                     <StackPanel
                       HorizontalAlignment="Left" Orientation="Horizontal"
                       Spacing="8">
@@ -92,7 +92,7 @@
                     </StackPanel>
                   </DataTemplate>
 
-                  <DataTemplate DataType="m:SettingsCustomizableItem">
+                  <DataTemplate DataType="configuration:SettingsCustomizableItem">
                     <StackPanel Orientation="Horizontal">
                       <ContentControl
                         x:Name="PART_SettingsItemContentControl" HorizontalAlignment="Left"
@@ -111,14 +111,14 @@
                     </StackPanel>
                   </DataTemplate>
 
-                  <DataTemplate DataType="m:SettingsSelectionItem">
+                  <DataTemplate DataType="configuration:SettingsSelectionItem">
                     <ComboBox
                       MinWidth="320" MinHeight="32"
                       HorizontalAlignment="Left"
                       ItemsSource="{Binding ItemsSource}"
                       SelectedItem="{Binding SelectedItem, Mode=TwoWay}">
                       <ComboBox.ItemTemplate>
-                        <DataTemplate DataType="m:SettingsSelectionItem+Item">
+                        <DataTemplate DataType="configuration:SettingsSelectionItem+Item">
                           <ContentControl
                             Content="{Binding Key^}"
                             ContentTemplate="{Binding ContentTemplate}"/>
@@ -127,14 +127,14 @@
                     </ComboBox>
                   </DataTemplate>
 
-                  <DataTemplate DataType="m:SettingsKeyboardHotkeyItem">
+                  <DataTemplate DataType="configuration:SettingsKeyboardHotkeyItem">
                     <v:KeyboardHotkeyInputBox
                       MinWidth="320" MinHeight="32"
                       HorizontalAlignment="Left"
                       Hotkey="{Binding Value, Mode=TwoWay}"/>
                   </DataTemplate>
 
-                  <DataTemplate DataType="m:SettingsControlItem">
+                  <DataTemplate DataType="configuration:SettingsControlItem">
                     <ContentControl Content="{Binding Control}"/>
                   </DataTemplate>
                 </DataTemplates>

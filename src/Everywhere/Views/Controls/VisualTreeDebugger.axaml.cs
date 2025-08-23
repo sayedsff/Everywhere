@@ -9,6 +9,8 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Everywhere.Common;
+using Everywhere.Interop;
 
 namespace Everywhere.Views;
 

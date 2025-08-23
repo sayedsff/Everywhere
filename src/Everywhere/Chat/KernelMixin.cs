@@ -1,6 +1,6 @@
 ﻿using Anthropic.SDK;
-using Everywhere.Enums;
-using Everywhere.Models;
+using Everywhere.AI;
+using Everywhere.Configuration;
 using Microsoft.Extensions.AI;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;

@@ -1,83 +1,90 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <IsDeploymentTarget>true</IsDeploymentTarget>
-    </PropertyGroup>
-    
-    <ItemGroup>
-        <AvaloniaResource Include="Assets\**"/>
-    </ItemGroup>
+  <PropertyGroup>
+    <IsDeploymentTarget>true</IsDeploymentTarget>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Anthropic.SDK" />
-        <PackageReference Include="Avalonia"/>
-        <PackageReference Include="Avalonia.Themes.Fluent"/>
-        <PackageReference Include="Avalonia.Fonts.Inter"/>
-        <PackageReference Include="Avalonia.Diagnostics">
-            <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
-            <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
-        </PackageReference>
-        <PackageReference Include="HotAvalonia" PrivateAssets="All"/>
-        <PackageReference Include="CommunityToolkit.Mvvm"/>
-        <PackageReference Include="Lucide.Avalonia"/>
-        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="JetBrains.Profiler.Api"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite"/>
-        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Microsoft.EntityFrameworkCore.Tools">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-        <PackageReference Include="Microsoft.Extensions.Configuration"/>
-        <PackageReference Include="Microsoft.SemanticKernel"/>
-        <PackageReference Include="Microsoft.SemanticKernel.Connectors.Ollama" />
-        <PackageReference Include="Microsoft.SemanticKernel.Connectors.OpenAI"/>
-        <PackageReference Include="Microsoft.SemanticKernel.Plugins.Web"/>
-        <PackageReference Include="ModelContextProtocol" />
-        <PackageReference Include="ObservableCollections"/>
-        <PackageReference Include="PuppeteerSharp" />
-        <PackageReference Include="Serilog" />
-        <PackageReference Include="Serilog.Extensions.Logging" />
-        <PackageReference Include="Serilog.Sinks.Console" />
-        <PackageReference Include="Serilog.Sinks.File" />
-        <PackageReference Include="System.Drawing.Common"/>
-        <PackageReference Include="System.Linq.Async" />
-        <PackageReference Include="Xaml.Behaviors.Avalonia"/>
-        <PackageReference Include="ZLinq"/>
-    </ItemGroup>
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\**"/>
+  </ItemGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\..\3rd\LiveMarkdown.Avalonia\src\LiveMarkdown.Avalonia\LiveMarkdown.Avalonia.csproj"/>
-        <ProjectReference Include="..\..\3rd\MessagePack-CSharp\src\MessagePack.SourceGenerator\MessagePack.SourceGenerator.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer"/>
-        <ProjectReference Include="..\..\3rd\MessagePack-CSharp\src\MessagePack\MessagePack.csproj"/>
-        <ProjectReference Include="..\..\3rd\shad-ui\src\ShadUI\ShadUI.csproj"/>
-        <ProjectReference Include="..\..\3rd\WritableJsonConfiguration\src\WritableJsonConfiguration\WritableJsonConfiguration.csproj"/>
-        <ProjectReference Include="..\Everywhere.I18N.SourceGenerator\Everywhere.I18N.SourceGenerator.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Anthropic.SDK"/>
+    <PackageReference Include="Avalonia"/>
+    <PackageReference Include="Avalonia.Themes.Fluent"/>
+    <PackageReference Include="Avalonia.Fonts.Inter"/>
+    <PackageReference Include="Avalonia.Diagnostics">
+      <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
+      <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="HotAvalonia" PrivateAssets="All"/>
+    <PackageReference Include="Lucide.Avalonia"/>
+    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="JetBrains.Profiler.Api"/>
+    <PackageReference Include="Microsoft.EntityFrameworkCore"/>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite"/>
+    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Microsoft.EntityFrameworkCore.Tools">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Configuration"/>
+    <PackageReference Include="Microsoft.SemanticKernel"/>
+    <PackageReference Include="Microsoft.SemanticKernel.Connectors.Ollama"/>
+    <PackageReference Include="Microsoft.SemanticKernel.Connectors.OpenAI"/>
+    <PackageReference Include="Microsoft.SemanticKernel.Plugins.Web"/>
+    <PackageReference Include="ModelContextProtocol"/>
+    <PackageReference Include="PuppeteerSharp"/>
+    <PackageReference Include="Serilog"/>
+    <PackageReference Include="Serilog.Extensions.Logging"/>
+    <PackageReference Include="Serilog.Sinks.Console"/>
+    <PackageReference Include="Serilog.Sinks.File"/>
+    <PackageReference Include="System.Drawing.Common"/>
+    <PackageReference Include="Xaml.Behaviors.Avalonia"/>
+  </ItemGroup>
 
-    <ItemGroup>
-        <AvaloniaResource Include="..\..\img\Everywhere.png">
-            <Link>Assets\Everywhere.png</Link>
-        </AvaloniaResource>
-        <AvaloniaResource Include="..\..\img\Everywhere.ico">
-            <Link>Assets\Everywhere.ico</Link>
-        </AvaloniaResource>
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\3rd\LiveMarkdown.Avalonia\src\LiveMarkdown.Avalonia\LiveMarkdown.Avalonia.csproj"/>
+    <ProjectReference Include="..\..\3rd\MessagePack-CSharp\src\MessagePack.SourceGenerator\MessagePack.SourceGenerator.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer"/>
+    <ProjectReference Include="..\..\3rd\shad-ui\src\ShadUI\ShadUI.csproj"/>
+    <ProjectReference Include="..\..\3rd\WritableJsonConfiguration\src\WritableJsonConfiguration\WritableJsonConfiguration.csproj"/>
+    <ProjectReference Include="..\Everywhere.Abstractions\Everywhere.Abstractions.csproj"/>
+    <ProjectReference Include="..\Everywhere.I18N.SourceGenerator\Everywhere.I18N.SourceGenerator.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer"/>
+  </ItemGroup>
 
-    <ItemGroup>
-      <None Remove="i18n.tsv" />
-      <EmbeddedResource Remove="I18N\*.resx" />
-      <AdditionalFiles Include="I18N\*.resx" />
-    </ItemGroup>
+  <ItemGroup>
+    <AvaloniaResource Include="..\..\img\Everywhere.png">
+      <Link>Assets\Everywhere.png</Link>
+    </AvaloniaResource>
+    <AvaloniaResource Include="..\..\img\Everywhere.ico">
+      <Link>Assets\Everywhere.ico</Link>
+    </AvaloniaResource>
+  </ItemGroup>
 
-    <ItemGroup>
-      <Compile Update="Views\WelcomeView.axaml.cs">
-        <DependentUpon>WelcomeView.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
-    </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="I18N\Strings.de.resx"/>
+    <EmbeddedResource Include="I18N\Strings.es.resx"/>
+    <EmbeddedResource Include="I18N\Strings.fr.resx"/>
+    <EmbeddedResource Include="I18N\Strings.it.resx"/>
+    <EmbeddedResource Include="I18N\Strings.ja.resx"/>
+    <EmbeddedResource Include="I18N\Strings.ko.resx"/>
+    <EmbeddedResource Include="I18N\Strings.resx"/>
+    <EmbeddedResource Include="I18N\Strings.ru.resx"/>
+    <EmbeddedResource Include="I18N\Strings.zh-hans.resx"/>
+    <EmbeddedResource Include="I18N\Strings.zh-hant-hk.resx"/>
+    <EmbeddedResource Include="I18N\Strings.zh-hant.resx"/>
+    <None Remove="i18n.tsv"/>
+    <EmbeddedResource Remove="I18N\*.resx"/>
+    <AdditionalFiles Include="I18N\*.resx"/>
+  </ItemGroup>
 
-    <ItemGroup>
-      <AvaloniaResource Include="..\..\CHANGELOG.md">
-        <Link>Assets\CHANGELOG.md</Link>
-      </AvaloniaResource>
-    </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Views\WelcomeView.axaml.cs">
+      <DependentUpon>WelcomeView.axaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="..\..\CHANGELOG.md">
+      <Link>Assets\CHANGELOG.md</Link>
+    </AvaloniaResource>
+  </ItemGroup>
 </Project>

@@ -2,7 +2,9 @@
 using System.Reflection;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Everywhere.Models;
+using Everywhere.Common;
+using Everywhere.Configuration;
+using Everywhere.Interop;
 using Everywhere.Views;
 using Lucide.Avalonia;
 using Microsoft.Extensions.DependencyInjection;

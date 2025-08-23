@@ -1,5 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Everywhere.Models;
+using Everywhere.Chat.Plugins;
 
 namespace Everywhere.ViewModels;
 

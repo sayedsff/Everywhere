@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using Everywhere.Models;
+using Everywhere.Chat.Plugins;
 using Lucide.Avalonia;
 using ObservableCollections;
 using ZLinq;

@@ -1,8 +1,10 @@
 ﻿using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Everywhere.Enums;
-using Everywhere.Models;
+using Everywhere.AI;
+using Everywhere.Chat.Plugins;
+using Everywhere.Common;
+using Everywhere.Configuration;
 
 namespace Everywhere.Initialization;
 

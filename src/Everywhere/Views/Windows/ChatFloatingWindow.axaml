@@ -1,14 +1,14 @@
 ﻿<v:ReactiveWindow
   x:Class="Everywhere.Views.ChatFloatingWindow" xmlns="https://github.com/avaloniaui"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:at="clr-namespace:Everywhere.AttachedProperties"
-  xmlns:be="clr-namespace:Everywhere.Behaviors" xmlns:i="clr-namespace:Everywhere.Interfaces"
-  xmlns:m="clr-namespace:Everywhere.Models" xmlns:markdown="clr-namespace:LiveMarkdown.Avalonia;assembly=LiveMarkdown.Avalonia"
-  xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI" xmlns:themes="clr-namespace:ShadUI.Themes;assembly=ShadUI"
-  xmlns:v="clr-namespace:Everywhere.Views" xmlns:vc="clr-namespace:Everywhere.ValueConverters"
-  xmlns:vm="clr-namespace:Everywhere.ViewModels" x:DataType="vm:ChatFloatingWindowViewModel"
-  x:TypeArguments="vm:ChatFloatingWindowViewModel" Background="Transparent"
-  CanResize="False" ExtendClientAreaChromeHints="NoChrome"
-  ExtendClientAreaToDecorationsHint="True"
+  xmlns:be="clr-namespace:Everywhere.Behaviors" xmlns:chat="clr-namespace:Everywhere.Chat"
+  xmlns:common="clr-namespace:Everywhere.Common" xmlns:interop="clr-namespace:Everywhere.Interop"
+  xmlns:md="clr-namespace:LiveMarkdown.Avalonia;assembly=LiveMarkdown.Avalonia" xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI"
+  xmlns:themes="clr-namespace:ShadUI.Themes;assembly=ShadUI" xmlns:v="clr-namespace:Everywhere.Views"
+  xmlns:vc="clr-namespace:Everywhere.ValueConverters" xmlns:vm="clr-namespace:Everywhere.ViewModels"
+  x:DataType="vm:ChatFloatingWindowViewModel" x:TypeArguments="vm:ChatFloatingWindowViewModel"
+  Background="Transparent" CanResize="False"
+  ExtendClientAreaChromeHints="NoChrome" ExtendClientAreaToDecorationsHint="True"
   IsOpened="{Binding IsOpened, Mode=OneWayToSource}"
   RequestedThemeVariant="{x:Static themes:ThemeVariants.Acrylic}"
   ShowInTaskbar="False" SizeToContent="WidthAndHeight"
@@ -106,7 +106,7 @@
                   </ItemsControl.ItemsPanel>
 
                   <ItemsControl.ItemTemplate>
-                    <DataTemplate DataType="m:ChatContextHistory">
+                    <DataTemplate DataType="chat:ChatContextHistory">
                       <StackPanel
                         Orientation="Vertical" Spacing="4">
                         <TextBlock
@@ -215,7 +215,7 @@
                           </ListBox.ItemContainerTheme>
 
                           <ListBox.ItemTemplate>
-                            <DataTemplate DataType="m:ChatContext">
+                            <DataTemplate DataType="chat:ChatContext">
                               <TextBlock
                                 Text="{Binding Metadata.Topic, TargetNullValue={I18N {x:Static LocaleKey.ChatContext_Metadata_Title_Default}}}"
                                 TextTrimming="CharacterEllipsis"/>
@@ -294,7 +294,7 @@
               </ItemsControl.IsVisible>
 
               <ItemsControl.DataTemplates>
-                <DataTemplate DataType="m:DynamicNamedCommand">
+                <DataTemplate DataType="common:DynamicNamedCommand">
                   <Button
                     Classes="Secondary" Height="32"
                     Padding="12,4"
@@ -435,7 +435,7 @@
                 <Style Selector="ContentControl.ChatMessage">
                   <Setter Property="at:DataTemplatesAttach.DataTemplates">
                     <DataTemplates>
-                      <DataTemplate DataType="m:AssistantChatMessage">
+                      <DataTemplate DataType="chat:AssistantChatMessage">
                         <StackPanel
                           Classes="ChatMessage Assistant" Background="Transparent"
                           Orientation="Vertical" Spacing="4">
@@ -455,7 +455,7 @@
                             </ItemsControl.ItemTemplate>
                           </ItemsControl>
 
-                          <markdown:MarkdownRenderer
+                          <md:MarkdownRenderer
                             InlineHyperlinkCommand="{Binding $parent[v:ChatFloatingWindow].LaunchInlineHyperlinkCommand}"
                             MarkdownBuilder="{Binding MarkdownBuilder}"/>
 
@@ -482,10 +482,10 @@
                             Orientation="Horizontal">
                             <NumericUpDown
                               x:Name="ChoiceSelector" Margin="0,0,4,0"
-                              IsVisible="{Binding $parent[ContentControl].((m:ChatMessageNode)DataContext).Parent.ChoiceCount, FallbackValue=False, Converter={x:Static vc:NumberConverters.GreaterThanOne}}"
-                              Maximum="{Binding $parent[ContentControl].((m:ChatMessageNode)DataContext).Parent.ChoiceCount, FallbackValue=1}"
+                              IsVisible="{Binding $parent[ContentControl].((chat:ChatMessageNode)DataContext).Parent.ChoiceCount, FallbackValue=False, Converter={x:Static vc:NumberConverters.GreaterThanOne}}"
+                              Maximum="{Binding $parent[ContentControl].((chat:ChatMessageNode)DataContext).Parent.ChoiceCount, FallbackValue=1}"
                               Minimum="1"
-                              Value="{Binding $parent[ContentControl].((m:ChatMessageNode)DataContext).Parent.ChoiceIndex, FallbackValue=1, Converter={x:Static vc:NumberConverters.PlusOne}}"/>
+                              Value="{Binding $parent[ContentControl].((chat:ChatMessageNode)DataContext).Parent.ChoiceIndex, FallbackValue=1, Converter={x:Static vc:NumberConverters.PlusOne}}"/>
 
                             <Button
                               Classes="Ghost"
@@ -505,7 +505,7 @@
                         </StackPanel>
                       </DataTemplate>
 
-                      <DataTemplate DataType="m:UserChatMessage">
+                      <DataTemplate DataType="chat:UserChatMessage">
                         <StackPanel
                           Classes="ChatMessage User" Margin="36,0,0,0"
                           HorizontalAlignment="Right" Background="Transparent"
@@ -524,7 +524,7 @@
                             </ItemsControl.ItemsPanel>
 
                             <ItemsControl.DataTemplates>
-                              <DataTemplate DataType="m:ChatFileAttachment">
+                              <DataTemplate DataType="chat:ChatFileAttachment">
                                 <Panel>
                                   <Border
                                     ClipToBounds="True" CornerRadius="4"
@@ -559,7 +559,7 @@
                                 </Panel>
                               </DataTemplate>
 
-                              <DataTemplate DataType="m:ChatAttachment">
+                              <DataTemplate DataType="chat:ChatAttachment">
                                 <Border
                                   Height="24"
                                   Background="{DynamicResource CardBackgroundColor}"
@@ -584,7 +584,7 @@
                         </StackPanel>
                       </DataTemplate>
 
-                      <DataTemplate DataType="m:ActionChatMessage">
+                      <DataTemplate DataType="chat:ActionChatMessage">
                         <Border
                           Classes="ChatMessage Action ChatBubble" Margin="0,0,36,0"
                           Padding="0" HorizontalAlignment="Left">
@@ -681,7 +681,7 @@
               </ItemsControl.Styles>
 
               <ItemsControl.ItemTemplate>
-                <DataTemplate DataType="m:ChatMessageNode">
+                <DataTemplate DataType="chat:ChatMessageNode">
                   <ContentControl
                     Classes="ChatMessage"
                     Content="{Binding Message}"/>
@@ -711,7 +711,7 @@
             <v:ChatInputBox.AddChatAttachmentMenuItems>
               <MenuItem
                 Command="{Binding AddElementCommand}"
-                CommandParameter="{x:Static i:PickElementMode.Screen}"
+                CommandParameter="{x:Static interop:PickElementMode.Screen}"
                 Header="{I18N {x:Static LocaleKey.ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AddScreen}}">
                 <MenuItem.Icon>
                   <LucideIcon
@@ -721,7 +721,7 @@
               </MenuItem>
               <MenuItem
                 Command="{Binding AddElementCommand}"
-                CommandParameter="{x:Static i:PickElementMode.Window}"
+                CommandParameter="{x:Static interop:PickElementMode.Window}"
                 Header="{I18N {x:Static LocaleKey.ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AddWindow}}">
                 <MenuItem.Icon>
                   <LucideIcon
@@ -731,7 +731,7 @@
               </MenuItem>
               <MenuItem
                 Command="{Binding AddElementCommand}"
-                CommandParameter="{x:Static i:PickElementMode.Element}"
+                CommandParameter="{x:Static interop:PickElementMode.Element}"
                 Header="{I18N {x:Static LocaleKey.ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AddElement}}">
                 <MenuItem.Icon>
                   <LucideIcon

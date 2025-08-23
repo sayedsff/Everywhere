@@ -1,4 +1,6 @@
 ﻿using Avalonia.Controls;
+using Everywhere.Common;
+using Everywhere.Interop;
 
 namespace Everywhere.Views;
 

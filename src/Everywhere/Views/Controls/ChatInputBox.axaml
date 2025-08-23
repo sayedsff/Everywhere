@@ -1,6 +1,6 @@
 ﻿<ResourceDictionary
   xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-  xmlns:be="clr-namespace:Everywhere.Behaviors" xmlns:m="clr-namespace:Everywhere.Models"
+  xmlns:be="clr-namespace:Everywhere.Behaviors" xmlns:chat="clr-namespace:Everywhere.Chat"
   xmlns:shadui="clr-namespace:ShadUI;assembly=ShadUI" xmlns:v="clr-namespace:Everywhere.Views">
 
   <ControlTheme
@@ -92,7 +92,7 @@
               </ItemsControl.ItemsPanel>
 
               <ItemsControl.DataTemplates>
-                <DataTemplate DataType="m:ChatFileAttachment">
+                <DataTemplate DataType="chat:ChatFileAttachment">
                   <Border
                     Height="24"
                     Background="{DynamicResource CardBackgroundColor}"
@@ -140,7 +140,7 @@
                   </Border>
                 </DataTemplate>
 
-                <DataTemplate DataType="m:ChatAttachment">
+                <DataTemplate DataType="chat:ChatAttachment">
                   <Border
                     Height="24"
                     Background="{DynamicResource CardBackgroundColor}"

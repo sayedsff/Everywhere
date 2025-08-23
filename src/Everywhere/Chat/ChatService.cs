@@ -1,6 +1,10 @@
 ﻿using System.Text;
 using System.Text.Json;
-using Everywhere.Models;
+using Everywhere.AI;
+using Everywhere.Chat.Plugins;
+using Everywhere.Common;
+using Everywhere.Configuration;
+using Everywhere.Interop;
 using Lucide.Avalonia;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel;

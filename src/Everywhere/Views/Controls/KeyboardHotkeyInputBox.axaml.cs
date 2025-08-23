@@ -2,7 +2,9 @@
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
-using Everywhere.Models;
+using Everywhere.Common;
+using Everywhere.Configuration;
+using Everywhere.Interop;
 
 namespace Everywhere.Views;
 

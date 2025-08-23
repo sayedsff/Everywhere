@@ -7,14 +7,15 @@ using Avalonia.Input;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Everywhere.Enums;
-using Everywhere.Models;
+using Everywhere.Chat;
+using Everywhere.Common;
+using Everywhere.Configuration;
+using Everywhere.Interop;
 using Everywhere.Utilities;
 using Lucide.Avalonia;
 using Microsoft.Extensions.Logging;
 using ObservableCollections;
 using ZLinq;
-using ChatMessage = Everywhere.Models.ChatMessage;
 
 namespace Everywhere.ViewModels;
 

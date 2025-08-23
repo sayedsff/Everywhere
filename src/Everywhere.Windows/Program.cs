@@ -2,22 +2,26 @@
 using Avalonia.Controls;
 using Avalonia.Input.Platform;
 using Avalonia.Platform.Storage;
+using Everywhere.AI;
 using Everywhere.Chat;
 using Everywhere.Chat.Plugins;
+using Everywhere.Common;
+using Everywhere.Configuration;
 using Everywhere.Database;
 using Everywhere.Extensions;
 using Everywhere.Initialization;
-using Everywhere.Interfaces;
-using Everywhere.Models;
+using Everywhere.Interop;
 using Everywhere.ViewModels;
 using Everywhere.Views;
 using Everywhere.Views.Pages;
-using Everywhere.Windows.ChatPlugins;
-using Everywhere.Windows.Services;
+using Everywhere.Windows.Chat.Plugins;
+using Everywhere.Windows.Configuration;
+using Everywhere.Windows.Interop;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Extensions.Logging;
+using SoftwareUpdater = Everywhere.Windows.Common.SoftwareUpdater;
 
 namespace Everywhere.Windows;
 

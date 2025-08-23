@@ -3,7 +3,9 @@ using Avalonia.Controls;
 using Avalonia.Input.Platform;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Everywhere.Common;
 using Everywhere.Utilities;
+using Everywhere.Views;
 using ShadUI;
 
 namespace Everywhere.ViewModels;

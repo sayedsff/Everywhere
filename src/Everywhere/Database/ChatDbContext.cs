@@ -1,4 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Everywhere.Chat;
+using Everywhere.Common;
+using Everywhere.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.Extensions.DependencyInjection;

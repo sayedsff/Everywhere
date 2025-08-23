@@ -1,6 +1,7 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Threading;
+using Everywhere.Views;
 using Microsoft.Extensions.DependencyInjection;
 using ShadUI;
 using ZLinq;

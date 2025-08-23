@@ -2,7 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
-using Everywhere.Models;
+using Everywhere.Configuration;
 using ShadUI.Themes;
 
 namespace Everywhere.Views;

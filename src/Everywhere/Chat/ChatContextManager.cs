@@ -2,8 +2,8 @@
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Everywhere.Enums;
-using Everywhere.Models;
+using Everywhere.Common;
+using Everywhere.Configuration;
 using Everywhere.Utilities;
 using Microsoft.SemanticKernel.ChatCompletion;
 using ObservableCollections;

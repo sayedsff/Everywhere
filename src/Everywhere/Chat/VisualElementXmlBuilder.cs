@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Security;
 using System.Text;
 using System.Text.RegularExpressions;
+using Everywhere.Interop;
 using ZLinq;
 #if DEBUG
 using JetBrains.Profiler.Api;

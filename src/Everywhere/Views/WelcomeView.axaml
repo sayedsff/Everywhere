@@ -2,7 +2,7 @@
   x:Class="Everywhere.Views.WelcomeView" xmlns="https://github.com/avaloniaui"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:md="clr-namespace:LiveMarkdown.Avalonia;assembly=LiveMarkdown.Avalonia"
-  xmlns:vc="clr-namespace:Everywhere.ValueConverters" xmlns:views="clr-namespace:Everywhere.Views"
+  xmlns:v="clr-namespace:Everywhere.Views" xmlns:vc="clr-namespace:Everywhere.ValueConverters"
   d:DesignHeight="450" d:DesignWidth="800"
   mc:Ignorable="d">
   <StackPanel
@@ -33,7 +33,7 @@
       HorizontalAlignment="Center" HorizontalScrollBarVisibility="Disabled">
       <md:MarkdownRenderer
         Margin="0,0,4,0" InlineHyperlinkClick="HandleMarkdownRendererInlineHyperlinkClick"
-        MarkdownBuilder="{Binding $parent[views:WelcomeView].MarkdownBuilder}"/>
+        MarkdownBuilder="{Binding $parent[v:WelcomeView].MarkdownBuilder}"/>
     </ScrollViewer>
 
     <StackPanel

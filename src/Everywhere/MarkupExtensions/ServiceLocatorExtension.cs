@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Avalonia.Markup.Xaml;
+using Everywhere.Common;
 
 namespace Everywhere.MarkupExtensions;
 

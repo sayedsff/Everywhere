@@ -1,6 +1,6 @@
 ﻿using System.Buffers.Binary;
 using System.Linq.Expressions;
-using Everywhere.Models;
+using Everywhere.Chat;
 using MessagePack;
 using Microsoft.EntityFrameworkCore;
 

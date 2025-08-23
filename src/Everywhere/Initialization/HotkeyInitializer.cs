@@ -1,5 +1,7 @@
 ﻿using Avalonia.Threading;
-using Everywhere.Models;
+using Everywhere.Common;
+using Everywhere.Configuration;
+using Everywhere.Interop;
 using Everywhere.Views;
 using Microsoft.Extensions.Logging;
 

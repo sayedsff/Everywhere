@@ -4,8 +4,8 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.Input;
-using Everywhere.Enums;
-using Everywhere.Models;
+using Everywhere.Chat;
+using Everywhere.Configuration;
 using LiveMarkdown.Avalonia;
 
 namespace Everywhere.Views;
