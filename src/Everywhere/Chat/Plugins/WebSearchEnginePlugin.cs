@@ -86,9 +86,9 @@ public partial class WebSearchEnginePlugin : BuiltInChatPlugin
                 WebSnapshotAsync,
                 ChatFunctionPermissions.InternetAccess));
 
-        SettingsItems = SettingsItemFactory.CreateForObject(settings, "Plugin_WebSearchEngine");
+        SettingsItems = SettingsItemFactory.CreateForObject(_settings, "Plugin_WebSearchEngine");
 
-        new ObjectObserver(HandleSettingsChanged).Observe(settings);
+        new ObjectObserver(HandleSettingsChanged).Observe(_settings);
     }
 
     private void HandleSettingsChanged(in ObjectObserverChangedEventArgs e)
@@ -226,22 +226,32 @@ public partial class WebSearchEnginePlugin : BuiltInChatPlugin
             }
 
             await using var page = await _browser.NewPageAsync();
-            await page.GoToAsync(url);
+            try
+            {
+                await page.SetUserAgentAsync(
+                    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36");
+                await page.GoToAsync(url, waitUntil: [WaitUntilNavigation.Load, WaitUntilNavigation.Networkidle2]);
 
-            var node = await page.Accessibility.SnapshotAsync();
-            var json = JsonSerializer.Serialize(
-                new
-                {
-                    node.Name,
-                    Elements = node.Children.Select(n => new
+                var node = await page.Accessibility.SnapshotAsync();
+                var json = JsonSerializer.Serialize(
+                    new
                     {
-                        n.Name,
-                        n.Description,
-                        n.Role
-                    })
-                },
-                _jsonSerializerOptions);
-            return json;
+                        node.Name,
+                        Elements = node.Children.Select(n => new
+                        {
+                            n.Name,
+                            n.Description,
+                            n.Role
+                        })
+                    },
+                    _jsonSerializerOptions);
+
+                return json;
+            }
+            finally
+            {
+                await page.CloseAsync();
+            }
         }
         finally
         {
