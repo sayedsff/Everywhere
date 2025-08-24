@@ -79,6 +79,8 @@ public static class Entrance
 
         TaskScheduler.UnobservedTaskException += (_, e) =>
         {
+            if (e.Observed) return;
+
             Log.Logger.Error(e.Exception, "Unobserved Task Exception");
             e.SetObserved();
         };
