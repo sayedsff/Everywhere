@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -6,6 +7,7 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Everywhere.Configuration;
+using Everywhere.Interop;
 using Everywhere.Utilities;
 using Google.Apis.Services;
 using Lucide.Avalonia;
@@ -29,6 +31,7 @@ public partial class WebSearchEnginePlugin : BuiltInChatPlugin
 
     private readonly WebSearchEngineSettings _settings;
     private readonly IRuntimeConstantProvider _runtimeConstantProvider;
+    private readonly IWatchdogManager _watchdogManager;
     private readonly ILoggerFactory _loggerFactory;
     private readonly ILogger<WebSearchEnginePlugin> _logger;
     private readonly DebounceExecutor<WebSearchEnginePlugin> _browserDisposer;
@@ -37,14 +40,17 @@ public partial class WebSearchEnginePlugin : BuiltInChatPlugin
 
     private IWebSearchEngineConnector? _connector;
     private IBrowser? _browser;
+    private Process? _browserProcess;
 
     public WebSearchEnginePlugin(
-        WebSearchEngineSettings settings,
+        Settings settings,
         IRuntimeConstantProvider runtimeConstantProvider,
+        IWatchdogManager watchdogManager,
         ILoggerFactory loggerFactory) : base("WebSearchEngine")
     {
-        _settings = settings;
+        _settings = settings.Plugin.WebSearchEngine;
         _runtimeConstantProvider = runtimeConstantProvider;
+        _watchdogManager = watchdogManager;
         _loggerFactory = loggerFactory;
         _logger = loggerFactory.CreateLogger<WebSearchEnginePlugin>();
         _browserDisposer = new DebounceExecutor<WebSearchEnginePlugin>(
@@ -58,6 +64,15 @@ public partial class WebSearchEnginePlugin : BuiltInChatPlugin
                     if (that._browser is null) return;
                     that._browser.CloseAsync();
                     DisposeCollector.DisposeToDefault(ref that._browser);
+
+                    if (that._browserProcess is { HasExited: false })
+                    {
+                        that._watchdogManager.UnregisterProcessAsync(that._browserProcess.Id);
+
+                        // Kill existing browser process if any
+                        that._browserProcess.Kill();
+                        that._browserProcess = null;
+                    }
                 }
             },
             TimeSpan.FromMinutes(5)); // Dispose browser after 5 minutes of inactivity
@@ -165,6 +180,13 @@ public partial class WebSearchEnginePlugin : BuiltInChatPlugin
             {
                 try
                 {
+                    if (_browserProcess is { HasExited: false })
+                    {
+                        // Kill existing browser process if any
+                        _browserProcess.Kill();
+                        _browserProcess = null;
+                    }
+
                     var cachePath = _runtimeConstantProvider.EnsureWritableDataFolderPath("cache/plugins/puppeteer");
                     var browserFetcher = new BrowserFetcher
                     {
@@ -192,6 +214,9 @@ public partial class WebSearchEnginePlugin : BuiltInChatPlugin
                             Browser = SupportedBrowser.Chromium,
                             Headless = true
                         });
+
+                    _browserProcess = launcher.Process.Process;
+                    await _watchdogManager.RegisterProcessAsync(_browserProcess.Id);
                 }
                 catch (Exception e)
                 {

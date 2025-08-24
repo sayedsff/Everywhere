@@ -62,9 +62,12 @@ public class App : Application
 
         try
         {
-            foreach (var group in ServiceLocator.Resolve<IEnumerable<IAsyncInitializer>>().GroupBy(i => i.Priority).OrderByDescending(g => g.Key))
+            foreach (var group in ServiceLocator
+                       .Resolve<IEnumerable<IAsyncInitializer>>()
+                       .GroupBy(i => i.Priority)
+                       .OrderByDescending(g => g.Key))
             {
-                Task.WhenAll(group.Select(i => i.InitializeAsync())).WaitOnDispatcherFrame();
+                Task.WhenAll(group.Select(i => i.InitializeAsync())).WaitOnDispatcherFrame();;
             }
         }
         catch (Exception ex)

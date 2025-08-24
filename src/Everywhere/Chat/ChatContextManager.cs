@@ -4,7 +4,9 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Everywhere.Common;
 using Everywhere.Configuration;
+using Everywhere.Interop;
 using Everywhere.Utilities;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel.ChatCompletion;
 using ObservableCollections;
 using ZLinq;
@@ -213,4 +215,16 @@ public partial class ChatContextManager : ObservableObject, IChatContextManager,
     public Task InitializeAsync() => UpdateHistoryAsync(8);
 
     private static bool IsEmptyContext([NotNullWhen(true)] ChatContext? chatContext) => chatContext is { Count: 1 };
+}
+
+
+public static class ChatContextManagerExtension
+{
+    public static IServiceCollection AddChatContextManager(this IServiceCollection services)
+    {
+        services.AddSingleton<ChatContextManager>();
+        services.AddSingleton<IChatContextManager>(x => x.GetRequiredService<ChatContextManager>());
+        services.AddTransient<IAsyncInitializer>(x => x.GetRequiredService<ChatContextManager>());
+        return services;
+    }
 }

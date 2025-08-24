@@ -1,10 +1,9 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using Everywhere.Chat.Plugins;
 using Lucide.Avalonia;
 using ObservableCollections;
 using ZLinq;
 
-namespace Everywhere.Chat;
+namespace Everywhere.Chat.Plugins;
 
 public class ChatPluginManager : IChatPluginManager
 {
@@ -17,10 +16,9 @@ public class ChatPluginManager : IChatPluginManager
     private readonly ObservableList<BuiltInChatPlugin> _builtInPlugins = [];
     private readonly ObservableList<McpChatPlugin> _mcpPlugins = [];
 
-    public ChatPluginManager WithBuiltInPlugins(params IEnumerable<BuiltInChatPlugin> plugins)
+    public ChatPluginManager(IEnumerable<BuiltInChatPlugin> builtInPlugins)
     {
-        _builtInPlugins.AddRange(plugins);
-        return this;
+        _builtInPlugins.AddRange(builtInPlugins);
     }
 
     public IChatPluginScope CreateScope()

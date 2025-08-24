@@ -45,6 +45,7 @@ public static class Program
                 .AddSingleton<INativeHelper, Win32NativeHelper>()
                 .AddSingleton<ISoftwareUpdater, SoftwareUpdater>()
                 .AddSettings()
+                .AddWatchdogManager()
 
                 #endregion
 
@@ -86,19 +87,20 @@ public static class Program
 
                 #endregion
 
-                #region Assistant Chat
+                #region Chat Plugins
+
+                .AddTransient<BuiltInChatPlugin, WebSearchEnginePlugin>()
+                .AddTransient<BuiltInChatPlugin, FileSystemPlugin>()
+                .AddTransient<BuiltInChatPlugin, PowerShellPlugin>()
+
+                #endregion
+
+                #region Chat
 
                 .AddSingleton<IKernelMixinFactory, KernelMixinFactory>()
-                .AddSingleton<ChatContextManager>()
-                .AddTransient<IChatContextManager>(xx => xx.GetRequiredService<ChatContextManager>())
-                .AddSingleton<IChatPluginManager>(xx => new ChatPluginManager().WithBuiltInPlugins(
-                    new WebSearchEnginePlugin(
-                        xx.GetRequiredService<Settings>().Plugin.WebSearchEngine,
-                        xx.GetRequiredService<IRuntimeConstantProvider>(),
-                        xx.GetRequiredService<ILoggerFactory>()),
-                    new FileSystemPlugin(xx.GetRequiredService<ILogger<FileSystemPlugin>>()),
-                    new PowerShellPlugin(xx.GetRequiredService<ILogger<PowerShellPlugin>>())))
+                .AddSingleton<IChatPluginManager, ChatPluginManager>()
                 .AddSingleton<IChatService, ChatService>()
+                .AddChatContextManager()
 
                 #endregion
 
@@ -107,7 +109,6 @@ public static class Program
                 .AddTransient<IAsyncInitializer, HotkeyInitializer>()
                 .AddTransient<IAsyncInitializer, SettingsInitializer>()
                 .AddTransient<IAsyncInitializer, UpdaterInitializer>()
-                .AddTransient<IAsyncInitializer>(xx => xx.GetRequiredService<ChatContextManager>())
 
             #endregion
 

@@ -239,17 +239,20 @@ public class I18NSourceGenerator : IIncrementalGenerator
 
                   static LocaleManager()
                   {
-                      Locales.Add("default", new __default());
+                      Avalonia.Threading.Dispatcher.UIThread.InvokeOnDemand(() => 
+                      {
+                          Locales.Add("default", new __default());
               """);
 
         foreach (var localeName in localeNames)
         {
             var escapedLocaleName = localeName.Replace("-", "_");
-            sb.AppendLine($"        Locales.Add(\"{localeName}\", new __{escapedLocaleName}());");
+            sb.AppendLine($"            Locales.Add(\"{localeName}\", new __{escapedLocaleName}());");
         }
 
         sb.AppendLine(
             """
+                    });
                 }
                 
                 public delegate void LocaleChangedEventHandler(string? oldLocale, string newLocale);
@@ -261,23 +264,26 @@ public class I18NSourceGenerator : IIncrementalGenerator
                     get => field;
                     set
                     {
-                        if (field == value) return;
-                
-                        var app = Application.Current!;
-                        if (field != null && Locales.TryGetValue(field, out var oldLocale))
+                        Avalonia.Threading.Dispatcher.UIThread.InvokeOnDemand(() => 
                         {
-                            app.Resources.MergedDictionaries.Remove(oldLocale);
-                        }
-                        
-                        var oldLocaleName = field;
-                        field = value;
-                        if (value is null || !Locales.TryGetValue(value, out var newLocale))
-                        {
-                            (field, newLocale) = Locales.First();
-                        }
-                        
-                        app.Resources.MergedDictionaries.Add(newLocale);
-                        LocaleChanged?.Invoke(oldLocaleName, field!);
+                            if (field == value) return;
+                            
+                            var app = Application.Current!;
+                            if (field != null && Locales.TryGetValue(field, out var oldLocale))
+                            {
+                                app.Resources.MergedDictionaries.Remove(oldLocale);
+                            }
+                            
+                            var oldLocaleName = field;
+                            field = value;
+                            if (value is null || !Locales.TryGetValue(value, out var newLocale))
+                            {
+                                (field, newLocale) = Locales.First();
+                            }
+                            
+                            app.Resources.MergedDictionaries.Add(newLocale);
+                            LocaleChanged?.Invoke(oldLocaleName, field!);
+                        });
                     }
                 }
             }
