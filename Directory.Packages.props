@@ -5,6 +5,7 @@
     <EntityFrameworkVersion>9.0.7</EntityFrameworkVersion>
     <SemanticKernelVersion>1.63.0</SemanticKernelVersion>
     <AvaloniaVersion>11.3.2</AvaloniaVersion>
+    <SkiaSharpVersion>3.119.0</SkiaSharpVersion>
     <TokenizersVersion>1.2.1</TokenizersVersion>
   </PropertyGroup>
   <ItemGroup>
@@ -60,6 +61,10 @@
     </PackageVersion>
     <PackageVersion Include="HotAvalonia" Version="3.0.0" />
     <PackageVersion Include="Lucide.Avalonia" Version="0.1.38" />
+    <PackageVersion Include="SkiaSharp" Version="$(SkiaSharpVersion)" />
+    <PackageVersion Include="SkiaSharp.NativeAssets.Linux" Version="$(SkiaSharpVersion)" />
+    <PackageVersion Include="SkiaSharp.NativeAssets.macOS" Version="$(SkiaSharpVersion)" />
+    <PackageVersion Include="SkiaSharp.NativeAssets.Win32" Version="$(SkiaSharpVersion)" />
     <PackageVersion Include="Xaml.Behaviors.Avalonia" Version="11.3.2" />
     <!-- Markdown packages -->
     <PackageVersion Include="ColorCode.Core" Version="2.0.15" />
