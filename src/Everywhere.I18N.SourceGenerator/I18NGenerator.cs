@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Security;
 using System.Text;
 using System.Xml.Linq;
 using Microsoft.CodeAnalysis;
@@ -161,10 +162,23 @@ public class I18NSourceGenerator : IIncrementalGenerator
 
         foreach (var entry in entries)
         {
-            var key = entry.Key;
-            var escapedKey = EscapeVariableName(key);
+            var escapedSummary = SecurityElement.Escape(entry.Value);
+            if (escapedSummary is not null && escapedSummary.Contains('\n'))
+            {
+                sb.AppendLine("    /// <summary>");
+                foreach (var summaryLine in escapedSummary.Split('\n'))
+                {
+                    sb.AppendLine($"    /// {summaryLine}");
+                }
+                sb.AppendLine("    /// </summary>");
+            }
+            else
+            {
+                sb.AppendLine($"    /// <summary>{escapedSummary}</summary>");
+            }
 
-            sb.AppendLine($"    public const string {escapedKey} = \"{key}\";");
+            var escapedKey = EscapeVariableName(entry.Key);
+            sb.AppendLine($"    public const string {escapedKey} = \"{entry.Key}\";");
         }
 
         sb.AppendLine("}");
