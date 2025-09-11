@@ -1,6 +1,7 @@
-﻿using Everywhere.Database;
+﻿using Everywhere.Chat;
+using Everywhere.Database;
 
-namespace Everywhere.Chat;
+namespace Everywhere.Storage;
 
 /// <summary>
 /// Abstraction for chat database operations used by the application.

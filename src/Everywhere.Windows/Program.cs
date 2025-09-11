@@ -83,12 +83,13 @@ public static class Program
 
                 #region Database
 
-                .AddChatDbContextAndStorage()
+                .AddDatabaseAndStorage()
 
                 #endregion
 
                 #region Chat Plugins
 
+                .AddTransient<BuiltInChatPlugin, VisualTreePlugin>()
                 .AddTransient<BuiltInChatPlugin, WebSearchEnginePlugin>()
                 .AddTransient<BuiltInChatPlugin, FileSystemPlugin>()
                 .AddTransient<BuiltInChatPlugin, PowerShellPlugin>()

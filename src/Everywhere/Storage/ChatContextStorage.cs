@@ -1,10 +1,13 @@
 ﻿using System.Buffers.Binary;
 using System.Linq.Expressions;
 using Everywhere.Chat;
+using Everywhere.Database;
 using MessagePack;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using ZLinq;
 
-namespace Everywhere.Database;
+namespace Everywhere.Storage;
 
 /// <summary>
 /// EF Core implementation of IChatContextStorage using explicit "snapshot diff" saves.
@@ -12,6 +15,8 @@ namespace Everywhere.Database;
 /// </summary>
 public sealed class ChatContextStorage(
     IDbContextFactory<ChatDbContext> dbFactory,
+    IBlobStorage blobStorage,
+    ILogger<ChatContextStorage> logger,
     MessagePackSerializerOptions? serializerOptions = null
 ) : IChatContextStorage
 {
@@ -162,6 +167,15 @@ public sealed class ChatContextStorage(
             .Where(x => x.ChatContextId == chatContextId && !x.IsDeleted)
             .ToListAsync(cancellationToken);
 
+        var nodeBlobRows = await db.NodeBlobs.AsNoTracking()
+            .Where(x => x.ChatContextId == chatContextId)
+            .ToListAsync(cancellationToken);
+
+        var requiredBlobHashes = nodeBlobRows.Select(nb => nb.BlobSha256).Distinct().ToList();
+        var blobsByHash = await db.Blobs.AsNoTracking()
+            .Where(b => requiredBlobHashes.Contains(b.Sha256))
+            .ToDictionaryAsync(b => b.Sha256, cancellationToken);
+
         // Root node
         var rootRow = nodeRows.FirstOrDefault(x => x.Id == Guid.Empty);
         if (rootRow is null || DeserializeMessage(rootRow.Payload) is not SystemChatMessage rootMessage)
@@ -179,6 +193,20 @@ public sealed class ChatContextStorage(
             if (row.Id == Guid.Empty) continue; // handle root later
 
             var msg = DeserializeMessage(row.Payload);
+            if (msg is UserChatMessage userMsg)
+            {
+                foreach (var attachment in userMsg.Attachments.OfType<ChatFileAttachment>())
+                {
+                    if (blobsByHash.TryGetValue(attachment.Sha256, out var blobEntity))
+                    {
+                        attachment.FilePath = blobEntity.LocalPath;
+                    }
+
+                    // If blob is not found, FilePath will remain as it was from deserialization,
+                    // which might be an old/invalid path. This is expected behavior if files are missing.
+                }
+            }
+
             var node = new ChatMessageNode(row.Id, msg, []);
             nodesById[row.Id] = node;
 
@@ -270,6 +298,13 @@ public sealed class ChatContextStorage(
             .Where(x => x.ChatContextId == chatId)
             .ToDictionaryAsync(x => x.Id, cancellationToken);
 
+        var dbNodeBlobs = await db.NodeBlobs
+            .Where(x => x.ChatContextId == chatId)
+            .ToListAsync(cancellationToken);
+        var dbNodeBlobsSet = dbNodeBlobs
+            .Select(nb => (nb.ChatNodeId, nb.BlobSha256, nb.Index))
+            .ToHashSet();
+
         var memNodes = context.GetAllNodes().ToDictionary(x => x.Id, x => x);
 
         // Upsert / Update
@@ -289,6 +324,48 @@ public sealed class ChatContextStorage(
                 row.Author = node.Message.Role.Label.SafeSubstring(0, 10);
                 row.UpdatedAt = now;
                 row.IsDeleted = false;
+            }
+
+            if (node.Message is IChatMessageWithAttachments chatMessageWithAttachments)
+            {
+                var fileAttachments = chatMessageWithAttachments.Attachments.AsValueEnumerable().OfType<ChatFileAttachment>().ToList();
+                for (var i = 0; i < fileAttachments.Count; i++)
+                {
+                    var attachment = fileAttachments[i];
+                    var key = (node.Id, attachment.Sha256, i);
+
+                    // If the association already exists, remove it from the set to mark it as "seen".
+                    if (dbNodeBlobsSet.Remove(key))
+                    {
+                        continue;
+                    }
+
+                    // The association is new, so we need to ensure the blob exists and add the association.
+                    var blob = await blobStorage.QueryBlobAsync(attachment.Sha256, cancellationToken);
+                    if (blob is null)
+                    {
+                        // This indicates the blob isn't in our DB. Let's store it.
+                        try
+                        {
+                            await using var fileStream = File.OpenRead(attachment.FilePath);
+                            await blobStorage.StorageBlobAsync(fileStream, attachment.MimeType, cancellationToken);
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.LogError(ex, "Failed to store attachment blob {Sha256} from {FilePath}", attachment.Sha256, attachment.FilePath);
+                            // Ignore and continue; we don't want to fail the entire save operation due to a missing file.
+                        }
+                    }
+
+                    // Add the new association record.
+                    db.NodeBlobs.Add(new NodeBlobEntity
+                    {
+                        ChatContextId = chatId,
+                        ChatNodeId = node.Id,
+                        Index = i,
+                        BlobSha256 = attachment.Sha256
+                    });
+                }
             }
         }
 

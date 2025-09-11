@@ -4,7 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Everywhere.Common;
 using Everywhere.Configuration;
-using Everywhere.Interop;
+using Everywhere.Storage;
 using Everywhere.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel.ChatCompletion;

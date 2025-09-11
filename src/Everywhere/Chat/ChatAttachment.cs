@@ -2,9 +2,10 @@
 using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Everywhere.Interop;
+using Everywhere.Storage;
 using Lucide.Avalonia;
 using MessagePack;
-using ZLinq;
+using Serilog;
 
 namespace Everywhere.Chat;
 
@@ -73,15 +74,15 @@ public partial class ChatFileAttachment(
     public override LucideIconKind Icon => LucideIconKind.File;
 
     [Key(1)]
-    public string FilePath => filePath;
+    public string FilePath { get; set; } = filePath;
 
     [Key(2)]
-    public string Sha256 => sha256;
+    public string Sha256 { get; } = sha256;
 
     [Key(3)]
-    public string MimeType => mimeType;
+    public string MimeType { get; } = MimeTypeUtilities.VerifyMimeType(mimeType);
 
-    public bool IsImage => MimeType.StartsWith("image/", StringComparison.OrdinalIgnoreCase);
+    public bool IsImage => MimeTypeUtilities.IsImage(MimeType);
 
     public Bitmap? Image
     {
@@ -116,63 +117,18 @@ public partial class ChatFileAttachment(
         {
             await using var stream = File.OpenRead(FilePath);
             Bitmap bitmap = WriteableBitmap.Decode(stream);
-            return await ResizeImageOnDemandAsync(bitmap);
+            return await ResizeImageOnDemandAsync(bitmap, maxWidth, maxHeight);
         }
-        catch
+        catch (Exception ex)
         {
+            Log.Logger.ForContext<ChatFileAttachment>().Error(ex, "Failed to load image from file: {FilePath}", FilePath);
             return null;
         }
     }
 
-    public static readonly IReadOnlyDictionary<string, string> SupportedMimeTypes = new Dictionary<string, string>
+    public override string ToString()
     {
-        { ".jpg", "image/jpeg" },
-        { ".jpeg", "image/jpeg" },
-        { ".png", "image/png" },
-        { ".gif", "image/gif" },
-        { ".bmp", "image/bmp" },
-        { ".webp", "image/webp" },
-        { ".mp4", "video/mp4" },
-        { ".mov", "video/quicktime" },
-        { ".avi", "video/x-msvideo" },
-        { ".mkv", "video/x-matroska" },
-        { ".mp3", "audio/mpeg" },
-        { ".wav", "audio/wav" },
-        { ".flac", "audio/flac" },
-        { ".pdf", "application/pdf" },
-        { ".doc", "application/msword" },
-        { ".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
-        { ".xls", "application/vnd.ms-excel" },
-        { ".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
-        { ".ppt", "application/vnd.ms-powerpoint" },
-        { ".pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation" },
-        { ".txt", "text/plain" },
-        { ".rtf", "application/rtf" },
-        { ".json", "application/json" },
-        { ".csv", "text/csv" },
-        { ".md", "text/markdown" },
-        { ".html", "text/html" },
-        { ".xhtml", "application/xhtml+xml" },
-        { ".xml", "application/xml" },
-        { ".css", "text/css" },
-        { ".js", "text/javascript" },
-        { ".sh", "application/x-sh" },
-    };
-
-    public static async Task<string?> DetectMimeTypeAsync(string filePath)
-    {
-        var extension = Path.GetExtension(filePath).ToLowerInvariant();
-        if (SupportedMimeTypes.TryGetValue(extension, out var mimeType))
-        {
-            return mimeType;
-        }
-
-        // detect mime type by reading file header
-        var buffer = new byte[1024];
-        await using var stream = File.OpenRead(filePath);
-        var bytesRead = await stream.ReadAsync(buffer);
-        var isBinary = buffer.AsValueEnumerable().Take(bytesRead).Any(b => b == 0); // check for null bytes, which indicate binary data
-        return isBinary ? null : "text/plain"; // default to plain text if no specific type is detected
+        return $"{MimeType}: {Path.GetFileName(FilePath)}";
     }
 
     /// <summary>
@@ -199,16 +155,7 @@ public partial class ChatFileAttachment(
             throw new NotSupportedException($"File size exceeds the maximum allowed size of {maxBytesSize} bytes.");
         }
 
-        if (mimeType is not null && !SupportedMimeTypes.Values.Contains(mimeType))
-        {
-            throw new NotSupportedException($"Unsupported MIME type: {mimeType}");
-        }
-
-        mimeType ??= await DetectMimeTypeAsync(filePath);
-        if (mimeType is null)
-        {
-            throw new NotSupportedException($"Could not detect MIME type for file: {filePath}");
-        }
+        mimeType = await MimeTypeUtilities.EnsureMimeTypeAsync(mimeType, filePath);
 
         var sha256 = await SHA256.HashDataAsync(stream);
         var sha256String = Convert.ToHexString(sha256).ToLowerInvariant();

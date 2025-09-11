@@ -11,6 +11,7 @@ using Everywhere.Chat;
 using Everywhere.Common;
 using Everywhere.Configuration;
 using Everywhere.Interop;
+using Everywhere.Storage;
 using Everywhere.Utilities;
 using Lucide.Avalonia;
 using Microsoft.Extensions.Logging;
@@ -51,6 +52,7 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
 
     private readonly IVisualElementContext _visualElementContext;
     private readonly INativeHelper _nativeHelper;
+    private readonly IBlobStorage _blobStorage;
     private readonly IRuntimeConstantProvider _runtimeConstantProvider;
     private readonly ILogger<ChatFloatingWindowViewModel> _logger;
 
@@ -58,20 +60,22 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
     private readonly ReusableCancellationTokenSource _cancellationTokenSource = new();
 
     public ChatFloatingWindowViewModel(
+        Settings settings,
         IChatContextManager chatContextManager,
         IChatService chatService,
-        Settings settings,
         IVisualElementContext visualElementContext,
         INativeHelper nativeHelper,
+        IBlobStorage blobStorage,
         IRuntimeConstantProvider runtimeConstantProvider,
         ILogger<ChatFloatingWindowViewModel> logger)
     {
+        Settings = settings;
         ChatContextManager = chatContextManager;
         ChatService = chatService;
-        Settings = settings;
 
         _visualElementContext = visualElementContext;
         _nativeHelper = nativeHelper;
+        _blobStorage = blobStorage;
         _runtimeConstantProvider = runtimeConstantProvider;
         _logger = logger;
 
@@ -225,32 +229,16 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
 
                 await Task.Run(async () =>
                 {
-                    var imageCachePath = _runtimeConstantProvider.EnsureWritableDataFolderPath("cache/img");
-                    Directory.CreateDirectory(imageCachePath);
+                    using var memoryStream = new MemoryStream();
+                    bitmap.Save(memoryStream, 100);
 
-                    using var ms = new MemoryStream();
-                    bitmap.Save(ms, 100);
+                    var blob = await _blobStorage.StorageBlobAsync(memoryStream, "image/png", cancellationToken);
 
-                    ms.Position = 0;
-                    var sha256 = await SHA256.HashDataAsync(ms, cancellationToken);
-                    var sha256String = Convert.ToHexString(sha256).ToLowerInvariant();
-                    var cacheFilePath = Path.Combine(imageCachePath, $"{sha256String}.png");
-
-                    var fileInfo = new FileInfo(Path.Combine(imageCachePath, $"{sha256String}.png"));
-                    if (!fileInfo.Exists || fileInfo.Length == 0)
-                    {
-                        ms.Position = 0;
-                        await using var fs = fileInfo.Open(FileMode.Create, FileAccess.Write, FileShare.None);
-                        await ms.CopyToAsync(fs, cancellationToken);
-                    }
-
-                    var attachment = await ChatFileAttachment.CreateAsync(fileInfo.FullName);
-                    if (!attachment.IsImage)
-                    {
-                        _logger.LogWarning("The cached file is not an image: {CacheFilePath}", cacheFilePath);
-                        return;
-                    }
-
+                    var attachment = new ChatFileAttachment(
+                        new DynamicResourceKey(string.Empty),
+                        blob.LocalPath,
+                        blob.Sha256,
+                        blob.MimeType);
                     _chatAttachments.Add(attachment);
                 },
                 cancellationToken);

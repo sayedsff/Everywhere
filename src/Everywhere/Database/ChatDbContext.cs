@@ -1,10 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Everywhere.Chat;
 using Everywhere.Common;
-using Everywhere.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Everywhere.Database;
 
@@ -224,6 +221,12 @@ public sealed class BlobEntity
     public required string Sha256 { get; init; }
 
     /// <summary>
+    /// Local file path where the blob is stored.
+    /// </summary>
+    [MaxLength(1024)]
+    public required string LocalPath { get; init; }
+
+    /// <summary>
     /// MIME type, e.g., "image/png".
     /// </summary>
     [MaxLength(255)]
@@ -235,7 +238,7 @@ public sealed class BlobEntity
     public required long Size { get; init; }
 
     /// <summary>
-    /// Local creation time (when the blob was first stored locally).
+    /// Local creation time.
     /// </summary>
     public required DateTimeOffset CreatedAt { get; init; }
 
@@ -243,17 +246,4 @@ public sealed class BlobEntity
     /// Last access time (for LRU/GC decisions).
     /// </summary>
     public DateTimeOffset LastAccessAt { get; set; }
-}
-
-public static class ChatDbExtension
-{
-    public static IServiceCollection AddChatDbContextAndStorage(this IServiceCollection services) =>
-        services
-            .AddDbContextFactory<ChatDbContext>((x, options) =>
-            {
-                var dbPath = x.GetRequiredService<IRuntimeConstantProvider>().GetDatabasePath("chat.db");
-                options.UseSqlite($"Data Source={dbPath}");
-            })
-            .AddSingleton<IChatContextStorage, ChatContextStorage>()
-            .AddTransient<IAsyncInitializer, ChatDbInitializer>();
 }
