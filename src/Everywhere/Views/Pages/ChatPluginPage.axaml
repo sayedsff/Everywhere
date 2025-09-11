@@ -123,7 +123,7 @@
     <TabControl
       Grid.Row="1" Grid.Column="2"
       ClipToBounds="False"
-      IsVisible="{Binding !!SelectedPlugin}">
+      IsVisible="{Binding SelectedPlugin, Converter={x:Static ObjectConverters.IsNotNull}}">
       <TabItem Header="{I18N {x:Static LocaleKey.ChatPluginPage_TabItem_Settings_Header}}">
         <ScrollViewer
           Margin="0,0,-12,0" Padding="0,0,12,0"
@@ -145,10 +145,15 @@
             <ItemsControl.DataTemplates>
               <DataTemplate DataType="p:ChatFunction">
                 <Grid
-                  ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto">
-                  <LucideIcon
+                  ColumnDefinitions="Auto,Auto,*" RowDefinitions="Auto,Auto">
+                  <CheckBox
                     Grid.Row="0" Grid.RowSpan="2"
                     Grid.Column="0" Margin="0,0,12,0"
+                    IsChecked="{Binding IsEnabled}"/>
+
+                  <LucideIcon
+                    Grid.Row="0" Grid.RowSpan="2"
+                    Grid.Column="1" Margin="0,0,12,0"
                     VerticalAlignment="Center"
                     IsVisible="{Binding !!Icon}"
                     Kind="{Binding Icon}"
@@ -156,19 +161,14 @@
 
                   <TextBlock
                     Classes="p" Grid.Row="0"
-                    Grid.Column="1" Margin="0,-8,0,0"
+                    Grid.Column="2" Margin="0,-8,0,0"
                     Text="{Binding KernelFunction.Name}"
                     TextWrapping="Wrap"/>
                   <TextBlock
                     Classes="Muted" Grid.Row="1"
-                    Grid.Column="1"
+                    Grid.Column="2"
                     Text="{Binding KernelFunction.Description}"
                     TextWrapping="Wrap"/>
-
-                  <ToggleSwitch
-                    Grid.Row="0" Grid.RowSpan="2"
-                    Grid.Column="2" Margin="16,0,2,0"
-                    IsChecked="{Binding IsEnabled}"/>
                 </Grid>
               </DataTemplate>
             </ItemsControl.DataTemplates>

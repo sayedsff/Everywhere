@@ -28,6 +28,14 @@ public partial class ChatContext : ObservableObject, IReadOnlyList<ChatMessageNo
     [IgnoreMember]
     public int Count => _branchNodes.Count;
 
+    /// <summary>
+    /// OriginalId: VisualElement.Id
+    /// VisualElement is dynamically created and not serialized, so we keep a map here to track them.
+    /// This is also not serialized.
+    /// </summary>
+    [IgnoreMember]
+    public Dictionary<string, int> VisualElementIdMap { get; } = [];
+
     public ChatMessageNode this[int index] => _branchNodes[index];
 
     /// <summary>

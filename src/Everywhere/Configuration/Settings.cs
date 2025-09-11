@@ -25,6 +25,7 @@ using Lucide.Avalonia;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using ObservableCollections;
 using ShadUI;
 using WritableJsonConfiguration;
 
@@ -484,7 +485,14 @@ public class PluginSettings : SettingsCategory
 {
     public override string Header => "Plugin";
 
+    public ObservableDictionary<string, bool> IsEnabledRecords { get; set; } = new();
+
     public WebSearchEngineSettings WebSearchEngine { get; set; } = new();
+
+    public PluginSettings()
+    {
+        IsEnabledRecords.CollectionChanged += delegate { OnPropertyChanged(nameof(IsEnabledRecords)); };
+    }
 }
 
 public partial class WebSearchEngineSettings : SettingsCategory

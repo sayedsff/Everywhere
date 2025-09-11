@@ -1,9 +1,10 @@
 ﻿using MessagePack;
+using MessagePack.Formatters;
 using Microsoft.SemanticKernel.ChatCompletion;
 
 namespace Everywhere.Serialization;
 
-public class AuthorRoleMessagePackFormatter : MessagePack.Formatters.IMessagePackFormatter<AuthorRole>
+public class AuthorRoleMessagePackFormatter : IMessagePackFormatter<AuthorRole>
 {
     public AuthorRole Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
     {

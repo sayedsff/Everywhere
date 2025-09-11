@@ -357,6 +357,11 @@
                   <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}"/>
                 </Style>
 
+                <Style Selector="Border.Invalid">
+                  <Setter Property="Background" Value="{DynamicResource ErrorColor20}"/>
+                  <Setter Property="ToolTip.Tip" Value="Invalid"/>
+                </Style>
+
                 <Style Selector="Button.Ghost">
                   <Setter Property="Padding" Value="4"/>
                   <Setter Property="MinHeight" Value="0"/>
@@ -439,7 +444,7 @@
                         <StackPanel
                           Classes="ChatMessage Assistant" Background="Transparent"
                           Orientation="Vertical" Spacing="4">
-                          <ItemsControl ItemsSource="{Binding Actions}">
+                          <ItemsControl ItemsSource="{Binding FunctionCalls, Converter={x:Static vc:ObservableListConverters.ObservableOnDispatcher}}">
                             <ItemsControl.ItemsPanel>
                               <ItemsPanelTemplate>
                                 <StackPanel Spacing="2"/>
@@ -557,6 +562,26 @@
                                     </StackPanel>
                                   </Border>
                                 </Panel>
+                              </DataTemplate>
+
+                              <DataTemplate DataType="chat:ChatVisualElementAttachment">
+                                <Border
+                                  Height="24"
+                                  Background="{DynamicResource CardBackgroundColor}"
+                                  Classes.Invalid="{Binding Element, Converter={x:Static ObjectConverters.IsNull}}"
+                                  CornerRadius="4">
+                                  <StackPanel
+                                    Margin="6,0" Orientation="Horizontal"
+                                    Spacing="4">
+                                    <LucideIcon
+                                      VerticalAlignment="Center"
+                                      Kind="{Binding Icon}"
+                                      Size="14"/>
+                                    <TextBlock
+                                      VerticalAlignment="Center" FontSize="12"
+                                      Text="{Binding HeaderKey^}"/>
+                                  </StackPanel>
+                                </Border>
                               </DataTemplate>
 
                               <DataTemplate DataType="chat:ChatAttachment">

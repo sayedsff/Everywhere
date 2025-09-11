@@ -24,7 +24,9 @@ public class ObjectObserver(ObjectObserverChangedEventHandler handler) : IDispos
             type,
             t => t.GetProperties(BindingFlags.Public | BindingFlags.Instance)
                 .AsValueEnumerable()
-                .Where(p => p is { CanRead: true, CanWrite: true, IsSpecialName: false })
+                .Where(p =>
+                    p is { CanRead: true, CanWrite: true, IsSpecialName: false } ||
+                    p.PropertyType.IsAssignableTo(typeof(INotifyPropertyChanged)))
                 .Where(p => p.GetMethod?.GetParameters() is { Length: 0 }) // Ignore
                 .Where(p => p.GetCustomAttribute<JsonIgnoreAttribute>() is null)
                 .ToArray());

@@ -16,7 +16,7 @@ namespace Everywhere.Chat;
 /// </summary>
 /// <param name="coreElements"></param>
 /// <param name="softTokenLimit"></param>
-public partial class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreElements, int softTokenLimit)
+public partial class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreElements, int softTokenLimit, int startingId)
 {
     private enum QueueOrigin
     {
@@ -200,14 +200,31 @@ public partial class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreE
         {
             var indent = new string(' ', indentLevel * 2);
             var element = xmlElement.Element;
+            var elementType = element.Type;
 
             // Start tag
-            _visualTreeXmlBuilder.Append(indent).Append('<').Append(element.Type);
+            _visualTreeXmlBuilder.Append(indent).Append('<').Append(elementType);
 
             // Add ID
-            var id = _idMap.Count;
+            var id = _idMap.Count + startingId;
             _idMap[element.Id] = id;
             _visualTreeXmlBuilder.Append(" id=\"").Append(id).Append('"');
+
+            var isContainer = elementType is
+                VisualElementType.Document or
+                VisualElementType.Panel or
+                VisualElementType.TopLevel or
+                VisualElementType.Screen;
+            if (isContainer)
+            {
+                // for containers, include the element's size
+                var bounds = element.BoundingRectangle;
+                _visualTreeXmlBuilder
+                    .Append(" x=\"").Append(bounds.X).Append('"')
+                    .Append(" y=\"").Append(bounds.Y).Append('"')
+                    .Append(" width=\"").Append(bounds.Width).Append('"')
+                    .Append(" height=\"").Append(bounds.Height).Append('"');
+            }
 
             if (xmlElement.Description != null)
             {
@@ -221,6 +238,11 @@ public partial class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreE
 
             if (xmlElement.Children.Count == 0 && xmlElement.Contents.Count == 0)
             {
+                if (isContainer)
+                {
+                    _visualTreeXmlBuilder.Append(" inner-content-not-accessible");
+                }
+
                 // Self-closing tag if no children and no content
                 _visualTreeXmlBuilder.Append("/>").AppendLine();
                 return;
@@ -266,9 +288,7 @@ public partial class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreE
             return 0;
         }
 
-        return IsCjkLanguage(text)
-            ? (int)Math.Ceiling(text.Length * CjkTokenRatio)
-            : (int)Math.Ceiling(CountWords(text) * EnglishTokenRatio);
+        return IsCjkLanguage(text) ? (int)Math.Ceiling(text.Length * CjkTokenRatio) : (int)Math.Ceiling(CountWords(text) * EnglishTokenRatio);
     }
 
     /// <summary>

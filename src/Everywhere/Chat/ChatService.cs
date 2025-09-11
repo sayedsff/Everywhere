@@ -1,12 +1,13 @@
 ﻿using System.Text;
-using System.Text.Json;
 using Everywhere.AI;
 using Everywhere.Chat.Plugins;
 using Everywhere.Common;
 using Everywhere.Configuration;
 using Everywhere.Interop;
+using Everywhere.Storage;
 using Lucide.Avalonia;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
@@ -18,7 +19,8 @@ public class ChatService(
     IChatContextManager chatContextManager,
     IChatPluginManager chatPluginManager,
     IKernelMixinFactory kernelMixinFactory,
-    Settings settings
+    Settings settings,
+    ILogger<ChatService> logger
 ) : IChatService
 {
     public async Task SendMessageAsync(UserChatMessage userMessage, CancellationToken cancellationToken)
@@ -79,16 +81,29 @@ public class ChatService(
 
             var xmlBuilder = new VisualElementXmlBuilder(
                 elements,
-                kernelMixin.MaxTokenTotal / 20);
+                kernelMixin.MaxTokenTotal / 20,
+                chatContext.VisualElementIdMap.Count + 1);
             var renderedVisualTreePrompt = await Task.Run(
                 () =>
-                    Prompts.RenderPrompt(
+                {
+                    var xml = xmlBuilder.BuildXml(cancellationToken);
+                    var idMap = xmlBuilder.GetIdMap(cancellationToken);
+
+                    if (!idMap.TryGetValue(elements[0].Id, out var focusedElementId))
+                    {
+                        focusedElementId = -1;
+                    }
+
+                    chatContext.VisualElementIdMap.AddRange(idMap);
+
+                    return Prompts.RenderPrompt(
                         Prompts.VisualTreePrompt,
                         new Dictionary<string, Func<string>>
                         {
-                            { "VisualTree", () => xmlBuilder.BuildXml(cancellationToken) },
-                            { "FocusedElementId", () => xmlBuilder.GetIdMap(cancellationToken)[elements[0].Id].ToString() },
-                        }),
+                            { "VisualTree", () => xml },
+                            { "FocusedElementId", () => focusedElementId.ToString() },
+                        });
+                },
                 cancellationToken);
             userChatMessage.UserPrompt = renderedVisualTreePrompt + "\n\n" + userChatMessage.UserPrompt;
         }
@@ -110,10 +125,11 @@ public class ChatService(
         var builder = Kernel.CreateBuilder();
 
         builder.Services.AddSingleton(kernelMixin.ChatCompletionService);
+        builder.Services.AddSingleton(chatContext);
 
         if (settings.Internal.IsToolCallEnabled)
         {
-            var chatPluginScope = chatPluginManager.CreateScope();
+            var chatPluginScope = chatPluginManager.CreateScope(chatContext);
             builder.Services.AddSingleton(chatPluginScope);
             foreach (var plugin in chatPluginScope.Plugins)
             {
@@ -123,13 +139,6 @@ public class ChatService(
 
         return builder.Build();
     }
-
-    /// <summary>
-    /// Represents a record of a function call and its result.
-    /// </summary>
-    /// <param name="FunctionCall"></param>
-    /// <param name="Result"></param>
-    private record FunctionCallRecord(FunctionCallContent FunctionCall, FunctionResultContent Result);
 
     private async Task GenerateAsync(
         IKernelMixin kernelMixin,
@@ -212,23 +221,22 @@ public class ChatService(
                         throw new InvalidOperationException($"Function '{functionCallContentGroup.Key}' is not available");
                     }
 
-                    var actionChatMessage = new ActionChatMessage(
-                        AuthorRole.Tool,
+                    var functionCallChatMessage = new FunctionCallChatMessage(
                         chatFunction.Icon ?? chatPlugin.Icon ?? LucideIconKind.Hammer,
                         chatFunction.KernelFunction.Name)
                     {
                         IsBusy = true,
                     };
-                    assistantChatMessage.Actions.Add(actionChatMessage);
+                    assistantChatMessage.FunctionCalls.Add(functionCallChatMessage);
 
                     // Add call message to the chat history.
                     var functionCallMessage = new ChatMessageContent(AuthorRole.Assistant, content: null);
                     chatHistory.Add(functionCallMessage);
 
                     // Iterate through the function call contents in the group.
-                    var functionCallRecords = new List<FunctionCallRecord>(functionCallContentGroup.Count());
                     foreach (var functionCallContent in functionCallContentGroup)
                     {
+                        functionCallChatMessage.Calls.Add(functionCallContent);
                         functionCallMessage.Items.Add(functionCallContent);
 
                         FunctionResultContent resultContent;
@@ -239,22 +247,26 @@ public class ChatService(
                         catch (Exception ex)
                         {
                             resultContent = new FunctionResultContent(functionCallContent, $"Error: {ex.Message}");
-                            actionChatMessage.ErrorMessageKey = ex.GetFriendlyMessage();
+                            functionCallChatMessage.ErrorMessageKey = ex.GetFriendlyMessage();
+                            logger.LogError(ex, "Error invoking function '{FunctionName}'", functionCallContent.FunctionName);
                         }
 
-                        // Add result content to the chat history and the function result contents list.
-                        functionCallRecords.Add(new FunctionCallRecord(functionCallContent, resultContent));
+                        functionCallChatMessage.Results.Add(resultContent);
                         chatHistory.Add(new ChatMessageContent(AuthorRole.Tool, [resultContent]));
 
-                        if (actionChatMessage.ErrorMessageKey is not null)
+                        if (functionCallChatMessage.ErrorMessageKey is not null)
                         {
                             break; // If an error occurs, we stop processing further function calls.
                         }
                     }
 
+                    if (await TryCreateExtraToolCallResultsContentAsync(functionCallChatMessage) is { } extraToolCallResultsContent)
+                    {
+                        chatHistory.Add(extraToolCallResultsContent);
+                    }
+
                     // Serialize the function calls and results to JSON.
-                    actionChatMessage.Content = JsonSerializer.Serialize(functionCallRecords);
-                    actionChatMessage.IsBusy = false;
+                    functionCallChatMessage.IsBusy = false;
                 }
             }
 
@@ -277,6 +289,7 @@ public class ChatService(
         catch (Exception e)
         {
             assistantChatMessage.ErrorMessageKey = e.GetFriendlyMessage();
+            logger.LogError(e, "Error generating chat response");
         }
         finally
         {
@@ -296,9 +309,9 @@ public class ChatService(
                 case AssistantChatMessage assistant:
                 {
                     // If the assistant message has actions, we need to yield them first.
-                    foreach (var actionChatMessage in assistant.Actions)
+                    foreach (var functionCallChatMessage in assistant.FunctionCalls)
                     {
-                        await foreach (var actionChatMessageContent in CreateChatMessageContentsAsync(actionChatMessage))
+                        await foreach (var actionChatMessageContent in CreateChatMessageContentsAsync(functionCallChatMessage))
                         {
                             yield return actionChatMessageContent;
                         }
@@ -310,33 +323,24 @@ public class ChatService(
                 case UserChatMessage user:
                 {
                     var content = new ChatMessageContent(chatMessage.Role, user.UserPrompt);
-
-                    foreach (var imageAttachment in user.Attachments.OfType<ChatFileAttachment>().Where(a => a.IsImage))
-                    {
-                        using var image = await imageAttachment.GetImageAsync();
-                        if (image is null) continue;
-
-                        using var ms = new MemoryStream();
-                        image.Save(ms, 100);
-                        ms.Position = 0;
-                        content.Items.Add(new ImageContent(ms.ToArray(), "image/png"));
-                    }
-
+                    await AddAttachmentsToChatMessageContentAsync(user.Attachments, content);
                     yield return content;
-
                     break;
                 }
-                case ActionChatMessage { Role.Label: "tool", Content: { } json }:
+                case FunctionCallChatMessage functionCall:
                 {
-                    var functionCallRecords = DeserializeFunctionCallRecords(json);
-
                     var functionCallMessage = new ChatMessageContent(AuthorRole.Assistant, content: null);
-                    functionCallMessage.Items.AddRange(functionCallRecords.Select(f => f.FunctionCall));
+                    functionCallMessage.Items.AddRange(functionCall.Calls);
                     yield return functionCallMessage;
 
-                    foreach (var (_, result) in functionCallRecords)
+                    foreach (var result in functionCall.Results)
                     {
                         yield return result.ToChatMessage();
+                    }
+
+                    if (await TryCreateExtraToolCallResultsContentAsync(functionCall) is { } extraToolCallResultsContent)
+                    {
+                        yield return extraToolCallResultsContent;
                     }
 
                     break;
@@ -347,16 +351,67 @@ public class ChatService(
                     break;
                 }
             }
+        }
 
-            static List<FunctionCallRecord> DeserializeFunctionCallRecords(string json)
+        async ValueTask<ChatMessageContent?> TryCreateExtraToolCallResultsContentAsync(FunctionCallChatMessage functionCallChatMessage)
+        {
+            if (!functionCallChatMessage.Attachments.Any()) return null;
+
+            var content = new ChatMessageContent(AuthorRole.User, "Extra tool call results in order");
+            await AddAttachmentsToChatMessageContentAsync(functionCallChatMessage.Attachments, content);
+            return content;
+        }
+
+        async ValueTask AddAttachmentsToChatMessageContentAsync(IEnumerable<ChatAttachment> attachments, ChatMessageContent content)
+        {
+            foreach (var attachment in attachments)
             {
-                try
+                switch (attachment)
                 {
-                    return JsonSerializer.Deserialize<List<FunctionCallRecord>>(json) ?? [];
-                }
-                catch (JsonException)
-                {
-                    return [];
+                    case ChatTextAttachment text:
+                    {
+                        content.Items.Add(new TextContent(text.Text));
+                        break;
+                    }
+                    case ChatFileAttachment file:
+                    {
+                        byte[] data;
+
+                        var fileInfo = new FileInfo(file.FilePath);
+                        if (!fileInfo.Exists || fileInfo.Length <= 0 || fileInfo.Length > 25 * 1024 * 1024) // TODO: Configurable max file size?
+                        {
+                            continue;
+                        }
+
+                        try
+                        {
+                            data = await File.ReadAllBytesAsync(file.FilePath, cancellationToken);
+                        }
+                        catch (Exception ex)
+                        {
+                            // If we fail to read the file, just skip it.
+                            // The file might be deleted or moved.
+                            // We don't want to fail the whole message because of one attachment.
+                            // Just log the error and continue.
+                            logger.LogWarning(ex, "Failed to read attachment file '{FilePath}'", file.FilePath);
+                            continue;
+                        }
+
+                        if (MimeTypeUtilities.IsAudio(file.MimeType))
+                        {
+                            content.Items.Add(new AudioContent(data, file.MimeType));
+                        }
+                        else if (MimeTypeUtilities.IsImage(file.MimeType))
+                        {
+                            content.Items.Add(new ImageContent(data, file.MimeType));
+                        }
+                        else
+                        {
+                            content.Items.Add(new BinaryContent(data, file.MimeType));
+                        }
+
+                        break;
+                    }
                 }
             }
         }

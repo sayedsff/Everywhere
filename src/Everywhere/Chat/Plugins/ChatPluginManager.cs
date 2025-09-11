@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Everywhere.Configuration;
+using Everywhere.Utilities;
 using Lucide.Avalonia;
 using ObservableCollections;
 using ZLinq;
@@ -7,44 +9,109 @@ namespace Everywhere.Chat.Plugins;
 
 public class ChatPluginManager : IChatPluginManager
 {
-    public NotifyCollectionChangedSynchronizedViewList<BuiltInChatPlugin> BuiltInPlugins =>
+    public INotifyCollectionChangedSynchronizedViewList<BuiltInChatPlugin> BuiltInPlugins =>
         _builtInPlugins.ToNotifyCollectionChangedSlim(SynchronizationContextCollectionEventDispatcher.Current);
 
-    public NotifyCollectionChangedSynchronizedViewList<McpChatPlugin> McpPlugins =>
+    public INotifyCollectionChangedSynchronizedViewList<McpChatPlugin> McpPlugins =>
         _mcpPlugins.ToNotifyCollectionChangedSlim(SynchronizationContextCollectionEventDispatcher.Current);
 
     private readonly ObservableList<BuiltInChatPlugin> _builtInPlugins = [];
     private readonly ObservableList<McpChatPlugin> _mcpPlugins = [];
 
-    public ChatPluginManager(IEnumerable<BuiltInChatPlugin> builtInPlugins)
+    public ChatPluginManager(IEnumerable<BuiltInChatPlugin> builtInPlugins, Settings settings)
     {
         _builtInPlugins.AddRange(builtInPlugins);
+
+        var isEnabledRecords = settings.Plugin.IsEnabledRecords;
+        foreach (var builtInPlugin in _builtInPlugins)
+        {
+            builtInPlugin.IsEnabled = GetIsEnabled($"built-in.{builtInPlugin.Name}");
+            foreach (var function in builtInPlugin.Functions)
+            {
+                function.IsEnabled = GetIsEnabled($"built-in.{builtInPlugin.Name}.{function.KernelFunction.Name}");
+            }
+        }
+
+        new ObjectObserver(HandleBuiltInPluginsChange).Observe(BuiltInPlugins);
+
+        bool GetIsEnabled(string path) => !isEnabledRecords.TryGetValue(path, out var isEnabled) || isEnabled;
+
+        void HandleBuiltInPluginsChange(in ObjectObserverChangedEventArgs e)
+        {
+            if (!e.Path.EndsWith("IsEnabled", StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            var parts = e.Path.Split(':');
+            if (parts.Length < 2 || !int.TryParse(parts[0], out var pluginIndex) || pluginIndex < 0 || pluginIndex >= _builtInPlugins.Count)
+            {
+                return;
+            }
+
+            var plugin = _builtInPlugins[pluginIndex];
+            switch (parts.Length)
+            {
+                case 2:
+                {
+                    settings.Plugin.IsEnabledRecords[$"built-in.{plugin.Name}"] = plugin.IsEnabled;
+                    break;
+                }
+                case 4 when
+                    int.TryParse(parts[2], out var functionIndex) &&
+                    functionIndex >= 0 &&
+                    functionIndex < plugin.Functions.Count:
+                {
+                    var function = plugin.Functions[functionIndex];
+                    settings.Plugin.IsEnabledRecords[$"built-in.{plugin.Name}.{function.KernelFunction.Name}"] = function.IsEnabled;
+                    break;
+                }
+            }
+        }
     }
 
-    public IChatPluginScope CreateScope()
+    public void AddMcpPlugin(McpTransportConfiguration configuration)
     {
-        return new Scope(_builtInPlugins
-            .AsValueEnumerable()
-            .Cast<ChatPlugin>()
-            .Concat(_mcpPlugins)
-            .Where(p => p.IsEnabled)
-            .Select(p => new ChatPluginSnapshot(p))
-            .ToList());
+        throw new NotImplementedException();
     }
 
-    private class ChatPluginSnapshot(ChatPlugin original) : ChatPlugin(original.Name)
+    public IChatPluginScope CreateScope(ChatContext chatContext)
     {
-        public override DynamicResourceKey HeaderKey { get; } = original.HeaderKey;
-        public override DynamicResourceKey DescriptionKey { get; } = original.DescriptionKey;
-        public override LucideIconKind? Icon { get; } = original.Icon;
-        public override IEnumerable<ChatFunction> Functions { get; } = original.Functions.AsValueEnumerable().Where(p => p.IsEnabled).ToList();
+        return new Scope(
+            _builtInPlugins
+                .AsValueEnumerable()
+                .Cast<ChatPlugin>()
+                .Concat(_mcpPlugins)
+                .Where(p => p.IsEnabled)
+                .Select(p => new ChatPluginSnapshot(p, chatContext))
+                .ToList());
+    }
+
+    private class ChatPluginSnapshot : ChatPlugin
+    {
+        public override DynamicResourceKey HeaderKey => _originalChatPlugin.HeaderKey;
+        public override DynamicResourceKey DescriptionKey => _originalChatPlugin.DescriptionKey;
+        public override LucideIconKind? Icon => _originalChatPlugin.Icon;
+        public override string? BeautifulIcon => _originalChatPlugin.BeautifulIcon;
+
+        private readonly ChatPlugin _originalChatPlugin;
+
+        public ChatPluginSnapshot(ChatPlugin originalChatPlugin, ChatContext chatContext) : base(originalChatPlugin.Name)
+        {
+            _originalChatPlugin = originalChatPlugin;
+            AllowedPermissions = originalChatPlugin.AllowedPermissions.ActualValue;
+            _functions.AddRange(originalChatPlugin.SnapshotFunctions(chatContext));
+        }
     }
 
     private class Scope(List<ChatPluginSnapshot> pluginSnapshots) : IChatPluginScope
     {
         public IEnumerable<ChatPlugin> Plugins => pluginSnapshots;
 
-        public bool TryGetPluginAndFunction(string functionName, [NotNullWhen(true)] out ChatPlugin? plugin, [NotNullWhen(true)] out ChatFunction? function)
+        public bool TryGetPluginAndFunction(
+            string functionName,
+            [NotNullWhen(true)] out ChatPlugin? plugin,
+            [NotNullWhen(true)] out ChatFunction? function)
         {
             foreach (var pluginSnapshot in pluginSnapshots)
             {

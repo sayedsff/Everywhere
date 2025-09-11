@@ -4,26 +4,28 @@ using ObservableCollections;
 namespace Everywhere.Chat.Plugins;
 
 /// <summary>
-///
+/// Manages chat plugins, both built-in and MCP (Modular Chat Plugin) plugins.
 /// </summary>
 public interface IChatPluginManager
 {
     /// <summary>
     /// Gets the list of built-in chat plugins for Binding use in the UI.
     /// </summary>
-    NotifyCollectionChangedSynchronizedViewList<BuiltInChatPlugin> BuiltInPlugins { get; }
+    INotifyCollectionChangedSynchronizedViewList<BuiltInChatPlugin> BuiltInPlugins { get; }
 
     /// <summary>
     /// Gets the list of MCP chat plugins for Binding use in the UI.
     /// </summary>
-    NotifyCollectionChangedSynchronizedViewList<McpChatPlugin> McpPlugins { get; }
+    INotifyCollectionChangedSynchronizedViewList<McpChatPlugin> McpPlugins { get; }
+
+    void AddMcpPlugin(McpTransportConfiguration configuration);
 
     /// <summary>
     /// Creates a new scope for available chat plugins and their functions.
     /// This method should be lightweight and fast, as it is called frequently.
     /// </summary>
     /// <returns></returns>
-    IChatPluginScope CreateScope();
+    IChatPluginScope CreateScope(ChatContext chatContext);
 }
 
 /// <summary>

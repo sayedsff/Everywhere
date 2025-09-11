@@ -25,9 +25,10 @@ public class PowerShellPlugin : BuiltInChatPlugin
     }
 
     [KernelFunction("execute_powershell_script")]
-    [Description(
-        "Execute a signle or multi-line PowerShell script and obtain its output. You MUST provide a concise description for user, explaining what you are doing.")]
-    private async Task<string> ExecutePowerShellScriptAsync(string description, string script)
+    [Description("Execute PowerShell script and obtain its output.")]
+    private async Task<string> ExecutePowerShellScriptAsync(
+        [Description("A concise description for user, explaining what you are doing")] string description,
+        [Description("Signle or multi-line")] string script)
     {
         _logger.LogInformation("Executing PowerShell script with description: {Description}\nScript: {Script}", description, script);
 

@@ -39,21 +39,30 @@ public abstract partial class ChatPlugin(string name) : KernelPlugin(name)
     [ObservableProperty]
     public partial Customizable<ChatFunctionPermissions> AllowedPermissions { get; set; } = ChatFunctionPermissions.None;
 
-    public abstract IEnumerable<ChatFunction> Functions { get; }
+    /// <summary>
+    /// Gets the list of functions provided by this plugin for Binding use in the UI.
+    /// </summary>
+    [field: AllowNull, MaybeNull]
+    public NotifyCollectionChangedSynchronizedViewList<ChatFunction> Functions =>
+        field ??= _functions.ToNotifyCollectionChangedSlim(SynchronizationContextCollectionEventDispatcher.Current);
 
     /// <summary>
     /// Gets the SettingsItems for this chat function.
     /// </summary>
     public virtual IReadOnlyList<SettingsItem>? SettingsItems => null;
 
-    public override int FunctionCount => Functions.Count();
+    public override int FunctionCount => _functions.Count(f => f.IsEnabled);
+
+    protected readonly ObservableList<ChatFunction> _functions = [];
+
+    public virtual IEnumerable<ChatFunction> SnapshotFunctions(ChatContext chatContext) => _functions.Where(f => f.IsEnabled);
 
     public override IEnumerator<KernelFunction> GetEnumerator() =>
-        Functions.Where(f => f.IsEnabled).Select(f => f.KernelFunction).GetEnumerator();
+        _functions.Where(f => f.IsEnabled).Select(f => f.KernelFunction).GetEnumerator();
 
     public override bool TryGetFunction(string name, [NotNullWhen(true)] out KernelFunction? function)
     {
-        function = Functions.AsValueEnumerable().Where(f => f.IsEnabled).Select(f => f.KernelFunction).FirstOrDefault(f => f.Name == name);
+        function = _functions.AsValueEnumerable().Where(f => f.IsEnabled).Select(f => f.KernelFunction).FirstOrDefault(f => f.Name == name);
         return function is not null;
     }
 }
@@ -67,10 +76,6 @@ public abstract class BuiltInChatPlugin(string name) : ChatPlugin(name)
     public override DynamicResourceKey HeaderKey => new($"NativeChatPlugin_{Name}_Header");
 
     public override DynamicResourceKey DescriptionKey => new($"NativeChatPlugin_{Name}_Description");
-
-    public override IEnumerable<ChatFunction> Functions => _functions;
-
-    protected readonly List<ChatFunction> _functions = [];
 }
 
 /// <summary>
@@ -90,6 +95,4 @@ public partial class McpChatPlugin(string name) : ChatPlugin(name)
     /// </summary>
     [ObservableProperty]
     public partial ChatFunctionPermissions DefaultPermissions { get; set; } = ChatFunctionPermissions.AllAccess;
-
-    public override NotifyCollectionChangedSynchronizedViewList<ChatFunction> Functions => throw new NotImplementedException();
 }

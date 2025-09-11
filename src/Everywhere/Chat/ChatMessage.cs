@@ -1,5 +1,4 @@
 ﻿using System.Collections.Immutable;
-using System.Collections.ObjectModel;
 using System.Text.Json.Serialization;
 using Avalonia.Controls.Documents;
 using Avalonia.Threading;
@@ -8,7 +7,9 @@ using Everywhere.Serialization;
 using LiveMarkdown.Avalonia;
 using Lucide.Avalonia;
 using MessagePack;
+using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
+using ObservableCollections;
 
 namespace Everywhere.Chat;
 
@@ -17,6 +18,7 @@ namespace Everywhere.Chat;
 [Union(1, typeof(AssistantChatMessage))]
 [Union(2, typeof(UserChatMessage))]
 [Union(3, typeof(ActionChatMessage))]
+[Union(4, typeof(FunctionCallChatMessage))]
 public abstract partial class ChatMessage : ObservableObject
 {
     public abstract AuthorRole Role { get; }
@@ -25,6 +27,11 @@ public abstract partial class ChatMessage : ObservableObject
     [JsonIgnore]
     [ObservableProperty]
     public partial bool IsBusy { get; set; }
+}
+
+public interface IChatMessageWithAttachments
+{
+    IEnumerable<ChatAttachment> Attachments { get; }
 }
 
 [MessagePackObject(OnlyIncludeKeyedMembers = true)]
@@ -62,11 +69,8 @@ public partial class AssistantChatMessage : ChatMessage
     [Key(3)]
     public DateTimeOffset FinishedAt { get; set; } = DateTimeOffset.UtcNow;
 
-    /// <summary>
-    /// A collection of actions that the assistant can perform. Such as function calling.
-    /// </summary>
     [Key(4)]
-    public ObservableCollection<ActionChatMessage> Actions { get; set; } = [];
+    public ObservableList<FunctionCallChatMessage> FunctionCalls { get; set; } = [];
 
     public AssistantChatMessage()
     {
@@ -85,7 +89,7 @@ public partial class AssistantChatMessage : ChatMessage
 }
 
 [MessagePackObject(OnlyIncludeKeyedMembers = true, AllowPrivate = true)]
-public partial class UserChatMessage(string userPrompt, IReadOnlyList<ChatAttachment> attachments) : ChatMessage
+public partial class UserChatMessage(string userPrompt, IEnumerable<ChatAttachment> attachments) : ChatMessage, IChatMessageWithAttachments
 {
     public override AuthorRole Role => AuthorRole.User;
 
@@ -96,7 +100,7 @@ public partial class UserChatMessage(string userPrompt, IReadOnlyList<ChatAttach
     public string UserPrompt { get; set; } = userPrompt;
 
     [Key(1)]
-    public IReadOnlyList<ChatAttachment> Attachments => attachments;
+    public IEnumerable<ChatAttachment> Attachments { get; set; } = attachments;
 
     /// <summary>
     /// The inlines that display in the chat message.
@@ -123,7 +127,6 @@ public partial class UserChatMessage(string userPrompt, IReadOnlyList<ChatAttach
 public partial class ActionChatMessage : ChatMessage
 {
     [Key(0)]
-    [MessagePackFormatter(typeof(AuthorRoleMessagePackFormatter))]
     public override AuthorRole Role { get; }
 
     [Key(1)]
@@ -134,9 +137,6 @@ public partial class ActionChatMessage : ChatMessage
     [ObservableProperty]
     public partial DynamicResourceKey? HeaderKey { get; set; }
 
-    /// <summary>
-    /// Actual content that llm returns.
-    /// </summary>
     [Key(3)]
     public string? Content { get; set; }
 
@@ -147,11 +147,8 @@ public partial class ActionChatMessage : ChatMessage
     [Key(5)]
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 
-    [Key(6)]
-    public ObservableCollection<ActionChatMessageStep> Steps { get; set; } = [];
-
     [SerializationConstructor]
-    private ActionChatMessage() { }
+    protected ActionChatMessage() { }
 
     public ActionChatMessage(AuthorRole role, LucideIconKind icon, DynamicResourceKey? headerKey)
     {
@@ -162,12 +159,29 @@ public partial class ActionChatMessage : ChatMessage
 }
 
 /// <summary>
-/// Represents a step in an action message. Such as a function call step.
+/// Represents a function call action message in the chat.
 /// </summary>
-[MessagePackObject]
-public partial class ActionChatMessageStep : ObservableObject
+[MessagePackObject(AllowPrivate = true, OnlyIncludeKeyedMembers = true)]
+public partial class FunctionCallChatMessage : ActionChatMessage, IChatMessageWithAttachments
 {
-    [Key(0)]
-    [ObservableProperty]
-    public partial DynamicResourceKeyBase? Header { get; set; }
+    [Key(6)]
+    public List<FunctionCallContent> Calls { get; set; } = [];
+
+    [Key(7)]
+    public List<FunctionResultContent> Results { get; set; } = [];
+
+    /// <summary>
+    /// Attachments associated with this action message. Used to provide additional context of a tool call result.
+    /// </summary>
+    [IgnoreMember]
+    public IEnumerable<ChatAttachment> Attachments => Results.Select(r => r.Result).OfType<ChatAttachment>();
+
+    [SerializationConstructor]
+    private FunctionCallChatMessage() { }
+
+    public FunctionCallChatMessage(LucideIconKind icon, DynamicResourceKey? headerKey) : base(AuthorRole.Tool, icon, headerKey)
+    {
+        Icon = icon;
+        HeaderKey = headerKey;
+    }
 }
