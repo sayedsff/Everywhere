@@ -3,6 +3,7 @@ using Everywhere.Utilities;
 #endif
 
 using Serilog;
+using Serilog.Formatting.Json;
 
 namespace Everywhere.Common;
 
@@ -29,6 +30,7 @@ public static class Entrance
     public static void Initialize(string[] args)
     {
         InitializeApplicationMutex(args);
+        InitializeLogger();
         InitializeErrorHandling();
     }
 
@@ -55,23 +57,23 @@ public static class Entrance
 #endif
     }
 
-    private static void InitializeErrorHandling()
+    private static void InitializeLogger()
     {
-        const string OutputTemplate =
-            "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff}] [{Level:u3}] " +
-            "[{SourceContext}] {Message:lj}{NewLine}{Exception}";
         var dataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Everywhere");
 
         Log.Logger = new LoggerConfiguration()
             .Enrich.FromLogContext()
             .WriteTo.Console(
-                outputTemplate: OutputTemplate)
+                outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff}] [{Level:u3}] [{SourceContext}] {Message:lj}{NewLine}{Exception}")
             .WriteTo.File(
-                Path.Combine(dataPath, "logs", ".log"),
-                rollingInterval: RollingInterval.Day,
-                outputTemplate: OutputTemplate)
+                new JsonFormatter(),
+                Path.Combine(dataPath, "logs", ".jsonl"),
+                rollingInterval: RollingInterval.Day)
             .CreateLogger();
+    }
 
+    private static void InitializeErrorHandling()
+    {
         AppDomain.CurrentDomain.UnhandledException += (_, e) =>
         {
             Log.Logger.Error(e.ExceptionObject as Exception, "Unhandled Exception");
