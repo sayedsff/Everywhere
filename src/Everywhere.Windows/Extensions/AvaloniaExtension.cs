@@ -268,4 +268,13 @@ internal static class AvaloniaExtension
         // Return 0 for unsupported keys
         _ => 0
     };
+
+    public static KeyModifiers ToKeyModifiers(this VIRTUAL_KEY key) => key switch
+    {
+        VIRTUAL_KEY.VK_SHIFT or VIRTUAL_KEY.VK_LSHIFT or VIRTUAL_KEY.VK_RSHIFT => KeyModifiers.Shift,
+        VIRTUAL_KEY.VK_CONTROL or VIRTUAL_KEY.VK_LCONTROL or VIRTUAL_KEY.VK_RCONTROL => KeyModifiers.Control,
+        VIRTUAL_KEY.VK_MENU or VIRTUAL_KEY.VK_LMENU or VIRTUAL_KEY.VK_RMENU => KeyModifiers.Alt,
+        VIRTUAL_KEY.VK_LWIN or VIRTUAL_KEY.VK_RWIN => KeyModifiers.Meta,
+        _ => KeyModifiers.None
+    };
 }

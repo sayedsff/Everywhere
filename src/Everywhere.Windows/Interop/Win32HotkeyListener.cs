@@ -10,6 +10,7 @@ using Avalonia.Input;
 using Everywhere.Configuration;
 using Everywhere.Extensions;
 using Everywhere.Interop;
+using Everywhere.Utilities;
 using Everywhere.Windows.Extensions;
 
 namespace Everywhere.Windows.Interop;
@@ -18,33 +19,43 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
 {
     public event PointerHotkeyActivatedHandler PointerHotkeyActivated
     {
-        add => pointerHotkeyActivated += value;
-        remove => pointerHotkeyActivated -= value;
+        add => _pointerHotkeyActivated += value;
+        remove => _pointerHotkeyActivated -= value;
     }
 
     public event KeyboardHotkeyActivatedHandler KeyboardHotkeyActivated
     {
-        add => keyboardHotkeyActivated += value;
-        remove => keyboardHotkeyActivated -= value;
+        add => _keyboardHotkeyActivated += value;
+        remove => _keyboardHotkeyActivated -= value;
     }
 
     public KeyboardHotkey KeyboardHotkey
     {
-        get => keyboardHotkey;
-        set => PInvoke.PostMessage(hotkeyWindowHWnd, WM_REGISTER_HOTKEY, new WPARAM((nuint)value.Key), new LPARAM((nint)value.Modifiers));
+        get => _keyboardHotkey;
+        set => PInvoke.PostMessage(_hotkeyWindowHWnd, WM_REGISTER_HOTKEY, new WPARAM((nuint)value.Key), new LPARAM((nint)value.Modifiers));
     }
 
     private const nuint TimerId = 1;
     private const nuint InjectExtra = 0x0d000721;
     private const uint WM_REGISTER_HOTKEY = (uint)WINDOW_MESSAGE.WM_USER;
 
-    private static PointerHotkeyActivatedHandler? pointerHotkeyActivated;
-    private static KeyboardHotkeyActivatedHandler? keyboardHotkeyActivated;
-    private static KeyboardHotkey keyboardHotkey;
+    private static PointerHotkeyActivatedHandler? _pointerHotkeyActivated;
+    private static KeyboardHotkeyActivatedHandler? _keyboardHotkeyActivated;
 
-    private static HWND hotkeyWindowHWnd;
-    private static uint pressedXButton;
-    private static bool isXButtonEventTriggered;
+    private static KeyboardHotkey _keyboardHotkey;
+    private static LowLevelKeyboardHook? _keyboardHotkeyHook;
+    private static KeyModifiers _pressedHookedModifiers;
+    private static bool _isHotkeyTriggered;
+    private static HWND _hotkeyWindowHWnd;
+    private static bool _isHotkeyRegistered;
+
+    private static uint _pressedXButton;
+    private static bool _isXButtonEventTriggered;
+
+    /// <summary>
+    /// Indicates whether a keyboard hotkey scope is currently active.
+    /// </summary>
+    private static bool _isKeyboardHotkeyScoped;
 
     static Win32HotkeyListener()
     {
@@ -60,7 +71,7 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
     private static void HookWindowMessageLoop()
     {
         using var hModule = PInvoke.GetModuleHandle(null);
-        hotkeyWindowHWnd = PInvoke.CreateWindowEx(
+        _hotkeyWindowHWnd = PInvoke.CreateWindowEx(
             WINDOW_EX_STYLE.WS_EX_NOACTIVATE,
             "STATIC",
             "Everywhere.HotKeyWindow",
@@ -73,7 +84,7 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
             null,
             hModule,
             null);
-        if (hotkeyWindowHWnd.IsNull)
+        if (_hotkeyWindowHWnd.IsNull)
         {
             Marshal.ThrowExceptionForHR(Marshal.GetLastWin32Error());
         }
@@ -86,50 +97,55 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
                 case WM_REGISTER_HOTKEY:
                 {
                     var value = new KeyboardHotkey((Key)msg.wParam.Value, (KeyModifiers)msg.lParam.Value);
-                    if (keyboardHotkey == value) continue;
+                    if (_keyboardHotkey == value) continue;
 
-                    if (!keyboardHotkey.IsEmpty)
-                    {
-                        PInvoke.UnregisterHotKey(hotkeyWindowHWnd, 0);
-                    }
+                    if (_isHotkeyRegistered) PInvoke.UnregisterHotKey(_hotkeyWindowHWnd, 0);
+                    DisposeCollector.DisposeToDefault(ref _keyboardHotkeyHook);
 
                     if (value.Modifiers == KeyModifiers.None || value.Key == Key.None)
                     {
                         // invalid hotkey, ignore
-                        keyboardHotkey = default;
+                        _keyboardHotkey = default;
                         continue;
                     }
 
-                    keyboardHotkey = value;
+                    _keyboardHotkey = value;
 
-                    var hotKeyModifiers = HOT_KEY_MODIFIERS.MOD_NOREPEAT;
-                    if (value.Modifiers.HasFlag(KeyModifiers.Control))
-                        hotKeyModifiers |= HOT_KEY_MODIFIERS.MOD_CONTROL;
-                    if (value.Modifiers.HasFlag(KeyModifiers.Shift))
-                        hotKeyModifiers |= HOT_KEY_MODIFIERS.MOD_SHIFT;
-                    if (value.Modifiers.HasFlag(KeyModifiers.Alt))
-                        hotKeyModifiers |= HOT_KEY_MODIFIERS.MOD_ALT;
                     if (value.Modifiers.HasFlag(KeyModifiers.Meta))
-                        hotKeyModifiers |= HOT_KEY_MODIFIERS.MOD_WIN;
-                    PInvoke.RegisterHotKey(
-                        hotkeyWindowHWnd,
-                        0,
-                        hotKeyModifiers,
-                        (uint)value.Key.ToVirtualKey()
-                    );
+                    {
+                        // for those keys with Meta modifier, we need a low level keyboard hook to block the Windows key down event
+                        _keyboardHotkeyHook = new LowLevelKeyboardHook(KeyboardHotkeyHookProc);
+                    }
+                    else
+                    {
+                        var hotKeyModifiers = HOT_KEY_MODIFIERS.MOD_NOREPEAT;
+                        if (value.Modifiers.HasFlag(KeyModifiers.Control))
+                            hotKeyModifiers |= HOT_KEY_MODIFIERS.MOD_CONTROL;
+                        if (value.Modifiers.HasFlag(KeyModifiers.Shift))
+                            hotKeyModifiers |= HOT_KEY_MODIFIERS.MOD_SHIFT;
+                        if (value.Modifiers.HasFlag(KeyModifiers.Alt))
+                            hotKeyModifiers |= HOT_KEY_MODIFIERS.MOD_ALT;
+                        _isHotkeyRegistered = PInvoke.RegisterHotKey(
+                            _hotkeyWindowHWnd,
+                            0,
+                            hotKeyModifiers,
+                            (uint)value.Key.ToVirtualKey()
+                        );
+                    }
+
                     break;
                 }
-                case (uint)WINDOW_MESSAGE.WM_HOTKEY:
+                case (uint)WINDOW_MESSAGE.WM_HOTKEY when !_isKeyboardHotkeyScoped:
                 {
-                    keyboardHotkeyActivated?.Invoke();
+                    _keyboardHotkeyActivated?.Invoke();
                     break;
                 }
                 case (uint)WINDOW_MESSAGE.WM_TIMER when msg.wParam == TimerId:
                 {
-                    isXButtonEventTriggered = true;
-                    PInvoke.KillTimer(hotkeyWindowHWnd, TimerId);
+                    _isXButtonEventTriggered = true;
+                    PInvoke.KillTimer(_hotkeyWindowHWnd, TimerId);
 
-                    if (pointerHotkeyActivated is not { } handler) continue;
+                    if (_pointerHotkeyActivated is not { } handler) continue;
                     PInvoke.GetCursorPos(out var point);
                     handler.Invoke(new PixelPoint(point.X, point.Y));
                     break;
@@ -139,7 +155,80 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
             PInvoke.DispatchMessage(&msg);
         }
 
-        PInvoke.DestroyWindow(hotkeyWindowHWnd);
+        // Cleanup
+        if (_isHotkeyRegistered) PInvoke.UnregisterHotKey(_hotkeyWindowHWnd, 0);
+        DisposeCollector.DisposeToDefault(ref _keyboardHotkeyHook);
+
+        PInvoke.DestroyWindow(_hotkeyWindowHWnd);
+    }
+
+    private static void KeyboardHotkeyHookProc(UIntPtr wParam, ref KBDLLHOOKSTRUCT lParam, ref bool blockNext)
+    {
+        if (_isKeyboardHotkeyScoped) return;
+
+        var virtualKey = (VIRTUAL_KEY)lParam.vkCode;
+        var key = virtualKey.ToAvaloniaKey();
+        var keyModifiers = virtualKey.ToKeyModifiers();
+
+        switch ((WINDOW_MESSAGE)wParam)
+        {
+            case WINDOW_MESSAGE.WM_KEYDOWN or WINDOW_MESSAGE.WM_SYSKEYDOWN:
+            {
+                // If a modifier key is pressed, add it to our state.
+                if (keyModifiers != KeyModifiers.None)
+                {
+                    _pressedHookedModifiers |= keyModifiers;
+                }
+
+                // Check if the pressed key is the main key of the hotkey,
+                // all required modifiers are pressed, and the hotkey hasn't been triggered yet.
+                var isMainKeyPressed = key == _keyboardHotkey.Key && key != Key.None;
+                var areModifiersPressed = _pressedHookedModifiers == _keyboardHotkey.Modifiers;
+
+                if (!_isHotkeyTriggered && isMainKeyPressed && areModifiersPressed)
+                {
+                    // Mark as triggered to prevent re-firing.
+                    _isHotkeyTriggered = true;
+                    // Block this key event.
+                    blockNext = true;
+                    // Invoke the hotkey activated event.
+                    _keyboardHotkeyActivated?.Invoke();
+                    return;
+                }
+
+                // If any part of the hotkey combination is pressed, block the event.
+                // This is to prevent side effects, e.g., opening the Start Menu with the Win key.
+                if ((_pressedHookedModifiers & _keyboardHotkey.Modifiers) != 0 || isMainKeyPressed)
+                {
+                    blockNext = true;
+                }
+
+                break;
+            }
+            case WINDOW_MESSAGE.WM_KEYUP or WINDOW_MESSAGE.WM_SYSKEYUP:
+            {
+                // If a modifier key is released, remove it from our state.
+                if (keyModifiers != KeyModifiers.None)
+                {
+                    _pressedHookedModifiers &= ~keyModifiers;
+                }
+
+                // If all modifier keys are released, reset the triggered flag.
+                // This allows the hotkey to be triggered again.
+                if (_pressedHookedModifiers == KeyModifiers.None)
+                {
+                    _isHotkeyTriggered = false;
+                }
+
+                // Block the key up event if it was part of the hotkey combination
+                // to ensure consistent behavior.
+                if ((_keyboardHotkey.Modifiers.HasFlag(keyModifiers) && keyModifiers != KeyModifiers.None) || key == _keyboardHotkey.Key)
+                {
+                    blockNext = true;
+                }
+                break;
+            }
+        }
     }
 
     private static LRESULT MouseHookProc(int code, WPARAM wParam, LPARAM lParam)
@@ -155,21 +244,21 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
         {
             case (uint)WINDOW_MESSAGE.WM_XBUTTONDOWN when button is PInvoke.XBUTTON1:
             {
-                pressedXButton = button;
-                PInvoke.SetTimer(hotkeyWindowHWnd, TimerId, 500, null);
+                _pressedXButton = button;
+                PInvoke.SetTimer(_hotkeyWindowHWnd, TimerId, 500, null);
                 return new LRESULT(1); // block XButton1 down event
             }
-            case (uint)WINDOW_MESSAGE.WM_XBUTTONUP when button == pressedXButton:
+            case (uint)WINDOW_MESSAGE.WM_XBUTTONUP when button == _pressedXButton:
             {
-                pressedXButton = 0;
+                _pressedXButton = 0;
 
-                if (isXButtonEventTriggered)
+                if (_isXButtonEventTriggered)
                 {
-                    isXButtonEventTriggered = false;
+                    _isXButtonEventTriggered = false;
                     return new LRESULT(1); // block XButton1 up event
                 }
 
-                PInvoke.KillTimer(hotkeyWindowHWnd, TimerId);
+                PInvoke.KillTimer(_hotkeyWindowHWnd, TimerId);
 
                 // send XButton1 down and up event to the system in new thread
                 // otherwise it will cause a deadlock
@@ -218,48 +307,47 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
     {
         public KeyboardHotkey PressingHotkey { get; private set; }
 
-        private readonly PropertyChangingEventArgs changingEventArgsCache = new(nameof(PressingHotkey));
-        private readonly PropertyChangedEventArgs changedEventArgsCache = new(nameof(PressingHotkey));
-        private readonly LowLevelKeyboardHook keyboardHook;
+        private readonly PropertyChangingEventArgs _changingEventArgsCache = new(nameof(PressingHotkey));
+        private readonly PropertyChangedEventArgs _changedEventArgsCache = new(nameof(PressingHotkey));
+        private readonly LowLevelKeyboardHook _keyboardHook;
 
-        private KeyModifiers pressedKeyModifiers = KeyModifiers.None;
+        private KeyModifiers _pressedKeyModifiers = KeyModifiers.None;
 
         public KeyboardHotkeyScopeImpl()
         {
-            keyboardHook = new LowLevelKeyboardHook(KeyboardHookCallback);
+            if (_isKeyboardHotkeyScoped)
+            {
+                throw new InvalidOperationException("Only one keyboard hotkey scope can be active at a time.");
+            }
+
+            _keyboardHook = new LowLevelKeyboardHook(KeyboardHookCallback);
+            _isKeyboardHotkeyScoped = true;
         }
 
         private void KeyboardHookCallback(UIntPtr wParam, ref KBDLLHOOKSTRUCT lParam, ref bool blockNext)
         {
             var virtualKey = (VIRTUAL_KEY)lParam.vkCode;
-            var systemKey = virtualKey switch
-            {
-                VIRTUAL_KEY.VK_CONTROL or VIRTUAL_KEY.VK_LCONTROL or VIRTUAL_KEY.VK_RCONTROL => KeyModifiers.Control,
-                VIRTUAL_KEY.VK_SHIFT or VIRTUAL_KEY.VK_LSHIFT or VIRTUAL_KEY.VK_RSHIFT => KeyModifiers.Shift,
-                VIRTUAL_KEY.VK_MENU or VIRTUAL_KEY.VK_LMENU or VIRTUAL_KEY.VK_RMENU => KeyModifiers.Alt,
-                VIRTUAL_KEY.VK_LWIN or VIRTUAL_KEY.VK_RWIN => KeyModifiers.Meta,
-                _ => KeyModifiers.None
-            };
+            var keyModifiers = virtualKey.ToKeyModifiers();
 
             switch ((WINDOW_MESSAGE)wParam)
             {
-                case WINDOW_MESSAGE.WM_KEYDOWN when systemKey == KeyModifiers.None:
+                case WINDOW_MESSAGE.WM_KEYDOWN when keyModifiers == KeyModifiers.None:
                 {
                     PressingHotkey = PressingHotkey with { Key = virtualKey.ToAvaloniaKey() };
-                    PropertyChanging?.Invoke(this, changingEventArgsCache);
+                    PropertyChanging?.Invoke(this, _changingEventArgsCache);
                     break;
                 }
                 case WINDOW_MESSAGE.WM_KEYDOWN:
                 {
-                    pressedKeyModifiers |= systemKey;
-                    PressingHotkey = PressingHotkey with { Modifiers = pressedKeyModifiers };
-                    PropertyChanging?.Invoke(this, changingEventArgsCache);
+                    _pressedKeyModifiers |= keyModifiers;
+                    PressingHotkey = PressingHotkey with { Modifiers = _pressedKeyModifiers };
+                    PropertyChanging?.Invoke(this, _changingEventArgsCache);
                     break;
                 }
                 case WINDOW_MESSAGE.WM_KEYUP:
                 {
-                    pressedKeyModifiers &= ~systemKey;
-                    if (pressedKeyModifiers == KeyModifiers.None)
+                    _pressedKeyModifiers &= ~keyModifiers;
+                    if (_pressedKeyModifiers == KeyModifiers.None)
                     {
                         if (PressingHotkey.Modifiers != KeyModifiers.None && PressingHotkey.Key == Key.None)
                         {
@@ -267,8 +355,8 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
                         }
 
                         // system key is all released, capture is done
-                        PropertyChanging?.Invoke(this, changingEventArgsCache);
-                        PropertyChanged?.Invoke(this, changedEventArgsCache);
+                        PropertyChanging?.Invoke(this, _changingEventArgsCache);
+                        PropertyChanged?.Invoke(this, _changedEventArgsCache);
                     }
                     break;
                 }
@@ -279,7 +367,8 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
 
         public void Dispose()
         {
-            keyboardHook.Dispose();
+            _keyboardHook.Dispose();
+            _isKeyboardHotkeyScoped = false;
         }
 
         public event PropertyChangingEventHandler? PropertyChanging;
