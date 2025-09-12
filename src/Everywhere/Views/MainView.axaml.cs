@@ -18,7 +18,7 @@ public partial class MainView : ReactiveUserControl<MainViewModel>
         InitializeComponent();
     }
 
-    private void HandleCommonPropertyChanged(object? _, PropertyChangedEventArgs e)
+    private void HandleSettingsCommonPropertyChanged(object? _, PropertyChangedEventArgs e)
     {
         if (e.PropertyName != nameof(CommonSettings.Theme)) return;
         Dispatcher.UIThread.InvokeOnDemand(ApplyTheme);
@@ -28,7 +28,7 @@ public partial class MainView : ReactiveUserControl<MainViewModel>
     {
         base.OnLoaded(e);
 
-        _settings.Common.PropertyChanged += HandleCommonPropertyChanged;
+        _settings.Common.PropertyChanged += HandleSettingsCommonPropertyChanged;
         ApplyTheme();
     }
 
@@ -36,7 +36,7 @@ public partial class MainView : ReactiveUserControl<MainViewModel>
     {
         base.OnUnloaded(e);
 
-        _settings.Common.PropertyChanged -= HandleCommonPropertyChanged;
+        _settings.Common.PropertyChanged -= HandleSettingsCommonPropertyChanged;
     }
 
     private void ApplyTheme()

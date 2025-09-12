@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
 using Avalonia.Data.Converters;
@@ -178,9 +177,12 @@ public static class SettingsItemFactory
         {
             result = SettingsSelectionItem.FromEnum(itemPropertyInfo.PropertyType, name);
         }
-        else if (itemPropertyInfo.PropertyType.IsAssignableTo(typeof(Control)))
+        else if (itemPropertyInfo.PropertyType.IsAssignableTo(typeof(ISettingsControl)))
         {
-            var control = itemPropertyInfo.GetValue(null).NotNull<Control>();
+            var settingsControl = itemPropertyInfo.GetMethod is { IsStatic: true } ?
+                itemPropertyInfo.GetValue(null).NotNull<ISettingsControl>() :
+                itemPropertyInfo.GetValue(target).NotNull<ISettingsControl>();
+            var control = settingsControl.CreateControl();
             control.DataContext = target;
             result = new SettingsControlItem(name, control);
         }

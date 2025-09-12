@@ -108,7 +108,6 @@ public static class Program
                 #region Initialize
 
                 .AddTransient<IAsyncInitializer, HotkeyInitializer>()
-                .AddTransient<IAsyncInitializer, SettingsInitializer>()
                 .AddTransient<IAsyncInitializer, UpdaterInitializer>()
 
             #endregion

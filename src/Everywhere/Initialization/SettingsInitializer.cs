@@ -5,19 +5,61 @@ using Everywhere.AI;
 using Everywhere.Chat.Plugins;
 using Everywhere.Common;
 using Everywhere.Configuration;
+using Everywhere.Utilities;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Everywhere.Initialization;
 
-public class SettingsInitializer(Settings settings) : IAsyncInitializer
+/// <summary>
+/// Initializes the settings with dynamic defined list.
+/// Also initializes an observer that automatically saves the settings when changed.
+/// </summary>
+public class SettingsInitializer : IAsyncInitializer
 {
     public int Priority => 50;
+
+    private readonly Dictionary<string, object?> _saveBuffer = new();
+    private readonly DebounceExecutor<Dictionary<string, object?>> _saveDebounceExecutor;
+    private readonly Settings _settings;
+
+    public SettingsInitializer(Settings settings, [FromKeyedServices(typeof(Settings))] IConfiguration configuration)
+    {
+        _settings = settings;
+
+        _saveDebounceExecutor = new DebounceExecutor<Dictionary<string, object?>>(
+            () => _saveBuffer,
+            saveBuffer =>
+            {
+                lock (saveBuffer)
+                {
+                    if (saveBuffer.Count == 0) return;
+                    foreach (var (key, value) in saveBuffer) configuration.Set(key, value);
+                    saveBuffer.Clear();
+                }
+            },
+            TimeSpan.FromSeconds(0.5));
+    }
 
     public Task InitializeAsync()
     {
         InitializeModelProviders();
         InitializeSearchEngineProviders();
 
+        InitializeObserver();
+
         return Task.CompletedTask;
+    }
+
+    private void InitializeObserver()
+    {
+        new ObjectObserver(HandleSettingsChanges).Observe(_settings);
+
+        void HandleSettingsChanges(in ObjectObserverChangedEventArgs e)
+        {
+            lock (_saveBuffer) _saveBuffer[e.Path] = e.Value;
+            _saveDebounceExecutor.Trigger();
+        }
     }
 
     private void InitializeModelProviders()
@@ -535,10 +577,10 @@ public class SettingsInitializer(Settings settings) : IAsyncInitializer
                     ]
                 }
             ],
-            settings.Model.ModelProviders);
+            _settings.Model.ModelProviders);
 
-        settings.Model.SelectedModelProviderId ??= settings.Model.ModelProviders.FirstOrDefault()?.Id;
-        settings.Model.SelectedModelDefinitionId ??= settings.Model.ModelProviders.FirstOrDefault()?.ModelDefinitions.FirstOrDefault()?.Id;
+        _settings.Model.SelectedModelProviderId ??= _settings.Model.ModelProviders.FirstOrDefault()?.Id;
+        _settings.Model.SelectedModelDefinitionId ??= _settings.Model.ModelProviders.FirstOrDefault()?.ModelDefinitions.FirstOrDefault()?.Id;
     }
 
     /// <summary>
@@ -606,7 +648,7 @@ public class SettingsInitializer(Settings settings) : IAsyncInitializer
 
     private void InitializeSearchEngineProviders()
     {
-        var webSearchEngineSettings = settings.Plugin.WebSearchEngine;
+        var webSearchEngineSettings = _settings.Plugin.WebSearchEngine;
 
         ApplySearchEngineProviders(
             [
