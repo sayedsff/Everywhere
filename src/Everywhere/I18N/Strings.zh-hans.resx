@@ -679,10 +679,10 @@
         <value>提供网络搜索能力，先搜索后回答，可减少大语言模型幻觉，并提供最新信息。</value>
     </data>
     <data name="NativeChatPlugin_Shell_Header" xml:space="preserve">
-        <value>Shell</value>
+        <value>终端</value>
     </data>
     <data name="NativeChatPlugin_Shell_Description" xml:space="preserve">
-        <value>提供执行命令的能力，允许直接和系统交互，提供无限可能。</value>
+        <value>提供在终端中执行命令的能力，允许直接和系统交互，提供无限可能。</value>
     </data>
     <data name="NativeChatPlugin_FileSystem_Header" xml:space="preserve">
         <value>文件系统</value>
@@ -704,5 +704,11 @@
     </data>
     <data name="ChatPluginPage_TabItem_Functions_Header" xml:space="preserve">
         <value>功能</value>
+    </data>
+    <data name="NativeChatPlugin_VisualTree_Header" xml:space="preserve">
+        <value>视觉树</value>
+    </data>
+    <data name="NativeChatPlugin_VisualTree_Description" xml:space="preserve">
+        <value>提供感知屏幕上元素的能力。</value>
     </data>
 </root>

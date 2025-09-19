@@ -696,13 +696,13 @@ Tip: You can reopen this message by clicking “About - Welcome Page”.</value>
         <value>Web Search Engine</value>
     </data>
     <data name="NativeChatPlugin_WebSearchEngine_Description" xml:space="preserve">
-        <value>Providing web search capabilities, searching before answering, can reduce large language model hallucinations and provide the latest information.</value>
+        <value>Provides the ability to search the web before answering, can reduce large language model hallucinations and provide the latest information.</value>
     </data>
     <data name="NativeChatPlugin_Shell_Header" xml:space="preserve">
-        <value>Shell</value>
+        <value>Terminal</value>
     </data>
     <data name="NativeChatPlugin_Shell_Description" xml:space="preserve">
-        <value>Provides the ability to execute commands, allowing direct interaction with the system and offering unlimited possibilities.</value>
+        <value>Provides the ability to execute commands in terminal, allowing direct interaction with the system and offering unlimited possibilities.</value>
     </data>
     <data name="NativeChatPlugin_FileSystem_Header" xml:space="preserve">
         <value>File System</value>
@@ -724,5 +724,11 @@ Tip: You can reopen this message by clicking “About - Welcome Page”.</value>
     </data>
     <data name="ChatPluginPage_TabItem_Functions_Header" xml:space="preserve">
         <value>Functions</value>
+    </data>
+    <data name="NativeChatPlugin_VisualTree_Header" xml:space="preserve">
+        <value>Visual Tree</value>
+    </data>
+    <data name="NativeChatPlugin_VisualTree_Description" xml:space="preserve">
+        <value>Provides the ability to perceive elements on the screen.</value>
     </data>
 </root>
