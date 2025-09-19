@@ -26,14 +26,20 @@ public interface IVisualElementContext
 
     IVisualElement? KeyboardFocusedElement { get; }
 
-    IVisualElement? PointerOverElement { get; }
-
     /// <summary>
     /// Get the element at the specified point.
     /// </summary>
     /// <param name="point">Point in screen pixels.</param>
+    /// <param name="mode"></param>
     /// <returns></returns>
-    IVisualElement? ElementFromPoint(PixelPoint point);
+    IVisualElement? ElementFromPoint(PixelPoint point, PickElementMode mode = PickElementMode.Element);
+
+    /// <summary>
+    /// Get the element under the mouse pointer.
+    /// </summary>
+    /// <param name="mode"></param>
+    /// <returns></returns>
+    IVisualElement? ElementFromPointer(PickElementMode mode = PickElementMode.Element);
 
     /// <summary>
     /// Let the user pick an element from the screen.

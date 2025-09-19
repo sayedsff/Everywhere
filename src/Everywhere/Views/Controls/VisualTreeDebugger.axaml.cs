@@ -37,7 +37,7 @@ public partial class VisualTreeDebugger : UserControl
         IHotkeyListener hotkeyListener,
         IVisualElementContext visualElementContext)
     {
-        this._visualElementContext = visualElementContext;
+        _visualElementContext = visualElementContext;
 
         InitializeComponent();
 
@@ -47,7 +47,7 @@ public partial class VisualTreeDebugger : UserControl
         hotkeyListener.KeyboardHotkeyActivated += () =>
         {
             _rootElements.Clear();
-            var element = visualElementContext.PointerOverElement;
+            var element = visualElementContext.ElementFromPointer();
             if (element == null) return;
             element = element
                 .GetAncestors()

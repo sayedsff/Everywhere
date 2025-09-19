@@ -181,7 +181,7 @@ public partial class ChatInputBox : TextBox
                 {
                     element = element.Parent;
                     if (element is not { DataContext: ChatVisualElementAttachment attachment }) continue;
-                    _visualElementAttachmentOverlayWindow.Value.UpdateForVisualElement(attachment.Element);
+                    _visualElementAttachmentOverlayWindow.Value.UpdateForVisualElement(attachment.Element?.Target);
                     return;
                 }
                 _visualElementAttachmentOverlayWindow.Value.UpdateForVisualElement(null);

@@ -49,7 +49,6 @@ DwmGetWindowAttribute
 DwmSetWindowAttribute
 
 GetCurrentProcessId
-GetWindowThreadProcessId
 GetModuleHandle
 EnumWindows
 

@@ -35,7 +35,7 @@ public class HotkeyInitializer(
                         .GetAncestors(true)
                         .CurrentAndNext()
                         .FirstOrDefault(t => t.Current.Type == VisualElementType.TextEdit || t.Current.ProcessId != t.Next.ProcessId).Current ??
-                    visualElementContext.PointerOverElement?
+                    visualElementContext.ElementFromPointer()?
                         .GetAncestors(true)
                         .LastOrDefault();
                 if (element == null) return;

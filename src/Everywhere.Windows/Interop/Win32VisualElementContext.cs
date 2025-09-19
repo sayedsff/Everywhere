@@ -18,6 +18,7 @@ using FlaUI.Core.Definitions;
 using FlaUI.Core.Patterns.Infrastructure;
 using FlaUI.Core.Tools;
 using FlaUI.UIA3;
+using Microsoft.Extensions.Logging;
 using ZLinq;
 using Application = Avalonia.Application;
 using Bitmap = Avalonia.Media.Imaging.Bitmap;
@@ -35,8 +36,6 @@ public partial class Win32VisualElementContext : IVisualElementContext
     private static readonly ITreeWalker TreeWalker = Automation.TreeWalkerFactory.GetContentViewWalker();
 
     // private static readonly TextServiceImpl TextService = new();
-    private static readonly int CurrentProcessId = (int)PInvoke.GetCurrentProcessId();
-    // private static readonly Lazy<DwmScreenCaptureHelper> DwmScreenCaptureHelper = new();
     private static readonly Lazy<Direct3D11ScreenCaptureHelper> Direct3D11ScreenCaptureHelper = new();
 
     public event IVisualElementContext.KeyboardFocusedElementChangedHandler? KeyboardFocusedElementChanged;
@@ -46,10 +45,12 @@ public partial class Win32VisualElementContext : IVisualElementContext
     public IVisualElement? PointerOverElement => TryFrom(static () => PInvoke.GetCursorPos(out var point) ? Automation.FromPoint(point) : null);
 
     private readonly INativeHelper _nativeHelper;
+    private readonly ILogger<Win32VisualElementContext> _logger;
 
-    public Win32VisualElementContext(INativeHelper nativeHelper)
+    public Win32VisualElementContext(INativeHelper nativeHelper, ILogger<Win32VisualElementContext> logger)
     {
         _nativeHelper = nativeHelper;
+        _logger = logger;
 
         Automation.RegisterFocusChangedEvent(element =>
         {
@@ -60,12 +61,43 @@ public partial class Win32VisualElementContext : IVisualElementContext
                 return;
             }
 
-            if (element.FrameworkAutomationElement.ProcessId.ValueOrDefault == CurrentProcessId) return;
             handler(new AutomationVisualElementImpl(this, element, true));
         });
     }
 
-    public IVisualElement? ElementFromPoint(PixelPoint point) => TryFrom(() => Automation.FromPoint(new Point(point.X, point.Y)));
+
+    public IVisualElement? ElementFromPoint(PixelPoint point, PickElementMode mode = PickElementMode.Element)
+    {
+        switch (mode)
+        {
+            case PickElementMode.Element:
+            {
+                return TryFrom(() => Automation.FromPoint(new Point(point.X, point.Y)));
+            }
+            case PickElementMode.Window:
+            {
+                IVisualElement? element = TryFrom(() => Automation.FromPoint(new Point(point.X, point.Y)), false);
+                while (element is AutomationVisualElementImpl { IsTopLevelWindow: false })
+                {
+                    element = element.Parent;
+                }
+
+                return element;
+            }
+            case PickElementMode.Screen:
+            {
+                var hMonitor = PInvoke.MonitorFromPoint(new Point(point.X, point.Y), MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST);
+                return hMonitor == HMONITOR.Null ? null : new ScreenVisualElementImpl(this, hMonitor);
+            }
+        }
+
+        return null;
+    }
+
+    public IVisualElement? ElementFromPointer(PickElementMode mode = PickElementMode.Element)
+    {
+        return !PInvoke.GetCursorPos(out var point) ? null : ElementFromPoint(new PixelPoint(point.X, point.Y), mode);
+    }
 
     public async Task<IVisualElement?> PickElementAsync(PickElementMode mode)
     {
@@ -85,13 +117,11 @@ public partial class Win32VisualElementContext : IVisualElementContext
     {
         try
         {
-            if (factory() is { } element && element.FrameworkAutomationElement.ProcessId.ValueOrDefault != CurrentProcessId)
-                return new AutomationVisualElementImpl(this, element, windowBarrier);
+            if (factory() is { } element) return new AutomationVisualElementImpl(this, element, windowBarrier);
         }
         catch (Exception ex)
         {
-            // Log the exception if needed
-            Console.WriteLine($"Error retrieving UI Automation element: {ex.Message}");
+            _logger.LogError(ex, "Failed to get AutomationElement");
         }
 
         return null;
@@ -540,7 +570,7 @@ public partial class Win32VisualElementContext : IVisualElementContext
         /// <remarks>
         ///     e.g. A control inside a window or a non-win32 element will return false.
         /// </remarks>
-        private bool IsTopLevelWindow =>
+        public bool IsTopLevelWindow =>
             NativeWindowHandle != IntPtr.Zero &&
             PInvoke.GetAncestor((HWND)NativeWindowHandle, GET_ANCESTOR_FLAGS.GA_ROOTOWNER) == NativeWindowHandle;
 
@@ -582,9 +612,6 @@ public partial class Win32VisualElementContext : IVisualElementContext
                         var windowPlacement = new WINDOWPLACEMENT();
                         if (!PInvoke.GetWindowPlacement(hWnd, ref windowPlacement) ||
                             windowPlacement.showCmd == SHOW_WINDOW_CMD.SW_SHOWMINIMIZED) return true;
-
-                        var pid = 0U;
-                        if (PInvoke.GetWindowThreadProcessId(hWnd, &pid) == 0 || pid == CurrentProcessId) return true;
 
                         if (PInvoke.MonitorFromWindow(hWnd, MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONULL) != hMonitor) return true;
                         windows.Add(hWnd);
