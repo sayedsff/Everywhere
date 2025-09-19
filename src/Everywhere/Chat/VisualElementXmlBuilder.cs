@@ -1,12 +1,9 @@
-﻿using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Security;
+﻿using System.Security;
 using System.Text;
 using System.Text.RegularExpressions;
 using Everywhere.Interop;
 using ZLinq;
 #if DEBUG
-using JetBrains.Profiler.Api;
 #endif
 
 namespace Everywhere.Chat;
@@ -40,41 +37,20 @@ public partial class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreE
         public override int GetHashCode() => Element.Id.GetHashCode();
     }
 
-    private readonly Dictionary<string, int> _idMap = [];
+    /// <summary>
+    ///     The mapping from original element ID to the built sequential ID starting from <see cref="startingId"/>.
+    /// </summary>
+    public Dictionary<int, IVisualElement> BuiltVisualElements { get; } = new();
+
     private readonly HashSet<XmlVisualElement> _rootElements = [];
     private StringBuilder? _visualTreeXmlBuilder;
 
     public string BuildXml(CancellationToken cancellationToken)
     {
-        EnsureBuilt(cancellationToken);
-        return _visualTreeXmlBuilder.ToString();
-    }
-
-    public IReadOnlyDictionary<string, int> GetIdMap(CancellationToken cancellationToken)
-    {
-        EnsureBuilt(cancellationToken);
-        return _idMap;
-    }
-
-    public IEnumerable<IVisualElement> GetRootElements(CancellationToken cancellationToken)
-    {
-        EnsureBuilt(cancellationToken);
-        return _rootElements.Select(e => e.Element);
-    }
-
-    [MemberNotNull(nameof(_visualTreeXmlBuilder))]
-    private void EnsureBuilt(CancellationToken cancellationToken)
-    {
         if (coreElements.Count == 0) throw new InvalidOperationException("No core elements to build XML from.");
 
-        if (_visualTreeXmlBuilder != null) return;
+        if (_visualTreeXmlBuilder != null) return _visualTreeXmlBuilder.ToString();
         cancellationToken.ThrowIfCancellationRequested();
-
-#if DEBUG
-        Debug.WriteLine("BuildInternal started...");
-        var sw = Stopwatch.StartNew();
-        MeasureProfiler.StartCollectingData();
-#endif
 
         var buildQueue = new Queue<QueuedElement>(coreElements.Select(e => new QueuedElement(e, QueueOrigin.CoreElement, e.Parent?.Id)));
         var visitedElements = new Dictionary<string, XmlVisualElement>();
@@ -180,12 +156,6 @@ public partial class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreE
         foreach (var rootElement in _rootElements) InternalBuildXml(rootElement, 0);
         _visualTreeXmlBuilder.TrimEnd();
 
-#if DEBUG
-        MeasureProfiler.SaveData();
-        sw.Stop();
-        Debug.WriteLine($"BuildInternal finished in {sw.ElapsedMilliseconds}ms");
-#endif
-
         string TruncateIfNeeded(string text, int maxLength)
         {
             var tokenCount = EstimateTokenCount(text);
@@ -206,8 +176,8 @@ public partial class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreE
             _visualTreeXmlBuilder.Append(indent).Append('<').Append(elementType);
 
             // Add ID
-            var id = _idMap.Count + startingId;
-            _idMap[element.Id] = id;
+            var id = BuiltVisualElements.Count + startingId;
+            BuiltVisualElements[id] = element;
             _visualTreeXmlBuilder.Append(" id=\"").Append(id).Append('"');
 
             var isContainer = elementType is
@@ -238,9 +208,9 @@ public partial class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreE
 
             if (xmlElement.Children.Count == 0 && xmlElement.Contents.Count == 0)
             {
-                if (isContainer)
+                if (isContainer && element.BoundingRectangle is { Width: > 64, Height: > 64 })
                 {
-                    _visualTreeXmlBuilder.Append(" inner-content-not-accessible");
+                    _visualTreeXmlBuilder.Append(" warning=\"XML content may be inaccessible!\"");
                 }
 
                 // Self-closing tag if no children and no content
@@ -267,6 +237,8 @@ public partial class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreE
             // End tag
             _visualTreeXmlBuilder.Append(indent).Append("</").Append(element.Type).Append('>').AppendLine();
         }
+
+        return _visualTreeXmlBuilder.ToString();
     }
 
     // The token-to-word ratio for English/Latin-based text.

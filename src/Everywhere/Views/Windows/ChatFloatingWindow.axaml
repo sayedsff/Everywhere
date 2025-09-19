@@ -568,7 +568,7 @@
                                 <Border
                                   Height="24"
                                   Background="{DynamicResource CardBackgroundColor}"
-                                  Classes.Invalid="{Binding Element, Converter={x:Static ObjectConverters.IsNull}}"
+                                  Classes.Invalid="{Binding Element.Target, Converter={x:Static ObjectConverters.IsNull}, FallbackValue=true}"
                                   CornerRadius="4">
                                   <StackPanel
                                     Margin="6,0" Orientation="Horizontal"

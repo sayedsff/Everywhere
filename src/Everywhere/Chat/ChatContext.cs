@@ -1,6 +1,8 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Everywhere.Interop;
+using Everywhere.Utilities;
 using MessagePack;
 using ObservableCollections;
 
@@ -29,12 +31,12 @@ public partial class ChatContext : ObservableObject, IReadOnlyList<ChatMessageNo
     public int Count => _branchNodes.Count;
 
     /// <summary>
-    /// OriginalId: VisualElement.Id
+    /// VisualElement.Id: VisualElement.
     /// VisualElement is dynamically created and not serialized, so we keep a map here to track them.
     /// This is also not serialized.
     /// </summary>
     [IgnoreMember]
-    public Dictionary<string, int> VisualElementIdMap { get; } = [];
+    public ResilientCache<int, IVisualElement> VisualElements { get; } = new();
 
     public ChatMessageNode this[int index] => _branchNodes[index];
 

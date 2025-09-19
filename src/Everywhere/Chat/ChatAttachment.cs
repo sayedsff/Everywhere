@@ -3,6 +3,7 @@ using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Everywhere.Interop;
 using Everywhere.Storage;
+using Everywhere.Utilities;
 using Lucide.Avalonia;
 using MessagePack;
 using Serilog;
@@ -31,7 +32,7 @@ public partial class ChatVisualElementAttachment : ChatAttachment
     /// Ignore this property during serialization because it should already be converted into prompts and shouldn't appear in history.
     /// </summary>
     [IgnoreMember]
-    public IVisualElement? Element { get; }
+    public ResilientReference<IVisualElement>? Element { get; }
 
     [SerializationConstructor]
     private ChatVisualElementAttachment(DynamicResourceKeyBase headerKey, LucideIconKind icon) : base(headerKey)
@@ -42,7 +43,7 @@ public partial class ChatVisualElementAttachment : ChatAttachment
     public ChatVisualElementAttachment(DynamicResourceKeyBase headerKey, LucideIconKind icon, IVisualElement element) : base(headerKey)
     {
         Icon = icon;
-        Element = element;
+        Element = new ResilientReference<IVisualElement>(element);
     }
 }
 
@@ -116,7 +117,7 @@ public partial class ChatFileAttachment(
         try
         {
             await using var stream = File.OpenRead(FilePath);
-            Bitmap bitmap = WriteableBitmap.Decode(stream);
+            var bitmap = Bitmap.DecodeToWidth(stream, maxWidth);
             return await ResizeImageOnDemandAsync(bitmap, maxWidth, maxHeight);
         }
         catch (Exception ex)

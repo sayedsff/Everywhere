@@ -2,22 +2,30 @@
 using Everywhere.Database;
 using Everywhere.Interop;
 using Everywhere.Storage;
+using Lucide.Avalonia;
 using Microsoft.SemanticKernel;
-using ZLinq;
 
 namespace Everywhere.Chat.Plugins;
 
 public class VisualTreePlugin : BuiltInChatPlugin
 {
-    private readonly IBlobStorage _blobStorage;
+    public override LucideIconKind? Icon => LucideIconKind.Component;
 
-    public VisualTreePlugin(IBlobStorage blobStorage) : base("VisualTree")
+    private readonly IBlobStorage _blobStorage;
+    private readonly IVisualElementContext _visualElementContext;
+
+    public VisualTreePlugin(IBlobStorage blobStorage, IVisualElementContext visualElementContext) : base("VisualTree")
     {
         _blobStorage = blobStorage;
+        _visualElementContext = visualElementContext;
 
         _functions.Add(
             new AnonymousChatFunction(
-                CaptureVisualElementAsync,
+                CaptureVisualElementByIdAsync,
+                ChatFunctionPermissions.ScreenRead));
+        _functions.Add(
+            new AnonymousChatFunction(
+                CaptureFullScreenAsync,
                 ChatFunctionPermissions.ScreenRead));
     }
 
@@ -27,36 +35,35 @@ public class VisualTreePlugin : BuiltInChatPlugin
     /// <param name="chatContext"></param>
     /// <returns></returns>
     public override IEnumerable<ChatFunction> SnapshotFunctions(ChatContext chatContext) =>
-        chatContext.VisualElementIdMap.Count == 0 ? [] : base.SnapshotFunctions(chatContext);
+        chatContext.VisualElements.Count == 0 ? [] : base.SnapshotFunctions(chatContext);
 
-    [KernelFunction("capture_visual_element")]
-    [Description("Captures a screenshot of the specified visual element by Id. Use when XML content is inaccessible or child elements are fewer than expected.")]
-    private async Task<ChatFileAttachment> CaptureVisualElementAsync([FromKernelServices] ChatContext chatContext, int elementId)
+    [KernelFunction("capture_visual_element_by_id")]
+    [Description("Captures a screenshot of the specified visual element by Id. Use when XML content is inaccessible or element is image-like.")]
+    private Task<ChatFileAttachment> CaptureVisualElementByIdAsync([FromKernelServices] ChatContext chatContext, int elementId)
     {
-        var originalId = chatContext
-            .VisualElementIdMap
-            .AsValueEnumerable()
-            .FirstOrDefault(kv => kv.Value == elementId)
-            .Key;
-        if (originalId.IsNullOrEmpty())
+        if (!chatContext.VisualElements.TryGetValue(elementId, out var visualElement))
         {
-            throw new ArgumentException($"Element with id {elementId} does not exist.");
+            throw new ArgumentException($"Visual element with id '{elementId}' is not found or has been destroyed.", nameof(elementId));
         }
 
-        var visualElement = chatContext
-            .AsValueEnumerable()
-            .Select(n => n.Message)
-            .OfType<UserChatMessage>()
-            .SelectMany(m => m.Attachments)
-            .OfType<ChatVisualElementAttachment>()
-            .Select(a => a.Element)
-            .OfType<IVisualElement>()
-            .FirstOrDefault(e => e.Id == originalId);
+        return CaptureVisualElementAsync(visualElement);
+    }
+
+    [KernelFunction("capture_full_screen")]
+    [Description("Captures a screenshot of the entire screen. Use when no specific visual element is available.")]
+    private Task<ChatFileAttachment> CaptureFullScreenAsync()
+    {
+        var visualElement = _visualElementContext.ElementFromPointer(PickElementMode.Screen);
         if (visualElement is null)
         {
-            throw new ArgumentException($"Visual element with id '{elementId}' is not found or not available at this time.", nameof(elementId));
+            throw new InvalidOperationException("No screen is available to capture.");
         }
 
+        return CaptureVisualElementAsync(visualElement);
+    }
+
+    private async Task<ChatFileAttachment> CaptureVisualElementAsync(IVisualElement visualElement)
+    {
         var bitmap = await visualElement.CaptureAsync();
 
         BlobEntity blob;

@@ -41,6 +41,10 @@ public partial class ChatContextManager : ObservableObject, IChatContextManager,
             var previous = _current;
             if (!SetProperty(ref _current, value)) return;
 
+            // Update active state
+            _current?.VisualElements.IsActive = true;
+            previous?.VisualElements.IsActive = false;
+
             // BUG:
             // IDK why if I remove the previous context immediately,
             // Avalonia will fuck up and crash immediately with IndexOutOfRangeException.

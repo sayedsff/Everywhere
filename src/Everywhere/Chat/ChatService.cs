@@ -5,6 +5,7 @@ using Everywhere.Common;
 using Everywhere.Configuration;
 using Everywhere.Interop;
 using Everywhere.Storage;
+using Everywhere.Utilities;
 using Lucide.Avalonia;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -61,7 +62,7 @@ public class ChatService(
             .Attachments
             .AsValueEnumerable()
             .OfType<ChatVisualElementAttachment>()
-            .Select(a => a.Element)
+            .Select(a => a.Element?.Target)
             .OfType<IVisualElement>()
             .ToArray();
 
@@ -82,26 +83,44 @@ public class ChatService(
             var xmlBuilder = new VisualElementXmlBuilder(
                 elements,
                 kernelMixin.MaxTokenTotal / 20,
-                chatContext.VisualElementIdMap.Count + 1);
+                chatContext.VisualElements.Count + 1);
             var renderedVisualTreePrompt = await Task.Run(
                 () =>
                 {
                     var xml = xmlBuilder.BuildXml(cancellationToken);
-                    var idMap = xmlBuilder.GetIdMap(cancellationToken);
+                    var builtVisualElements = xmlBuilder.BuiltVisualElements;
 
-                    if (!idMap.TryGetValue(elements[0].Id, out var focusedElementId))
+                    string focusedElementIdString;
+                    if (builtVisualElements.FirstOrDefault(kv => ReferenceEquals(kv.Value, elements[0])) is
+                        { Key: var focusedElementId, Value: not null })
                     {
-                        focusedElementId = -1;
+                        focusedElementIdString = focusedElementId.ToString();
+                    }
+                    else
+                    {
+                        focusedElementIdString = "null";
                     }
 
-                    chatContext.VisualElementIdMap.AddRange(idMap);
+                    // Adds the visual elements to the chat context for future reference.
+                    chatContext.VisualElements.AddRange(builtVisualElements);
+
+                    // Then deactivate all the references, making them weak references.
+                    foreach (var reference in userChatMessage
+                                 .Attachments
+                                 .AsValueEnumerable()
+                                 .OfType<ChatVisualElementAttachment>()
+                                 .Select(a => a.Element)
+                                 .OfType<ResilientReference<IVisualElement>>())
+                    {
+                        reference.IsActive = false;
+                    }
 
                     return Prompts.RenderPrompt(
                         Prompts.VisualTreePrompt,
                         new Dictionary<string, Func<string>>
                         {
                             { "VisualTree", () => xml },
-                            { "FocusedElementId", () => focusedElementId.ToString() },
+                            { "FocusedElementId", () => focusedElementIdString },
                         });
                 },
                 cancellationToken);
@@ -151,15 +170,17 @@ public class ChatService(
             cancellationToken.ThrowIfCancellationRequested();
 
             var kernel = BuildKernel(kernelMixin, chatContext);
-            var chatHistory = new ChatHistory(
-                await chatContext
-                    .Select(n => n.Message)
-                    .Where(m => !ReferenceEquals(m, assistantChatMessage)) // exclude the current assistant message
-                    .Where(m => m.Role.Label is "system" or "assistant" or "user" or "tool")
-                    .ToAsyncEnumerable()
-                    .SelectMany(CreateChatMessageContentsAsync)
-                    .OfType<ChatMessageContent>()
-                    .ToArrayAsync(cancellationToken: cancellationToken));
+            var chatHistory = new ChatHistory();
+            foreach (var chatMessage in chatContext
+                         .Select(n => n.Message)
+                         .Where(m => !ReferenceEquals(m, assistantChatMessage)) // exclude the current assistant message
+                         .Where(m => m.Role.Label is "system" or "assistant" or "user" or "tool"))
+            {
+                await foreach(var chatMessageContent in CreateChatMessageContentsAsync(chatMessage))
+                {
+                    chatHistory.Add(chatMessageContent);
+                }
+            }
 
             while (true)
             {

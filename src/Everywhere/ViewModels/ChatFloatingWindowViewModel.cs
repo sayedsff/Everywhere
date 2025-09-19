@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Security.Cryptography;
 using Avalonia.Input;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -53,7 +52,6 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
     private readonly IVisualElementContext _visualElementContext;
     private readonly INativeHelper _nativeHelper;
     private readonly IBlobStorage _blobStorage;
-    private readonly IRuntimeConstantProvider _runtimeConstantProvider;
     private readonly ILogger<ChatFloatingWindowViewModel> _logger;
 
     private readonly ObservableList<ChatAttachment> _chatAttachments = [];
@@ -66,7 +64,6 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
         IVisualElementContext visualElementContext,
         INativeHelper nativeHelper,
         IBlobStorage blobStorage,
-        IRuntimeConstantProvider runtimeConstantProvider,
         ILogger<ChatFloatingWindowViewModel> logger)
     {
         Settings = settings;
@@ -76,7 +73,6 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
         _visualElementContext = visualElementContext;
         _nativeHelper = nativeHelper;
         _blobStorage = blobStorage;
-        _runtimeConstantProvider = runtimeConstantProvider;
         _logger = logger;
 
         InitializeCommands();
@@ -134,7 +130,7 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
         {
             QuickActions = _chatAttachments switch
             {
-                [ChatVisualElementAttachment { Element.Type: VisualElementType.TextEdit }] => textEditActions,
+                [ChatVisualElementAttachment { Element.Target.Type: VisualElementType.TextEdit }] => textEditActions,
                 _ => null
             };
         }
@@ -159,7 +155,7 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
         await ExecuteBusyTaskAsync(
             async token =>
             {
-                if (_chatAttachments.Any(a => a is ChatVisualElementAttachment vea && vea.Element?.Equals(targetElement) is true))
+                if (_chatAttachments.Any(a => a is ChatVisualElementAttachment vea && Equals(vea.Element?.Target, targetElement)))
                 {
                     IsOpened = true;
                     return;
@@ -189,7 +185,7 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
             if (_chatAttachments.Count >= Settings.Internal.MaxChatAttachmentCount) return;
 
             if (await _visualElementContext.PickElementAsync(mode) is not { } element) return;
-            if (_chatAttachments.OfType<ChatVisualElementAttachment>().Any(a => a.Element?.Id == element.Id)) return;
+            if (_chatAttachments.OfType<ChatVisualElementAttachment>().Any(a => Equals(a.Element?.Target, element))) return;
             _chatAttachments.Add(await Task.Run(() => CreateFromVisualElement(element), cancellationToken));
         },
         _logger.ToExceptionHandler());
