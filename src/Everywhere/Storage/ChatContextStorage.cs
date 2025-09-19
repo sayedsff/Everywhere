@@ -347,8 +347,7 @@ public sealed class ChatContextStorage(
                         // This indicates the blob isn't in our DB. Let's store it.
                         try
                         {
-                            await using var fileStream = File.OpenRead(attachment.FilePath);
-                            await blobStorage.StorageBlobAsync(fileStream, attachment.MimeType, cancellationToken);
+                            await blobStorage.StorageBlobAsync(attachment.FilePath, attachment.MimeType, cancellationToken: cancellationToken);
                         }
                         catch (Exception ex)
                         {
