@@ -88,8 +88,6 @@ public interface IVisualElement
     /// </remarks>
     string? GetText(int maxLength = -1);
 
-    void SetText(string text, bool append);
-
     Task<Bitmap> CaptureAsync();
 }
 

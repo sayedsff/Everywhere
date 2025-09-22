@@ -59,3 +59,6 @@ GetDIBits
 GetObject
 BITMAP
 BI_COMPRESSION
+
+CreateDispatcherQueueController
+SIZE

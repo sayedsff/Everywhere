@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using Everywhere.Configuration;
 using Everywhere.Database;
 using Everywhere.Interop;
 using Everywhere.Storage;
@@ -13,11 +14,13 @@ public class VisualTreePlugin : BuiltInChatPlugin
 
     private readonly IBlobStorage _blobStorage;
     private readonly IVisualElementContext _visualElementContext;
+    private readonly Settings _settings;
 
-    public VisualTreePlugin(IBlobStorage blobStorage, IVisualElementContext visualElementContext) : base("VisualTree")
+    public VisualTreePlugin(IBlobStorage blobStorage, IVisualElementContext visualElementContext, Settings settings) : base("VisualTree")
     {
         _blobStorage = blobStorage;
         _visualElementContext = visualElementContext;
+        _settings = settings;
 
         _functions.Add(
             new AnonymousChatFunction(
@@ -30,12 +33,16 @@ public class VisualTreePlugin : BuiltInChatPlugin
     }
 
     /// <summary>
-    /// When there is no visual element in the chat context, do not expose any function.
+    /// When LLM does not support image input or image feature is disabled, and there is no visual element in the chat context, hide this plugin.
     /// </summary>
     /// <param name="chatContext"></param>
     /// <returns></returns>
     public override IEnumerable<ChatFunction> SnapshotFunctions(ChatContext chatContext) =>
-        chatContext.VisualElements.Count == 0 ? [] : base.SnapshotFunctions(chatContext);
+        _settings.Model.SelectedModelDefinition?.IsImageInputSupported.ActualValue is not true &&
+        !_settings.Internal.IsImageEnabled &&
+        chatContext.VisualElements.Count == 0 ?
+            [] :
+            base.SnapshotFunctions(chatContext);
 
     [KernelFunction("capture_visual_element_by_id")]
     [Description("Captures a screenshot of the specified visual element by Id. Use when XML content is inaccessible or element is image-like.")]

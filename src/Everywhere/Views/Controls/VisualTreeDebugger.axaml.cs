@@ -191,16 +191,7 @@ internal class DebuggerVisualElement(IVisualElement element) : ObservableObject
 
     public PixelRect BoundingRectangle => element.BoundingRectangle;
 
-    public string? Text
-    {
-        get => element.GetText();
-        set
-        {
-            if (value == null) return;
-            element.SetText(value, false);
-            OnPropertyChanged();
-        }
-    }
+    public string? Text => element.GetText();
 }
 
 internal class VisualElementProperty(PropertyInfo propertyInfo) : ObservableObject
