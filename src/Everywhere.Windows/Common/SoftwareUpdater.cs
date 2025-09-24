@@ -9,7 +9,6 @@ using Everywhere.Configuration;
 using Everywhere.Interop;
 using Microsoft.Extensions.Logging;
 #if !DEBUG
-using Everywhere.Enums;
 using Everywhere.Utilities;
 #endif
 

@@ -1,5 +1,5 @@
 ﻿#if !DEBUG
-using Everywhere.Utilities;
+using Everywhere.Interop;
 #endif
 
 using Serilog;
@@ -10,7 +10,7 @@ namespace Everywhere.Common;
 public static class Entrance
 {
 #if !DEBUG
-    private static Mutex? AppMutex;
+    private static Mutex? _appMutex;
 #endif
 
     /// <summary>
@@ -19,11 +19,11 @@ public static class Entrance
     public static void ReleaseMutex()
     {
 #if !DEBUG
-        if (AppMutex == null) return;
+        if (_appMutex == null) return;
 
-        AppMutex.ReleaseMutex();
-        AppMutex.Dispose();
-        AppMutex = null;
+        _appMutex.ReleaseMutex();
+        _appMutex.Dispose();
+        _appMutex = null;
 #endif
     }
 
@@ -40,7 +40,7 @@ public static class Entrance
         // axaml designer may launch this code, so we need to set it to null.
         _ = args;
 #else
-        AppMutex = new Mutex(true, "EverywhereAppMutex", out var createdNew);
+        _appMutex = new Mutex(true, "EverywhereAppMutex", out var createdNew);
         if (!createdNew)
         {
             if (!args.Contains("--autorun"))
