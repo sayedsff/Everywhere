@@ -17,8 +17,3 @@ public interface IKernelMixin : IDisposable
 
     PromptExecutionSettings GetPromptExecutionSettings(bool isToolRequired = false, bool isToolAutoInvoke = false);
 }
-
-public interface IKernelMixinFactory
-{
-    IKernelMixin GetOrCreate();
-}

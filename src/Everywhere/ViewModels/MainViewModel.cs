@@ -47,23 +47,31 @@ public partial class MainViewModel(IServiceProvider serviceProvider, Settings se
                 }));
         SelectedPage = _pages.FirstOrDefault();
 
-        ShowWelcomeDialogOnDemand();
+        ShowOobeDialogOnDemand();
 
         return base.ViewLoaded(cancellationToken);
     }
 
     /// <summary>
-    /// Shows the welcome dialog if the application is launched for the first time or after an update.
+    /// Shows the OOBE dialog if the application is launched for the first time or after an update.
     /// </summary>
-    private void ShowWelcomeDialogOnDemand()
+    private void ShowOobeDialogOnDemand()
     {
         var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString();
-        if (settings.Internal.PreviousLaunchVersion == version) return;
-
-        DialogManager
-            .CreateDialog(ServiceLocator.Resolve<WelcomeView>())
-            .Dismissible()
-            .Show();
+        var previousLaunchVersion = settings.Internal.PreviousLaunchVersion;
+        if (previousLaunchVersion is null)
+        {
+            DialogManager
+                .CreateDialog(ServiceLocator.Resolve<WelcomeView>())
+                .Show();
+        }
+        else if (previousLaunchVersion != version)
+        {
+            DialogManager
+                .CreateDialog(ServiceLocator.Resolve<ChangeLogView>())
+                .Dismissible()
+                .Show();
+        }
 
         settings.Internal.PreviousLaunchVersion = version;
     }

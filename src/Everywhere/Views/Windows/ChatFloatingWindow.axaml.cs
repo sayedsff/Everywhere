@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using Avalonia.Automation.Peers;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -48,13 +49,13 @@ public partial class ChatFloatingWindow : ReactiveWindow<ChatFloatingWindowViewM
         set => SetValue(IsWindowPinnedProperty, value);
     }
 
-    private readonly ILauncher launcher;
-    private readonly Settings settings;
+    private readonly ILauncher _launcher;
+    private readonly Settings _settings;
 
     public ChatFloatingWindow(ILauncher launcher, Settings settings)
     {
-        this.launcher = launcher;
-        this.settings = settings;
+        _launcher = launcher;
+        _settings = settings;
 
         InitializeComponent();
         AddHandler(KeyDownEvent, HandleKeyDown, RoutingStrategies.Tunnel);
@@ -96,7 +97,7 @@ public partial class ChatFloatingWindow : ReactiveWindow<ChatFloatingWindowViewM
         else if (change.Property == IsWindowPinnedProperty)
         {
             var value = change.NewValue is true;
-            settings.Internal.IsChatFloatingWindowPinned = value;
+            _settings.Internal.IsChatFloatingWindowPinned = value;
 
             if (value)
             {
@@ -122,6 +123,11 @@ public partial class ChatFloatingWindow : ReactiveWindow<ChatFloatingWindowViewM
         {
             IsOpened = false;
         }
+    }
+
+    protected override AutomationPeer OnCreateAutomationPeer()
+    {
+        return null!; // Disable automation peer to avoid being detected by self
     }
 
     private void CalculatePositionAndPlacement()
@@ -231,11 +237,11 @@ public partial class ChatFloatingWindow : ReactiveWindow<ChatFloatingWindowViewM
             Show();
             ChatInputBox.Focus();
 
-            switch (settings.Behavior.ChatFloatingWindowPinMode)
+            switch (_settings.Behavior.ChatFloatingWindowPinMode)
             {
                 case ChatFloatingWindowPinMode.RememberLast:
                 {
-                    IsWindowPinned = settings.Internal.IsChatFloatingWindowPinned;
+                    IsWindowPinned = _settings.Internal.IsChatFloatingWindowPinned;
                     break;
                 }
                 case ChatFloatingWindowPinMode.AlwaysPinned:
@@ -259,7 +265,7 @@ public partial class ChatFloatingWindow : ReactiveWindow<ChatFloatingWindowViewM
 
     private void HandleChatInputBoxTextChanged(object? sender, TextChangedEventArgs e)
     {
-        if (settings.Behavior.ChatFloatingWindowPinMode == ChatFloatingWindowPinMode.PinOnInput)
+        if (_settings.Behavior.ChatFloatingWindowPinMode == ChatFloatingWindowPinMode.PinOnInput)
         {
             IsWindowPinned = true;
         }
@@ -281,6 +287,6 @@ public partial class ChatFloatingWindow : ReactiveWindow<ChatFloatingWindowViewM
     private Task LaunchInlineHyperlink(InlineHyperlinkClickedEventArgs e)
     {
         // currently we only support http(s) links for safety reasons
-        return e.HRef is not { Scheme: "http" or "https" } uri ? Task.CompletedTask : launcher.LaunchUriAsync(uri);
+        return e.HRef is not { Scheme: "http" or "https" } uri ? Task.CompletedTask : _launcher.LaunchUriAsync(uri);
     }
 }

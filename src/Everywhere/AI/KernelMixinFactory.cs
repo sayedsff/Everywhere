@@ -1,5 +1,4 @@
 ﻿using Anthropic.SDK;
-using Everywhere.AI;
 using Everywhere.Configuration;
 using Microsoft.Extensions.AI;
 using Microsoft.SemanticKernel;
@@ -8,31 +7,32 @@ using Microsoft.SemanticKernel.Connectors.Ollama;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using OllamaSharp;
 
-namespace Everywhere.Chat;
+namespace Everywhere.AI;
 
-public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
+public class KernelMixinFactory : IKernelMixinFactory
 {
     private CachedKernelMixin? _cachedKernelMixin;
 
-    public IKernelMixin GetOrCreate()
+    public IKernelMixin GetOrCreate(ModelSettings modelSettings, string? apiKeyOverride = null)
     {
-        var modelProvider = settings.Model.ModelProviders.FirstOrDefault(p => p.Id == settings.Model.SelectedModelProviderId);
+        var modelProvider = modelSettings.SelectedModelProvider;
         if (modelProvider is null)
         {
             throw new InvalidOperationException("No model provider found with the selected ID.");
         }
 
-        var modelDefinition = modelProvider.ModelDefinitions.FirstOrDefault(m => m.Id == settings.Model.SelectedModelDefinitionId);
+        var modelDefinition = modelSettings.SelectedModelDefinition;
         if (modelDefinition is null)
         {
             throw new InvalidOperationException("No model definition found with the selected ID.");
         }
 
+        var apiKey = apiKeyOverride ?? modelProvider.ApiKey;
         if (_cachedKernelMixin is not null &&
             _cachedKernelMixin.Schema == modelProvider.Schema &&
             _cachedKernelMixin.ModelId == modelDefinition.Id &&
             _cachedKernelMixin.Endpoint == modelProvider.Endpoint &&
-            _cachedKernelMixin.ApiKey == modelProvider.ApiKey)
+            _cachedKernelMixin.ApiKey == apiKey)
         {
             return _cachedKernelMixin.KernelMixin;
         }
@@ -42,12 +42,12 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
             modelProvider.Schema,
             modelDefinition.Id,
             modelProvider.Endpoint,
-            modelProvider.ApiKey,
+            apiKey,
             modelProvider.Schema.ActualValue switch
             {
-                ModelProviderSchema.OpenAI => new OpenAIKernelMixin(settings.Model, modelProvider, modelDefinition),
-                ModelProviderSchema.Anthropic => new AnthropicKernelMixin(settings.Model, modelProvider, modelDefinition),
-                ModelProviderSchema.Ollama => new OllamaKernelMixin(settings.Model, modelProvider, modelDefinition),
+                ModelProviderSchema.OpenAI => new OpenAIKernelMixin(modelSettings, modelProvider, modelDefinition, apiKey),
+                ModelProviderSchema.Anthropic => new AnthropicKernelMixin(modelSettings, modelProvider, modelDefinition, apiKey),
+                ModelProviderSchema.Ollama => new OllamaKernelMixin(modelSettings, modelProvider, modelDefinition),
                 _ => throw new NotSupportedException($"Model provider schema '{modelProvider.Schema}' is not supported.")
             });
         return _cachedKernelMixin.KernelMixin;
@@ -61,7 +61,7 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
         IKernelMixin KernelMixin
     );
 
-    private sealed class OpenAIKernelMixin(ModelSettings settings, ModelProvider provider, ModelDefinition definition) : IKernelMixin
+    private sealed class OpenAIKernelMixin(ModelSettings settings, ModelProvider provider, ModelDefinition definition, string? apiKey) : IKernelMixin
     {
         public IChatCompletionService ChatCompletionService => _chatCompletionService;
 
@@ -83,7 +83,7 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
         private readonly OpenAIChatCompletionService _chatCompletionService = new(
             definition.Id,
             new Uri(provider.Endpoint, UriKind.Absolute),
-            provider.ApiKey);
+            apiKey);
 
         public void Dispose() { }
     }
@@ -114,11 +114,11 @@ public class KernelMixinFactory(Settings settings) : IKernelMixinFactory
         private readonly ModelDefinition _definition;
         private readonly IChatClient _chatClient;
 
-        public AnthropicKernelMixin(ModelSettings settings, ModelProvider provider, ModelDefinition definition)
+        public AnthropicKernelMixin(ModelSettings settings, ModelProvider provider, ModelDefinition definition, string? apiKey)
         {
             _settings = settings;
             _definition = definition;
-            _chatClient = new AnthropicClient(new APIAuthentication(provider.ApiKey))
+            _chatClient = new AnthropicClient(new APIAuthentication(apiKey))
             {
                 ApiUrlFormat = provider.Endpoint + "/{0}/{1}"
             }.Messages;

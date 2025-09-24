@@ -28,7 +28,7 @@ public class ChatService(
     {
         var chatContext = chatContextManager.Current;
         chatContext.Add(userMessage);
-        var kernelMixin = kernelMixinFactory.GetOrCreate();
+        var kernelMixin = kernelMixinFactory.GetOrCreate(settings.Model);
         await ProcessUserChatMessageAsync(kernelMixin, chatContext, userMessage, cancellationToken);
         var assistantChatMessage = new AssistantChatMessage { IsBusy = true };
         chatContext.Add(assistantChatMessage);
@@ -44,7 +44,7 @@ public class ChatService(
 
         var assistantChatMessage = new AssistantChatMessage { IsBusy = true };
         node.Context.CreateBranchOn(node, assistantChatMessage);
-        return GenerateAsync(kernelMixinFactory.GetOrCreate(), node.Context, assistantChatMessage, cancellationToken);
+        return GenerateAsync(kernelMixinFactory.GetOrCreate(settings.Model), node.Context, assistantChatMessage, cancellationToken);
     }
 
     public Task EditAsync(ChatMessageNode node, CancellationToken cancellationToken)

@@ -7,7 +7,6 @@ using Everywhere.Chat;
 using Everywhere.Chat.Plugins;
 using Everywhere.Common;
 using Everywhere.Configuration;
-using Everywhere.Database;
 using Everywhere.Extensions;
 using Everywhere.Initialization;
 using Everywhere.Interop;
@@ -74,8 +73,10 @@ public static class Program
                 .AddSingleton<IMainViewPage, ChatPluginPage>()
                 .AddSingleton<AboutPageViewModel>()
                 .AddSingleton<IMainViewPage, AboutPage>()
-                .AddSingleton<WelcomeViewModel>()
-                .AddSingleton<WelcomeView>()
+                .AddTransient<WelcomeViewModel>()
+                .AddTransient<WelcomeView>()
+                .AddTransient<ChangeLogViewModel>()
+                .AddTransient<ChangeLogView>()
                 .AddSingleton<MainViewModel>()
                 .AddSingleton<MainView>()
 

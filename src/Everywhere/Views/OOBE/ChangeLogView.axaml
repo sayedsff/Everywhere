@@ -1,5 +1,5 @@
 ﻿<UserControl
-  x:Class="Everywhere.Views.WelcomeView" xmlns="https://github.com/avaloniaui"
+  x:Class="Everywhere.Views.ChangeLogView" xmlns="https://github.com/avaloniaui"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:md="clr-namespace:LiveMarkdown.Avalonia;assembly=LiveMarkdown.Avalonia"
   xmlns:v="clr-namespace:Everywhere.Views" xmlns:vc="clr-namespace:Everywhere.ValueConverters"
@@ -19,13 +19,13 @@
       <TextBlock
         Classes="h2" VerticalAlignment="Center"
         FontWeight="Normal"
-        Text="{I18N {x:Static LocaleKey.WelcomeView_Header}}"/>
+        Text="{I18N {x:Static LocaleKey.ChangeLogView_Header}}"/>
     </StackPanel>
 
     <TextBlock
       Width="620" HorizontalAlignment="Center"
       LineHeight="22"
-      Text="{I18N {x:Static LocaleKey.WelcomeView_Content}}"
+      Text="{I18N {x:Static LocaleKey.ChangeLogView_Content}}"
       TextAlignment="Center" TextWrapping="Wrap"/>
 
     <ScrollViewer
@@ -33,7 +33,7 @@
       HorizontalAlignment="Center" HorizontalScrollBarVisibility="Disabled">
       <md:MarkdownRenderer
         Margin="0,0,4,0" InlineHyperlinkClick="HandleMarkdownRendererInlineHyperlinkClick"
-        MarkdownBuilder="{Binding $parent[v:WelcomeView].MarkdownBuilder}"/>
+        MarkdownBuilder="{Binding $parent[v:ChangeLogView].MarkdownBuilder}"/>
     </ScrollViewer>
 
     <StackPanel
@@ -41,27 +41,32 @@
       Spacing="8">
       <HyperlinkButton
         VerticalAlignment="Center"
-        Content="{I18N {x:Static LocaleKey.WelcomeView_OfficialDocs}}"
+        Content="{I18N {x:Static LocaleKey.ChangeLogView_ViewOnGitHubHyperlinkButton_Content}}"
+        NavigateUri="https://github.com/DearVa/Everywhere/releases"
+        TextElement.Foreground="{DynamicResource InfoColor}"/>
+      <HyperlinkButton
+        VerticalAlignment="Center"
+        Content="{I18N {x:Static LocaleKey.WelcomeView_OfficialDocsHyperlinkButton_Content}}"
         NavigateUri="https://everywhere.nekora.dev"
         TextElement.Foreground="{DynamicResource InfoColor}"/>
       <HyperlinkButton
         VerticalAlignment="Center"
-        Content="{I18N {x:Static LocaleKey.WelcomeView_ReportBug}}"
-        NavigateUri="{I18N {x:Static LocaleKey.WelcomeView_ReportBugUri}, Converter={x:Static vc:CommonConverters.StringToUri}}"
+        Content="{I18N {x:Static LocaleKey.ChangeLogView_ReportBugHyperlinkButton_Content}}"
+        NavigateUri="{I18N {x:Static LocaleKey.ChangeLogView_ReportBugHyperlinkButton_NavigateUri}, Converter={x:Static vc:CommonConverters.StringToUri}}"
         TextElement.Foreground="{DynamicResource InfoColor}"/>
       <HyperlinkButton
         VerticalAlignment="Center"
-        Content="{I18N {x:Static LocaleKey.WelcomeView_FeatureRequest}}"
-        NavigateUri="{I18N {x:Static LocaleKey.WelcomeView_FeatureRequestUri}, Converter={x:Static vc:CommonConverters.StringToUri}}"
+        Content="{I18N {x:Static LocaleKey.ChangeLogView_FeatureRequestHyperlinkButton_Content}}"
+        NavigateUri="{I18N {x:Static LocaleKey.ChangeLogView_FeatureRequestHyperlinkButton_NavigateUri}, Converter={x:Static vc:CommonConverters.StringToUri}}"
         TextElement.Foreground="{DynamicResource InfoColor}"/>
       <HyperlinkButton
         VerticalAlignment="Center"
-        Content="{I18N {x:Static LocaleKey.WelcomeView_Discord}}"
+        Content="{I18N {x:Static LocaleKey.WelcomeView_DiscordHyperlinkButton_Content}}"
         NavigateUri="https://discord.gg/5fyg6nE3yn"
         TextElement.Foreground="{DynamicResource InfoColor}"/>
       <HyperlinkButton
         VerticalAlignment="Center"
-        Content="{I18N {x:Static LocaleKey.WelcomeView_QQGroup}}"
+        Content="{I18N {x:Static LocaleKey.WelcomeView_QQGroupHyperlinkButton_Content}}"
         NavigateUri="https://qm.qq.com/cgi-bin/qm/qr?k=wp9aDBBnLc7pYATqT99tB-N2ZP2ETmJC&amp;jump_from=webapi&amp;authKey=97qUJfsQoI70dUNcgBZ0C3HCZeiEn8inLT7pzg8x+KinbQwfIrHFu3dB2+aHMbRD"
         TextElement.Foreground="{DynamicResource InfoColor}"/>
     </StackPanel>

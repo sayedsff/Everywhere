@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace Everywhere.Chat;
+namespace Everywhere.AI;
 
 public static partial class Prompts
 {
@@ -59,6 +59,12 @@ public static partial class Prompts
         ```
         
         请总结上述对话为 10 个字以内的话题，不需要包含标点符号，不需要包含人称，输出语言语种为：{SystemLanguage}
+        """;
+
+    public const string TestPrompt =
+        """
+        This is a test prompt.
+        You MUST Only reply with "Test successful!".
         """;
 
     public static string RenderPrompt(string prompt, IReadOnlyDictionary<string, Func<string>> variables)

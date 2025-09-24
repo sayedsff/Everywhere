@@ -31,9 +31,9 @@ namespace Everywhere.Configuration;
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
 public class Settings : ObservableObject
 {
-    public ModelSettings Model { get; set; } = new();
-
     public CommonSettings Common { get; set; } = new();
+
+    public ModelSettings Model { get; set; } = new();
 
     public BehaviorSettings Behavior { get; set; } = new();
 
@@ -219,7 +219,7 @@ public partial class ModelSettings : SettingsCategory
         {
             if (Equals(SelectedModelProviderId, value?.Id)) return;
             SelectedModelProviderId = value?.Id;
-            SelectedModelDefinitionId = value?.ModelDefinitions.FirstOrDefault()?.Id;
+            SelectedModelDefinitionId = value?.ModelDefinitions.FirstOrDefault(m => m.IsDefault)?.Id ?? value?.ModelDefinitions.FirstOrDefault()?.Id;
         }
     }
 

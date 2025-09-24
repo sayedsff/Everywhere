@@ -15,6 +15,7 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using Vortice;
 using Vortice.Direct3D;
 using Vortice.Direct3D11;
 using Vortice.DirectComposition;
@@ -100,7 +101,7 @@ public sealed partial class Direct3D11ScreenCapture : IAsyncDisposable
         _dCompositionVisual.SetTransform(transform);
 
         // Set the clip region
-        containerVisual.SetClip(new Vortice.RawRectF(0, 0, relativeRect.Width, relativeRect.Height));
+        containerVisual.SetClip(new RawRectF(0, 0, relativeRect.Width, relativeRect.Height));
 
         var visual = Visual.FromAbi(containerVisual.NativePointer);
         visual.Size = new Vector2(relativeRect.Width, relativeRect.Height);
@@ -177,9 +178,7 @@ public sealed partial class Direct3D11ScreenCapture : IAsyncDisposable
     public static async Task<Bitmap> CaptureAsync(nint sourceHWnd, PixelRect relativeRect, CancellationToken cancellationToken = default)
     {
         var targetHWnd = (Application.Current?.ApplicationLifetime as ClassicDesktopStyleApplicationLifetime)
-#pragma warning disable CA1826
             ?.Windows.FirstOrDefault()
-#pragma warning restore CA1826
             ?.TryGetPlatformHandle()?.Handle ?? IntPtr.Zero;
         if (targetHWnd == IntPtr.Zero)
         {

@@ -77,13 +77,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Views\WelcomeView.axaml.cs">
-      <DependentUpon>WelcomeView.axaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
     <AvaloniaResource Include="..\..\CHANGELOG.md">
       <Link>Assets\CHANGELOG.md</Link>
     </AvaloniaResource>

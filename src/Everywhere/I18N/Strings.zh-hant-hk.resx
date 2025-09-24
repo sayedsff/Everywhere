@@ -44,10 +44,10 @@
     <data name="SettingsSelectionItem_Common_Language_zh-hant-hk" xml:space="preserve">
         <value>中文 (繁體 香港特別行政區)</value>
     </data>
-    <data name="WelcomeView_FeatureRequestUri" xml:space="preserve">
+    <data name="ChangeLogView_FeatureRequestHyperlinkButton_NavigateUri" xml:space="preserve">
         <value>https://github.com/DearVa/Everywhere/issues/new?template=feature-request.yml</value>
     </data>
-    <data name="WelcomeView_ReportBugUri" xml:space="preserve">
+    <data name="ChangeLogView_ReportBugHyperlinkButton_NavigateUri" xml:space="preserve">
         <value>https://github.com/DearVa/Everywhere/issues/new?template=bug-report.yml</value>
     </data>
 </root>

@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Text.Json.Serialization;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Everywhere.Configuration;
 
 namespace Everywhere.AI;
@@ -50,7 +51,8 @@ public partial class ModelDefinition : ObservableObject
     /// <summary>
     /// Indicates whether the model supports tool calls.
     /// </summary>
-    [ObservableProperty] public partial Customizable<bool> IsDeepThinkingSupported { get; set; } = false;
+    [ObservableProperty]
+    public partial Customizable<bool> IsDeepThinkingSupported { get; set; } = false;
 
     /// <summary>
     /// The maximum number of tokens that the model can process in a single request.
@@ -61,25 +63,11 @@ public partial class ModelDefinition : ObservableObject
     public required partial Customizable<int> MaxTokens { get; set; }
 
     /// <summary>
-    /// The date and time when the model was released.
+    /// Gets or sets the default model in a model provider.
+    /// This indicates the best (powerful but economical) model in the provider.
     /// </summary>
-    [ObservableProperty]
-    [HiddenSettingsItem]
-    public partial Customizable<DateOnly>? ReleasedAt { get; set; }
-
-    /// <summary>
-    /// Input price per 1M tokens in the model's native currency.
-    /// </summary>
-    [ObservableProperty]
-    [HiddenSettingsItem]
-    public partial Customizable<string>? InputPrice { get; set; }
-
-    /// <summary>
-    /// Output price per 1M tokens in the model's native currency.
-    /// </summary>
-    [ObservableProperty]
-    [HiddenSettingsItem]
-    public partial Customizable<string>? OutputPrice { get; set; }
+    [JsonIgnore]
+    public bool IsDefault { get; set; }
 
     public override bool Equals(object? obj) => obj is ModelDefinition other && Id == other.Id;
 

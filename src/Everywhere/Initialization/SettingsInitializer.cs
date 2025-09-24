@@ -84,9 +84,6 @@ public class SettingsInitializer : IAsyncInitializer
                             IsImageInputSupported = true,
                             IsFunctionCallingSupported = true,
                             IsDeepThinkingSupported = true,
-                            ReleasedAt = new DateOnly(2025, 08, 07),
-                            InputPrice = "$1.25/M",
-                            OutputPrice = "$10.00/M"
                         },
                         new ModelDefinition
                         {
@@ -97,22 +94,6 @@ public class SettingsInitializer : IAsyncInitializer
                             IsImageInputSupported = true,
                             IsFunctionCallingSupported = true,
                             IsDeepThinkingSupported = true,
-                            ReleasedAt = new DateOnly(2025, 08, 07),
-                            InputPrice = "$0.25/M",
-                            OutputPrice = "$2.00/M"
-                        },
-                        new ModelDefinition
-                        {
-                            Id = "gpt-5-nano",
-                            ModelId = "gpt-5-nano",
-                            DisplayName = "GPT-5 nano",
-                            MaxTokens = 400_000,
-                            IsImageInputSupported = true,
-                            IsFunctionCallingSupported = true,
-                            IsDeepThinkingSupported = true,
-                            ReleasedAt = new DateOnly(2025, 08, 07),
-                            InputPrice = "$0.05/M",
-                            OutputPrice = "$0.40/M"
                         },
                         new ModelDefinition
                         {
@@ -123,22 +104,6 @@ public class SettingsInitializer : IAsyncInitializer
                             IsImageInputSupported = true,
                             IsFunctionCallingSupported = true,
                             IsDeepThinkingSupported = true,
-                            ReleasedAt = new DateOnly(2025, 04, 17),
-                            InputPrice = "$1.10/M",
-                            OutputPrice = "$4.40/M"
-                        },
-                        new ModelDefinition
-                        {
-                            Id = "o3",
-                            ModelId = "o3",
-                            DisplayName = "o3",
-                            MaxTokens = 200_000,
-                            IsImageInputSupported = true,
-                            IsFunctionCallingSupported = true,
-                            IsDeepThinkingSupported = true,
-                            ReleasedAt = new DateOnly(2025, 04, 16),
-                            InputPrice = "$2.00/M",
-                            OutputPrice = "$8.00/M"
                         },
                         new ModelDefinition
                         {
@@ -149,9 +114,7 @@ public class SettingsInitializer : IAsyncInitializer
                             IsImageInputSupported = true,
                             IsFunctionCallingSupported = true,
                             IsDeepThinkingSupported = false,
-                            ReleasedAt = new DateOnly(2025, 04, 14),
-                            InputPrice = "$2.00/M",
-                            OutputPrice = "$8.00/M"
+                            IsDefault = true
                         },
                         new ModelDefinition
                         {
@@ -162,9 +125,6 @@ public class SettingsInitializer : IAsyncInitializer
                             IsImageInputSupported = true,
                             IsFunctionCallingSupported = true,
                             IsDeepThinkingSupported = false,
-                            ReleasedAt = new DateOnly(2025, 04, 14),
-                            InputPrice = "$0.40/M",
-                            OutputPrice = "$1.60/M"
                         },
                         new ModelDefinition
                         {
@@ -175,9 +135,6 @@ public class SettingsInitializer : IAsyncInitializer
                             IsImageInputSupported = true,
                             IsFunctionCallingSupported = true,
                             IsDeepThinkingSupported = false,
-                            ReleasedAt = new DateOnly(2024, 05, 13),
-                            InputPrice = "$2.50/M",
-                            OutputPrice = "$10.00/M"
                         },
                         new ModelDefinition
                         {
@@ -209,9 +166,6 @@ public class SettingsInitializer : IAsyncInitializer
                             IsImageInputSupported = true,
                             IsFunctionCallingSupported = true,
                             IsDeepThinkingSupported = true,
-                            ReleasedAt = new DateOnly(2025, 08, 05),
-                            InputPrice = "$15.00/M",
-                            OutputPrice = "$75.00/M"
                         },
                         new ModelDefinition
                         {
@@ -222,9 +176,6 @@ public class SettingsInitializer : IAsyncInitializer
                             IsImageInputSupported = true,
                             IsFunctionCallingSupported = true,
                             IsDeepThinkingSupported = true,
-                            ReleasedAt = new DateOnly(2025, 05, 23),
-                            InputPrice = "$15.00/M",
-                            OutputPrice = "$75.00/M"
                         },
                         new ModelDefinition
                         {
@@ -235,9 +186,6 @@ public class SettingsInitializer : IAsyncInitializer
                             IsImageInputSupported = true,
                             IsFunctionCallingSupported = true,
                             IsDeepThinkingSupported = true,
-                            ReleasedAt = new DateOnly(2025, 05, 23),
-                            InputPrice = "3.00/M",
-                            OutputPrice = "$15.00/M"
                         },
                         new ModelDefinition
                         {
@@ -248,9 +196,7 @@ public class SettingsInitializer : IAsyncInitializer
                             IsImageInputSupported = true,
                             IsFunctionCallingSupported = true,
                             IsDeepThinkingSupported = true,
-                            ReleasedAt = new DateOnly(2025, 02, 24),
-                            InputPrice = "$3.00/M",
-                            OutputPrice = "$15.00/M"
+                            IsDefault = true
                         },
                         new ModelDefinition
                         {
@@ -261,9 +207,6 @@ public class SettingsInitializer : IAsyncInitializer
                             IsImageInputSupported = true,
                             IsFunctionCallingSupported = true,
                             IsDeepThinkingSupported = false,
-                            ReleasedAt = new DateOnly(2024, 10, 22),
-                            InputPrice = "$1.00/M",
-                            OutputPrice = "$5.00/M"
                         },
                         new ModelDefinition
                         {
@@ -279,7 +222,7 @@ public class SettingsInitializer : IAsyncInitializer
                 },
                 new ModelProvider
                 {
-                    Id = "gemini",
+                    Id = "google",
                     DisplayName = "Google (Gemini)",
                     Endpoint = "https://generativelanguage.googleapis.com/v1beta/openai",
                     IconUrl = "https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/google-color.svg",
@@ -295,9 +238,6 @@ public class SettingsInitializer : IAsyncInitializer
                             IsImageInputSupported = true,
                             IsFunctionCallingSupported = true,
                             IsDeepThinkingSupported = true,
-                            ReleasedAt = new DateOnly(2025, 06, 01),
-                            InputPrice = "$1.25/M",
-                            OutputPrice = "$10.00/M"
                         },
                         new ModelDefinition
                         {
@@ -308,9 +248,7 @@ public class SettingsInitializer : IAsyncInitializer
                             IsImageInputSupported = true,
                             IsFunctionCallingSupported = true,
                             IsDeepThinkingSupported = true,
-                            ReleasedAt = new DateOnly(2025, 06, 01),
-                            InputPrice = "$0.30/M",
-                            OutputPrice = "$2.50/M"
+                            IsDefault = true
                         },
                         new ModelDefinition
                         {
@@ -321,9 +259,6 @@ public class SettingsInitializer : IAsyncInitializer
                             IsImageInputSupported = true,
                             IsFunctionCallingSupported = true,
                             IsDeepThinkingSupported = true,
-                            ReleasedAt = new DateOnly(2025, 07, 01),
-                            InputPrice = "$0.1/M",
-                            OutputPrice = "$0.4/M"
                         },
                         new ModelDefinition
                         {
@@ -355,9 +290,7 @@ public class SettingsInitializer : IAsyncInitializer
                             IsImageInputSupported = false,
                             IsFunctionCallingSupported = true,
                             IsDeepThinkingSupported = false,
-                            ReleasedAt = new DateOnly(2025, 03, 24),
-                            InputPrice = "$0.28/M",
-                            OutputPrice = "$1.0/M"
+                            IsDefault = true
                         },
                         new ModelDefinition
                         {
@@ -368,9 +301,6 @@ public class SettingsInitializer : IAsyncInitializer
                             IsImageInputSupported = false,
                             IsFunctionCallingSupported = true,
                             IsDeepThinkingSupported = true,
-                            ReleasedAt = new DateOnly(2025, 05, 28),
-                            InputPrice = "0.55/M",
-                            OutputPrice = "$2.21/M"
                         },
                         new ModelDefinition
                         {
@@ -387,7 +317,7 @@ public class SettingsInitializer : IAsyncInitializer
                 new ModelProvider
                 {
                     Id = "moonshot",
-                    DisplayName = "Moonshot",
+                    DisplayName = "Moonshot (Kimi)",
                     Endpoint = "https://api.moonshot.cn/v1",
                     IconUrl = "https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/moonshot.svg",
                     Schema = ModelProviderSchema.OpenAI,
@@ -402,9 +332,6 @@ public class SettingsInitializer : IAsyncInitializer
                             IsImageInputSupported = false,
                             IsFunctionCallingSupported = true,
                             IsDeepThinkingSupported = false,
-                            ReleasedAt = new DateOnly(2025, 07, 11),
-                            InputPrice = "$0.55/M",
-                            OutputPrice = "$2.21/M"
                         },
                         new ModelDefinition
                         {
@@ -415,9 +342,7 @@ public class SettingsInitializer : IAsyncInitializer
                             IsImageInputSupported = true,
                             IsFunctionCallingSupported = true,
                             IsDeepThinkingSupported = false,
-                            ReleasedAt = new DateOnly(2025, 02, 17),
-                            InputPrice = "$1.38/M",
-                            OutputPrice = "$4.14/M"
+                            IsDefault = true
                         },
                         new ModelDefinition
                         {
@@ -428,9 +353,6 @@ public class SettingsInitializer : IAsyncInitializer
                             IsImageInputSupported = true,
                             IsFunctionCallingSupported = false,
                             IsDeepThinkingSupported = true,
-                            ReleasedAt = new DateOnly(2025, 05, 06),
-                            InputPrice = "$27.62/M",
-                            OutputPrice = "$27.62/M"
                         },
                         new ModelDefinition
                         {
@@ -446,51 +368,85 @@ public class SettingsInitializer : IAsyncInitializer
                 },
                 new ModelProvider
                 {
-                    Id = "xai",
-                    DisplayName = "xAI (Grok)",
-                    Endpoint = "https://api.x.ai/v1",
-                    IconUrl = "https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/grok.svg",
+                    Id = "openrouter",
+                    DisplayName = "OpenRouter",
+                    Endpoint = "https://openrouter.ai/api/v1",
+                    IconUrl = "https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/openrouter.svg",
                     Schema = ModelProviderSchema.OpenAI,
                     ModelDefinitions =
                     [
                         new ModelDefinition
                         {
-                            Id = "grok-4",
-                            ModelId = "grok-4",
-                            DisplayName = "Grok 4",
-                            MaxTokens = 256_000,
-                            IsImageInputSupported = true,
-                            IsFunctionCallingSupported = true,
-                            IsDeepThinkingSupported = true,
-                            ReleasedAt = new DateOnly(2025, 07, 09),
-                            InputPrice = "$3.00/M",
-                            OutputPrice = "$15.00/M"
-                        },
-                        new ModelDefinition
-                        {
-                            Id = "grok-3-mini",
-                            ModelId = "grok-3-mini",
-                            DisplayName = "Grok 3 Mini",
-                            MaxTokens = 128_000,
+                            Id = "x-ai/grok-4-fast:free",
+                            ModelId = "x-ai/grok-4-fast:free",
+                            DisplayName = "xAI: Grok 4 Fast (free)",
+                            MaxTokens = 2_000_000,
                             IsImageInputSupported = false,
                             IsFunctionCallingSupported = true,
-                            IsDeepThinkingSupported = true,
-                            ReleasedAt = new DateOnly(2025, 04, 03),
-                            InputPrice = "$0.30/M",
-                            OutputPrice = "$0.50/M"
+                            IsDeepThinkingSupported = false,
+                            IsDefault = true
                         },
                         new ModelDefinition
                         {
-                            Id = "grok-3",
-                            ModelId = "grok-3",
-                            DisplayName = "Grok 3",
+                            Id = "anthropic/claude-sonnet-4",
+                            ModelId = "anthropic/claude-sonnet-4",
+                            DisplayName = "Anthropic: Claude Sonnet 4",
+                            MaxTokens = 1_000_000,
+                            IsImageInputSupported = true,
+                            IsFunctionCallingSupported = true,
+                            IsDeepThinkingSupported = false,
+                        },
+                        new ModelDefinition
+                        {
+                            Id = "google/gemini-2.5-flash",
+                            ModelId = "google/gemini-2.5-flash",
+                            DisplayName = "Google: Gemini 2.5 Flash",
+                            MaxTokens = 1_048_576,
+                            IsImageInputSupported = true,
+                            IsFunctionCallingSupported = true,
+                            IsDeepThinkingSupported = false,
+                        },
+                        new ModelDefinition
+                        {
+                            Id = "custom",
+                            ModelId = "MODEL_ID_HERE",
+                            DisplayName = "Custom Model",
+                            MaxTokens = 128_000,
+                            IsImageInputSupported = false,
+                            IsFunctionCallingSupported = false,
+                            IsDeepThinkingSupported = false,
+                        }
+                    ]
+                },
+                new ModelProvider
+                {
+                    Id = "siliconflow",
+                    DisplayName = "SiliconCloud (SiliconFlow)",
+                    Endpoint = "https://api.siliconflow.cn/v1",
+                    IconUrl = "https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/siliconcloud-color.svg",
+                    Schema = ModelProviderSchema.OpenAI,
+                    ModelDefinitions =
+                    [
+                        new ModelDefinition
+                        {
+                            Id = "Qwen/Qwen3-8B",
+                            ModelId = "Qwen/Qwen3-8B",
+                            DisplayName = "Qwen3-8B (free)",
                             MaxTokens = 128_000,
                             IsImageInputSupported = false,
                             IsFunctionCallingSupported = true,
                             IsDeepThinkingSupported = false,
-                            ReleasedAt = new DateOnly(2025, 04, 03),
-                            InputPrice = "$3.00/M",
-                            OutputPrice = "$15.00/M"
+                            IsDefault = true
+                        },
+                        new ModelDefinition
+                        {
+                            Id = "deepseek-ai/DeepSeek-V3.1",
+                            ModelId = "deepseek-ai/DeepSeek-V3.1",
+                            DisplayName = "DeepSeek-V3.1",
+                            MaxTokens = 160_000,
+                            IsImageInputSupported = false,
+                            IsFunctionCallingSupported = true,
+                            IsDeepThinkingSupported = false,
                         },
                         new ModelDefinition
                         {
@@ -522,7 +478,6 @@ public class SettingsInitializer : IAsyncInitializer
                             IsImageInputSupported = false,
                             IsFunctionCallingSupported = true,
                             IsDeepThinkingSupported = true,
-                            ReleasedAt = new DateOnly(2025, 08, 05),
                         },
                         new ModelDefinition
                         {
@@ -533,6 +488,7 @@ public class SettingsInitializer : IAsyncInitializer
                             IsImageInputSupported = false,
                             IsFunctionCallingSupported = false,
                             IsDeepThinkingSupported = true,
+                            IsDefault = true
                         },
                         new ModelDefinition
                         {

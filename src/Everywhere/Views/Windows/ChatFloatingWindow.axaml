@@ -175,16 +175,16 @@
 
                                           <Button.Flyout>
                                             <MenuFlyout Placement="BottomEdgeAlignedLeft">
-                                              <MenuItem
-                                                Classes="MenuFlyoutMenuItem"
-                                                Command="{Binding $parent[v:ChatFloatingWindow].((vm:ChatFloatingWindowViewModel)DataContext).ChatContextManager.RenameCommand, FallbackValue={x:Null}}"
-                                                CommandParameter="{Binding $parent[ListBoxItem].Content}"
-                                                Header="{I18N {x:Static LocaleKey.ChatFloatingWindow_HistoryAction_Rename}}">
-                                                <MenuItem.Icon>
-                                                  <LucideIcon
-                                                    Classes="MenuFlyoutIcon" Kind="Pencil"/>
-                                                </MenuItem.Icon>
-                                              </MenuItem>
+                                              <!--  <MenuItem  -->
+                                              <!--  Classes="MenuFlyoutMenuItem"  -->
+                                              <!--  Command="{Binding $parent[v:ChatFloatingWindow].((vm:ChatFloatingWindowViewModel)DataContext).ChatContextManager.RenameCommand, FallbackValue={x:Null}}"  -->
+                                              <!--  CommandParameter="{Binding $parent[ListBoxItem].Content}"  -->
+                                              <!--  Header="{I18N {x:Static LocaleKey.ChatFloatingWindow_HistoryAction_Rename}}">  -->
+                                              <!--   <MenuItem.Icon> -->
+                                              <!--  <LucideIcon  -->
+                                              <!--  Classes="MenuFlyoutIcon" Kind="Pencil"/>  -->
+                                              <!--   </MenuItem.Icon> -->
+                                              <!-- </MenuItem> -->
                                               <MenuItem
                                                 Classes="MenuFlyoutMenuItem"
                                                 Command="{Binding $parent[v:ChatFloatingWindow].((vm:ChatFloatingWindowViewModel)DataContext).ChatContextManager.RemoveCommand, FallbackValue={x:Null}}"

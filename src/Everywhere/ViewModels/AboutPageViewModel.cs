@@ -15,6 +15,14 @@ public partial class AboutPageViewModel : ReactiveViewModelBase
     {
         DialogManager
             .CreateDialog(ServiceLocator.Resolve<WelcomeView>())
+            .Show();
+    }
+
+    [RelayCommand]
+    private void OpenChangeLogDialog()
+    {
+        DialogManager
+            .CreateDialog(ServiceLocator.Resolve<ChangeLogView>())
             .Dismissible()
             .Show();
     }

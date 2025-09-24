@@ -471,35 +471,25 @@
     <data name="AboutPage_WelcomePage" xml:space="preserve">
         <value>Welcome Page</value>
     </data>
-    <data name="WelcomeView_QQGroup" xml:space="preserve">
-        <value>QQ Group</value>
+    <data name="WelcomeView_IntroStep_Message1" xml:space="preserve">
+        <value>👋 Welcome to Everywhere</value>
     </data>
-    <data name="WelcomeView_OfficialDocs" xml:space="preserve">
-        <value>Official Docs</value>
+    <data name="WelcomeView_IntroStep_Message2" xml:space="preserve">
+        <value>Nice to meet you! Let me be your assistant and help you solve problems!</value>
     </data>
-    <data name="WelcomeView_Header" xml:space="preserve">
-        <value>Welcome to Everywhere 👋</value>
-    </data>
-    <data name="WelcomeView_Content" xml:space="preserve">
-        <value>It's a pleasure to meet you! Let me be your assistant and accompany you in solving your problems!
-If this is your first time using it, please click on the official documentation below for instructions!
-I'm still very young, so if you have any problems, feel free to click the link below for feedback, I'll keep on evolving!
-You're also welcome to click the link below to enter the group discussion, more social media is under construction, so stay tuned.
-Tip: You can reopen this message by clicking “About - Welcome Page”.</value>
-    </data>
-    <data name="WelcomeView_ReportBug" xml:space="preserve">
+    <data name="ChangeLogView_ReportBugHyperlinkButton_Content" xml:space="preserve">
         <value>Report a Bug</value>
     </data>
-    <data name="WelcomeView_FeatureRequest" xml:space="preserve">
+    <data name="ChangeLogView_FeatureRequestHyperlinkButton_Content" xml:space="preserve">
         <value>Feature Request</value>
     </data>
-    <data name="WelcomeView_ReportBugUri" xml:space="preserve">
+    <data name="ChangeLogView_ReportBugHyperlinkButton_NavigateUri" xml:space="preserve">
         <value>https://github.com/DearVa/Everywhere/issues/new?template=bug-report.yml</value>
     </data>
-    <data name="WelcomeView_FeatureRequestUri" xml:space="preserve">
+    <data name="ChangeLogView_FeatureRequestHyperlinkButton_NavigateUri" xml:space="preserve">
         <value>https://github.com/DearVa/Everywhere/issues/new?template=feature-request.yml</value>
     </data>
-    <data name="WelcomeView_Discord" xml:space="preserve">
+    <data name="WelcomeView_DiscordHyperlinkButton_Content" xml:space="preserve">
         <value>Discord</value>
     </data>
     <data name="ChatFloatingWindow_TogglePin_ToolTip" xml:space="preserve">
@@ -730,5 +720,119 @@ Tip: You can reopen this message by clicking “About - Welcome Page”.</value>
     </data>
     <data name="NativeChatPlugin_VisualTree_Description" xml:space="preserve">
         <value>Provides the ability to perceive elements on the screen.</value>
+    </data>
+    <data name="ChangeLogView_ViewOnGitHubHyperlinkButton_Content" xml:space="preserve">
+        <value>View on GitHub</value>
+    </data>
+    <data name="ChangeLogView_Header" xml:space="preserve">
+        <value>Everywhere has been updated to the latest version 🎉</value>
+    </data>
+    <data name="ChangeLogView_Content" xml:space="preserve">
+        <value>I'm still very young, so if you have any problems, feel free to click the link below for feedback, I'll keep on evolving!
+You're also welcome to click the link below to enter the group discussion, more social media is under construction, so stay tuned.
+Tip: You can reopen this message by clicking “About - What's new”.</value>
+    </data>
+    <data name="WelcomeView_QQGroupHyperlinkButton_Content" xml:space="preserve">
+        <value>QQ Group</value>
+    </data>
+    <data name="WelcomeView_OfficialDocsHyperlinkButton_Content" xml:space="preserve">
+        <value>Official Docs</value>
+    </data>
+    <data name="AboutPage_WhatsNew" xml:space="preserve">
+        <value>What's new</value>
+    </data>
+    <data name="WelcomeViewModel_ValidateApiKey_FailedToast_Title" xml:space="preserve">
+        <value>Validation failed</value>
+    </data>
+    <data name="WelcomeView_LetsStartButton_Content" xml:space="preserve">
+        <value>Let's start!</value>
+    </data>
+    <data name="WelcomeView_SkipButton_Content" xml:space="preserve">
+        <value>Skip</value>
+    </data>
+    <data name="WelcomeView_PreviousStepButton_Content" xml:space="preserve">
+        <value>Previous step</value>
+    </data>
+    <data name="WelcomeView_NextStepButton_Content" xml:space="preserve">
+        <value>Next step</value>
+    </data>
+    <data name="WelcomeView_SelectModelProviderStep_Message1" xml:space="preserve">
+        <value>Okay, let's move on to Step 1: choosing a "brain" for Me!
+My intelligence comes from powerful Large language models (LLMs), which are provided by the specialized service providers listed below. You can choose any one of them to power me.</value>
+    </data>
+    <data name="WelcomeView_SelectModelProviderStep_Message2" xml:space="preserve">
+        <value>Please select a provider you have or plan to use, and I'll tell you more about it. Don't worry, Everywhere is just an independent client and is not officially affiliated with them.</value>
+    </data>
+    <data name="WelcomeView_ModelProviderWrapper_openai_Description" xml:space="preserve">
+        <value>OpenAI is a popular provider of AI models, known for its GPT series and others. You can register and obtain an API key on their official website. Please check their list of supported countries and regions.</value>
+    </data>
+    <data name="WelcomeView_ModelProviderWrapper_anthropic_Description" xml:space="preserve">
+        <value>Anthropic focuses on developing safe and reliable AI models, with its flagship product being the Claude series. Please visit their official website for model details and API pricing.</value>
+    </data>
+    <data name="WelcomeView_ModelProviderWrapper_google_Description" xml:space="preserve">
+        <value>Google develops the Gemini series of multimodal AI models. You can obtain an API key through Google AI Studio or Google Cloud Platform. Please verify that the service is available in your region.</value>
+    </data>
+    <data name="WelcomeView_ModelProviderWrapper_deepseek_Description" xml:space="preserve">
+        <value>DeepSeek is a company focused on general artificial intelligence, with models that perform well in code generation and Chinese language processing. You can register and get started on their official website.</value>
+    </data>
+    <data name="WelcomeView_ModelProviderWrapper_moonshot_Description" xml:space="preserve">
+        <value>Moonshot AI is known for its Kimi intelligent assistant, which supports long-text inputs. The company offers an open platform with API services. For more details, please visit their official website.</value>
+    </data>
+    <data name="WelcomeView_ModelProviderWrapper_openrouter_Description" xml:space="preserve">
+        <value>OpenRouter is an API aggregation and routing service that allows you to access a variety of models from multiple providers (such as OpenAI, Anthropic, Google, etc.) through a single, unified interface. This is very convenient for testing and comparing different models (Including free models). Please refer to their official documentation for pricing and available models.</value>
+    </data>
+    <data name="WelcomeView_ModelProviderWrapper_siliconflow_Description" xml:space="preserve">
+        <value>SiliconFlow is an efficient AI inference platform that supports a wide range of open-source and proprietary models (Including free models). It provides developers with flexible, high-performance model deployment and inference services. For specific supported models and pricing, please visit their official website.</value>
+    </data>
+    <data name="WelcomeView_EnterApiKeyStep_Message1" xml:space="preserve">
+        <value>Great! Now we need an API key to get started. Please enter or paste it into the text box below. Then click "Verify API key".</value>
+    </data>
+    <data name="WelcomeView_EnterApiKeyStep_Message2" xml:space="preserve">
+        <value>Don't worry, your key is highly secure. It's only used for authentication with the model provider, and I won't read it.</value>
+    </data>
+    <data name="WelcomeView_SelectModelProviderStep_OfficialWebsiteHyperlinkButton_Content" xml:space="preserve">
+        <value>👉 Official website</value>
+    </data>
+    <data name="WelcomeView_IntroStep_Message6" xml:space="preserve">
+        <value>Tip: You can click “About - Welcome Page” to reopen this message.</value>
+    </data>
+    <data name="WelcomeView_IntroStep_Message5" xml:space="preserve">
+        <value>Useful Links: </value>
+    </data>
+    <data name="WelcomeView_IntroStep_Message3" xml:space="preserve">
+        <value>You can wake me up anytime, everywhere. I can understand your current work context—whether it's emails, articles, or web pages—and help you solve problems more intelligently!</value>
+    </data>
+    <data name="WelcomeView_IntroStep_Message4" xml:space="preserve">
+        <value>If this is your first time using it, I'll guide you through the initial setup in three simple steps.</value>
+    </data>
+    <data name="WelcomeView_EnterApiKeyStep_Message3" xml:space="preserve">
+        <value>If you're unsure how to obtain it, you can check out this tutorial I've prepared for you:</value>
+    </data>
+    <data name="WelcomeView_EnterApiKeyStep_Message4" xml:space="preserve">
+        <value>Whispered hint: It usually starts with “sk-” or “AI,” so don't miss it!</value>
+    </data>
+    <data name="WelcomeView_EnterApiKeyStep_HowToGetApiKeyHyperlinkButton_Content" xml:space="preserve">
+        <value>👉 Click to open</value>
+    </data>
+    <data name="WelcomeView_VerifyApiKeyButton_Content" xml:space="preserve">
+        <value>Verify API key</value>
+    </data>
+    <data name="WelcomeView_EnterApiKeyStep_Message5" xml:space="preserve">
+        <value>Also, you can select a model or keep the default.</value>
+    </data>
+    <data name="WelcomeView_ApiKeyTextBox_Watermark" xml:space="preserve">
+        <value>Enter API key here...</value>
+    </data>
+    <data name="WelcomeView_EnterApiKeyStep_Message6" xml:space="preserve">
+        <value>🎉 Verify successful! Let's move on to the final step!</value>
+    </data>
+    <data name="WelcomeView_FinishButton_Content" xml:space="preserve">
+        <value>Finish</value>
+    </data>
+    <data name="WelcomeView_FinaleStep_Message1" xml:space="preserve">
+        <value>Congratulations! Everything is complete. You can wake me up anytime using the shortcut key below.</value>
+    </data>
+    <data name="WelcomeView_FinaleStep_Message2" xml:space="preserve">
+        <value>If there's no response, it might be occupied by other software. You can click to change the shortcut key.</value>
     </data>
 </root>

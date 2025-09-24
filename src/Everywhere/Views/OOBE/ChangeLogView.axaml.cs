@@ -7,16 +7,16 @@ using Microsoft.Extensions.Logging;
 
 namespace Everywhere.Views;
 
-public partial class WelcomeView : ReactiveUserControl<WelcomeViewModel>
+public partial class ChangeLogView : ReactiveUserControl<ChangeLogViewModel>
 {
-    public static readonly DirectProperty<WelcomeView, ObservableStringBuilder> MarkdownBuilderProperty =
-        AvaloniaProperty.RegisterDirect<WelcomeView, ObservableStringBuilder>(
+    public static readonly DirectProperty<ChangeLogView, ObservableStringBuilder> MarkdownBuilderProperty =
+        AvaloniaProperty.RegisterDirect<ChangeLogView, ObservableStringBuilder>(
             nameof(MarkdownBuilder),
             o => o.MarkdownBuilder);
 
     public ObservableStringBuilder MarkdownBuilder { get; } = new();
 
-    public WelcomeView()
+    public ChangeLogView()
     {
         InitializeComponent();
     }
@@ -31,7 +31,7 @@ public partial class WelcomeView : ReactiveUserControl<WelcomeViewModel>
 
             using var changeLogReader = new StreamReader(AssetLoader.Open(new Uri("avares://Everywhere/Assets/CHANGELOG.md", UriKind.Absolute)));
 
-            var maxLines = 200;
+            var maxLines = 100;
             while (changeLogReader.ReadLine() is { } line && maxLines-- > 0)
             {
                 MarkdownBuilder.AppendLine(line);
@@ -44,7 +44,7 @@ public partial class WelcomeView : ReactiveUserControl<WelcomeViewModel>
         }
         catch (Exception ex)
         {
-            ServiceLocator.Resolve<ILogger<WelcomeView>>().LogError(ex, "Failed to load changelog.");
+            ServiceLocator.Resolve<ILogger<ChangeLogView>>().LogError(ex, "Failed to load changelog.");
         }
     }
 

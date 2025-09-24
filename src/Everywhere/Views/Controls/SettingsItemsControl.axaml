@@ -129,7 +129,7 @@
 
                   <DataTemplate DataType="configuration:SettingsKeyboardHotkeyItem">
                     <v:KeyboardHotkeyInputBox
-                      MinWidth="320" MinHeight="32"
+                      MinWidth="160" MinHeight="32"
                       HorizontalAlignment="Left"
                       Hotkey="{Binding Value, Mode=TwoWay}"/>
                   </DataTemplate>

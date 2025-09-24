@@ -450,37 +450,33 @@
         <value>删除</value>
     </data>
     <data name="AboutPage_WelcomePage" xml:space="preserve">
-        <value>欢迎页面</value>
+        <value>欢迎页</value>
     </data>
-    <data name="WelcomeView_QQGroup" xml:space="preserve">
+    <data name="WelcomeView_QQGroupHyperlinkButton_Content" xml:space="preserve">
         <value>QQ 群</value>
     </data>
-    <data name="WelcomeView_OfficialDocs" xml:space="preserve">
+    <data name="WelcomeView_OfficialDocsHyperlinkButton_Content" xml:space="preserve">
         <value>官方文档</value>
     </data>
-    <data name="WelcomeView_Header" xml:space="preserve">
-        <value>欢迎来到 Everywhere 👋</value>
+    <data name="WelcomeView_IntroStep_Message1" xml:space="preserve">
+        <value>👋 欢迎来到 Everywhere</value>
     </data>
-    <data name="WelcomeView_Content" xml:space="preserve">
-        <value>很高兴认识你！就让我做你的助手，陪伴你解决问题吧！
-如果你是第一次使用，请点击下方官方文档查看使用说明！
-目前我还刚诞生不久，如果遇到问题，欢迎点击下方链接反馈，我会不断进化的！
-也欢迎点击下方链接进入群组讨论，更多的社交媒体正在建设中，敬请期待。
-提示：你可点击“关于-欢迎页面”重新打开此消息。</value>
+    <data name="WelcomeView_IntroStep_Message2" xml:space="preserve">
+        <value>很高兴认识你！就让我做你的助手，陪伴你解决问题吧！</value>
     </data>
-    <data name="WelcomeView_ReportBug" xml:space="preserve">
+    <data name="ChangeLogView_ReportBugHyperlinkButton_Content" xml:space="preserve">
         <value>反馈 Bug</value>
     </data>
-    <data name="WelcomeView_FeatureRequest" xml:space="preserve">
+    <data name="ChangeLogView_FeatureRequestHyperlinkButton_Content" xml:space="preserve">
         <value>功能请求</value>
     </data>
-    <data name="WelcomeView_ReportBugUri" xml:space="preserve">
+    <data name="ChangeLogView_ReportBugHyperlinkButton_NavigateUri" xml:space="preserve">
         <value>https://github.com/DearVa/Everywhere/issues/new?template=bug-report-zh.yml</value>
     </data>
-    <data name="WelcomeView_FeatureRequestUri" xml:space="preserve">
+    <data name="ChangeLogView_FeatureRequestHyperlinkButton_NavigateUri" xml:space="preserve">
         <value>https://github.com/DearVa/Everywhere/issues/new?template=feature-request-zh.yml</value>
     </data>
-    <data name="WelcomeView_Discord" xml:space="preserve">
+    <data name="WelcomeView_DiscordHyperlinkButton_Content" xml:space="preserve">
         <value>Discord</value>
     </data>
     <data name="ChatFloatingWindow_TogglePin_ToolTip" xml:space="preserve">
@@ -710,5 +706,113 @@
     </data>
     <data name="NativeChatPlugin_VisualTree_Description" xml:space="preserve">
         <value>提供感知屏幕上元素的能力。</value>
+    </data>
+    <data name="ChangeLogView_ViewOnGitHubHyperlinkButton_Content" xml:space="preserve">
+        <value>在 GitHub 查看</value>
+    </data>
+    <data name="ChangeLogView_Header" xml:space="preserve">
+        <value>Everywhere 已更新到最新版本 🎉</value>
+    </data>
+    <data name="ChangeLogView_Content" xml:space="preserve">
+        <value>目前我还刚诞生不久，如果遇到问题，欢迎点击下方链接反馈，我会不断进化的！
+也欢迎点击下方链接进入群组讨论，更多的社交媒体正在建设中，敬请期待。
+提示：你可点击“关于 - 最新变化”重新打开此消息。</value>
+    </data>
+    <data name="AboutPage_WhatsNew" xml:space="preserve">
+        <value>最新变化</value>
+    </data>
+    <data name="WelcomeViewModel_ValidateApiKey_FailedToast_Title" xml:space="preserve">
+        <value>校验失败</value>
+    </data>
+    <data name="WelcomeView_LetsStartButton_Content" xml:space="preserve">
+        <value>让我们开始吧！</value>
+    </data>
+    <data name="WelcomeView_SkipButton_Content" xml:space="preserve">
+        <value>跳过</value>
+    </data>
+    <data name="WelcomeView_PreviousStepButton_Content" xml:space="preserve">
+        <value>上一步</value>
+    </data>
+    <data name="WelcomeView_NextStepButton_Content" xml:space="preserve">
+        <value>下一步</value>
+    </data>
+    <data name="WelcomeView_SelectModelProviderStep_Message1" xml:space="preserve">
+        <value>好的，现在我们来进行第一步：为我选择一个“大脑”！
+我的智能来自于大语言模型 (LLMs)，这些模型由下方列出的专业服务商提供。你可以选择其中任何一个来驱动我。</value>
+    </data>
+    <data name="WelcomeView_SelectModelProviderStep_Message2" xml:space="preserve">
+        <value>请选择一个你拥有或计划使用的服务商，选好后我会为你介绍。别担心，我只是一个独立的客户端，和它们没有官方合作关系。</value>
+    </data>
+    <data name="WelcomeView_ModelProviderWrapper_openai_Description" xml:space="preserve">
+        <value>OpenAI 是广受欢迎的 AI 模型提供商，旗下拥有 GPT 系列等多种模型。您可以在其官网注册并获取 API 密钥。请注意查阅其服务支持的国家/地区列表。</value>
+    </data>
+    <data name="WelcomeView_ModelProviderWrapper_anthropic_Description" xml:space="preserve">
+        <value>Anthropic 专注于开发安全、可靠的 AI 模型，其旗舰产品是 Claude 系列。请访问其官网了解模型详情和 API 定价。</value>
+    </data>
+    <data name="WelcomeView_ModelProviderWrapper_google_Description" xml:space="preserve">
+        <value>Google 开发了名为 Gemini 的多模态 AI 模型系列。您可以通过 Google AI Studio 或 Google Cloud Platform 获取 API 密钥。请确认您所在地区是否可以访问其服务。</value>
+    </data>
+    <data name="WelcomeView_ModelProviderWrapper_deepseek_Description" xml:space="preserve">
+        <value>DeepSeek (深度求索) 是一家专注于通用人工智能的公司，其模型在代码和中文处理方面表现出色。您可以在其官网注册并开始使用。</value>
+    </data>
+    <data name="WelcomeView_ModelProviderWrapper_moonshot_Description" xml:space="preserve">
+        <value>Moonshot AI (月之暗面) 以其支持长文本输入 的Kimi 智能助手而闻名。该公司提供开放平台 API 服务，详情请访问其官网。</value>
+    </data>
+    <data name="WelcomeView_ModelProviderWrapper_openrouter_Description" xml:space="preserve">
+        <value>OpenRouter 是一个 API 聚合和路由服务，它允许您通过一个统一的接口访问来自多个提供商（如 OpenAI, Anthropic, Google 等）的多种模型（包括免费模型）。这对于测试和比较不同模型非常方便。价格和可用模型请参考其官方文档。</value>
+    </data>
+    <data name="WelcomeView_ModelProviderWrapper_siliconflow_Description" xml:space="preserve">
+        <value>SiliconFlow 是一个国产的高效 AI 推理平台，支持运行多种开源或专有模型（包括免费模型）。它为开发者提供了灵活、高性能的模型部署和推理服务。具体支持的模型和定价策略请访问其官网。</value>
+    </data>
+    <data name="WelcomeView_SelectModelProviderStep_OfficialWebsiteHyperlinkButton_Content" xml:space="preserve">
+        <value>👉 官方网站</value>
+    </data>
+    <data name="WelcomeView_IntroStep_Message6" xml:space="preserve">
+        <value>提示：你可点击“关于 - 欢迎页”重新打开此消息。</value>
+    </data>
+    <data name="WelcomeView_IntroStep_Message5" xml:space="preserve">
+        <value>实用链接：</value>
+    </data>
+    <data name="WelcomeView_IntroStep_Message3" xml:space="preserve">
+        <value>你可以随时随处唤醒我。我能理解你当前的工作上下文，无论是邮件、文章还是网页，帮你更智能地解决问题！</value>
+    </data>
+    <data name="WelcomeView_IntroStep_Message4" xml:space="preserve">
+        <value>如果你是第一次使用，接下来我会通过简单的三步带你完成初始配置。</value>
+    </data>
+    <data name="WelcomeView_EnterApiKeyStep_Message1" xml:space="preserve">
+        <value>非常好！现在我们需要一个 API 密钥才能开始使用，请将其输入或粘贴到下面的文本框内，之后点击“验证秘钥有消息。</value>
+    </data>
+    <data name="WelcomeView_EnterApiKeyStep_Message2" xml:space="preserve">
+        <value>别担心，你的密钥非常安全，它仅用于和模型提供商认证，我不会读取。</value>
+    </data>
+    <data name="WelcomeView_EnterApiKeyStep_Message3" xml:space="preserve">
+        <value>如果你不确定如何获取，可以看看我为你准备的这篇教程：</value>
+    </data>
+    <data name="WelcomeView_EnterApiKeyStep_Message4" xml:space="preserve">
+        <value>小声提示：通常它以“sk-”或者“AI”之类的开头，不要漏掉啦！</value>
+    </data>
+    <data name="WelcomeView_EnterApiKeyStep_HowToGetApiKeyHyperlinkButton_Content" xml:space="preserve">
+        <value>👉 点击打开</value>
+    </data>
+    <data name="WelcomeView_VerifyApiKeyButton_Content" xml:space="preserve">
+        <value>验证密钥有效性</value>
+    </data>
+    <data name="WelcomeView_EnterApiKeyStep_Message5" xml:space="preserve">
+        <value>同时，你也可以选择一个模型，或者保持默认。</value>
+    </data>
+    <data name="WelcomeView_ApiKeyTextBox_Watermark" xml:space="preserve">
+        <value>在此处输入 API 密钥...</value>
+    </data>
+    <data name="WelcomeView_EnterApiKeyStep_Message6" xml:space="preserve">
+        <value>🎉 验证成功！让我们进入最后一步吧！</value>
+    </data>
+    <data name="WelcomeView_FinishButton_Content" xml:space="preserve">
+        <value>完成</value>
+    </data>
+    <data name="WelcomeView_FinaleStep_Message1" xml:space="preserve">
+        <value>恭喜！全部完成了。你可以随时按下面的快捷键唤醒我。</value>
+    </data>
+    <data name="WelcomeView_FinaleStep_Message2" xml:space="preserve">
+        <value>如果没反应，可能是被其他软件占用，可以点击换一个快捷键哦。</value>
     </data>
 </root>

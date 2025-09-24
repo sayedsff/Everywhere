@@ -2,6 +2,7 @@
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Everywhere.AI;
 using Everywhere.Common;
 using Everywhere.Configuration;
 using Everywhere.Storage;

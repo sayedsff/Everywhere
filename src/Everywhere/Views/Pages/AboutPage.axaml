@@ -33,6 +33,11 @@
         TextElement.Foreground="{DynamicResource InfoColor}"/>
       <HyperlinkButton
         VerticalAlignment="Center"
+        Command="{Binding OpenChangeLogDialogCommand}"
+        Content="{I18N {x:Static LocaleKey.AboutPage_WhatsNew}}"
+        TextElement.Foreground="{DynamicResource InfoColor}"/>
+      <HyperlinkButton
+        VerticalAlignment="Center"
         Content="{I18N {x:Static LocaleKey.AboutPage_ProjectLink}}"
         NavigateUri="https://github.com/DearVa/Everywhere"
         TextElement.Foreground="{DynamicResource InfoColor}"/>
