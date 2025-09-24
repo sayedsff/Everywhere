@@ -128,11 +128,11 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
 
         void HandleChatAttachmentsCollectionChanged(in NotifyCollectionChangedEventArgs<ChatAttachment> x)
         {
-            QuickActions = _chatAttachments switch
+            Task.Run(() => QuickActions = _chatAttachments switch
             {
                 [ChatVisualElementAttachment { Element.Target.Type: VisualElementType.TextEdit }] => textEditActions,
                 _ => null
-            };
+            }).Detach(_logger.ToExceptionHandler());
         }
 
         _chatAttachments.CollectionChanged += HandleChatAttachmentsCollectionChanged;
@@ -168,9 +168,10 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
                     return;
                 }
 
-                TargetBoundingRect = targetElement.BoundingRectangle;
+                var (boundingRect, attachment) = await Task.Run(() => (targetElement.BoundingRectangle, CreateFromVisualElement(targetElement)), token).WaitAsync(TimeSpan.FromSeconds(1), token);
+                TargetBoundingRect = boundingRect;
                 _chatAttachments.Clear();
-                _chatAttachments.Add(await Task.Run(() => CreateFromVisualElement(targetElement), token));
+                _chatAttachments.Add(attachment);
                 IsOpened = true;
             },
             _logger.ToExceptionHandler(),

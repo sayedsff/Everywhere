@@ -1,6 +1,7 @@
 ﻿using Avalonia.Controls;
 using Everywhere.Common;
 using Everywhere.Interop;
+using Microsoft.Extensions.Logging;
 
 namespace Everywhere.Views;
 
@@ -30,26 +31,33 @@ public class OverlayWindow : Window
         base.OnClosing(e);
     }
 
-    public void UpdateForVisualElement(IVisualElement? element)
+    public async void UpdateForVisualElement(IVisualElement? element)
     {
-        if (element == null)
+        try
         {
-            Hide();
-        }
-        else
-        {
-            Show();
-            var boundingRectangle = element.BoundingRectangle;
-            Position = new PixelPoint(boundingRectangle.X, boundingRectangle.Y);
-            var scaling = DesktopScaling;
-            Width = boundingRectangle.Width / scaling;
-            Height = boundingRectangle.Height / scaling;
-
-            if (_owner is { Topmost: true })
+            if (element == null)
             {
-                _owner.Topmost = false;
-                _owner.Topmost = true;
+                Hide();
             }
+            else
+            {
+                Show();
+                var boundingRectangle = await Task.Run(() => element.BoundingRectangle).WaitAsync(TimeSpan.FromSeconds(0.5));
+                Position = new PixelPoint(boundingRectangle.X, boundingRectangle.Y);
+                var scaling = DesktopScaling;
+                Width = boundingRectangle.Width / scaling;
+                Height = boundingRectangle.Height / scaling;
+
+                if (_owner is { Topmost: true })
+                {
+                    _owner.Topmost = false;
+                    _owner.Topmost = true;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ServiceLocator.Resolve<ILogger<OverlayWindow>>().LogError(ex, "Failed to update OverlayWindow for visual element.");
         }
     }
 }

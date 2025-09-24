@@ -39,8 +39,15 @@ public class HotkeyInitializer(
                         .GetAncestors(true)
                         .LastOrDefault();
                 if (element == null) return;
+
+                var hWnd = element.NativeWindowHandle;
                 Dispatcher.UIThread.Invoke(() =>
-                    ServiceLocator.Resolve<ChatFloatingWindow>().ViewModel.TryFloatToTargetElementAsync(element).Detach(logger.ToExceptionHandler()));
+                {
+                    var chatFloatingWindow = ServiceLocator.Resolve<ChatFloatingWindow>();
+                    if (hWnd == chatFloatingWindow.TryGetPlatformHandle()?.Handle) return;
+
+                    chatFloatingWindow.ViewModel.TryFloatToTargetElementAsync(element).Detach(logger.ToExceptionHandler());
+                });
             });
         };
         // hotkeyListener.PointerHotkeyActivated += point =>
