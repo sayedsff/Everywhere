@@ -57,9 +57,9 @@ public partial class MainViewModel(IServiceProvider serviceProvider, Settings se
     /// </summary>
     private void ShowOobeDialogOnDemand()
     {
-        var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString();
-        var previousLaunchVersion = settings.Internal.PreviousLaunchVersion;
-        if (previousLaunchVersion is null)
+        var version = Assembly.GetExecutingAssembly().GetName().Version;
+        if (!Version.TryParse(settings.Internal.PreviousLaunchVersion, out var previousLaunchVersion)) previousLaunchVersion = null;
+        if (previousLaunchVersion is null || previousLaunchVersion < new Version(0, 3, 0)) // 0.3.0 is the first version with OOBE
         {
             DialogManager
                 .CreateDialog(ServiceLocator.Resolve<WelcomeView>())
@@ -73,7 +73,7 @@ public partial class MainViewModel(IServiceProvider serviceProvider, Settings se
                 .Show();
         }
 
-        settings.Internal.PreviousLaunchVersion = version;
+        settings.Internal.PreviousLaunchVersion = version?.ToString();
     }
 
     protected internal override Task ViewUnloaded()
