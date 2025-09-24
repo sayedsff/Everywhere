@@ -1,3 +1,33 @@
+## [v0.3.0](https://github.com/DearVa/Everywhere/releases/tag/v0.3.0) - 2025-09-24
+
+### ✨ New Features
+- Added OOBE (Out-Of-Box Experience) for first time users, which includes:
+  - Welcome Dialog
+  - Quick Setup Wizard
+- Added supported for custom model
+- Added database for storing chat attachments
+- Added support for more hotkey, such as `Copilot` key on Windows
+- Added watchdog process to monitor the main process and clean up zombie processes
+
+### 🔄️ Changed
+- Refactored Plugin System, which includes:
+  - Added Plugin Manager in Settings
+  - Refactored web search plugin
+  - Added file system plugin for reading and writing files
+  - Added code execution plugin with PowerShell on Windows
+  - Added web browsing plugin with Puppeteer
+  - Added visual element plugin for capturing screen content when UI automation is not available
+- Refactored logging system with structured logging
+- Improved visual capturing performance
+
+### 🐞 Fixed
+- Fixed removing or switching chat history frequently may cause crash
+- Fixed emoji rendering issues in the chat window
+- Fixed application may freeze when active on own window
+- Fixed settings load/save issues
+
+
+
 ## [v0.2.4](https://github.com/DearVa/Everywhere/releases/tag/v0.2.4) - 2025-08-15
 
 ### ✨ New Features
