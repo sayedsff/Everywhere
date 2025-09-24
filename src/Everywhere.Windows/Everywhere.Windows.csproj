@@ -34,7 +34,7 @@
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="dotnet publish -c $(Configuration) -r win-x64 ..\Everywhere.Watchdog\Everywhere.Watchdog.csproj -o ..\Everywhere.Watchdog\bin\$(Configuration)\publish"/>
+    <Exec Command="dotnet publish -c $(Configuration) -r win-x64 ..\Everywhere.Watchdog\Everywhere.Watchdog.csproj -o ..\Everywhere.Watchdog\bin\$(Configuration)\publish --no-restore -v d"/>
     <Exec Command="xcopy /Y /I ..\Everywhere.Watchdog\bin\$(Configuration)\publish\Everywhere.Watchdog.exe $(OutDir)"/>
   </Target>
 </Project>

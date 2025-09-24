@@ -65,10 +65,17 @@ jobs:
         echo $releaseBody | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
         echo "$delimiter" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
 
+    - name: Restore
+      shell: pwsh
+      run: |
+        dotnet new nugetconfig
+        dotnet clean Everywhere.sln --configuration Release && dotnet nuget locals all --clear
+        dotnet restore Everywhere.sln -r win-x64
+
     - name: Publish Everywhere.Windows
       shell: pwsh
       run: |
-        dotnet publish src/Everywhere.Windows/Everywhere.Windows.csproj -c Release --configfile nuget.config --self-contained true -p:AssemblyVersion=$env:VERSION -p:FileVersion=$env:VERSION -o ./publish
+        dotnet publish src/Everywhere.Windows/Everywhere.Windows.csproj -c Release --self-contained true -p:AssemblyVersion=$env:VERSION -p:FileVersion=$env:VERSION -o ./publish --no-restore
 
     - name: Build NSIS installer
       shell: pwsh
