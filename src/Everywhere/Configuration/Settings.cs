@@ -110,7 +110,7 @@ public partial class CommonSettings : SettingsCategory
 
     [JsonIgnore]
     [SettingsItem(IsVisibleBindingPath = $"!{nameof(IsAdministrator)}")]
-    public SettingsControl<RestartAsAdministratorButton> RestartAsAdministrator { get; } = new();
+    public SettingsControl<RestartAsAdministratorControl> RestartAsAdministrator { get; } = new();
 
     [JsonIgnore]
     [SettingsItem(IsEnabledBindingPath = $"{nameof(IsAdministrator)} || !{nameof(IsAdministratorStartupEnabled)}")]
@@ -358,6 +358,6 @@ public static class SettingsExtensions
             return settings;
         })
         .AddTransient<SoftwareUpdateControl>()
-        .AddTransient<RestartAsAdministratorButton>()
+        .AddTransient<RestartAsAdministratorControl>()
         .AddTransient<IAsyncInitializer, SettingsInitializer>();
 }

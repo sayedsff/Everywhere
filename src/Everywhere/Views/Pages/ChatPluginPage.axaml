@@ -1,23 +1,27 @@
 ﻿<UserControl
   x:Class="Everywhere.Views.Pages.ChatPluginPage" xmlns="https://github.com/avaloniaui"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:md="clr-namespace:LiveMarkdown.Avalonia;assembly=LiveMarkdown.Avalonia"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:md="clr-namespace:LiveMarkdown.Avalonia;assembly=LiveMarkdown.Avalonia"
   xmlns:p="clr-namespace:Everywhere.Chat.Plugins" xmlns:v="clr-namespace:Everywhere.Views"
   xmlns:vm="clr-namespace:Everywhere.ViewModels" d:DesignHeight="450"
   d:DesignWidth="800" x:DataType="vm:ChatPluginPageViewModel"
   mc:Ignorable="d">
   <UserControl.Styles>
     <Style Selector="ListBox.PluginListBox">
+      <Style Selector="^ ListBoxItem">
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+      </Style>
       <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
       <Setter Property="ItemTemplate">
         <DataTemplate DataType="p:ChatPlugin">
           <Grid
-            ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto">
+            ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto">
             <LucideIcon
               Grid.Row="0" Grid.RowSpan="2"
               Grid.Column="0" Margin="0,0,12,0"
               Kind="{Binding Icon}"/>
-
             <TextBlock
               Classes="p" Grid.Row="0"
               Grid.Column="1" Margin="0,-8,0,0"
@@ -29,10 +33,9 @@
               Grid.Column="1" IsHitTestVisible="False"
               Text="{Binding DescriptionKey^}"
               TextTrimming="CharacterEllipsis"/>
-
             <CheckBox
               Grid.Row="0" Grid.RowSpan="2"
-              Grid.Column="2" Margin="16,0,2,0"
+              Grid.Column="2" Margin="16,0,0,0"
               IsChecked="{Binding IsEnabled}"/>
           </Grid>
         </DataTemplate>
@@ -58,7 +61,7 @@
       Grid.Column="0" ClipToBounds="False">
       <TabItem Header="{I18N {x:Static LocaleKey.ChatPluginPage_TabItem_BuiltIn_Header}}">
         <ListBox
-          Classes="PluginListBox" Margin="0,0,16,0"
+          Classes="PluginListBox" Margin="0,0,10,0"
           ItemsSource="{Binding Manager.BuiltInPlugins}"
           SelectedItem="{Binding SelectedPlugin}"/>
       </TabItem>
@@ -83,7 +86,7 @@
 
     <GridSplitter
       Grid.Row="0" Grid.RowSpan="2"
-      Grid.Column="1" Margin="-2,0"
+      Grid.Column="1" Margin="4,0"
       VerticalAlignment="Stretch" Background="Transparent"/>
 
     <Grid
@@ -148,7 +151,7 @@
                   ColumnDefinitions="Auto,Auto,*" RowDefinitions="Auto,Auto">
                   <CheckBox
                     Grid.Row="0" Grid.RowSpan="2"
-                    Grid.Column="0" Margin="0,0,12,0"
+                    Grid.Column="0" Margin="4,0,12,0"
                     IsChecked="{Binding IsEnabled}"/>
 
                   <LucideIcon
@@ -161,12 +164,13 @@
 
                   <TextBlock
                     Classes="p" Grid.Row="0"
-                    Grid.Column="2" Margin="0,-8,0,0"
+                    Grid.Column="2" Margin="0,-4,0,0"
                     Text="{Binding KernelFunction.Name}"
                     TextWrapping="Wrap"/>
                   <TextBlock
                     Classes="Muted" Grid.Row="1"
                     Grid.Column="2"
+                    Margin="0, 0,0,4"
                     Text="{Binding KernelFunction.Description}"
                     TextWrapping="Wrap"/>
                 </Grid>
