@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Reflection;
@@ -62,6 +63,11 @@ public class ObjectObserver(ObjectObserverChangedEventHandler handler) : IDispos
         private readonly WeakReference<INotifyPropertyChanged> _targetReference;
         private readonly ConcurrentDictionary<string, Observation> _observations = [];
 
+        /// <summary>
+        /// when <see cref="ObservableCollection{T}"/> is Reset, we cannot get the old items count from event args.
+        /// So we need to keep track of the count ourselves.
+        /// </summary>
+        private int _listItemCount;
         private bool _isDisposed;
 
         public Observation(string basePath, INotifyPropertyChanged target, ObjectObserver owner)
@@ -94,6 +100,7 @@ public class ObjectObserver(ObjectObserverChangedEventHandler handler) : IDispos
 
             if (target is IList list)
             {
+                _listItemCount = list.Count;
                 for (var i = 0; i < list.Count; i++)
                 {
                     ObserveObject(i.ToString(), list[i]);
@@ -183,7 +190,7 @@ public class ObjectObserver(ObjectObserverChangedEventHandler handler) : IDispos
                 case NotifyCollectionChangedAction.Reset:
                 {
                     // Reset clears the collection, so we need to re-observe all items
-                    for (var i = 0; i < sender.NotNull<IList>().Count; i++)
+                    for (var i = 0; i < _listItemCount; i++)
                     {
                         ObserveObject(i.ToString(), null);
                     }
@@ -193,6 +200,8 @@ public class ObjectObserver(ObjectObserverChangedEventHandler handler) : IDispos
                     break;
                 }
             }
+
+            _listItemCount = list.Count;
 
             // Notify changes in the affected range
             for (var i = changeRange.Start.Value; i < changeRange.End.Value; i++)
