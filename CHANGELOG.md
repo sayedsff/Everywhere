@@ -19,12 +19,15 @@
   - Added visual element plugin for capturing screen content when UI automation is not available
 - Refactored logging system with structured logging
 - Improved visual capturing performance
+- Chat window now can be resized
 
 ### 🐞 Fixed
 - Fixed removing or switching chat history frequently may cause crash
 - Fixed emoji rendering issues in the chat window
 - Fixed application may freeze when active on own window
 - Fixed settings load/save issues
+- Fixed the background of tray icon menu is transparent
+- Fixed new chat button disable state is not updated when switching chat history
 
 
 
