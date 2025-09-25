@@ -11,14 +11,20 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <WatchdogProject>..\Everywhere.Watchdog\Everywhere.Watchdog.csproj</WatchdogProject>
+    <WatchdogOutDir>$(MSBuildThisFileDirectory)$(WatchdogProject)\..\bin\$(Configuration)\net9.0\win-x64\publish\</WatchdogOutDir>
+    <WatchdogExecutable>$(WatchdogOutDir)Everywhere.Watchdog.exe</WatchdogExecutable>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Avalonia.Desktop"/>
     <PackageReference Include="HotAvalonia" PrivateAssets="All"/>
     <PackageReference Include="Microsoft.PowerShell.SDK"/>
     <PackageReference Include="Microsoft.Windows.CsWin32"/>
     <PackageReference Include="FlaUI.UIA3"/>
-    <PackageReference Include="SkiaSharp" />
-    <PackageReference Include="SkiaSharp.NativeAssets.Win32" />
+    <PackageReference Include="SkiaSharp"/>
+    <PackageReference Include="SkiaSharp.NativeAssets.Win32"/>
     <PackageReference Include="Vortice.Direct3D11"/>
     <PackageReference Include="Vortice.DirectComposition"/>
   </ItemGroup>
@@ -31,10 +37,16 @@
     <None Include="..\..\img\Everywhere.ico">
       <Link>Everywhere.ico</Link>
     </None>
+    <Content Include="$(WatchdogExecutable)">
+      <Link>Everywhere.Watchdog.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
 
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="dotnet publish -c $(Configuration) -r win-x64 ..\Everywhere.Watchdog\Everywhere.Watchdog.csproj -o ..\Everywhere.Watchdog\bin\$(Configuration)\publish --no-restore"/>
-    <Exec Command="xcopy /Y /I ..\Everywhere.Watchdog\bin\$(Configuration)\publish\Everywhere.Watchdog.exe $(OutDir)"/>
+  <Target Name="BuildWatchdog" BeforeTargets="BeforeBuild" Inputs="$(WatchdogProject)" Outputs="$(WatchdogExecutable)">
+    <Message Text="Watchdog executable is out-of-date. Building..." Importance="high"/>
+    <Exec Command="dotnet restore &quot;$(WatchdogProject)&quot; -r win-x64"/>
+    <Exec Command="dotnet publish &quot;$(WatchdogProject)&quot; -c $(Configuration) -r win-x64 --self-contained --no-restore -o &quot;$(WatchdogOutDir)&quot;"/>
   </Target>
 </Project>

@@ -3,6 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <PublishAot>true</PublishAot>
+    <SelfContained>true</SelfContained>
     <OptimizationPreference>Size</OptimizationPreference>
   </PropertyGroup>
 

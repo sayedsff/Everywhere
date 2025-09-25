@@ -76,7 +76,6 @@ jobs:
       shell: pwsh
       run: |
         dotnet new nugetconfig
-        dotnet clean Everywhere.sln --configuration Release && dotnet nuget locals all --clear
         dotnet restore Everywhere.sln -r win-x64
 
     - name: Publish Everywhere.Windows
