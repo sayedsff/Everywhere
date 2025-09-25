@@ -58,6 +58,7 @@ public partial class ChatContextManager : ObservableObject, IChatContextManager,
 
             OnPropertyChanged(nameof(ChatMessageNodes));
             RemoveCommand.NotifyCanExecuteChanged();
+            CreateNewCommand.NotifyCanExecuteChanged();
         }
     }
 
@@ -119,6 +120,8 @@ public partial class ChatContextManager : ObservableObject, IChatContextManager,
     {
         lock (_saveBuffer) _saveBuffer.Add(sender);
         _saveDebounceExecutor.Trigger();
+
+        CreateNewCommand.NotifyCanExecuteChanged();
     }
 
     [MemberNotNull(nameof(_current))]
@@ -145,6 +148,7 @@ public partial class ChatContextManager : ObservableObject, IChatContextManager,
         OnPropertyChanged(nameof(Current));
         OnPropertyChanged(nameof(ChatMessageNodes));
         RemoveCommand.NotifyCanExecuteChanged();
+        CreateNewCommand.NotifyCanExecuteChanged();
     }
 
     private bool CanRemove => _history.Count > 1 || !IsEmptyContext(_current);
