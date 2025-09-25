@@ -38,12 +38,12 @@
         TextElement.Foreground="{DynamicResource InfoColor}"/>
       <HyperlinkButton
         VerticalAlignment="Center"
-        Content="{I18N {x:Static LocaleKey.AboutPage_ProjectLink}}"
+        Content="{I18N {x:Static LocaleKey.AboutPage_GithubRepo}}"
         NavigateUri="https://github.com/DearVa/Everywhere"
         TextElement.Foreground="{DynamicResource InfoColor}"/>
       <HyperlinkButton
         VerticalAlignment="Center"
-        Content="{I18N {x:Static LocaleKey.AboutPage_OpenSourceNotice}}"
+        Content="{I18N {x:Static LocaleKey.AboutPage_OpenSourceLicenses}}"
         NavigateUri="https://github.com/DearVa/Everywhere/blob/main/ThirdPartyNotices.txt"
         TextElement.Foreground="{DynamicResource InfoColor}"/>
     </StackPanel>

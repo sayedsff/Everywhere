@@ -2,7 +2,7 @@
 
 public enum ChatFloatingWindowPinMode
 {
-    [DynamicResourceKey(LocaleKey.ChatFloatingWindowPinMode_RemeberLast)]
+    [DynamicResourceKey(LocaleKey.ChatFloatingWindowPinMode_RememberPrevious)]
     RememberLast,
 
     [DynamicResourceKey(LocaleKey.ChatFloatingWindowPinMode_AlwaysPinned)]

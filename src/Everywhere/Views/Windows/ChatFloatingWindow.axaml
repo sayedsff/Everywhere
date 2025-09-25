@@ -737,7 +737,7 @@
               <MenuItem
                 Command="{Binding AddElementCommand}"
                 CommandParameter="{x:Static interop:PickElementMode.Screen}"
-                Header="{I18N {x:Static LocaleKey.ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AddScreen}}">
+                Header="{I18N {x:Static LocaleKey.ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_PickScreen}}">
                 <MenuItem.Icon>
                   <LucideIcon
                     Width="18" Height="18"
@@ -747,7 +747,7 @@
               <MenuItem
                 Command="{Binding AddElementCommand}"
                 CommandParameter="{x:Static interop:PickElementMode.Window}"
-                Header="{I18N {x:Static LocaleKey.ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AddWindow}}">
+                Header="{I18N {x:Static LocaleKey.ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_PickWindow}}">
                 <MenuItem.Icon>
                   <LucideIcon
                     Width="18" Height="18"
@@ -757,7 +757,7 @@
               <MenuItem
                 Command="{Binding AddElementCommand}"
                 CommandParameter="{x:Static interop:PickElementMode.Element}"
-                Header="{I18N {x:Static LocaleKey.ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AddElement}}">
+                Header="{I18N {x:Static LocaleKey.ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_PickElement}}">
                 <MenuItem.Icon>
                   <LucideIcon
                     Width="18" Height="18"
@@ -766,7 +766,7 @@
               </MenuItem>
               <MenuItem
                 Command="{Binding AddClipboardCommand}"
-                Header="{I18N {x:Static LocaleKey.ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AddClipboard}}">
+                Header="{I18N {x:Static LocaleKey.ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_PasteFromClipboard}}">
                 <MenuItem.Icon>
                   <LucideIcon
                     Width="18" Height="18"
@@ -775,7 +775,7 @@
               </MenuItem>
               <MenuItem
                 Command="{Binding AddFileCommand}"
-                Header="{I18N {x:Static LocaleKey.ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AddFile}}">
+                Header="{I18N {x:Static LocaleKey.ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AttachFile}}">
                 <MenuItem.Icon>
                   <LucideIcon
                     Width="18" Height="18"

@@ -179,19 +179,19 @@
     <data name="ChatFloatingWindow_Close_ToolTip" xml:space="preserve">
         <value>关闭 (Esc)</value>
     </data>
-    <data name="ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AddScreen" xml:space="preserve">
-        <value>添加屏幕</value>
+    <data name="ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_PickScreen" xml:space="preserve">
+        <value>选择屏幕</value>
     </data>
-    <data name="ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AddWindow" xml:space="preserve">
-        <value>添加窗口</value>
+    <data name="ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_PickWindow" xml:space="preserve">
+        <value>选择窗口</value>
     </data>
-    <data name="ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AddElement" xml:space="preserve">
-        <value>添加元素</value>
+    <data name="ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_PickElement" xml:space="preserve">
+        <value>选取元素</value>
     </data>
-    <data name="ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AddClipboard" xml:space="preserve">
-        <value>添加剪切板</value>
+    <data name="ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_PasteFromClipboard" xml:space="preserve">
+        <value>从剪切板复制</value>
     </data>
-    <data name="ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AddFile" xml:space="preserve">
+    <data name="ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AttachFile" xml:space="preserve">
         <value>添加文件</value>
     </data>
     <data name="ChatFloatingWindowViewModel_TextEditActions_Translate" xml:space="preserve">
@@ -428,11 +428,11 @@
     <data name="AboutPage_Version" xml:space="preserve">
         <value>版本：</value>
     </data>
-    <data name="AboutPage_ProjectLink" xml:space="preserve">
-        <value>项目地址</value>
+    <data name="AboutPage_GithubRepo" xml:space="preserve">
+        <value>Github 仓库</value>
     </data>
-    <data name="AboutPage_OpenSourceNotice" xml:space="preserve">
-        <value>开放源代码通知</value>
+    <data name="AboutPage_OpenSourceLicenses" xml:space="preserve">
+        <value>开放源代码许可</value>
     </data>
     <data name="App_EverywhereIsAlreadyRunning" xml:space="preserve">
         <value>Everywhere 已在运行，请检查托盘图标。</value>
@@ -482,7 +482,7 @@
     <data name="ChatFloatingWindow_TogglePin_ToolTip" xml:space="preserve">
         <value>固定窗口 (Ctrl+D)</value>
     </data>
-    <data name="ChatFloatingWindowPinMode_RemeberLast" xml:space="preserve">
+    <data name="ChatFloatingWindowPinMode_RememberPrevious" xml:space="preserve">
         <value>记住之前的状态</value>
     </data>
     <data name="ChatFloatingWindowPinMode_AlwaysPinned" xml:space="preserve">
@@ -594,7 +594,7 @@
         <value>以管理员身份重启</value>
     </data>
     <data name="Settings_Common_RestartAsAdministrator_Description" xml:space="preserve">
-        <value>由于操作系统限制，当以管理员身份运行任何应用程序（也称为提升权限）时，如果提升权限的应用程序处于活动状态或试图与 Everywhere 的某个功能（如“选择元素”）交互，Everywhere 可能无法正常工作。可以通过同时以管理员身份运行 Everywhere 来解决此问题。</value>
+        <value>由于操作系统限制，当以管理员身份运行任何应用程序（提升权限）时，如果提升权限的应用程序处于活动状态或试图与 Everywhere 的某个功能（如“选择元素”）交互，Everywhere 可能无法正常工作。可以通过同时以管理员身份运行 Everywhere 来解决此问题。</value>
     </data>
     <data name="Settings_Common_RestartAsAdministrator_Button_Content" xml:space="preserve">
         <value>重启</value>
@@ -705,7 +705,7 @@
         <value>视觉树</value>
     </data>
     <data name="NativeChatPlugin_VisualTree_Description" xml:space="preserve">
-        <value>提供感知屏幕上元素的能力。</value>
+        <value>提供屏幕内元素的感知能力。</value>
     </data>
     <data name="ChangeLogView_ViewOnGitHubHyperlinkButton_Content" xml:space="preserve">
         <value>在 GitHub 查看</value>

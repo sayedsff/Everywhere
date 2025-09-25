@@ -193,24 +193,24 @@
     <data name="ChatFloatingWindow_Close_ToolTip" xml:space="preserve">
         <value>Close (Esc)</value>
     </data>
-    <data name="ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AddScreen"
+    <data name="ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_PickScreen"
         xml:space="preserve">
-        <value>Add Screen</value>
+        <value>Pick Screen</value>
     </data>
-    <data name="ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AddWindow"
+    <data name="ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_PickWindow"
         xml:space="preserve">
-        <value>Add Window</value>
+        <value>Pick Window</value>
     </data>
-    <data name="ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AddElement"
+    <data name="ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_PickElement"
         xml:space="preserve">
-        <value>Add Element</value>
+        <value>Pick Element</value>
     </data>
-    <data name="ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AddClipboard"
+    <data name="ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_PasteFromClipboard"
         xml:space="preserve">
-        <value>Add Clipboard</value>
+        <value>Paste from Clipboard</value>
     </data>
-    <data name="ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AddFile" xml:space="preserve">
-        <value>Add File</value>
+    <data name="ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AttachFile" xml:space="preserve">
+        <value>Attach File</value>
     </data>
     <data name="ChatFloatingWindowViewModel_TextEditActions_Translate" xml:space="preserve">
         <value>Translate</value>
@@ -447,11 +447,11 @@
     <data name="AboutPage_Version" xml:space="preserve">
         <value>Version: </value>
     </data>
-    <data name="AboutPage_ProjectLink" xml:space="preserve">
-        <value>Project Link</value>
+    <data name="AboutPage_GithubRepo" xml:space="preserve">
+        <value>Github Repo</value>
     </data>
-    <data name="AboutPage_OpenSourceNotice" xml:space="preserve">
-        <value>Open Source Notice</value>
+    <data name="AboutPage_OpenSourceLicenses" xml:space="preserve">
+        <value>Open Source Licenses</value>
     </data>
     <data name="App_EverywhereIsAlreadyRunning" xml:space="preserve">
         <value>Everywhere is already running, please check Tray Icon.</value>
@@ -495,8 +495,8 @@
     <data name="ChatFloatingWindow_TogglePin_ToolTip" xml:space="preserve">
         <value>Pin Window (Ctrl+D)</value>
     </data>
-    <data name="ChatFloatingWindowPinMode_RemeberLast" xml:space="preserve">
-        <value>Remeber last status</value>
+    <data name="ChatFloatingWindowPinMode_RememberPrevious" xml:space="preserve">
+        <value>Remember previous status</value>
     </data>
     <data name="ChatFloatingWindowPinMode_AlwaysPinned" xml:space="preserve">
         <value>Always pinned</value>
@@ -596,7 +596,7 @@
         <value>Run at Startup</value>
     </data>
     <data name="Settings_Common_IsStartupEnabled_Description" xml:space="preserve">
-        <value>Everywhere will run automatically after startup. If “Startup as administrator” is enabled, the current option can only be disabled in administrator mode.</value>
+        <value>Everywhere will run automatically after startup. If “Startup as Administrator” is enabled, the current option can only be disabled in administrator mode.</value>
     </data>
     <data name="Settings_Common_IsAdministratorStartupEnabled_Header" xml:space="preserve">
         <value>Startup as Administrator</value>
@@ -605,7 +605,7 @@
         <value>Everywhere will start automatically as administrator. You can only turn this option on or off in administrator mode.</value>
     </data>
     <data name="Settings_Common_RestartAsAdministrator_Description" xml:space="preserve">
-        <value>Due to operating system restrictions, when running any application as an administrator (also referred to as elevated permissions), Everywhere may not work correctly when the elevated applications are in focus or trying to interact with a Everywhere feature like "Pick Element". This can be addressed by also running Everywhere as administrator.</value>
+        <value>Due to operating system restrictions, when running any application as an administrator (elevated permissions), Everywhere may not work correctly when the elevated applications are in focus or trying to interact with a Everywhere feature like "Pick Element". This can be addressed by also running Everywhere as administrator.</value>
     </data>
     <data name="Settings_Common_RestartAsAdministrator_Header" xml:space="preserve">
         <value>Restart as Administrator</value>
@@ -698,7 +698,7 @@
         <value>File System</value>
     </data>
     <data name="NativeChatPlugin_FileSystem_Description" xml:space="preserve">
-        <value>Provides the ability to access system files, such as enumerating, creating, deleting, renaming, reading, or writing files.</value>
+        <value>Provides the ability to access files, such as enumerating, creating, deleting, renaming, reading, or writing.</value>
     </data>
     <data name="FriendlyExceptionMessage_InvalidOperation" xml:space="preserve">
         <value>Invalid operation. {0}</value>
@@ -739,7 +739,7 @@ Tip: You can reopen this message by clicking “About - What's new”.</value>
         <value>Official Docs</value>
     </data>
     <data name="AboutPage_WhatsNew" xml:space="preserve">
-        <value>What's new</value>
+        <value>What's New</value>
     </data>
     <data name="WelcomeViewModel_ValidateApiKey_FailedToast_Title" xml:space="preserve">
         <value>Validation failed</value>
