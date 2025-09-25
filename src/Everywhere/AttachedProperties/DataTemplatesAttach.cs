@@ -19,10 +19,10 @@ public class DataTemplatesAttach : AvaloniaObject
 
     static DataTemplatesAttach()
     {
-        DataTemplatesProperty.Changed.AddClassHandler<Control>(HandleDataTemplatesChanges);
+        DataTemplatesProperty.Changed.AddClassHandler<Control>(HandleDataTemplatesChanged);
     }
 
-    private static void HandleDataTemplatesChanges(Control sender, AvaloniaPropertyChangedEventArgs args)
+    private static void HandleDataTemplatesChanged(Control sender, AvaloniaPropertyChangedEventArgs args)
     {
         sender.DataTemplates.Clear();
         if (args.NewValue is DataTemplates dataTemplates) sender.DataTemplates.AddRange(dataTemplates);

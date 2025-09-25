@@ -742,7 +742,7 @@
           TextWrapping="Wrap">
           <v:ChatInputBox.AddChatAttachmentMenuItems>
             <MenuItem
-              Command="{Binding AddElementCommand}"
+              Command="{Binding PickElementCommand}"
               CommandParameter="{x:Static interop:PickElementMode.Screen}"
               Header="{I18N {x:Static LocaleKey.ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_PickScreen}}">
               <MenuItem.Icon>
@@ -752,7 +752,7 @@
               </MenuItem.Icon>
             </MenuItem>
             <MenuItem
-              Command="{Binding AddElementCommand}"
+              Command="{Binding PickElementCommand}"
               CommandParameter="{x:Static interop:PickElementMode.Window}"
               Header="{I18N {x:Static LocaleKey.ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_PickWindow}}">
               <MenuItem.Icon>
@@ -762,7 +762,7 @@
               </MenuItem.Icon>
             </MenuItem>
             <MenuItem
-              Command="{Binding AddElementCommand}"
+              Command="{Binding PickElementCommand}"
               CommandParameter="{x:Static interop:PickElementMode.Element}"
               Header="{I18N {x:Static LocaleKey.ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_PickElement}}">
               <MenuItem.Icon>
@@ -773,7 +773,7 @@
             </MenuItem>
             <MenuItem
               Command="{Binding AddClipboardCommand}"
-              Header="{I18N {x:Static LocaleKey.ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_PasteFromClipboard}}">
+              Header="{I18N {x:Static LocaleKey.ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_ClipboardContent}}">
               <MenuItem.Icon>
                 <LucideIcon
                   Width="18" Height="18"

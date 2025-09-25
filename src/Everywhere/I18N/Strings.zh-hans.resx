@@ -186,13 +186,13 @@
         <value>选择窗口</value>
     </data>
     <data name="ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_PickElement" xml:space="preserve">
-        <value>选取元素</value>
+        <value>选择元素</value>
     </data>
-    <data name="ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_PasteFromClipboard" xml:space="preserve">
-        <value>从剪切板复制</value>
+    <data name="ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_ClipboardContent" xml:space="preserve">
+        <value>剪切板内容</value>
     </data>
     <data name="ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AttachFile" xml:space="preserve">
-        <value>添加文件</value>
+        <value>附加文件</value>
     </data>
     <data name="ChatFloatingWindowViewModel_TextEditActions_Translate" xml:space="preserve">
         <value>翻译</value>

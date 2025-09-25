@@ -180,7 +180,7 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
     }
 
     [RelayCommand(CanExecute = nameof(IsNotBusy))]
-    private Task AddElementAsync(PickElementMode mode) => ExecuteBusyTaskAsync(
+    private Task PickElementAsync(PickElementMode mode) => ExecuteBusyTaskAsync(
         async cancellationToken =>
         {
             if (_chatAttachments.Count >= Settings.Internal.MaxChatAttachmentCount) return;
@@ -423,7 +423,7 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
 
         if (e.PropertyName == nameof(IsBusy))
         {
-            AddElementCommand.NotifyCanExecuteChanged();
+            PickElementCommand.NotifyCanExecuteChanged();
             AddClipboardCommand.NotifyCanExecuteChanged();
             AddFileCommand.NotifyCanExecuteChanged();
             SendMessageCommand.NotifyCanExecuteChanged();

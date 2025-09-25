@@ -18,38 +18,38 @@ public partial class Win32VisualElementContext
 {
     private class ElementPicker : Window
     {
-        private readonly Win32VisualElementContext context;
-        private readonly INativeHelper nativeHelper;
-        private readonly PickElementMode mode;
+        private readonly Win32VisualElementContext _context;
+        private readonly INativeHelper _nativeHelper;
+        private readonly PickElementMode _mode;
 
-        private readonly PixelRect screenBounds;
-        private readonly Bitmap bitmap;
-        private readonly Border clipBorder;
-        private readonly Image image;
-        private readonly double scale;
-        private readonly TaskCompletionSource<IVisualElement?> taskCompletionSource = new();
+        private readonly PixelRect _screenBounds;
+        private readonly Bitmap _bitmap;
+        private readonly Border _clipBorder;
+        private readonly Image _image;
+        private readonly double _scale;
+        private readonly TaskCompletionSource<IVisualElement?> _taskCompletionSource = new();
 
-        private Rect? previousMaskRect;
-        private IVisualElement? selectedElement;
+        private Rect? _previousMaskRect;
+        private IVisualElement? _selectedElement;
 
         private ElementPicker(
             Win32VisualElementContext context,
             INativeHelper nativeHelper,
             PickElementMode mode)
         {
-            this.context = context;
-            this.nativeHelper = nativeHelper;
-            this.mode = mode;
+            _context = context;
+            _nativeHelper = nativeHelper;
+            _mode = mode;
 
             var allScreens = Screens.All;
-            screenBounds = allScreens.Aggregate(default(PixelRect), (current, screen) => current.Union(screen.Bounds));
-            if (screenBounds.Width <= 0 || screenBounds.Height <= 0)
+            _screenBounds = allScreens.Aggregate(default(PixelRect), (current, screen) => current.Union(screen.Bounds));
+            if (_screenBounds.Width <= 0 || _screenBounds.Height <= 0)
             {
                 throw new InvalidOperationException("No valid screen bounds found.");
             }
 
-            bitmap = CaptureScreen(screenBounds);
-            clipBorder = new Border
+            _bitmap = CaptureScreen(_screenBounds);
+            _clipBorder = new Border
             {
                 ClipToBounds = false,
                 BorderThickness = new Thickness(2),
@@ -62,14 +62,14 @@ public partial class Win32VisualElementContext
                 IsHitTestVisible = false,
                 Children =
                 {
-                    new Image { Source = bitmap },
+                    new Image { Source = _bitmap },
                     new Border
                     {
                         Background = Brushes.Black,
                         Opacity = 0.4
                     },
-                    (image = new Image { Source = bitmap }),
-                    clipBorder
+                    (_image = new Image { Source = _bitmap }),
+                    _clipBorder
                 }
             };
 
@@ -80,10 +80,10 @@ public partial class Win32VisualElementContext
             SystemDecorations = SystemDecorations.None;
             WindowStartupLocation = WindowStartupLocation.Manual;
 
-            Position = screenBounds.Position;
-            scale = DesktopScaling; // we must set Position first to get the correct scaling factor
-            Width = screenBounds.Width / scale;
-            Height = screenBounds.Height / scale;
+            Position = _screenBounds.Position;
+            _scale = DesktopScaling; // we must set Position first to get the correct scaling factor
+            Width = _screenBounds.Width / _scale;
+            Height = _screenBounds.Height / _scale;
         }
 
         protected override unsafe void OnPointerEntered(PointerEventArgs e)
@@ -113,7 +113,7 @@ public partial class Win32VisualElementContext
 
         protected override void OnPointerPressed(PointerPressedEventArgs e)
         {
-            nativeHelper.SetWindowHitTestInvisible(this);
+            _nativeHelper.SetWindowHitTestInvisible(this);
 
             if (PInvoke.GetCursorPos(out var point)) Pick(point);
         }
@@ -127,7 +127,7 @@ public partial class Win32VisualElementContext
         {
             if (e.InitialPressMouseButton != MouseButton.Left)
             {
-                selectedElement = null;
+                _selectedElement = null;
             }
 
             Close();
@@ -135,22 +135,22 @@ public partial class Win32VisualElementContext
 
         protected override void OnKeyDown(KeyEventArgs e)
         {
-            if (e.Key == Key.Escape) selectedElement = null;
+            if (e.Key == Key.Escape) _selectedElement = null;
 
             Close();
         }
 
         protected override void OnClosed(EventArgs e)
         {
-            bitmap.Dispose();
-            taskCompletionSource.TrySetResult(selectedElement);
+            _bitmap.Dispose();
+            _taskCompletionSource.TrySetResult(_selectedElement);
         }
 
         private void Pick(Point point)
         {
             var maskRect = new Rect();
             var pixelPoint = new PixelPoint(point.X, point.Y);
-            switch (mode)
+            switch (_mode)
             {
                 case PickElementMode.Screen:
                 {
@@ -160,9 +160,9 @@ public partial class Win32VisualElementContext
                     var hMonitor = PInvoke.MonitorFromPoint(point, MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST);
                     if (hMonitor == HMONITOR.Null) break;
 
-                    selectedElement = new ScreenVisualElementImpl(context, hMonitor);
+                    _selectedElement = new ScreenVisualElementImpl(_context, hMonitor);
 
-                    maskRect = screen.Bounds.Translate(-(PixelVector)screenBounds.Position).ToRect(scale);
+                    maskRect = screen.Bounds.Translate(-(PixelVector)_screenBounds.Position).ToRect(_scale);
                     break;
                 }
                 case PickElementMode.Window:
@@ -173,18 +173,18 @@ public partial class Win32VisualElementContext
                     var rootHWnd = PInvoke.GetAncestor(selectedHWnd, GET_ANCESTOR_FLAGS.GA_ROOTOWNER);
                     if (rootHWnd == HWND.Null) break;
 
-                    selectedElement = context.TryFrom(() => Automation.FromHandle(rootHWnd));
-                    if (selectedElement == null) break;
+                    _selectedElement = _context.TryFrom(() => Automation.FromHandle(rootHWnd));
+                    if (_selectedElement == null) break;
 
-                    maskRect = selectedElement.BoundingRectangle.Translate(-(PixelVector)screenBounds.Position).ToRect(scale);
+                    maskRect = _selectedElement.BoundingRectangle.Translate(-(PixelVector)_screenBounds.Position).ToRect(_scale);
                     break;
                 }
                 case PickElementMode.Element:
                 {
-                    selectedElement = context.TryFrom(() => Automation.FromPoint(point));
-                    if (selectedElement == null) break;
+                    _selectedElement = _context.TryFrom(() => Automation.FromPoint(point));
+                    if (_selectedElement == null) break;
 
-                    maskRect = selectedElement.BoundingRectangle.Translate(-(PixelVector)screenBounds.Position).ToRect(scale);
+                    maskRect = _selectedElement.BoundingRectangle.Translate(-(PixelVector)_screenBounds.Position).ToRect(_scale);
                     break;
                 }
             }
@@ -194,14 +194,14 @@ public partial class Win32VisualElementContext
 
         private void SetMask(Rect rect)
         {
-            if (previousMaskRect == rect) return;
+            if (_previousMaskRect == rect) return;
 
-            image.Clip = new RectangleGeometry(rect);
-            clipBorder.Margin = new Thickness(rect.X, rect.Y, 0, 0);
-            clipBorder.Width = rect.Width;
-            clipBorder.Height = rect.Height;
+            _image.Clip = new RectangleGeometry(rect);
+            _clipBorder.Margin = new Thickness(rect.X, rect.Y, 0, 0);
+            _clipBorder.Width = rect.Width;
+            _clipBorder.Height = rect.Height;
 
-            previousMaskRect = rect;
+            _previousMaskRect = rect;
         }
 
         public static Task<IVisualElement?> PickAsync(
@@ -211,7 +211,7 @@ public partial class Win32VisualElementContext
         {
             var window = new ElementPicker(context, nativeHelper, mode);
             window.Show();
-            return window.taskCompletionSource.Task;
+            return window._taskCompletionSource.Task;
         }
     }
 }

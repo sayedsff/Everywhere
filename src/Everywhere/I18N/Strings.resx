@@ -195,19 +195,19 @@
     </data>
     <data name="ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_PickScreen"
         xml:space="preserve">
-        <value>Pick Screen</value>
+        <value>Pick screen</value>
     </data>
     <data name="ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_PickWindow"
         xml:space="preserve">
-        <value>Pick Window</value>
+        <value>Pick window</value>
     </data>
     <data name="ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_PickElement"
         xml:space="preserve">
-        <value>Pick Element</value>
+        <value>Pick element</value>
     </data>
-    <data name="ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_PasteFromClipboard"
+    <data name="ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_ClipboardContent"
         xml:space="preserve">
-        <value>Paste from Clipboard</value>
+        <value>Clipboard content</value>
     </data>
     <data name="ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AttachFile" xml:space="preserve">
         <value>Attach File</value>
