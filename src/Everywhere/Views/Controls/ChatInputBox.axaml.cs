@@ -13,8 +13,9 @@ using Everywhere.Utilities;
 
 namespace Everywhere.Views;
 
-[TemplatePart("PART_SendButton", typeof(Button))]
-[TemplatePart("PART_ChatAttachmentItemsControl", typeof(ItemsControl))]
+[TemplatePart("PART_SendButton", typeof(Button), IsRequired = true)]
+[TemplatePart("PART_ScrollViewer", typeof(ScrollViewer), IsRequired = true)]
+[TemplatePart("PART_ChatAttachmentItemsControl", typeof(ItemsControl), IsRequired = true)]
 public partial class ChatInputBox : TextBox
 {
     public static readonly StyledProperty<bool> PressCtrlEnterToSendProperty =
@@ -125,6 +126,7 @@ public partial class ChatInputBox : TextBox
     }
 
     private IDisposable? _sendButtonClickSubscription;
+    private IDisposable? _scrollViewerTextChangedSubscription;
     private IDisposable? _chatAttachmentItemsControlPointerMovedSubscription;
     private IDisposable? _chatAttachmentItemsControlPointerExitedSubscription;
 
@@ -137,14 +139,16 @@ public partial class ChatInputBox : TextBox
 
     public ChatInputBox()
     {
-        _visualElementAttachmentOverlayWindow = new Lazy<OverlayWindow>(() => new OverlayWindow(TopLevel.GetTopLevel(this) as WindowBase)
-        {
-            Content = new Border
+        _visualElementAttachmentOverlayWindow = new Lazy<OverlayWindow>(
+            () => new OverlayWindow(TopLevel.GetTopLevel(this) as WindowBase)
             {
-                Background = Brushes.DodgerBlue,
-                Opacity = 0.2
+                Content = new Border
+                {
+                    Background = Brushes.DodgerBlue,
+                    Opacity = 0.2
+                },
             },
-        }, LazyThreadSafetyMode.None);
+            LazyThreadSafetyMode.None);
 
         this.AddDisposableHandler(KeyDownEvent, HandleTextBoxKeyDown, RoutingStrategies.Tunnel);
     }
@@ -154,6 +158,7 @@ public partial class ChatInputBox : TextBox
         base.OnApplyTemplate(e);
 
         DisposeCollector.DisposeToDefault(ref _sendButtonClickSubscription);
+        DisposeCollector.DisposeToDefault(ref _scrollViewerTextChangedSubscription);
         DisposeCollector.DisposeToDefault(ref _chatAttachmentItemsControlPointerMovedSubscription);
         DisposeCollector.DisposeToDefault(ref _chatAttachmentItemsControlPointerExitedSubscription);
 
@@ -168,6 +173,15 @@ public partial class ChatInputBox : TextBox
                 Command.Execute(Text);
                 Text = string.Empty;
                 args.Handled = true;
+            },
+            handledEventsToo: true);
+
+        var scrollViewer = e.NameScope.Find<ScrollViewer>("PART_ScrollViewer").NotNull();
+        _scrollViewerTextChangedSubscription = this.AddDisposableHandler(
+            TextChangedEvent,
+            delegate
+            {
+                scrollViewer.Height = FontSize * 1.2 * (Math.Clamp(Text?.Count(c => c == '\n') ?? 0, 0, 4) + 1) + 1.2;
             },
             handledEventsToo: true);
 

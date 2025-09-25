@@ -44,8 +44,9 @@
           ColumnDefinitions="*,Auto" RowDefinitions="*,Auto,Auto"
           RowSpacing="4">
           <ScrollViewer
-            Grid.Row="0" Grid.Column="0"
-            Grid.ColumnSpan="2" Margin="2,0"
+            x:Name="PART_ScrollViewer" Grid.Row="0"
+            Grid.Column="0" Grid.ColumnSpan="2"
+            MinHeight="18.8" Margin="2,0"
             HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
             <Panel
               Background="Transparent" Cursor="IBeam">

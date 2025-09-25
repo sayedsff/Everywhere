@@ -3,6 +3,7 @@ using Avalonia.Automation.Peers;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Layout;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.Input;
 using Everywhere.Chat;
@@ -52,7 +53,7 @@ public partial class ChatFloatingWindow : ReactiveWindow<ChatFloatingWindowViewM
     private readonly ILauncher _launcher;
     private readonly Settings _settings;
 
-    public ChatFloatingWindow(ILauncher launcher, Settings settings)
+    public ChatFloatingWindow(ILauncher launcher, IChatContextManager chatContextManager, Settings settings)
     {
         _launcher = launcher;
         _settings = settings;
@@ -60,6 +61,7 @@ public partial class ChatFloatingWindow : ReactiveWindow<ChatFloatingWindowViewM
         InitializeComponent();
         AddHandler(KeyDownEvent, HandleKeyDown, RoutingStrategies.Tunnel);
 
+        chatContextManager.PropertyChanged += HandleChatContextManagerPropertyChanged;
         ViewModel.PropertyChanged += HandleViewModelPropertyChanged;
         ChatInputBox.TextChanged += HandleChatInputBoxTextChanged;
         ChatInputBox.PastingFromClipboard += HandleChatInputBoxPastingFromClipboard;
@@ -108,11 +110,73 @@ public partial class ChatFloatingWindow : ReactiveWindow<ChatFloatingWindowViewM
         }
     }
 
-    protected override void OnSizeChanged(SizeChangedEventArgs e)
-    {
-        base.OnSizeChanged(e);
+    /// <summary>
+    /// Indicates whether the window has been resized by the user.
+    /// </summary>
+    private bool _isResizedByUser;
 
-        ClampToScreen();
+    protected override void OnResized(WindowResizedEventArgs e)
+    {
+        base.OnResized(e);
+
+        if (e.Reason == WindowResizeReason.User)
+        {
+            _isResizedByUser = true;
+        }
+        else if (!_isResizedByUser)
+        {
+            ClampToScreen();
+        }
+    }
+
+    protected override Size MeasureOverride(Size availableSize)
+    {
+        if (!_isResizedByUser)
+        {
+            availableSize = new Size(400d, 600d);
+        }
+
+        double width = 0;
+        double height = 0;
+
+        {
+            var visualCount = VisualChildren.Count;
+            for (var i = 0; i < visualCount; i++)
+            {
+                var visual = VisualChildren[i];
+                if (visual is not Layoutable layoutable) continue;
+
+                layoutable.Measure(availableSize);
+                var childSize = layoutable.DesiredSize;
+                if (childSize.Width > width) width = childSize.Width;
+                if (childSize.Height > height) height = childSize.Height;
+            }
+        }
+
+        if (_isResizedByUser)
+        {
+            var clientSize = ClientSize;
+
+            if (!double.IsInfinity(availableSize.Width))
+            {
+                width = availableSize.Width;
+            }
+            else
+            {
+                width = clientSize.Width;
+            }
+
+            if (!double.IsInfinity(availableSize.Height))
+            {
+                height = availableSize.Height;
+            }
+            else
+            {
+                height = clientSize.Height;
+            }
+        }
+
+        return new Size(width, height);
     }
 
     protected override void OnLostFocus(RoutedEventArgs e)
@@ -225,6 +289,13 @@ public partial class ChatFloatingWindow : ReactiveWindow<ChatFloatingWindowViewM
     private void HandleTitleBarPointerPressed(object? sender, PointerPressedEventArgs e)
     {
         BeginMoveDrag(e);
+    }
+
+    private void HandleChatContextManagerPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(IChatContextManager.Current)) return;
+        SizeToContent = SizeToContent.WidthAndHeight; // Update size to content when chat context changes
+        _isResizedByUser = false;
     }
 
     private void HandleViewModelPropertyChanged(object? sender, PropertyChangedEventArgs args)
