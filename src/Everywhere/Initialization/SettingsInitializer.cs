@@ -43,10 +43,10 @@ public class SettingsInitializer : IAsyncInitializer
 
     public Task InitializeAsync()
     {
+        InitializeObserver();
+
         InitializeModelProviders();
         InitializeSearchEngineProviders();
-
-        InitializeObserver();
 
         return Task.CompletedTask;
     }
@@ -64,6 +64,15 @@ public class SettingsInitializer : IAsyncInitializer
 
     private void InitializeModelProviders()
     {
+        // Remove duplicate model providers by Id
+        _settings.Model.ModelProviders.Reset(_settings.Model.ModelProviders.DistinctBy(m => m.Id));
+
+        foreach (var modelProvider in _settings.Model.ModelProviders)
+        {
+            // Remove duplicate model definitions by Id
+            modelProvider.ModelDefinitions.Reset(modelProvider.ModelDefinitions.DistinctBy(m => m.Id));
+        }
+
         ApplyModelProviders(
             [
                 new ModelProvider
@@ -605,6 +614,9 @@ public class SettingsInitializer : IAsyncInitializer
     private void InitializeSearchEngineProviders()
     {
         var webSearchEngineSettings = _settings.Plugin.WebSearchEngine;
+
+        // Remove duplicate search engine providers by Id
+        webSearchEngineSettings.WebSearchEngineProviders.Reset(webSearchEngineSettings.WebSearchEngineProviders.DistinctBy(p => p.Id));
 
         ApplySearchEngineProviders(
             [
