@@ -176,7 +176,7 @@ public class ChatService(
                          .Where(m => !ReferenceEquals(m, assistantChatMessage)) // exclude the current assistant message
                          .Where(m => m.Role.Label is "system" or "assistant" or "user" or "tool"))
             {
-                await foreach(var chatMessageContent in CreateChatMessageContentsAsync(chatMessage))
+                await foreach (var chatMessageContent in CreateChatMessageContentsAsync(chatMessage))
                 {
                     chatHistory.Add(chatMessageContent);
                 }

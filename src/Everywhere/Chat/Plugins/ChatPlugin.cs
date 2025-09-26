@@ -31,7 +31,7 @@ public abstract partial class ChatPlugin(string name) : KernelPlugin(name)
     public virtual string? BeautifulIcon => null;
 
     [ObservableProperty]
-    public partial bool IsEnabled { get; set; } = true;
+    public partial bool IsEnabled { get; set; }
 
     /// <summary>
     /// Gets or sets the allowed permissions for the plugin.

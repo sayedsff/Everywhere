@@ -8,6 +8,7 @@ using Everywhere.Configuration;
 using Everywhere.Utilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using ZLinq;
 
 namespace Everywhere.Initialization;
 
@@ -65,12 +66,12 @@ public class SettingsInitializer : IAsyncInitializer
     private void InitializeModelProviders()
     {
         // Remove duplicate model providers by Id
-        _settings.Model.ModelProviders.Reset(_settings.Model.ModelProviders.DistinctBy(m => m.Id));
+        _settings.Model.ModelProviders.Reset(_settings.Model.ModelProviders.AsValueEnumerable().DistinctBy(m => m.Id).ToList());
 
         foreach (var modelProvider in _settings.Model.ModelProviders)
         {
             // Remove duplicate model definitions by Id
-            modelProvider.ModelDefinitions.Reset(modelProvider.ModelDefinitions.DistinctBy(m => m.Id));
+            modelProvider.ModelDefinitions.Reset(modelProvider.ModelDefinitions.AsValueEnumerable().DistinctBy(m => m.Id).ToList());
         }
 
         ApplyModelProviders(
