@@ -30,6 +30,7 @@ public class ChatService(
         chatContext.Add(userMessage);
         var kernelMixin = kernelMixinFactory.GetOrCreate(settings.Model);
         await ProcessUserChatMessageAsync(kernelMixin, chatContext, userMessage, cancellationToken);
+        userMessage.UserPrompt += "\n\nPlease try to use the tools if necessary, before answering.";
         var assistantChatMessage = new AssistantChatMessage { IsBusy = true };
         chatContext.Add(assistantChatMessage);
         await GenerateAsync(kernelMixin, chatContext, assistantChatMessage, cancellationToken);
@@ -244,7 +245,7 @@ public class ChatService(
 
                     var functionCallChatMessage = new FunctionCallChatMessage(
                         chatFunction.Icon ?? chatPlugin.Icon ?? LucideIconKind.Hammer,
-                        chatFunction.KernelFunction.Name)
+                        chatPlugin.HeaderKey)
                     {
                         IsBusy = true,
                     };

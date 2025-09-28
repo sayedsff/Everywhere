@@ -150,7 +150,7 @@ public partial class WebSearchEnginePlugin : BuiltInChatPlugin
     /// Only use this method if you are aware of the potential risks and have validated the input to prevent security vulnerabilities.
     /// </remarks>
     [KernelFunction("web_search")]
-    [Description("Perform a web search. You can call this multiple times with different queries to get more results.")]
+    [Description("Perform a web search. Invoke this multiple times with different queries to get more results.")]
     private async Task<string> WebSearchAsync(
         [Description("Search query")] string query,
         [Description("Number of results")] int count = 10,

@@ -617,7 +617,8 @@ public class SettingsInitializer : IAsyncInitializer
         var webSearchEngineSettings = _settings.Plugin.WebSearchEngine;
 
         // Remove duplicate search engine providers by Id
-        webSearchEngineSettings.WebSearchEngineProviders.Reset(webSearchEngineSettings.WebSearchEngineProviders.DistinctBy(p => p.Id));
+        webSearchEngineSettings.WebSearchEngineProviders.Reset(
+            webSearchEngineSettings.WebSearchEngineProviders.AsValueEnumerable().DistinctBy(p => p.Id).ToList());
 
         ApplySearchEngineProviders(
             [

@@ -25,16 +25,20 @@ public class ChatPluginManager : IChatPluginManager
         var isEnabledRecords = settings.Plugin.IsEnabledRecords;
         foreach (var builtInPlugin in _builtInPlugins)
         {
-            builtInPlugin.IsEnabled = GetIsEnabled($"built-in.{builtInPlugin.Name}");
+            builtInPlugin.IsEnabled = GetIsEnabled($"built-in.{builtInPlugin.Name}", false);
             foreach (var function in builtInPlugin.Functions)
             {
-                function.IsEnabled = GetIsEnabled($"built-in.{builtInPlugin.Name}.{function.KernelFunction.Name}");
+                function.IsEnabled = GetIsEnabled($"built-in.{builtInPlugin.Name}.{function.KernelFunction.Name}", true);
             }
         }
 
         new ObjectObserver(HandleBuiltInPluginsChange).Observe(BuiltInPlugins);
 
-        bool GetIsEnabled(string path) => !isEnabledRecords.TryGetValue(path, out var isEnabled) || isEnabled;
+
+        bool GetIsEnabled(string path, bool defaultValue)
+        {
+            return isEnabledRecords.TryGetValue(path, out var isEnabled) ? isEnabled : defaultValue;
+        }
 
         void HandleBuiltInPluginsChange(in ObjectObserverChangedEventArgs e)
         {

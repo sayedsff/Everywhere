@@ -594,7 +594,7 @@
         <value>以管理员身份重启</value>
     </data>
     <data name="Settings_Common_RestartAsAdministrator_Description" xml:space="preserve">
-        <value>由于操作系统限制，当以管理员身份运行任何应用程序（提升权限）时，如果提升权限的应用程序处于活动状态或试图与 Everywhere 的某个功能（如“选择元素”）交互，Everywhere 可能无法正常工作。可以通过同时以管理员身份运行 Everywhere 来解决此问题。</value>
+        <value>由于操作系统限制，当以管理员身份运行任何应用程序（提升权限）时，如果提升权限的应用程序处于活动状态或试图与 Everywhere 的某个功能（如“选择元素”）交互，Everywhere 可能无法正常工作。可以通过以管理员身份运行 Everywhere 来解决此问题。</value>
     </data>
     <data name="Settings_Common_RestartAsAdministrator_Button_Content" xml:space="preserve">
         <value>重启</value>
@@ -669,7 +669,7 @@
         <value>(Google 专用) 提供可编程搜索引擎 ID，详情请参考指南。</value>
     </data>
     <data name="NativeChatPlugin_WebSearchEngine_Header" xml:space="preserve">
-        <value>网络搜索引擎</value>
+        <value>网络搜索</value>
     </data>
     <data name="NativeChatPlugin_WebSearchEngine_Description" xml:space="preserve">
         <value>提供网络搜索能力，先搜索后回答，可减少大语言模型幻觉，并提供最新信息。</value>

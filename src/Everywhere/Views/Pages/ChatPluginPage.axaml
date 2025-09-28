@@ -1,8 +1,7 @@
 ﻿<UserControl
   x:Class="Everywhere.Views.Pages.ChatPluginPage" xmlns="https://github.com/avaloniaui"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-  xmlns:md="clr-namespace:LiveMarkdown.Avalonia;assembly=LiveMarkdown.Avalonia"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:md="clr-namespace:LiveMarkdown.Avalonia;assembly=LiveMarkdown.Avalonia"
   xmlns:p="clr-namespace:Everywhere.Chat.Plugins" xmlns:v="clr-namespace:Everywhere.Views"
   xmlns:vm="clr-namespace:Everywhere.ViewModels" d:DesignHeight="450"
   d:DesignWidth="800" x:DataType="vm:ChatPluginPageViewModel"
@@ -126,14 +125,15 @@
     <TabControl
       Grid.Row="1" Grid.Column="2"
       ClipToBounds="False"
-      IsVisible="{Binding SelectedPlugin, Converter={x:Static ObjectConverters.IsNotNull}}">
-      <TabItem Header="{I18N {x:Static LocaleKey.ChatPluginPage_TabItem_Settings_Header}}">
+      IsVisible="{Binding SelectedPlugin, Converter={x:Static ObjectConverters.IsNotNull}}"
+      SelectedIndex="{Binding PluginDetailsTabSelectedIndex, Mode=TwoWay}">
+      <TabItem
+        Header="{I18N {x:Static LocaleKey.ChatPluginPage_TabItem_Settings_Header}}"
+        IsVisible="{Binding !!SelectedPlugin.SettingsItems.Count, FallbackValue=false}">
         <ScrollViewer
           Margin="0,0,-12,0" Padding="0,0,12,0"
           CornerRadius="8" HorizontalScrollBarVisibility="Disabled">
-          <v:SettingsItemsControl
-            IsVisible="{Binding !!SelectedPlugin.SettingsItems.Count, FallbackValue=false}"
-            ItemsSource="{Binding SelectedPlugin.SettingsItems, FallbackValue={x:Null}}"/>
+          <v:SettingsItemsControl ItemsSource="{Binding SelectedPlugin.SettingsItems, FallbackValue={x:Null}}"/>
         </ScrollViewer>
       </TabItem>
 
@@ -169,8 +169,7 @@
                     TextWrapping="Wrap"/>
                   <TextBlock
                     Classes="Muted" Grid.Row="1"
-                    Grid.Column="2"
-                    Margin="0, 0,0,4"
+                    Grid.Column="2" Margin="0,0,0,4"
                     Text="{Binding KernelFunction.Description}"
                     TextWrapping="Wrap"/>
                 </Grid>

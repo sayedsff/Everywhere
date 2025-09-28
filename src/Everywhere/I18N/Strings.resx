@@ -605,7 +605,7 @@
         <value>Everywhere will start automatically as administrator. You can only turn this option on or off in administrator mode.</value>
     </data>
     <data name="Settings_Common_RestartAsAdministrator_Description" xml:space="preserve">
-        <value>Due to operating system restrictions, when running any application as an administrator (elevated permissions), Everywhere may not work correctly when the elevated applications are in focus or trying to interact with a Everywhere feature like "Pick Element". This can be addressed by also running Everywhere as administrator.</value>
+        <value>Due to operating system restrictions, when running any application as an administrator (elevated permissions), Everywhere may not work correctly when the elevated applications are in focus or trying to interact with a Everywhere feature like "Pick Element". This can be addressed by running Everywhere as administrator.</value>
     </data>
     <data name="Settings_Common_RestartAsAdministrator_Header" xml:space="preserve">
         <value>Restart as Administrator</value>
@@ -683,7 +683,7 @@
         <value>(Google only) Provides a programmable search engine ID. For details, refer to the guide.</value>
     </data>
     <data name="NativeChatPlugin_WebSearchEngine_Header" xml:space="preserve">
-        <value>Web Search Engine</value>
+        <value>Web Search</value>
     </data>
     <data name="NativeChatPlugin_WebSearchEngine_Description" xml:space="preserve">
         <value>Provides the ability to search the web before answering, can reduce large language model hallucinations and provide the latest information.</value>
