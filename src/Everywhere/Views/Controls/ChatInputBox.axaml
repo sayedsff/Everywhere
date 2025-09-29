@@ -38,6 +38,7 @@
     <Setter Property="SelectionBrush" Value="{DynamicResource PrimaryColor}"/>
     <Setter Property="SelectionForegroundBrush" Value="{DynamicResource PrimaryForegroundColor}"/>
     <Setter Property="CaretBrush" Value="{DynamicResource ForegroundColor}"/>
+    <Setter Property="MaxLines" Value="5"/>
     <Setter Property="Template">
       <ControlTemplate>
         <Grid
@@ -49,7 +50,8 @@
             MinHeight="18.8" Margin="2,0"
             HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
             <Panel
-              Background="Transparent" Cursor="IBeam">
+              MinHeight="18.4" Background="Transparent"
+              Cursor="IBeam">
               <TextBlock
                 FontSize="{TemplateBinding FontSize}"
                 IsVisible="{TemplateBinding Text, Converter={x:Static StringConverters.IsNullOrEmpty}}"

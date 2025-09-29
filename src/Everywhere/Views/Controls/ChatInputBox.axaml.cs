@@ -14,7 +14,6 @@ using Everywhere.Utilities;
 namespace Everywhere.Views;
 
 [TemplatePart("PART_SendButton", typeof(Button), IsRequired = true)]
-[TemplatePart("PART_ScrollViewer", typeof(ScrollViewer), IsRequired = true)]
 [TemplatePart("PART_ChatAttachmentItemsControl", typeof(ItemsControl), IsRequired = true)]
 public partial class ChatInputBox : TextBox
 {
@@ -125,8 +124,9 @@ public partial class ChatInputBox : TextBox
         set => SetValue(IsSendButtonEnabledProperty, value);
     }
 
+    private IDisposable? _textChangedSubscription;
     private IDisposable? _sendButtonClickSubscription;
-    private IDisposable? _scrollViewerTextChangedSubscription;
+    private IDisposable? _textPresenterSizeChangedSubscription;
     private IDisposable? _chatAttachmentItemsControlPointerMovedSubscription;
     private IDisposable? _chatAttachmentItemsControlPointerExitedSubscription;
 
@@ -157,8 +157,9 @@ public partial class ChatInputBox : TextBox
     {
         base.OnApplyTemplate(e);
 
+        DisposeCollector.DisposeToDefault(ref _textChangedSubscription);
         DisposeCollector.DisposeToDefault(ref _sendButtonClickSubscription);
-        DisposeCollector.DisposeToDefault(ref _scrollViewerTextChangedSubscription);
+        DisposeCollector.DisposeToDefault(ref _textPresenterSizeChangedSubscription);
         DisposeCollector.DisposeToDefault(ref _chatAttachmentItemsControlPointerMovedSubscription);
         DisposeCollector.DisposeToDefault(ref _chatAttachmentItemsControlPointerExitedSubscription);
 
@@ -173,15 +174,6 @@ public partial class ChatInputBox : TextBox
                 Command.Execute(Text);
                 Text = string.Empty;
                 args.Handled = true;
-            },
-            handledEventsToo: true);
-
-        var scrollViewer = e.NameScope.Find<ScrollViewer>("PART_ScrollViewer").NotNull();
-        _scrollViewerTextChangedSubscription = this.AddDisposableHandler(
-            TextChangedEvent,
-            delegate
-            {
-                scrollViewer.Height = FontSize * 1.2 * (Math.Clamp(Text?.Count(c => c == '\n') ?? 0, 0, 4) + 1) + 1.2;
             },
             handledEventsToo: true);
 
