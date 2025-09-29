@@ -34,6 +34,13 @@ public partial class ChatVisualElementAttachment : ChatAttachment
     [IgnoreMember]
     public ResilientReference<IVisualElement>? Element { get; }
 
+    /// <summary>
+    /// Indicates whether the visual element is currently focused.
+    /// This will change with focus and display with primary color in the UI.
+    /// </summary>
+    [IgnoreMember]
+    public bool IsFocusedElement { get; set; }
+
     [SerializationConstructor]
     private ChatVisualElementAttachment(DynamicResourceKeyBase headerKey, LucideIconKind icon) : base(headerKey)
     {

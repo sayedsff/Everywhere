@@ -47,8 +47,7 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
 
     public IChatContextManager ChatContextManager { get; }
 
-    public IChatService ChatService { get; }
-
+    private readonly IChatService _chatService;
     private readonly IVisualElementContext _visualElementContext;
     private readonly INativeHelper _nativeHelper;
     private readonly IBlobStorage _blobStorage;
@@ -68,8 +67,8 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
     {
         Settings = settings;
         ChatContextManager = chatContextManager;
-        ChatService = chatService;
 
+        _chatService = chatService;
         _visualElementContext = visualElementContext;
         _nativeHelper = nativeHelper;
         _blobStorage = blobStorage;
@@ -163,15 +162,14 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
 
                 Reset();
 
-                if (targetElement == null)
-                {
-                    return;
-                }
+                if (targetElement == null) return;
 
-                var (boundingRect, attachment) = await Task.Run(() => (targetElement.BoundingRectangle, CreateFromVisualElement(targetElement)), token).WaitAsync(TimeSpan.FromSeconds(1), token);
+                var (boundingRect, attachment) = await Task
+                    .Run(() => (targetElement.BoundingRectangle, CreateFromVisualElement(targetElement)), token)
+                    .WaitAsync(TimeSpan.FromSeconds(1), token);
                 TargetBoundingRect = boundingRect;
                 _chatAttachments.Clear();
-                _chatAttachments.Add(attachment);
+                _chatAttachments.Add(attachment.With(a => a.IsFocusedElement = true));
                 IsOpened = true;
             },
             _logger.ToExceptionHandler(),
@@ -224,21 +222,22 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
             {
                 if (await _nativeHelper.GetClipboardBitmapAsync() is not { } bitmap) return;
 
-                await Task.Run(async () =>
-                {
-                    using var memoryStream = new MemoryStream();
-                    bitmap.Save(memoryStream, 100);
+                await Task.Run(
+                    async () =>
+                    {
+                        using var memoryStream = new MemoryStream();
+                        bitmap.Save(memoryStream, 100);
 
-                    var blob = await _blobStorage.StorageBlobAsync(memoryStream, "image/png", cancellationToken);
+                        var blob = await _blobStorage.StorageBlobAsync(memoryStream, "image/png", cancellationToken);
 
-                    var attachment = new ChatFileAttachment(
-                        new DynamicResourceKey(string.Empty),
-                        blob.LocalPath,
-                        blob.Sha256,
-                        blob.MimeType);
-                    _chatAttachments.Add(attachment);
-                },
-                cancellationToken);
+                        var attachment = new ChatFileAttachment(
+                            new DynamicResourceKey(string.Empty),
+                            blob.LocalPath,
+                            blob.Sha256,
+                            blob.MimeType);
+                        _chatAttachments.Add(attachment);
+                    },
+                    cancellationToken);
             }
 
             // TODO: add as text attachment when text is too long
@@ -384,14 +383,14 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
             };
             _chatAttachments.Clear();
 
-            await ChatService.SendMessageAsync(userMessage, cancellationToken);
+            await _chatService.SendMessageAsync(userMessage, cancellationToken);
         },
         _logger.ToExceptionHandler(),
         cancellationToken: _cancellationTokenSource.Token);
 
     [RelayCommand(CanExecute = nameof(IsNotBusy))]
     private Task RetryAsync(ChatMessageNode chatMessageNode) => ExecuteBusyTaskAsync(
-        cancellationToken => ChatService.RetryAsync(chatMessageNode, cancellationToken),
+        cancellationToken => _chatService.RetryAsync(chatMessageNode, cancellationToken),
         _logger.ToExceptionHandler(),
         cancellationToken: _cancellationTokenSource.Token);
 

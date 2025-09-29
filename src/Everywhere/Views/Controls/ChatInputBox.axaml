@@ -87,6 +87,14 @@
             <ItemsControl
               x:Name="PART_ChatAttachmentItemsControl"
               ItemsSource="{TemplateBinding ChatAttachmentItemsSource}">
+              <ItemsControl.Styles>
+                <Style Selector="Border.FocusedElement">
+                  <Setter Property="BorderBrush" Value="{DynamicResource InfoColor}"/>
+                  <Setter Property="BorderThickness" Value="1"/>
+                  <Setter Property="Padding" Value="-1"/>
+                </Style>
+              </ItemsControl.Styles>
+
               <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                   <WrapPanel
@@ -128,6 +136,37 @@
                           Text="{Binding HeaderKey^}"/>
                       </StackPanel>
 
+                      <Button
+                        Padding="1" VerticalAlignment="Center"
+                        Background="Transparent" BorderThickness="0"
+                        Command="{Binding $parent[v:ChatInputBox].RemoveAttachmentCommand}"
+                        CommandParameter="{Binding}"
+                        Focusable="False"
+                        ToolTip.Tip="{I18N {x:Static LocaleKey.ChatAttachment_RemoveButton_ToolTip}}">
+                        <LucideIcon
+                          Foreground="{DynamicResource MutedColor}"
+                          Kind="X" Size="12"/>
+                      </Button>
+                    </StackPanel>
+                  </Border>
+                </DataTemplate>
+
+                <DataTemplate DataType="chat:ChatVisualElementAttachment">
+                  <Border
+                    Height="24"
+                    Background="{DynamicResource CardBackgroundColor}"
+                    Classes.FocusedElement="{Binding IsFocusedElement}"
+                    CornerRadius="4">
+                    <StackPanel
+                      Margin="6,0,4,0" Orientation="Horizontal"
+                      Spacing="4">
+                      <LucideIcon
+                        VerticalAlignment="Center"
+                        Kind="{Binding Icon}"
+                        Size="14"/>
+                      <TextBlock
+                        VerticalAlignment="Center" FontSize="12"
+                        Text="{Binding HeaderKey^}"/>
                       <Button
                         Padding="1" VerticalAlignment="Center"
                         Background="Transparent" BorderThickness="0"
