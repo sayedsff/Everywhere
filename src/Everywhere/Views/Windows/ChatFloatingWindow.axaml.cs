@@ -306,6 +306,8 @@ public partial class ChatFloatingWindow : ReactiveWindow<ChatFloatingWindowViewM
         if (IsOpened)
         {
             Show();
+            Topmost = false;
+            Topmost = true;
             ChatInputBox.Focus();
 
             switch (_settings.Behavior.ChatFloatingWindowPinMode)
