@@ -31,10 +31,7 @@ public class HotkeyInitializer(
         {
             ThreadPool.QueueUserWorkItem(_ =>
             {
-                var element = visualElementContext.KeyboardFocusedElement?
-                        .GetAncestors(true)
-                        .CurrentAndNext()
-                        .FirstOrDefault(t => t.Current.Type == VisualElementType.TextEdit || t.Current.ProcessId != t.Next.ProcessId).Current ??
+                var element = visualElementContext.KeyboardFocusedElement ??
                     visualElementContext.ElementFromPointer()?
                         .GetAncestors(true)
                         .LastOrDefault();
