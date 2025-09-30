@@ -356,6 +356,21 @@ public partial class ChatFloatingWindow : ReactiveWindow<ChatFloatingWindowViewM
         ViewModel.AddClipboardCommand.Execute(null);
     }
 
+    private void HandleResizeThumbPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (!e.Pointer.IsPrimary) return;
+
+        CanResize = true;
+        BeginResizeDrag(WindowEdge.SouthEast, e);
+    }
+
+    protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
+    {
+        base.OnPointerCaptureLost(e);
+
+        CanResize = false;
+    }
+
     [RelayCommand]
     private Task LaunchInlineHyperlink(InlineHyperlinkClickedEventArgs e)
     {

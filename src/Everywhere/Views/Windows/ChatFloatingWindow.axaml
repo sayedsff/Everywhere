@@ -8,7 +8,7 @@
   xmlns:vc="clr-namespace:Everywhere.ValueConverters" xmlns:vm="clr-namespace:Everywhere.ViewModels"
   MinWidth="400" MinHeight="144.8"
   x:DataType="vm:ChatFloatingWindowViewModel" x:TypeArguments="vm:ChatFloatingWindowViewModel"
-  Background="Transparent" CanResize="True"
+  Background="Transparent" CanResize="False"
   ExtendClientAreaChromeHints="NoChrome" ExtendClientAreaToDecorationsHint="True"
   IsOpened="{Binding IsOpened, Mode=OneWayToSource}"
   RequestedThemeVariant="{x:Static themes:ThemeVariants.Acrylic}"
@@ -791,6 +791,20 @@
           </v:ChatInputBox.AddChatAttachmentMenuItems>
         </v:ChatInputBox>
       </ExperimentalAcrylicBorder>
+    </Border>
+
+    <Border
+      Grid.Row="2" Width="10"
+      Height="10" Margin="2.5"
+      HorizontalAlignment="Right" VerticalAlignment="Bottom"
+      Background="Transparent" Cursor="BottomRightCorner"
+      PointerPressed="HandleResizeThumbPointerPressed">
+      <Viewbox Stretch="Uniform">
+        <Path
+          Data="M0 14.1 14.2 0M6 14.1l8.2-8.2"
+          Stroke="{DynamicResource BorderColor}"
+          StrokeThickness="2"/>
+      </Viewbox>
     </Border>
   </Grid>
 </v:ReactiveWindow>

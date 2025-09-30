@@ -252,7 +252,9 @@
                 Orientation="Horizontal" Spacing="2">
                 <LucideIcon
                   Kind="Image" Size="16"/>
-                <TextBlock Text="{I18N {x:Static LocaleKey.ChatInputBox_ImageButton_Text}}"/>
+                <TextBlock
+                  Classes="Caption"
+                  Text="{I18N {x:Static LocaleKey.ChatInputBox_ImageButton_Text}}"/>
               </StackPanel>
             </ToggleButton>
 
@@ -265,7 +267,9 @@
                 Orientation="Horizontal" Spacing="2">
                 <LucideIcon
                   Kind="Hammer" Size="16"/>
-                <TextBlock Text="{I18N {x:Static LocaleKey.ChatInputBox_ToolCallButton_Text}}"/>
+                <TextBlock
+                  Classes="Caption"
+                  Text="{I18N {x:Static LocaleKey.ChatInputBox_ToolCallButton_Text}}"/>
               </StackPanel>
             </ToggleButton>
           </StackPanel>
