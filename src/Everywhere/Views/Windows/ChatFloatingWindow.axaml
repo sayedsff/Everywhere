@@ -12,8 +12,8 @@
   ExtendClientAreaChromeHints="NoChrome" ExtendClientAreaToDecorationsHint="True"
   IsOpened="{Binding IsOpened, Mode=OneWayToSource}"
   RequestedThemeVariant="{x:Static themes:ThemeVariants.Acrylic}"
-  ShowInTaskbar="False" SizeToContent="WidthAndHeight"
-  SystemDecorations="BorderOnly"
+  ShowInTaskbar="{Binding $self.IsWindowPinned}"
+  SizeToContent="WidthAndHeight" SystemDecorations="BorderOnly"
   TargetBoundingRect="{Binding TargetBoundingRect}"
   Topmost="True" TransparencyLevelHint="AcrylicBlur"
   WindowStartupLocation="Manual">
@@ -332,7 +332,8 @@
         </ItemsControl>
 
         <ItemsControl
-          Margin="0,0,0,8" Padding="8,0"
+          x:Name="ItemsControl" Margin="0,0,0,8"
+          Padding="8,0"
           IsVisible="{Binding !!$self.ItemCount}"
           ItemsSource="{Binding ChatContextManager.ChatMessageNodes}">
           <ItemsControl.ItemsPanel>
