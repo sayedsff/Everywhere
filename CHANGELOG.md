@@ -1,33 +1,44 @@
 ## [v0.3.0](https://github.com/DearVa/Everywhere/releases/tag/v0.3.0) - 2025-09-24
 
 ### ✨ New Features
-- Added OOBE (Out-Of-Box Experience) for first time users, which includes:
-  - Welcome Dialog
+- 🎉 New Icon
+- Added acrylic effect to tray icon menu
+- Added OOBE (Out-Of-Box Experience) for first time users, including:
+  - The welcome Dialog
   - Quick Setup Wizard
-- Added supported for custom model
-- Added database for storing chat attachments
-- Added support for more hotkey, such as `Copilot` key on Windows
-- Added watchdog process to monitor the main process and clean up zombie processes
+- Added support for custom model
+- Added chat attachments storage
+- Added support for more hotkeys, such as `Copilot` key on Windows
+- Added watchdog process
+- Chat window can be resized manually
+- Chat window will show in taskbar when pinned
 
 ### 🔄️ Changed
-- Refactored Plugin System, which includes:
+- Refactored Plugin System, including:
   - Added Plugin Manager in Settings
-  - Refactored web search plugin
   - Added file system plugin for reading and writing files
   - Added code execution plugin with PowerShell on Windows
   - Added web browsing plugin with Puppeteer
   - Added visual element plugin for capturing screen content when UI automation is not available
+  - Refactored web search plugin
 - Refactored logging system with structured logging
 - Improved visual capturing performance
-- Chat window now can be resized
+- Improved acrylic effect visibility
 
 ### 🐞 Fixed
 - Fixed removing or switching chat history frequently may cause crash
 - Fixed emoji rendering issues in the chat window
-- Fixed application may freeze when active on own window
+- Fixed application may freeze when active chat window in some cases
 - Fixed settings load/save issues
-- Fixed the background of tray icon menu is transparent
 - Fixed new chat button disable state is not updated when switching chat history
+- Fixed detecting focused element mistakenly in some cases
+- Fixed chat window may auto scroll when selecting text
+
+### ⚠️ Known Issues
+- Chat messages may disappear when selecting text
+- Chat window may flicker when pinned
+
+**Full Changelog**: https://github.com/DearVa/Everywhere/compare/v0.2.4...v0.3.0
 
 
 
