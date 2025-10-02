@@ -16,7 +16,7 @@ Every moment, Every place. Your AI - `Everywhere`
   </h1>
 
   <p align="center">
-    <a href="https://everywhere.nekora.dev"><strong>(WIP) Explore the docs »</strong></a>
+    <a href="https://everywhere.sylinko.com"><strong>(WIP) Explore the docs »</strong></a>
     <br />
     <br />
     <a href="https://github.com/DearVa/Everywhere">View Demo</a>
@@ -195,7 +195,7 @@ Every moment, Every place. Your AI - `Everywhere`
 
 ### Documents
 
-Visit here: [Official Docs](https://everywhere.nekora.dev)
+Visit here: [Official Docs](https://everywhere.sylinko.com)
 
 Document is in development. Contributions are welcomed.
 

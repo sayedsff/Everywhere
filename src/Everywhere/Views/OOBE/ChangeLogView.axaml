@@ -47,7 +47,7 @@
       <HyperlinkButton
         VerticalAlignment="Center"
         Content="{I18N {x:Static LocaleKey.WelcomeView_OfficialDocsHyperlinkButton_Content}}"
-        NavigateUri="https://everywhere.nekora.dev"
+        NavigateUri="https://everywhere.sylinko.com"
         TextElement.Foreground="{DynamicResource InfoColor}"/>
       <HyperlinkButton
         VerticalAlignment="Center"

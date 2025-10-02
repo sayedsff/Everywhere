@@ -31,9 +31,9 @@ public partial class WelcomeViewModel : BusyViewModelBase
     {
         public DynamicResourceKeyBase DescriptionKey => new DynamicResourceKey($"WelcomeView_ModelProviderWrapper_{Provider.Id}_Description");
 
-        public Uri OfficialWebsiteUri => new(Provider.OfficialWebsiteUrl?.DefaultValue ?? "https://everywhere.nekora.dev", UriKind.Absolute);
+        public Uri OfficialWebsiteUri => new(Provider.OfficialWebsiteUrl?.DefaultValue ?? "https://everywhere.sylinko.com", UriKind.Absolute);
 
-        public Uri ApiKeyHelpUri => new($"https://everywhere.nekora.dev/model-provider/{Provider.Id}", UriKind.Absolute);
+        public Uri ApiKeyHelpUri => new($"https://everywhere.sylinko.com/model-provider/{Provider.Id}", UriKind.Absolute);
     }
 
     [ObservableProperty]

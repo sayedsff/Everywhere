@@ -16,7 +16,7 @@
   </h1>
 
   <p align="center">
-    <a href="https://everywhere.nekora.dev/zh-CN/"><strong>（开发中）查看文档 »</strong></a>
+    <a href="https://everywhere.sylinko.com/zh-CN/"><strong>（开发中）查看文档 »</strong></a>
     <br />
     <br />
     <a href="https://github.com/DearVa/Everywhere">查看演示</a>
@@ -195,7 +195,7 @@
 
 ### 文档
 
-访问 [官方文档](https://everywhere.nekora.dev)
+访问 [官方文档](https://everywhere.sylinko.com)
 
 文档正在建设中，欢迎贡献！
 

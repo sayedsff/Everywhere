@@ -4,7 +4,7 @@
     <MicrosoftPackageVersion>9.0.7</MicrosoftPackageVersion>
     <EntityFrameworkVersion>9.0.7</EntityFrameworkVersion>
     <SemanticKernelVersion>1.63.0</SemanticKernelVersion>
-    <AvaloniaVersion>11.3.2</AvaloniaVersion>
+    <AvaloniaVersion>11.3.4</AvaloniaVersion>
     <SkiaSharpVersion>3.119.0</SkiaSharpVersion>
     <TokenizersVersion>1.2.1</TokenizersVersion>
   </PropertyGroup>
@@ -66,9 +66,6 @@
     <PackageVersion Include="SkiaSharp.NativeAssets.macOS" Version="$(SkiaSharpVersion)" />
     <PackageVersion Include="SkiaSharp.NativeAssets.Win32" Version="$(SkiaSharpVersion)" />
     <PackageVersion Include="Xaml.Behaviors.Avalonia" Version="11.3.2" />
-    <!-- Markdown packages -->
-    <PackageVersion Include="ColorCode.Core" Version="2.0.15" />
-    <PackageVersion Include="Markdig" Version="0.41.3" />
     <!-- Windows packages -->
     <PackageVersion Include="Microsoft.Windows.CsWin32" Version="0.3.183">
       <PrivateAssets>all</PrivateAssets>
@@ -79,10 +76,10 @@
     <PackageVersion Include="Vortice.DirectComposition" Version="3.6.2" />
     <!-- NUnit packages -->
     <PackageVersion Include="BenchmarkDotNet" Version="0.15.1" />
-    <PackageVersion Include="coverlet.collector" Version="6.0.3" />
+    <PackageVersion Include="coverlet.collector" Version="6.0.4" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
-    <PackageVersion Include="NUnit" Version="4.3.2" />
+    <PackageVersion Include="NUnit" Version="4.4.0" />
     <PackageVersion Include="NUnit.Analyzers" Version="4.5.0" />
-    <PackageVersion Include="NUnit3TestAdapter" Version="4.6.0" />
+    <PackageVersion Include="NUnit3TestAdapter" Version="5.1.0" />
   </ItemGroup>
 </Project>
