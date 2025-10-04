@@ -19,9 +19,24 @@ public class PowerShellPlugin : BuiltInChatPlugin
     {
         _logger = logger;
 
-        _functions.Add(new AnonymousChatFunction(
-            ExecutePowerShellScriptAsync,
-            ChatFunctionPermissions.ShellExecute));
+        // Load powershell module
+        // from: https://github.com/PowerShell/PowerShell/issues/25793
+        var path = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly()?.Location);
+#if NET9_0
+        var modulesPath = Path.Combine(path ?? ".", "runtimes", "win", "lib", "net9.0", "Modules");
+#else
+        #error Target framework not supported
+#endif
+        Environment.SetEnvironmentVariable(
+            "PSModulePath",
+            $"{Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), @"WindowsPowerShell\v1.0\Modules")};" +
+            $"{modulesPath};" + // Import application auto-contained modules
+            Environment.GetEnvironmentVariable("PSModulePath"));
+
+        _functions.Add(
+            new AnonymousChatFunction(
+                ExecutePowerShellScriptAsync,
+                ChatFunctionPermissions.ShellExecute));
     }
 
     [KernelFunction("execute_powershell_script")]
