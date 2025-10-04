@@ -442,7 +442,7 @@
         <value>About</value>
     </data>
     <data name="AboutPage_Description" xml:space="preserve">
-        <value>Everywhere is a context-aware, interactive AI assistant built with .NET and Avalonia. Unlike traditional chat interfaces, Everywhere integrates directly with your desktop environment, perceiving your screen, understanding application context, and taking actions on your behalf.</value>
+        <value>Perceives your screen content in real-time, breaking down application barriers to provide intelligent assistance that truly fits the current context, transforming your desktop into a seamless, intelligent workspace.</value>
     </data>
     <data name="AboutPage_Version" xml:space="preserve">
         <value>Version: </value>

@@ -423,7 +423,7 @@
         <value>关于</value>
     </data>
     <data name="AboutPage_Description" xml:space="preserve">
-        <value>Everywhere 是一款基于 .NET 和 Avalonia 构建的具有上下文感知能力的交互式 AI 助手。与传统的聊天界面不同，Everywhere 直接集成到您的桌面环境中，感知您的屏幕内容，理解应用程序上下文，并代表您采取行动。</value>
+        <value>实时感知您的屏幕内容，打破应用边界，提供真正符合当下情境的智能协助，将您的桌面变为一个无缝的智能工作空间。</value>
     </data>
     <data name="AboutPage_Version" xml:space="preserve">
         <value>版本：</value>

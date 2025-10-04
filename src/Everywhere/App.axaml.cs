@@ -179,6 +179,7 @@ public class App : Application
 }
 
 #if DEBUG
+#pragma warning disable CS0067 // The event is for design-time only.
 file class DesignTimeRuntimeConstantProvider : IRuntimeConstantProvider
 {
     public object? this[RuntimeConstantType type] => null;
@@ -216,4 +217,5 @@ file class DesignTimeNativeHelper : INativeHelper
     public void ShowDesktopNotification(string message, string? title) { }
 }
 
+#pragma warning restore CS0067 // The event is for design-time only.
 #endif
