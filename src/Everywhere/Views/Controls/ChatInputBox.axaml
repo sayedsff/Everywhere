@@ -54,11 +54,17 @@
               Cursor="IBeam">
               <TextBlock
                 FontSize="{TemplateBinding FontSize}"
-                IsVisible="{TemplateBinding Text, Converter={x:Static StringConverters.IsNullOrEmpty}}"
                 Opacity="0.5"
                 Text="{TemplateBinding Watermark}"
                 TextAlignment="{TemplateBinding TextAlignment}"
-                TextWrapping="{TemplateBinding TextWrapping}"/>
+                TextWrapping="{TemplateBinding TextWrapping}">
+                <TextBlock.IsVisible>
+                  <MultiBinding Converter="{x:Static BoolConverters.And}">
+                    <Binding ElementName="PART_TextPresenter" Path="PreeditText" Converter="{x:Static StringConverters.IsNullOrEmpty}"/>
+                    <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Text" Converter="{x:Static StringConverters.IsNullOrEmpty}"/>
+                  </MultiBinding>
+                </TextBlock.IsVisible>
+              </TextBlock>
               <TextPresenter
                 x:Name="PART_TextPresenter"
                 CaretBrush="{TemplateBinding CaretBrush}"
