@@ -321,13 +321,13 @@
         <value>HTTP 请求错误 ({0}): {1}</value>
     </data>
     <data name="FriendlyExceptionMessage_HttpRequest_BadRequest" xml:space="preserve">
-        <value>错误的请求。</value>
+        <value>错误的请求，可能是 API 密钥错误或网络/地区不支持。</value>
     </data>
     <data name="FriendlyExceptionMessage_HttpRequest_Unauthorized" xml:space="preserve">
-        <value>请求未授权。</value>
+        <value>请求未授权，可能是 API 密钥错误或网络/地区不支持。</value>
     </data>
     <data name="FriendlyExceptionMessage_HttpRequest_Forbidden" xml:space="preserve">
-        <value>请求被阻止。</value>
+        <value>请求被阻止，可能是 API 密钥错误或网络/地区不支持。</value>
     </data>
     <data name="FriendlyExceptionMessage_HttpRequest_NotFound" xml:space="preserve">
         <value>未找到结果。</value>

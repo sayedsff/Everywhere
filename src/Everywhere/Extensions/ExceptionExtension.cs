@@ -1,4 +1,6 @@
-﻿using System.Net.Sockets;
+﻿using System.Net;
+using System.Net.Sockets;
+using Microsoft.SemanticKernel;
 
 namespace Everywhere.Extensions;
 
@@ -14,11 +16,11 @@ public static class ExceptionExtension
         {
             case HttpRequestException hre:
             {
-                var statusCode = hre.StatusCode ?? 0;
-                return new FormattedDynamicResourceKey(
-                    LocaleKey.FriendlyExceptionMessage_HttpRequest,
-                    new DirectResourceKey((int)statusCode),
-                    new DynamicResourceKey($"{LocaleKey.FriendlyExceptionMessage_HttpRequest}_{statusCode.ToString()}"));
+                return FormatHttpExceptionMessage(LocaleKey.FriendlyExceptionMessage_HttpRequest, hre.StatusCode);
+            }
+            case HttpOperationException hoe:
+            {
+                return FormatHttpExceptionMessage(LocaleKey.FriendlyExceptionMessage_HttpRequest, hoe.StatusCode);
             }
             case SocketException se:
             {
@@ -42,5 +44,15 @@ public static class ExceptionExtension
                     new DirectResourceKey(e.Message));
             }
         }
+    }
+
+    private static FormattedDynamicResourceKey FormatHttpExceptionMessage(string baseKey, HttpStatusCode? statusCode)
+    {
+        var key = $"{baseKey}_{statusCode.ToString()}";
+        if (!DynamicResourceKey.Exists(key)) key = $"{baseKey}_0";
+        return new FormattedDynamicResourceKey(
+            baseKey,
+            new DirectResourceKey(statusCode ?? 0),
+            new DynamicResourceKey(key));
     }
 }

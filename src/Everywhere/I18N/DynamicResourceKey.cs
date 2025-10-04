@@ -58,6 +58,21 @@ public partial class DynamicResourceKey(object key) : DynamicResourceKeyBase
     [return: NotNullIfNotNull(nameof(key))]
     public static implicit operator DynamicResourceKey?(string? key) => key == null ? null : new DynamicResourceKey(key);
 
+    public static bool Exists(object key) =>
+        Application.Current?.Resources.TryGetResource(key, null, out _) is true;
+
+    public static bool TryResolve(object key, [NotNullWhen(true)] out string? result)
+    {
+        if (Application.Current?.Resources.TryGetResource(key, null, out var resource) is true)
+        {
+            result = resource?.ToString() ?? string.Empty;
+            return true;
+        }
+
+        result = null;
+        return false;
+    }
+
     public static string Resolve(object key) =>
         (Application.Current?.Resources.TryGetResource(key, null, out var resource) is true ? resource?.ToString() : key.ToString()) ?? string.Empty;
 

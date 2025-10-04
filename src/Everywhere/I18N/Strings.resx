@@ -339,13 +339,13 @@
         <value>HTTP request error ({0}): {1}</value>
     </data>
     <data name="FriendlyExceptionMessage_HttpRequest_BadRequest" xml:space="preserve">
-        <value>Bad request.</value>
+        <value>Bad request, possibly due to an incorrect API key or unsupported network/region.</value>
     </data>
     <data name="FriendlyExceptionMessage_HttpRequest_Unauthorized" xml:space="preserve">
-        <value>Unauthorized request.</value>
+        <value>Unauthorized request, possibly due to an incorrect API key or unsupported network/region.</value>
     </data>
     <data name="FriendlyExceptionMessage_HttpRequest_Forbidden" xml:space="preserve">
-        <value>Request forbidden.</value>
+        <value>Request forbidden, possibly due to an incorrect API key or unsupported network/region.</value>
     </data>
     <data name="FriendlyExceptionMessage_HttpRequest_NotFound" xml:space="preserve">
         <value>Result not found.</value>

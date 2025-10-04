@@ -1,12 +1,11 @@
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <MicrosoftPackageVersion>9.0.7</MicrosoftPackageVersion>
+    <MicrosoftPackageVersion>9.0.9</MicrosoftPackageVersion>
     <EntityFrameworkVersion>9.0.7</EntityFrameworkVersion>
     <SemanticKernelVersion>1.63.0</SemanticKernelVersion>
     <AvaloniaVersion>11.3.4</AvaloniaVersion>
-    <SkiaSharpVersion>3.119.0</SkiaSharpVersion>
-    <TokenizersVersion>1.2.1</TokenizersVersion>
+    <SkiaSharpVersion>3.119.1</SkiaSharpVersion>
   </PropertyGroup>
   <ItemGroup>
     <!-- Base packages -->
@@ -60,7 +59,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageVersion>
     <PackageVersion Include="HotAvalonia" Version="3.0.0" />
-    <PackageVersion Include="Lucide.Avalonia" Version="0.1.38" />
+    <PackageVersion Include="Lucide.Avalonia" Version="0.1.43" />
     <PackageVersion Include="SkiaSharp" Version="$(SkiaSharpVersion)" />
     <PackageVersion Include="SkiaSharp.NativeAssets.Linux" Version="$(SkiaSharpVersion)" />
     <PackageVersion Include="SkiaSharp.NativeAssets.macOS" Version="$(SkiaSharpVersion)" />

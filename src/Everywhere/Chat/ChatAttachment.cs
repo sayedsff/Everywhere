@@ -57,7 +57,7 @@ public partial class ChatVisualElementAttachment : ChatAttachment
 [MessagePackObject(AllowPrivate = true, OnlyIncludeKeyedMembers = true)]
 public partial class ChatTextAttachment(DynamicResourceKeyBase headerKey, string text) : ChatAttachment(headerKey)
 {
-    public override LucideIconKind Icon => LucideIconKind.Text;
+    public override LucideIconKind Icon => LucideIconKind.TextInitial;
 
     [Key(1)]
     public string Text => text;

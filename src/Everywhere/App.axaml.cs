@@ -67,7 +67,7 @@ public class App : Application
                        .GroupBy(i => i.Priority)
                        .OrderByDescending(g => g.Key))
             {
-                Task.WhenAll(group.Select(i => i.InitializeAsync())).WaitOnDispatcherFrame();;
+                Task.WhenAll(group.Select(i => i.InitializeAsync())).WaitOnDispatcherFrame();
             }
         }
         catch (Exception ex)
@@ -149,8 +149,9 @@ public class App : Application
             if (window is { IsVisible: true })
             {
                 var topmost = window.Topmost;
-                window.Topmost = true;
+                window.Topmost = false;
                 window.Activate();
+                window.Topmost = true;
                 window.Topmost = topmost;
             }
             else
