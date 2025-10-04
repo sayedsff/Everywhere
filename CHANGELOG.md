@@ -1,3 +1,14 @@
+## [v0.3.1](https://github.com/DearVa/Everywhere/releases/tag/v0.3.1) - 2025-10-04
+
+### 🔄️ Changed
+- Improved markdown rendering styles
+- Improved OOBE experience
+- Changed official website link to https://everywhere.sylinko.com/
+
+**Full Changelog**: https://github.com/DearVa/Everywhere/compare/v0.3.0...v0.3.1
+
+
+
 ## [v0.3.0](https://github.com/DearVa/Everywhere/releases/tag/v0.3.0) - 2025-09-24
 
 ### ✨ New Features
