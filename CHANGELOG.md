@@ -1,3 +1,12 @@
+## [v0.3.2](https://github.com/DearVa/Everywhere/releases/tag/v0.3.2) - 2025-10-05
+
+### 🐞 Fixed
+- (Windows) Fixed powershell plugin missing modules 
+
+**Full Changelog**: https://github.com/DearVa/Everywhere/compare/v0.3.1...v0.3.2
+
+
+
 ## [v0.3.1](https://github.com/DearVa/Everywhere/releases/tag/v0.3.1) - 2025-10-04
 
 ### 🔄️ Changed
