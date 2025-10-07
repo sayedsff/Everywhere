@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Avalonia.Controls;
+using Avalonia.Layout;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Everywhere.Common;
 using Everywhere.Configuration;
@@ -39,7 +40,6 @@ public partial class MainViewModel(IServiceProvider serviceProvider, Settings se
                 {
                     [ContentControl.ContentProperty] = new TextBlock
                     {
-                        Classes = { "p" },
                         [!TextBlock.TextProperty] = p.Title.ToBinding()
                     },
                     [SidebarItem.RouteProperty] = p,

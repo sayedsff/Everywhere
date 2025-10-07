@@ -53,7 +53,7 @@
   </UserControl.Styles>
 
   <Grid
-    Margin="16,12" ColumnDefinitions="*,1,4*"
+    Margin="32,24" ColumnDefinitions="*,1,4*"
     RowDefinitions="Auto,*">
     <TabControl
       Grid.Row="0" Grid.RowSpan="2"

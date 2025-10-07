@@ -5,7 +5,7 @@
   <ScrollViewer
     HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
     <v:SettingsItemsControl
-      Margin="64,32" HorizontalAlignment="Stretch"
+      Margin="32,24" HorizontalAlignment="Stretch"
       ItemsSource="{Binding $parent[p:SettingsCategoryPage].Items}"/>
   </ScrollViewer>
 </UserControl>
