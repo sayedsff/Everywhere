@@ -19,4 +19,12 @@ public static class ServiceExtension
             .AddSingleton<IBlobStorage, BlobStorage>()
             .AddSingleton<IChatContextStorage, ChatContextStorage>()
             .AddTransient<IAsyncInitializer, ChatDbInitializer>();
+
+    public static IServiceCollection AddTelemetry(this IServiceCollection services) =>
+        services
+            .AddOpenTelemetry()
+            .WithLogging()
+            .WithTracing()
+            .WithMetrics()
+            .Services;
 }

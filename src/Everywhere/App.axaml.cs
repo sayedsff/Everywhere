@@ -4,11 +4,13 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media.Imaging;
+using Avalonia.Threading;
 using Everywhere.Common;
 using Everywhere.Configuration;
 using Everywhere.Interop;
 using Everywhere.Views;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 using ShadUI;
 using Window = Avalonia.Controls.Window;
 
@@ -23,6 +25,19 @@ public class App : Application
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
+
+        Dispatcher.UIThread.UnhandledException += (_, e) =>
+        {
+            Log.Logger.Error(e.Exception, "UI Thread Unhandled Exception");
+
+            NativeMessageBox.Show(
+                "Unexpected Error",
+                $"An unexpected error occurred:\n{e.Exception.Message}\n\nPlease check the logs for more details.",
+                NativeMessageBoxButtons.Ok,
+                NativeMessageBoxIcon.Error);
+
+            e.Handled = true;
+        };
 
 #if DEBUG
         if (Design.IsDesignMode)
@@ -72,6 +87,8 @@ public class App : Application
         }
         catch (Exception ex)
         {
+            Log.Logger.Fatal(ex, "Failed to initialize application");
+
             NativeMessageBox.Show(
                 "Initialization Error",
                 $"An error occurred during application initialization:\n{ex.Message}\n\nPlease check the logs for more details.",

@@ -24,6 +24,11 @@
     <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="$(MicrosoftPackageVersion)" />
     <PackageVersion Include="Microsoft.PowerShell.SDK" Version="7.5.2" />
     <PackageVersion Include="Nito.AsyncEx" Version="5.1.2" />
+    <PackageVersion Include="OpenTelemetry" Version="1.13.0" />
+    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.13.0" />
+    <PackageVersion Include="Sentry" Version="5.16.0" />
+    <PackageVersion Include="Sentry.OpenTelemetry" Version="5.16.0" />
+    <PackageVersion Include="Sentry.Serilog" Version="5.16.0" />
     <PackageVersion Include="Serilog" Version="4.3.0" />
     <PackageVersion Include="Serilog.Extensions.Logging" Version="9.0.2" />
     <PackageVersion Include="Serilog.Sinks.Console" Version="6.0.0" />

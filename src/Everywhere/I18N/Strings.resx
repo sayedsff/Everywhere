@@ -826,13 +826,31 @@ My intelligence comes from powerful Large language models (LLMs), which are prov
     <data name="WelcomeView_EnterApiKeyStep_Message6" xml:space="preserve">
         <value>🎉 Verify successful! Let's move on to the final step!</value>
     </data>
-    <data name="WelcomeView_FinishButton_Content" xml:space="preserve">
-        <value>Finish</value>
-    </data>
-    <data name="WelcomeView_FinaleStep_Message1" xml:space="preserve">
+    <data name="WelcomeView_HotkeyStep_Message1" xml:space="preserve">
         <value>Congratulations! Everything is complete. You can wake me up anytime using the shortcut key below.</value>
     </data>
-    <data name="WelcomeView_FinaleStep_Message2" xml:space="preserve">
+    <data name="WelcomeView_HotkeyStep_Message2" xml:space="preserve">
         <value>If there's no response, it might be occupied by other software. You can click to change the shortcut key.</value>
+    </data>
+    <data name="FriendlyExceptionMessage_Authentication" xml:space="preserve">
+        <value>Authentication error. {0}</value>
+    </data>
+    <data name="WelcomeView_TelemetryStep_Message1" xml:space="preserve">
+        <value>To help me improve, I need to enable “telemetry” to collect anonymous data. This data is used solely for analysis and does not contain or allow the inference of any personally identifiable information about you.</value>
+    </data>
+    <data name="WelcomeView_TelemetryStep_Message2" xml:space="preserve">
+        <value>You may choose to send only necessary data; this option will not affect core functionality.</value>
+    </data>
+    <data name="WelcomeView_SendOnlyNecessaryDataButton_Content" xml:space="preserve">
+        <value>Send only necessary data</value>
+    </data>
+    <data name="WelcomeView_EnableTelemetryButton_Content" xml:space="preserve">
+        <value>Enable telemetry</value>
+    </data>
+    <data name="Settings_Common_DiagnosticData_Header" xml:space="preserve">
+        <value>Diagnostic data</value>
+    </data>
+    <data name="Settings_Common_DiagnosticData_Description" xml:space="preserve">
+        <value>To help us improve, we need the “telemetry” to collect anonymous data. This data is used solely for analysis and does not contain or allow the inference of any personally identifiable information about you. You may choose to send only necessary data; this option will not affect core functionality.</value>
     </data>
 </root>

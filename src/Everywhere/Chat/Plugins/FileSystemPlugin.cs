@@ -76,7 +76,7 @@ public class FileSystemPlugin : BuiltInChatPlugin
     {
         _logger.LogInformation(
             "Listing files in path: {Path}, skip: {Skip}, maxCount: {MaxCount}, orderBy: {OrderBy}",
-            path,
+            path.SanitizePath(),
             skip,
             maxCount,
             orderBy);
@@ -106,7 +106,7 @@ public class FileSystemPlugin : BuiltInChatPlugin
     [Description("Gets information about a file or directory at the specified path.")]
     private FileInformation GetFileInformation(string path)
     {
-        _logger.LogInformation("Getting file information for path: {Path}", path);
+        _logger.LogInformation("Getting file information for path: {Path}", path.SanitizePath());
 
         if (string.IsNullOrWhiteSpace(path))
         {
@@ -116,7 +116,7 @@ public class FileSystemPlugin : BuiltInChatPlugin
         var fileInfo = new FileInfo(path);
         if (!fileInfo.Exists)
         {
-            throw new FileNotFoundException($"The file or directory at '{path}' does not exist.");
+            throw new FileNotFoundException($"The file or directory at does not exist.");
         }
 
         return new FileInformation(
@@ -134,7 +134,7 @@ public class FileSystemPlugin : BuiltInChatPlugin
     {
         _logger.LogInformation(
             "Reading text file at path: {Path}, startLine: {StartLine}, maxLines: {MaxLines}, encoding: {Encoding}",
-            path,
+            path.SanitizePath(),
             startLine,
             maxLines,
             encoding);
@@ -145,7 +145,7 @@ public class FileSystemPlugin : BuiltInChatPlugin
         }
         if (!File.Exists(path))
         {
-            throw new FileNotFoundException($"File does not exist: {path}");
+            throw new FileNotFoundException("File does not exist.");
         }
 
         var fileInfo = new FileInfo(path);
@@ -207,7 +207,7 @@ public class FileSystemPlugin : BuiltInChatPlugin
     [Description("Moves or renames a file or directory from sourcePath to destinationPath.")]
     private bool MoveFile(string sourcePath, string destinationPath)
     {
-        _logger.LogInformation("Moving file from {SourcePath} to {DestinationPath}", sourcePath, destinationPath);
+        _logger.LogInformation("Moving file from {SourcePath} to {DestinationPath}", sourcePath.SanitizePath(), destinationPath.SanitizePath());
 
         if (string.IsNullOrWhiteSpace(sourcePath) || string.IsNullOrWhiteSpace(destinationPath))
         {
@@ -215,7 +215,7 @@ public class FileSystemPlugin : BuiltInChatPlugin
         }
         if (!File.Exists(sourcePath) && !Directory.Exists(sourcePath))
         {
-            throw new FileNotFoundException($"Source does not exist: {sourcePath}");
+            throw new FileNotFoundException($"Source does not exist.");
         }
 
         if (File.Exists(sourcePath))
@@ -234,7 +234,7 @@ public class FileSystemPlugin : BuiltInChatPlugin
     [Description("Deletes a file or an directory at the specified path.")]
     private bool DeleteFile(string path, bool recursive = false)
     {
-        _logger.LogInformation("Deleting file at {Path}", path);
+        _logger.LogInformation("Deleting file at {Path}", path.SanitizePath());
 
         if (string.IsNullOrWhiteSpace(path))
         {
@@ -251,7 +251,7 @@ public class FileSystemPlugin : BuiltInChatPlugin
         }
         else
         {
-            throw new FileNotFoundException($"File or directory does not exist: {path}");
+            throw new FileNotFoundException("File or directory does not exist.");
         }
 
         return true;
@@ -264,7 +264,7 @@ public class FileSystemPlugin : BuiltInChatPlugin
         [Description("If true, throws an error if the file already exists. If false, overwrites the existing file.")]
         bool errorIfExists = true)
     {
-        _logger.LogInformation("Creating file at {Path}, errorIfExists: {ErrorIfExists}", path, errorIfExists);
+        _logger.LogInformation("Creating file at {Path}, errorIfExists: {ErrorIfExists}", path.SanitizePath(), errorIfExists);
 
         if (string.IsNullOrWhiteSpace(path))
         {
@@ -283,7 +283,7 @@ public class FileSystemPlugin : BuiltInChatPlugin
     [Description("Creates a new directory at the specified path.")]
     private void CreateDirectory(string path)
     {
-        _logger.LogInformation("Creating directory at {Path}", path);
+        _logger.LogInformation("Creating directory at {Path}", path.SanitizePath());
 
         if (string.IsNullOrWhiteSpace(path))
         {
@@ -301,7 +301,7 @@ public class FileSystemPlugin : BuiltInChatPlugin
     [Description("Writes content to a text file at the specified path. Binary files are not supported.")]
     private async Task WriteTextFile(string path, string content, string encoding = "utf-8", bool append = false)
     {
-        _logger.LogInformation("Writing text file at {Path}, encoding: {Encoding}, append: {Append}", path, encoding, append);
+        _logger.LogInformation("Writing text file at {Path}, encoding: {Encoding}, append: {Append}", path.SanitizePath(), encoding, append);
 
         if (string.IsNullOrWhiteSpace(path))
         {

@@ -372,10 +372,10 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
 
     [RelayCommand(CanExecute = nameof(IsNotBusy))]
     private Task SendMessage(string message) => ExecuteBusyTaskAsync(
-        async cancellationToken =>
+        cancellationToken =>
         {
             message = message.Trim();
-            if (message.Length == 0) return;
+            if (message.Length == 0) return Task.CompletedTask;
 
             var userMessage = new UserChatMessage(message, _chatAttachments.AsValueEnumerable().ToImmutableArray())
             {
@@ -383,14 +383,14 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
             };
             _chatAttachments.Clear();
 
-            await _chatService.SendMessageAsync(userMessage, cancellationToken);
+            return Task.Run(() => _chatService.SendMessageAsync(userMessage, cancellationToken), cancellationToken);
         },
         _logger.ToExceptionHandler(),
         cancellationToken: _cancellationTokenSource.Token);
 
     [RelayCommand(CanExecute = nameof(IsNotBusy))]
     private Task RetryAsync(ChatMessageNode chatMessageNode) => ExecuteBusyTaskAsync(
-        cancellationToken => _chatService.RetryAsync(chatMessageNode, cancellationToken),
+        cancellationToken => Task.Run(() => _chatService.RetryAsync(chatMessageNode, cancellationToken), cancellationToken),
         _logger.ToExceptionHandler(),
         cancellationToken: _cancellationTokenSource.Token);
 

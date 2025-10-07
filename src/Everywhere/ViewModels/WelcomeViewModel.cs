@@ -24,7 +24,11 @@ public partial class WelcomeViewModel : BusyViewModelBase
         /// <summary>
         /// Teach hotkey
         /// </summary>
-        Finale = 3
+        Hotkey = 3,
+        /// <summary>
+        /// Select telemetry preference
+        /// </summary>
+        Telemetry = 4
     }
 
     public record ModelProviderWrapper(ModelProvider Provider)
@@ -79,7 +83,7 @@ public partial class WelcomeViewModel : BusyViewModelBase
     }
 
     [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(GoToFinaleStepCommand))]
+    [NotifyCanExecuteChangedFor(nameof(GoToHotkeyStepCommand))]
     public partial bool IsApiKeyValid { get; private set; }
 
     public event Action? ApiKeyValidated;
@@ -169,5 +173,15 @@ public partial class WelcomeViewModel : BusyViewModelBase
     });
 
     [RelayCommand(CanExecute = nameof(IsApiKeyValid))]
-    private void GoToFinaleStep() => CurrentStep = Step.Finale;
+    private void GoToHotkeyStep() => CurrentStep = Step.Hotkey;
+
+    [RelayCommand]
+    private void GoToTelemetryStep() => CurrentStep = Step.Telemetry;
+
+    [RelayCommand]
+    private void SendOnlyNecessaryTelemetry()
+    {
+        Settings.Common.DiagnosticData = false;
+        Close();
+    }
 }

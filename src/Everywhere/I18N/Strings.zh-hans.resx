@@ -806,13 +806,31 @@
     <data name="WelcomeView_EnterApiKeyStep_Message6" xml:space="preserve">
         <value>🎉 验证成功！让我们进入最后一步吧！</value>
     </data>
-    <data name="WelcomeView_FinishButton_Content" xml:space="preserve">
-        <value>完成</value>
-    </data>
-    <data name="WelcomeView_FinaleStep_Message1" xml:space="preserve">
+    <data name="WelcomeView_HotkeyStep_Message1" xml:space="preserve">
         <value>恭喜！全部完成了。你可以随时按下面的快捷键唤醒我。</value>
     </data>
-    <data name="WelcomeView_FinaleStep_Message2" xml:space="preserve">
+    <data name="WelcomeView_HotkeyStep_Message2" xml:space="preserve">
         <value>如果没反应，可能是被其他软件占用，可以点击换一个快捷键哦。</value>
+    </data>
+    <data name="FriendlyExceptionMessage_Authentication" xml:space="preserve">
+        <value>认证错误。{0}</value>
+    </data>
+    <data name="WelcomeView_EnableTelemetryButton_Content" xml:space="preserve">
+        <value>启用遥测</value>
+    </data>
+    <data name="WelcomeView_SendOnlyNecessaryDataButton_Content" xml:space="preserve">
+        <value>仅发送必要数据</value>
+    </data>
+    <data name="WelcomeView_TelemetryStep_Message1" xml:space="preserve">
+        <value>为了帮助我成长，我需要启用“遥测”来收集匿名数据。这些数据仅用于分析，不包含也无法从中推断出任何和您个人有关的数据。</value>
+    </data>
+    <data name="WelcomeView_TelemetryStep_Message2" xml:space="preserve">
+        <value>您可以选择只发送必要数据，该选择不会影响核心功能。</value>
+    </data>
+    <data name="Settings_Common_DiagnosticData_Header" xml:space="preserve">
+        <value>诊断数据</value>
+    </data>
+    <data name="Settings_Common_DiagnosticData_Description" xml:space="preserve">
+        <value>为了帮助我们改进，我们需要“遥测”来收集匿名数据。这些数据仅用于分析，不包含也无法从中推断出任何和您个人有关的数据。您可以选择只发送必要数据，该选择不会影响核心功能。</value>
     </data>
 </root>

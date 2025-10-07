@@ -155,7 +155,7 @@
         </ListBox>
 
         <ListBox Classes="AssistantMessage">
-          <TextBlock Text="{I18N {x:Static LocaleKey.WelcomeView_FinaleStep_Message1}}"/>
+          <TextBlock Text="{I18N {x:Static LocaleKey.WelcomeView_HotkeyStep_Message1}}"/>
           <v:KeyboardHotkeyInputBox
             MinWidth="160" MinHeight="32"
             Margin="-10,-6" Background="Transparent"
@@ -163,7 +163,14 @@
             Hotkey="{Binding Settings.Behavior.ChatHotkey, Mode=TwoWay}"/>
           <TextBlock
             Classes="Muted"
-            Text="{I18N {x:Static LocaleKey.WelcomeView_FinaleStep_Message2}}"/>
+            Text="{I18N {x:Static LocaleKey.WelcomeView_HotkeyStep_Message2}}"/>
+        </ListBox>
+
+        <ListBox Classes="AssistantMessage">
+          <TextBlock Text="{I18N {x:Static LocaleKey.WelcomeView_TelemetryStep_Message1}}"/>
+          <TextBlock
+            Classes="Muted"
+            Text="{I18N {x:Static LocaleKey.WelcomeView_TelemetryStep_Message2}}"/>
         </ListBox>
       </Carousel.Items>
     </Carousel>
@@ -252,7 +259,7 @@
           <Button
             Classes="Primary" Grid.Row="1"
             Grid.Column="1"
-            Command="{Binding GoToFinaleStepCommand}"
+            Command="{Binding GoToHotkeyStepCommand}"
             Content="{I18N {x:Static LocaleKey.WelcomeView_NextStepButton_Content}}"
             IsVisible="{Binding IsApiKeyValid}"/>
           <Button
@@ -266,8 +273,21 @@
 
         <Button
           Classes="Primary" VerticalAlignment="Bottom"
-          Command="{Binding CloseCommand}"
-          Content="{I18N {x:Static LocaleKey.WelcomeView_FinishButton_Content}}"/>
+          Command="{Binding GoToTelemetryStepCommand}"
+          Content="{I18N {x:Static LocaleKey.WelcomeView_NextStepButton_Content}}"/>
+
+        <Grid
+          VerticalAlignment="Bottom" ColumnDefinitions="*,4*"
+          ColumnSpacing="8">
+          <Button
+            Classes="Secondary" Grid.Column="0"
+            Command="{Binding SendOnlyNecessaryTelemetry}"
+            Content="{I18N {x:Static LocaleKey.WelcomeView_SendOnlyNecessaryDataButton_Content}}"/>
+          <Button
+            Classes="Primary" Grid.Column="1"
+            Command="{Binding CloseCommand}"
+            Content="{I18N {x:Static LocaleKey.WelcomeView_EnableTelemetryButton_Content}}"/>
+        </Grid>
       </Carousel.Items>
     </Carousel>
 
@@ -277,7 +297,7 @@
       HorizontalAlignment="Right" VerticalAlignment="Top"
       Command="{Binding CloseCommand}"
       Content="{I18N {x:Static LocaleKey.WelcomeView_SkipButton_Content}}"
-      IsVisible="{Binding CurrentStep, Converter={x:Static ObjectConverters.NotEqual}, ConverterParameter={x:Static vm:WelcomeViewModel+Step.Finale}}"/>
+      IsVisible="{Binding CurrentStep, Converter={x:Static ObjectConverters.NotEqual}, ConverterParameter={x:Static vm:WelcomeViewModel+Step.Hotkey}}"/>
 
     <v:ConfettiEffect
       x:Name="ConfettiEffect" Grid.Row="0"

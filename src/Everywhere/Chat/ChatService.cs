@@ -1,4 +1,8 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Text;
+using System.Text.Json;
+using Anthropic.SDK.Messaging;
+using Avalonia.Threading;
 using Everywhere.AI;
 using Everywhere.Chat.Plugins;
 using Everywhere.Common;
@@ -7,12 +11,19 @@ using Everywhere.Interop;
 using Everywhere.Storage;
 using Everywhere.Utilities;
 using Lucide.Avalonia;
+using Microsoft.Extensions.AI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
+using OpenAI.Chat;
 using ZLinq;
+using ChatMessageContent = Microsoft.SemanticKernel.ChatMessageContent;
+using FunctionCallContent = Microsoft.SemanticKernel.FunctionCallContent;
+using FunctionResultContent = Microsoft.SemanticKernel.FunctionResultContent;
+using ImageContent = Microsoft.SemanticKernel.ImageContent;
+using TextContent = Microsoft.SemanticKernel.TextContent;
 
 namespace Everywhere.Chat;
 
@@ -24,33 +35,65 @@ public class ChatService(
     ILogger<ChatService> logger
 ) : IChatService
 {
+    private static readonly ActivitySource ActivitySource = new(typeof(ChatService).FullName.NotNull());
+
     public async Task SendMessageAsync(UserChatMessage userMessage, CancellationToken cancellationToken)
     {
+        using var activity = ActivitySource.StartActivity();
+
         var chatContext = chatContextManager.Current;
+        activity?.SetTag("chat.context.id", chatContext.Metadata.Id);
         chatContext.Add(userMessage);
-        var kernelMixin = kernelMixinFactory.GetOrCreate(settings.Model);
+
+        var kernelMixin = CreateKernelMixin();
+
         await ProcessUserChatMessageAsync(kernelMixin, chatContext, userMessage, cancellationToken);
         userMessage.UserPrompt += "\n\nPlease try to use the tools if necessary, before answering.";
+
         var assistantChatMessage = new AssistantChatMessage { IsBusy = true };
         chatContext.Add(assistantChatMessage);
+
         await GenerateAsync(kernelMixin, chatContext, assistantChatMessage, cancellationToken);
     }
 
-    public Task RetryAsync(ChatMessageNode node, CancellationToken cancellationToken)
+    public async Task RetryAsync(ChatMessageNode node, CancellationToken cancellationToken)
     {
+        using var activity = ActivitySource.StartActivity();
+        activity?.SetTag("chat.context.id", node.Context.Metadata.Id);
+
         if (node.Message.Role != AuthorRole.Assistant)
         {
-            return Task.FromException(new InvalidOperationException("Only assistant messages can be retried."));
+            throw new InvalidOperationException("Only assistant messages can be retried.");
         }
 
         var assistantChatMessage = new AssistantChatMessage { IsBusy = true };
         node.Context.CreateBranchOn(node, assistantChatMessage);
-        return GenerateAsync(kernelMixinFactory.GetOrCreate(settings.Model), node.Context, assistantChatMessage, cancellationToken);
+
+        await GenerateAsync(CreateKernelMixin(), node.Context, assistantChatMessage, cancellationToken);
     }
 
     public Task EditAsync(ChatMessageNode node, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
+    }
+
+    private IKernelMixin CreateKernelMixin()
+    {
+        using var activity = ActivitySource.StartActivity();
+
+        try
+        {
+            var kernelMixin = kernelMixinFactory.GetOrCreate(settings.Model);
+            activity?.SetTag("llm.provider.id", settings.Model.SelectedModelProviderId ?? "unknown");
+            activity?.SetTag("llm.model.id", settings.Model.SelectedModelDefinitionId ?? "unknown");
+            return kernelMixin;
+        }
+        catch (Exception e)
+        {
+            // This method may throw if the model settings are invalid.
+            logger.LogError(e, "Error creating kernel mixin");
+            throw;
+        }
     }
 
     private async static Task ProcessUserChatMessageAsync(
@@ -59,15 +102,56 @@ public class ChatService(
         UserChatMessage userChatMessage,
         CancellationToken cancellationToken)
     {
-        var elements = userChatMessage
-            .Attachments
-            .AsValueEnumerable()
-            .OfType<ChatVisualElementAttachment>()
-            .Select(a => a.Element?.Target)
-            .OfType<IVisualElement>()
-            .ToArray();
+        using var activity = ActivitySource.StartActivity();
+        activity?.SetTag("chat.context.id", chatContext.Metadata.Id);
 
-        if (elements.Length <= 0) return;
+        var attachmentTagValues = activity is null ? null : new List<object>();
+        var validVisualElements = new List<IVisualElement>();
+        foreach (var attachment in userChatMessage.Attachments.AsValueEnumerable().Take(10))
+        {
+            switch (attachment)
+            {
+                case ChatTextAttachment textAttachment:
+                {
+                    attachmentTagValues?.Add(
+                        new
+                        {
+                            type = "text",
+                            length = textAttachment.Text.Length
+                        });
+                    break;
+                }
+                case ChatFileAttachment fileAttachment:
+                {
+                    attachmentTagValues?.Add(
+                        new
+                        {
+                            type = "file",
+                            mime_type = fileAttachment.MimeType,
+                            file_size = GetFileSize(fileAttachment.FilePath)
+                        });
+                    break;
+                }
+                case ChatVisualElementAttachment visualElement:
+                {
+                    var element = visualElement.Element?.Target;
+                    if (element is not null) validVisualElements.Add(element);
+
+                    attachmentTagValues?.Add(
+                        new
+                        {
+                            type = "element",
+                            element_type = element?.Type.ToString() ?? "invalid",
+                        });
+
+                    break;
+                }
+            }
+        }
+
+        activity?.SetTag("attachments", JsonSerializer.Serialize(attachmentTagValues));
+
+        if (validVisualElements.Count <= 0) return;
 
         var analyzingContextMessage = new ActionChatMessage(
             new AuthorRole("action"),
@@ -82,17 +166,22 @@ public class ChatService(
             chatContext.Add(analyzingContextMessage);
 
             var xmlBuilder = new VisualElementXmlBuilder(
-                elements,
+                validVisualElements,
                 kernelMixin.MaxTokenTotal / 20,
                 chatContext.VisualElements.Count + 1);
             var renderedVisualTreePrompt = await Task.Run(
                 () =>
                 {
+                    // ReSharper disable once ExplicitCallerInfoArgument
+                    using var builderActivity = ActivitySource.StartActivity("BuildVisualTreeXml");
+
                     var xml = xmlBuilder.BuildXml(cancellationToken);
                     var builtVisualElements = xmlBuilder.BuiltVisualElements;
+                    builderActivity?.SetTag("xml.length", xml.Length);
+                    builderActivity?.SetTag("xml.built_visual_elements.count", builtVisualElements.Count);
 
                     string focusedElementIdString;
-                    if (builtVisualElements.FirstOrDefault(kv => ReferenceEquals(kv.Value, elements[0])) is
+                    if (builtVisualElements.FirstOrDefault(kv => ReferenceEquals(kv.Value, validVisualElements[0])) is
                         { Key: var focusedElementId, Value: not null })
                     {
                         focusedElementIdString = focusedElementId.ToString();
@@ -131,6 +220,19 @@ public class ChatService(
         {
             analyzingContextMessage.IsBusy = false;
         }
+
+        static long GetFileSize(string filePath)
+        {
+            try
+            {
+                var fileInfo = new FileInfo(filePath);
+                return fileInfo.Exists ? fileInfo.Length : 0;
+            }
+            catch
+            {
+                return 0;
+            }
+        }
     }
 
     /// <summary>
@@ -142,6 +244,8 @@ public class ChatService(
     /// <exception cref="NotSupportedException"></exception>
     private Kernel BuildKernel(IKernelMixin kernelMixin, ChatContext chatContext)
     {
+        using var activity = ActivitySource.StartActivity();
+
         var builder = Kernel.CreateBuilder();
 
         builder.Services.AddSingleton(kernelMixin.ChatCompletionService);
@@ -151,6 +255,8 @@ public class ChatService(
         {
             var chatPluginScope = chatPluginManager.CreateScope(chatContext);
             builder.Services.AddSingleton(chatPluginScope);
+            activity?.SetTag("plugins.count", chatPluginScope.Plugins.AsValueEnumerable().Count());
+
             foreach (var plugin in chatPluginScope.Plugins)
             {
                 builder.Plugins.Add(plugin);
@@ -166,6 +272,9 @@ public class ChatService(
         AssistantChatMessage assistantChatMessage,
         CancellationToken cancellationToken)
     {
+        using var activity = ActivitySource.StartActivity();
+        activity?.SetTag("chat.context.id", chatContext.Metadata.Id);
+
         try
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -183,51 +292,107 @@ public class ChatService(
                 }
             }
 
+            var toolCallCount = 0;
+            var inputTokenCount = 0L;
+            var outputTokenCount = 0L;
+            var totalTokenCount = 0L;
+
             while (true)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
                 AuthorRole? authorRole = null;
+                IReadOnlyList<FunctionCallContent> functionCallContents;
                 var assistantContentBuilder = new StringBuilder();
                 var functionCallContentBuilder = new FunctionCallContentBuilder();
                 var promptExecutionSettings = kernelMixin.GetPromptExecutionSettings();
 
-                await foreach (var streamingContent in kernelMixin.ChatCompletionService.GetStreamingChatMessageContentsAsync(
-                                   chatHistory,
-                                   promptExecutionSettings,
-                                   kernel,
-                                   cancellationToken))
+                // ReSharper disable once ExplicitCallerInfoArgument
+                using (var llmStreamActivity = ActivitySource.StartActivity("ChatCompletionService.GetStreamingChatMessageContents"))
                 {
-                    if (streamingContent.Content is not null)
-                    {
-                        assistantContentBuilder.Append(streamingContent.Content);
-                        assistantChatMessage.MarkdownBuilder.Append(streamingContent.Content);
-                    }
+                    llmStreamActivity?.SetTag("chat.context.id", chatContext.Metadata.Id);
 
-                    // for those LLM who doesn't implement function calling correctly,
-                    // we need to generate a unique ToolCallId for each tool call update.
-                    for (var i = 0; i < streamingContent.Items.Count; i++)
+                    await foreach (var streamingContent in kernelMixin.ChatCompletionService.GetStreamingChatMessageContentsAsync(
+                                       chatHistory,
+                                       promptExecutionSettings,
+                                       kernel,
+                                       cancellationToken))
                     {
-                        var item = streamingContent.Items[i];
-                        if (item is StreamingFunctionCallUpdateContent { Name.Length: > 0, CallId: null or { Length: 0 } } idiotContent)
+                        if (streamingContent.Metadata?.TryGetValue("Usage", out var usage) is true && usage is not null)
                         {
-                            // Generate a unique ToolCallId for the function call update.
-                            streamingContent.Items[i] = new StreamingFunctionCallUpdateContent(
-                                Guid.NewGuid().ToString("N"),
-                                idiotContent.Name,
-                                idiotContent.Arguments,
-                                idiotContent.FunctionCallIndex);
+                            switch (usage)
+                            {
+                                case UsageContent usageContent:
+                                {
+                                    inputTokenCount += usageContent.Details.InputTokenCount ?? 0;
+                                    outputTokenCount += usageContent.Details.OutputTokenCount ?? 0;
+                                    totalTokenCount += usageContent.Details.TotalTokenCount ?? 0;
+                                    break;
+                                }
+                                case UsageDetails usageDetails:
+                                {
+                                    inputTokenCount += usageDetails.InputTokenCount ?? 0;
+                                    outputTokenCount += usageDetails.OutputTokenCount ?? 0;
+                                    totalTokenCount += usageDetails.TotalTokenCount ?? 0;
+                                    break;
+                                }
+                                case Usage anthropicUsage:
+                                {
+                                    inputTokenCount += anthropicUsage.InputTokens;
+                                    outputTokenCount += anthropicUsage.OutputTokens;
+                                    totalTokenCount += anthropicUsage.InputTokens + anthropicUsage.OutputTokens;
+                                    break;
+                                }
+                                case ChatTokenUsage openAIUsage:
+                                {
+                                    inputTokenCount += openAIUsage.InputTokenCount;
+                                    outputTokenCount += openAIUsage.OutputTokenCount;
+                                    totalTokenCount += openAIUsage.TotalTokenCount;
+                                    break;
+                                }
+                            }
                         }
+
+                        if (streamingContent.Content is not null)
+                        {
+                            assistantContentBuilder.Append(streamingContent.Content);
+                            await Dispatcher.UIThread.InvokeAsync(() => assistantChatMessage.MarkdownBuilder.Append(streamingContent.Content));
+                        }
+
+                        // for those LLM who doesn't implement function calling correctly,
+                        // we need to generate a unique ToolCallId for each tool call update.
+                        for (var i = 0; i < streamingContent.Items.Count; i++)
+                        {
+                            var item = streamingContent.Items[i];
+                            if (item is StreamingFunctionCallUpdateContent { Name.Length: > 0, CallId: null or { Length: 0 } } idiotContent)
+                            {
+                                // Generate a unique ToolCallId for the function call update.
+                                streamingContent.Items[i] = new StreamingFunctionCallUpdateContent(
+                                    Guid.NewGuid().ToString("N"),
+                                    idiotContent.Name,
+                                    idiotContent.Arguments,
+                                    idiotContent.FunctionCallIndex);
+                            }
+                        }
+
+                        authorRole ??= streamingContent.Role;
+                        functionCallContentBuilder.Append(streamingContent);
                     }
 
-                    authorRole ??= streamingContent.Role;
-                    functionCallContentBuilder.Append(streamingContent);
+                    if (assistantContentBuilder.Length > 0) chatHistory.AddAssistantMessage(assistantContentBuilder.ToString());
+
+                    functionCallContents = functionCallContentBuilder.Build();
+
+                    llmStreamActivity?.SetTag("chat.history.count", chatHistory.AsValueEnumerable().Count());
+                    llmStreamActivity?.SetTag("chat.embedding.input", inputTokenCount);
+                    llmStreamActivity?.SetTag("chat.embedding.output", outputTokenCount);
+                    llmStreamActivity?.SetTag("chat.embedding.total", totalTokenCount);
+                    llmStreamActivity?.SetTag("chat.response.length", assistantContentBuilder.Length);
+                    llmStreamActivity?.SetTag("chat.response.tool_call.count", functionCallContents.Count);
                 }
 
-                if (assistantContentBuilder.Length > 0) chatHistory.AddAssistantMessage(assistantContentBuilder.ToString());
-
-                var functionCallContents = functionCallContentBuilder.Build();
-                if (functionCallContents.Count == 0) break;
+                if (functionCallContents.Count <= 0) break;
+                toolCallCount += functionCallContents.Count;
 
                 // Group function calls by plugin name, and create ActionChatMessages for each group.
                 var chatPluginScope = kernel.GetRequiredService<IChatPluginScope>();
@@ -258,6 +423,10 @@ public class ChatService(
                     // Iterate through the function call contents in the group.
                     foreach (var functionCallContent in functionCallContentGroup)
                     {
+                        // ReSharper disable once ExplicitCallerInfoArgument
+                        using var functionCallActivity = ActivitySource.StartActivity("Tool.InvokeFunction");
+                        functionCallActivity?.SetTag("tool.function_name", functionCallContent.FunctionName);
+
                         functionCallChatMessage.Calls.Add(functionCallContent);
                         functionCallMessage.Items.Add(functionCallContent);
 
@@ -268,8 +437,11 @@ public class ChatService(
                         }
                         catch (Exception ex)
                         {
+                            functionCallActivity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+
                             resultContent = new FunctionResultContent(functionCallContent, $"Error: {ex.Message}");
                             functionCallChatMessage.ErrorMessageKey = ex.GetFriendlyMessage();
+
                             logger.LogError(ex, "Error invoking function '{FunctionName}'", functionCallContent.FunctionName);
                         }
 
@@ -292,6 +464,8 @@ public class ChatService(
                 }
             }
 
+            activity?.SetTag("tool_calls.count", toolCallCount);
+
             if (chatContext.Metadata.Topic.IsNullOrEmpty() &&
                 chatHistory.Any(c => c.Role == AuthorRole.User) &&
                 chatHistory.Any(c => c.Role == AuthorRole.Assistant) &&
@@ -310,6 +484,7 @@ public class ChatService(
         }
         catch (Exception e)
         {
+            activity?.SetStatus(ActivityStatusCode.Error, e.Message);
             assistantChatMessage.ErrorMessageKey = e.GetFriendlyMessage();
             logger.LogError(e, "Error generating chat response");
         }
@@ -386,7 +561,7 @@ public class ChatService(
 
         async ValueTask AddAttachmentsToChatMessageContentAsync(IEnumerable<ChatAttachment> attachments, ChatMessageContent content)
         {
-            foreach (var attachment in attachments)
+            foreach (var attachment in attachments.Take(10)) // Limit to 10 attachments
             {
                 switch (attachment)
                 {
@@ -446,29 +621,45 @@ public class ChatService(
         ChatContextMetadata metadata,
         CancellationToken cancellationToken)
     {
-        var chatHistory = new ChatHistory
+        using var activity = ActivitySource.StartActivity();
+
+        try
         {
-            new ChatMessageContent(
-                AuthorRole.System,
-                Prompts.RenderPrompt(
-                    Prompts.SummarizeChatPrompt,
-                    new Dictionary<string, Func<string>>
-                    {
-                        { "UserMessage", () => userMessage },
-                        { "AssistantMessage", () => assistantMessage },
-                        { "SystemLanguage", () => settings.Common.Language }
-                    })),
-        };
-        var openAIPromptExecutionSettings = new OpenAIPromptExecutionSettings
+            activity?.SetTag("chat.context.id", metadata.Id);
+            activity?.SetTag("user_message.length", userMessage.Length);
+            activity?.SetTag("assistant_message.length", assistantMessage.Length);
+            activity?.SetTag("system_language", settings.Common.Language);
+
+            var chatHistory = new ChatHistory
+            {
+                new ChatMessageContent(
+                    AuthorRole.System,
+                    Prompts.RenderPrompt(
+                        Prompts.SummarizeChatPrompt,
+                        new Dictionary<string, Func<string>>
+                        {
+                            { "UserMessage", () => userMessage.SafeSubstring(0, 2048) },
+                            { "AssistantMessage", () => assistantMessage.SafeSubstring(0, 2048) },
+                            { "SystemLanguage", () => settings.Common.Language }
+                        })),
+            };
+            var openAIPromptExecutionSettings = new OpenAIPromptExecutionSettings
+            {
+                Temperature = 0.0f,
+                TopP = 1.0f,
+                FunctionChoiceBehavior = FunctionChoiceBehavior.None()
+            };
+            var chatMessageContent = await chatCompletionService.GetChatMessageContentAsync(
+                chatHistory,
+                openAIPromptExecutionSettings,
+                cancellationToken: cancellationToken);
+            metadata.Topic = chatMessageContent.Content;
+            activity?.SetTag("topic.length", metadata.Topic?.Length ?? 0);
+        }
+        catch (Exception e)
         {
-            Temperature = 0.0f,
-            TopP = 1.0f,
-            FunctionChoiceBehavior = FunctionChoiceBehavior.None()
-        };
-        var chatMessageContent = await chatCompletionService.GetChatMessageContentAsync(
-            chatHistory,
-            openAIPromptExecutionSettings,
-            cancellationToken: cancellationToken);
-        metadata.Topic = chatMessageContent.Content;
+            activity?.SetStatus(ActivityStatusCode.Error, e.Message);
+            logger.LogError(e, "Failed to generate chat title");
+        }
     }
 }

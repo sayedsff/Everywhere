@@ -32,7 +32,12 @@
     <PackageReference Include="Microsoft.SemanticKernel.Plugins.Web"/>
     <PackageReference Include="ModelContextProtocol"/>
     <PackageReference Include="Nito.AsyncEx"/>
+    <PackageReference Include="OpenTelemetry"/>
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting"/>
     <PackageReference Include="PuppeteerSharp"/>
+    <PackageReference Include="Sentry"/>
+    <PackageReference Include="Sentry.OpenTelemetry"/>
+    <PackageReference Include="Sentry.Serilog" />
     <PackageReference Include="Serilog"/>
     <PackageReference Include="Serilog.Extensions.Logging"/>
     <PackageReference Include="Serilog.Sinks.Console"/>

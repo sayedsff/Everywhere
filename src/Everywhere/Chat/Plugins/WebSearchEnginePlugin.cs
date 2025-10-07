@@ -169,7 +169,7 @@ public partial class WebSearchEnginePlugin : BuiltInChatPlugin
     [Description("Snapshot accessibility of a web page via Puppeteer, returning a json of the page content and metadata.")]
     private async Task<string> WebSnapshotAsync([Description("Web page URL to snapshot")] string url, CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation("Taking web snapshot of URL: {Url}", url);
+        _logger.LogInformation("Taking web snapshot...");
 
         _browserDisposer.Cancel();
         _browserLock.Enter();
@@ -205,7 +205,7 @@ public partial class WebSearchEnginePlugin : BuiltInChatPlugin
                         await browserFetcher.DownloadAsync(buildId);
                     }
 
-                    _logger.LogInformation("Using Puppeteer browser executable at: {ExecutablePath}", executablePath);
+                    _logger.LogInformation("Using Puppeteer browser executable at: {ExecutablePath}", executablePath.SanitizePath());
                     var launcher = new Launcher(_loggerFactory);
                     _browser = await launcher.LaunchAsync(
                         new LaunchOptions
@@ -220,7 +220,6 @@ public partial class WebSearchEnginePlugin : BuiltInChatPlugin
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError(e, "Failed to download or launch Puppeteer browser.");
                     throw new InvalidOperationException("Failed to download or launch Puppeteer browser.", e);
                 }
             }

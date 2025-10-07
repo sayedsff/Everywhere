@@ -121,7 +121,7 @@ public partial class ChatContextManager : ObservableObject, IChatContextManager,
         lock (_saveBuffer) _saveBuffer.Add(sender);
         _saveDebounceExecutor.Trigger();
 
-        CreateNewCommand.NotifyCanExecuteChanged();
+        Dispatcher.UIThread.InvokeOnDemand(CreateNewCommand.NotifyCanExecuteChanged);
     }
 
     [MemberNotNull(nameof(_current))]
