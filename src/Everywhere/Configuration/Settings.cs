@@ -172,6 +172,16 @@ public partial class CommonSettings : SettingsCategory
         }
     }
 
+    public bool DiagnosticData
+    {
+        get => !Entrance.SendOnlyNecessaryTelemetry;
+        set
+        {
+            Entrance.SendOnlyNecessaryTelemetry = !value;
+            OnPropertyChanged();
+        }
+    }
+
     private static void ShowErrorToast(Exception ex) => ServiceLocator.Resolve<ToastManager>()
         .CreateToast(LocaleKey.Common_Error.I18N())
         .WithContent(ex.GetFriendlyMessage())
@@ -326,6 +336,9 @@ public partial class InternalSettings : SettingsCategory
 
     [ObservableProperty]
     public partial bool IsChatFloatingWindowPinned { get; set; }
+
+    [ObservableProperty]
+    public partial string? ChatInputBoxText { get; set; }
 }
 
 public static class SettingsExtensions
