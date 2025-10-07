@@ -620,7 +620,7 @@
         <value>Check for updates</value>
     </data>
     <data name="Settings_Common_SoftwareUpdate_TextBlock_Run1_Text" xml:space="preserve">
-        <value>Current version: v{0}</value>
+        <value>Current version: {0}</value>
     </data>
     <data name="Settings_Common_SoftwareUpdate_TextBlock_Run2_Text" xml:space="preserve">
         <value>Last check time: </value>
@@ -629,7 +629,7 @@
         <value>Release notes</value>
     </data>
     <data name="Settings_Common_SoftwareUpdate_PerformUpdateButton_Content" xml:space="preserve">
-        <value>Update to v</value>
+        <value>Update to </value>
     </data>
     <data name="Common_Unknown" xml:space="preserve">
         <value>Unknown</value>
@@ -638,7 +638,7 @@
         <value>Everywhere is already the latest version.</value>
     </data>
     <data name="Settings_Common_SoftwareUpdate_Toast_NewVersionFound" xml:space="preserve">
-        <value>New version v{0} found.</value>
+        <value>New version {0} found.</value>
     </data>
     <data name="Settings_Common_SoftwareUpdate_Header" xml:space="preserve">
         <value>Software Update</value>

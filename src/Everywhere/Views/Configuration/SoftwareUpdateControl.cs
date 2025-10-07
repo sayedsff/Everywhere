@@ -30,63 +30,71 @@ public class SoftwareUpdateControl : StackPanel
         Orientation = Orientation.Horizontal;
         Children.AddRange(
         [
-            new TextBlock
+            new StackPanel
             {
-                Inlines =
-                [
-                    new Run
+                Children =
+                {
+                    new TextBlock
                     {
-                        [!Run.TextProperty] = new FormattedDynamicResourceKey(
-                            LocaleKey.Settings_Common_SoftwareUpdate_TextBlock_Run1_Text,
-                            new DirectResourceKey(softwareUpdater.CurrentVersion.ToString(3))).ToBinding()
+                        [!TextBlock.TextProperty] = new FormattedDynamicResourceKey(
+                                LocaleKey.Settings_Common_SoftwareUpdate_TextBlock_Run1_Text,
+                                new DirectResourceKey(softwareUpdater.CurrentVersion.ToString(3)))
+                            .ToBinding()
                     },
-                    new LineBreak(),
-                    new Run
+                    new StackPanel
                     {
-                        [!Run.TextProperty] = new DynamicResourceKey(LocaleKey.Settings_Common_SoftwareUpdate_TextBlock_Run2_Text).ToBinding()
-                    },
-                    new Run
-                    {
-                        [!Run.TextProperty] = new Binding
+                        Orientation = Orientation.Horizontal,
+                        Children =
                         {
-                            Path = $"{nameof(Settings.Common)}.{nameof(Settings.Common.LastUpdateCheckTime)}",
-                            Source = settings,
-                            Converter = CommonConverters.DateTimeOffsetToString,
-                            ConverterParameter = "G",
-                            Mode = BindingMode.OneWay
-                        }
-                    },
-                    new LineBreak(),
-                    new InlineUIContainer
-                    {
-                        Child = new Button
-                        {
-                            Classes = { "Ghost" },
-                            Content = new TextBlock
+                            new TextBlock
                             {
-                                Inlines =
-                                [
-                                    new Run
-                                    {
-                                        TextDecorations = TextDecorations.Underline,
-                                        [!TextElement.ForegroundProperty] = new DynamicResourceExtension("InfoColor"),
-                                        [!Run.TextProperty] = new DynamicResourceKey(
-                                            LocaleKey.Settings_Common_SoftwareUpdate_TextBlock_ReleaseNotes_Text).ToBinding()
-                                    }
-                                ]
+                                [!TextBlock.TextProperty] =
+                                    new DynamicResourceKey(LocaleKey.Settings_Common_SoftwareUpdate_TextBlock_Run2_Text).ToBinding()
                             },
-                            Command = new AsyncRelayCommand(() =>
-                                ServiceLocator.Resolve<ILauncher>()
-                                    .LaunchUriAsync(new Uri("https://github.com/DearVa/Everywhere/releases", UriKind.Absolute))
-                            ),
-                            CornerRadius = new CornerRadius(1),
-                            Height = double.NaN,
-                            MinHeight = 0,
-                            Padding = new Thickness(),
+                            new TextBlock
+                            {
+                                [!TextBlock.TextProperty] = new Binding
+                                {
+                                    Path = $"{nameof(Settings.Common)}.{nameof(Settings.Common.LastUpdateCheckTime)}",
+                                    Source = settings,
+                                    Converter = CommonConverters.DateTimeOffsetToString,
+                                    ConverterParameter = "G",
+                                    Mode = BindingMode.OneWay
+                                }
+                            },
                         }
-                    }
-                ],
-                VerticalAlignment = VerticalAlignment.Center,
+                    },
+                    new Button
+                    {
+                        Classes = { "Ghost" },
+                        HorizontalAlignment = HorizontalAlignment.Left,
+                        Content = new TextBlock
+                        {
+                            Inlines =
+                            [
+                                new Run
+                                {
+                                    TextDecorations = TextDecorations.Underline,
+                                    [!TextElement.ForegroundProperty] = new DynamicResourceExtension("InfoColor"),
+                                    [!Run.TextProperty] = new DynamicResourceKey(
+                                            LocaleKey.Settings_Common_SoftwareUpdate_TextBlock_ReleaseNotes_Text)
+                                        .ToBinding()
+                                }
+                            ]
+                        },
+                        Command = new AsyncRelayCommand(() =>
+                            ServiceLocator.Resolve<ILauncher>()
+                                .LaunchUriAsync(
+                                    new Uri(
+                                        "https://github.com/DearVa/Everywhere/releases",
+                                        UriKind.Absolute))
+                        ),
+                        CornerRadius = new CornerRadius(1),
+                        Height = double.NaN,
+                        MinHeight = 0,
+                        Padding = new Thickness(),
+                    },
+                }
             },
             new Button
             {
