@@ -1,7 +1,24 @@
+## [v0.3.3](https://github.com/DearVa/Everywhere/releases/tag/v0.3.3) - 2025-10-08
+
+### ✨ New Features
+- Added telemetry to help us improve. See [Data and Privacy](https://github.com/DearVa/Everywhere/blob/main/DATA_AND_PRIVACY.md)
+- Unsent messages will be saved automatically
+
+### 🔄️ Changed
+- Improved sidebar UI and animation
+
+### 🐞 Fixed
+- Fixed update message in settings page may disappear when fetching new version
+
+**Full Changelog**: https://github.com/DearVa/Everywhere/compare/v0.3.2...v0.3.3
+
+
+
 ## [v0.3.2](https://github.com/DearVa/Everywhere/releases/tag/v0.3.2) - 2025-10-05
 
 ### 🐞 Fixed
-- (Windows) Fixed powershell plugin missing modules 
+- Fixed chat input box watermark behavior error
+- (Windows) Fixed powershell plugin missing modules
 
 **Full Changelog**: https://github.com/DearVa/Everywhere/compare/v0.3.1...v0.3.2
 
