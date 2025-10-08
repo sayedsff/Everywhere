@@ -36,7 +36,7 @@ public partial class WebSearchEnginePlugin : BuiltInChatPlugin
     private readonly ILogger<WebSearchEnginePlugin> _logger;
     private readonly DebounceExecutor<WebSearchEnginePlugin> _browserDisposer;
     private readonly JsonSerializerOptions _jsonSerializerOptions = new() { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
-    private readonly Lock _browserLock = new();
+    private readonly SemaphoreSlim _browserLock = new(1, 1);
 
     private IWebSearchEngineConnector? _connector;
     private IBrowser? _browser;
@@ -57,7 +57,8 @@ public partial class WebSearchEnginePlugin : BuiltInChatPlugin
             () => this,
             static that =>
             {
-                lock (that._browserLock)
+                that._browserLock.Wait();
+                try
                 {
                     that._logger.LogDebug("Disposing browser after inactivity.");
 
@@ -73,6 +74,10 @@ public partial class WebSearchEnginePlugin : BuiltInChatPlugin
                         that._browserProcess.Kill();
                         that._browserProcess = null;
                     }
+                }
+                finally
+                {
+                    that._browserLock.Release();
                 }
             },
             TimeSpan.FromMinutes(5)); // Dispose browser after 5 minutes of inactivity
@@ -172,7 +177,7 @@ public partial class WebSearchEnginePlugin : BuiltInChatPlugin
         _logger.LogDebug("Taking web snapshot...");
 
         _browserDisposer.Cancel();
-        _browserLock.Enter();
+        await _browserLock.WaitAsync(cancellationToken);
 
         try
         {
@@ -262,7 +267,7 @@ public partial class WebSearchEnginePlugin : BuiltInChatPlugin
         finally
         {
             _browserDisposer.Trigger();
-            _browserLock.Exit();
+            _browserLock.Release();
         }
 
         async ValueTask<string?> TestUrlConnectionAsync(string testUrl)
