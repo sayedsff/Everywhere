@@ -16,7 +16,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
-using Microsoft.SemanticKernel.Connectors.OpenAI;
 using OpenAI.Chat;
 using ZLinq;
 using ChatMessageContent = Microsoft.SemanticKernel.ChatMessageContent;
@@ -35,11 +34,11 @@ public class ChatService(
     ILogger<ChatService> logger
 ) : IChatService
 {
-    private static readonly ActivitySource ActivitySource = new(typeof(ChatService).FullName.NotNull());
+    private readonly ActivitySource _activitySource = new(typeof(ChatService).FullName.NotNull());
 
     public async Task SendMessageAsync(UserChatMessage userMessage, CancellationToken cancellationToken)
     {
-        using var activity = ActivitySource.StartActivity();
+        using var activity = _activitySource.StartActivity();
 
         var chatContext = chatContextManager.Current;
         activity?.SetTag("chat.context.id", chatContext.Metadata.Id);
@@ -62,7 +61,7 @@ public class ChatService(
 
     public async Task RetryAsync(ChatMessageNode node, CancellationToken cancellationToken)
     {
-        using var activity = ActivitySource.StartActivity();
+        using var activity = _activitySource.StartActivity();
         activity?.SetTag("chat.context.id", node.Context.Metadata.Id);
 
         if (node.Message.Role != AuthorRole.Assistant)
@@ -83,7 +82,7 @@ public class ChatService(
 
     private IKernelMixin CreateKernelMixin()
     {
-        using var activity = ActivitySource.StartActivity();
+        using var activity = _activitySource.StartActivity();
 
         try
         {
@@ -100,13 +99,13 @@ public class ChatService(
         }
     }
 
-    private async static Task ProcessUserChatMessageAsync(
+    private async Task ProcessUserChatMessageAsync(
         IKernelMixin kernelMixin,
         ChatContext chatContext,
         UserChatMessage userChatMessage,
         CancellationToken cancellationToken)
     {
-        using var activity = ActivitySource.StartActivity();
+        using var activity = _activitySource.StartActivity();
         activity?.SetTag("chat.context.id", chatContext.Metadata.Id);
 
         var attachmentTagValues = activity is null ? null : new List<object>();
@@ -177,7 +176,7 @@ public class ChatService(
                 () =>
                 {
                     // ReSharper disable once ExplicitCallerInfoArgument
-                    using var builderActivity = ActivitySource.StartActivity("BuildVisualTreeXml");
+                    using var builderActivity = _activitySource.StartActivity("BuildVisualTreeXml");
 
                     var xml = xmlBuilder.BuildXml(cancellationToken);
                     var builtVisualElements = xmlBuilder.BuiltVisualElements;
@@ -248,7 +247,7 @@ public class ChatService(
     /// <exception cref="NotSupportedException"></exception>
     private Kernel BuildKernel(IKernelMixin kernelMixin, ChatContext chatContext)
     {
-        using var activity = ActivitySource.StartActivity();
+        using var activity = _activitySource.StartActivity();
 
         var builder = Kernel.CreateBuilder();
 
@@ -276,7 +275,7 @@ public class ChatService(
         AssistantChatMessage assistantChatMessage,
         CancellationToken cancellationToken)
     {
-        using var activity = ActivitySource.StartActivity();
+        using var activity = _activitySource.StartActivity();
         activity?.SetTag("chat.context.id", chatContext.Metadata.Id);
 
         try
@@ -312,7 +311,7 @@ public class ChatService(
                 var promptExecutionSettings = kernelMixin.GetPromptExecutionSettings();
 
                 // ReSharper disable once ExplicitCallerInfoArgument
-                using (var llmStreamActivity = ActivitySource.StartActivity("ChatCompletionService.GetStreamingChatMessageContents"))
+                using (var llmStreamActivity = _activitySource.StartActivity("ChatCompletionService.GetStreamingChatMessageContents"))
                 {
                     llmStreamActivity?.SetTag("chat.context.id", chatContext.Metadata.Id);
 
@@ -428,7 +427,7 @@ public class ChatService(
                     foreach (var functionCallContent in functionCallContentGroup)
                     {
                         // ReSharper disable once ExplicitCallerInfoArgument
-                        using var functionCallActivity = ActivitySource.StartActivity("Tool.InvokeFunction");
+                        using var functionCallActivity = _activitySource.StartActivity("Tool.InvokeFunction");
                         functionCallActivity?.SetTag("tool.function_name", functionCallContent.FunctionName);
 
                         functionCallChatMessage.Calls.Add(functionCallContent);
@@ -480,6 +479,7 @@ public class ChatService(
                 // we can generate a title for the chat context.
                 GenerateTitleAsync(
                     kernelMixin.ChatCompletionService,
+                    kernelMixin.GetPromptExecutionSettings(),
                     userMessage,
                     assistantMessage,
                     chatContext.Metadata,
@@ -620,12 +620,13 @@ public class ChatService(
 
     private async Task GenerateTitleAsync(
         IChatCompletionService chatCompletionService,
+        PromptExecutionSettings promptExecutionSettings,
         string userMessage,
         string assistantMessage,
         ChatContextMetadata metadata,
         CancellationToken cancellationToken)
     {
-        using var activity = ActivitySource.StartActivity();
+        using var activity = _activitySource.StartActivity();
 
         try
         {
@@ -647,15 +648,9 @@ public class ChatService(
                             { "SystemLanguage", () => settings.Common.Language }
                         })),
             };
-            var openAIPromptExecutionSettings = new OpenAIPromptExecutionSettings
-            {
-                Temperature = 0.0f,
-                TopP = 1.0f,
-                FunctionChoiceBehavior = FunctionChoiceBehavior.None()
-            };
             var chatMessageContent = await chatCompletionService.GetChatMessageContentAsync(
                 chatHistory,
-                openAIPromptExecutionSettings,
+                promptExecutionSettings,
                 cancellationToken: cancellationToken);
             metadata.Topic = chatMessageContent.Content;
             activity?.SetTag("topic.length", metadata.Topic?.Length ?? 0);
