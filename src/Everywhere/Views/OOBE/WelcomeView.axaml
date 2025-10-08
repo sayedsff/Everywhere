@@ -281,7 +281,7 @@
           ColumnSpacing="8">
           <Button
             Classes="Secondary" Grid.Column="0"
-            Command="{Binding SendOnlyNecessaryTelemetry}"
+            Command="{Binding SendOnlyNecessaryTelemetryCommand}"
             Content="{I18N {x:Static LocaleKey.WelcomeView_SendOnlyNecessaryDataButton_Content}}"/>
           <Button
             Classes="Primary" Grid.Column="1"

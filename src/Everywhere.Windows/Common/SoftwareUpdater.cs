@@ -120,7 +120,7 @@ public sealed partial class SoftwareUpdater(
 
         if (LatestVersion is null || LatestVersion <= CurrentVersion || _latestAsset is not { } asset)
         {
-            logger.LogInformation("No new version available to update.");
+            logger.LogDebug("No new version available to update.");
             return;
         }
 
@@ -158,12 +158,12 @@ public sealed partial class SoftwareUpdater(
         {
             if (fileInfo.Length == asset.Size && string.Equals(await HashFileAsync(), asset.Digest, StringComparison.OrdinalIgnoreCase))
             {
-                logger.LogInformation("Asset {AssetName} already exists and is valid, skipping download.", asset.Name);
+                logger.LogDebug("Asset {AssetName} already exists and is valid, skipping download.", asset.Name);
                 progress.Report(1.0);
                 return assetDownloadPath;
             }
 
-            logger.LogInformation("Asset {AssetName} exists but is invalid, redownloading.", asset.Name);
+            logger.LogDebug("Asset {AssetName} exists but is invalid, redownloading.", asset.Name);
         }
 
         var response = await GetResponseAsync(asset.DownloadUrl);

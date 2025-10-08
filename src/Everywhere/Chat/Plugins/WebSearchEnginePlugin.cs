@@ -59,7 +59,7 @@ public partial class WebSearchEnginePlugin : BuiltInChatPlugin
             {
                 lock (that._browserLock)
                 {
-                    that._logger.LogInformation("Disposing browser after inactivity.");
+                    that._logger.LogDebug("Disposing browser after inactivity.");
 
                     if (that._browser is null) return;
                     that._browser.CloseAsync();
@@ -102,7 +102,7 @@ public partial class WebSearchEnginePlugin : BuiltInChatPlugin
     {
         if (_connector is not null) return;
 
-        _logger.LogInformation("Ensuring web search engine connector is initialized.");
+        _logger.LogDebug("Ensuring web search engine connector is initialized.");
 
         if (_settings.SelectedWebSearchEngineProvider is not { } provider)
         {
@@ -157,7 +157,7 @@ public partial class WebSearchEnginePlugin : BuiltInChatPlugin
         [Description("Number of results to skip")] int offset = 0,
         CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation("Performing web search with query: {Query}, count: {Count}, offset: {Offset}", query, count, offset);
+        _logger.LogDebug("Performing web search with query: {Query}, count: {Count}, offset: {Offset}", query, count, offset);
 
         EnsureConnector();
 
@@ -169,7 +169,7 @@ public partial class WebSearchEnginePlugin : BuiltInChatPlugin
     [Description("Snapshot accessibility of a web page via Puppeteer, returning a json of the page content and metadata.")]
     private async Task<string> WebSnapshotAsync([Description("Web page URL to snapshot")] string url, CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation("Taking web snapshot...");
+        _logger.LogDebug("Taking web snapshot...");
 
         _browserDisposer.Cancel();
         _browserLock.Enter();
@@ -197,7 +197,7 @@ public partial class WebSearchEnginePlugin : BuiltInChatPlugin
                     var executablePath = browserFetcher.GetExecutablePath(buildId);
                     if (!File.Exists(executablePath))
                     {
-                        _logger.LogInformation("Downloading Puppeteer browser to cache directory: {CachePath}", cachePath);
+                        _logger.LogDebug("Downloading Puppeteer browser to cache directory: {CachePath}", cachePath);
                         browserFetcher.BaseUrl =
                             await TestUrlConnectionAsync("https://storage.googleapis.com/chromium-browser-snapshots") ??
                             await TestUrlConnectionAsync("https://cdn.npmmirror.com/binaries/chromium-browser-snapshots") ??
@@ -205,7 +205,7 @@ public partial class WebSearchEnginePlugin : BuiltInChatPlugin
                         await browserFetcher.DownloadAsync(buildId);
                     }
 
-                    _logger.LogInformation("Using Puppeteer browser executable at: {ExecutablePath}", executablePath.SanitizePath());
+                    _logger.LogDebug("Using Puppeteer browser executable at: {ExecutablePath}", executablePath);
                     var launcher = new Launcher(_loggerFactory);
                     _browser = await launcher.LaunchAsync(
                         new LaunchOptions

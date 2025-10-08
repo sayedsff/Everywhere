@@ -72,6 +72,7 @@ public static class Entrance
         {
             o.Dsn = "https://25114ca299b74da64aed26ffc2ac072e@o4510145762689024.ingest.us.sentry.io/4510145814069248";
             o.AutoSessionTracking = true;
+            o.Experimental.EnableLogs = true;
 #if DEBUG
             o.TracesSampleRate = 1.0;
             o.Environment = "debug";
@@ -83,19 +84,7 @@ public static class Entrance
             o.Release = typeof(Entrance).Assembly.GetName().Version?.ToString();
 
             o.UseOpenTelemetry();
-            o.SetBeforeSend(evt =>
-            {
-                if (evt.DebugImages != null)
-                {
-                    foreach (var img in evt.DebugImages)
-                    {
-                        img.CodeFile = img.CodeFile.SanitizePath();
-                        img.DebugFile = img.DebugFile.SanitizePath();
-                    }
-                }
-
-                return evt;
-            });
+            o.SetBeforeSend(evt => evt.Exception is OperationCanceledException ? null : evt);
             o.SetBeforeSendTransaction(transaction => SendOnlyNecessaryTelemetry ? null : transaction);
             o.SetBeforeBreadcrumb(breadcrumb => SendOnlyNecessaryTelemetry ? null : breadcrumb);
         });
@@ -132,7 +121,7 @@ public static class Entrance
                 new JsonFormatter(),
                 Path.Combine(dataPath, "logs", ".jsonl"),
                 rollingInterval: RollingInterval.Day)
-            .WriteTo.Sentry()
+            .WriteTo.Sentry(LogEventLevel.Information, LogEventLevel.Information)
             .CreateLogger();
     }
 

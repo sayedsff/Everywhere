@@ -74,9 +74,9 @@ public class FileSystemPlugin : BuiltInChatPlugin
     [Description("Lists files (including directories) in a specified path.")]
     private ListFilesResult ListFiles(string path, int skip = 0, int maxCount = 100, ListFilesOrderBy orderBy = ListFilesOrderBy.Name)
     {
-        _logger.LogInformation(
+        _logger.LogDebug(
             "Listing files in path: {Path}, skip: {Skip}, maxCount: {MaxCount}, orderBy: {OrderBy}",
-            path.SanitizePath(),
+            path,
             skip,
             maxCount,
             orderBy);
@@ -106,7 +106,7 @@ public class FileSystemPlugin : BuiltInChatPlugin
     [Description("Gets information about a file or directory at the specified path.")]
     private FileInformation GetFileInformation(string path)
     {
-        _logger.LogInformation("Getting file information for path: {Path}", path.SanitizePath());
+        _logger.LogDebug("Getting file information for path: {Path}", path);
 
         if (string.IsNullOrWhiteSpace(path))
         {
@@ -132,9 +132,9 @@ public class FileSystemPlugin : BuiltInChatPlugin
         "Binary files will read as hex string, 16 bytes per line.")]
     private async Task<ReadTextFileResult> ReadTextFileAsync(string path, int startLine = 0, int maxLines = 500, string encoding = "utf-8")
     {
-        _logger.LogInformation(
+        _logger.LogDebug(
             "Reading text file at path: {Path}, startLine: {StartLine}, maxLines: {MaxLines}, encoding: {Encoding}",
-            path.SanitizePath(),
+            path,
             startLine,
             maxLines,
             encoding);
@@ -207,7 +207,7 @@ public class FileSystemPlugin : BuiltInChatPlugin
     [Description("Moves or renames a file or directory from sourcePath to destinationPath.")]
     private bool MoveFile(string sourcePath, string destinationPath)
     {
-        _logger.LogInformation("Moving file from {SourcePath} to {DestinationPath}", sourcePath.SanitizePath(), destinationPath.SanitizePath());
+        _logger.LogDebug("Moving file from {SourcePath} to {DestinationPath}", sourcePath, destinationPath);
 
         if (string.IsNullOrWhiteSpace(sourcePath) || string.IsNullOrWhiteSpace(destinationPath))
         {
@@ -234,7 +234,7 @@ public class FileSystemPlugin : BuiltInChatPlugin
     [Description("Deletes a file or an directory at the specified path.")]
     private bool DeleteFile(string path, bool recursive = false)
     {
-        _logger.LogInformation("Deleting file at {Path}", path.SanitizePath());
+        _logger.LogDebug("Deleting file at {Path}", path);
 
         if (string.IsNullOrWhiteSpace(path))
         {
@@ -264,7 +264,7 @@ public class FileSystemPlugin : BuiltInChatPlugin
         [Description("If true, throws an error if the file already exists. If false, overwrites the existing file.")]
         bool errorIfExists = true)
     {
-        _logger.LogInformation("Creating file at {Path}, errorIfExists: {ErrorIfExists}", path.SanitizePath(), errorIfExists);
+        _logger.LogDebug("Creating file at {Path}, errorIfExists: {ErrorIfExists}", path, errorIfExists);
 
         if (string.IsNullOrWhiteSpace(path))
         {
@@ -283,7 +283,7 @@ public class FileSystemPlugin : BuiltInChatPlugin
     [Description("Creates a new directory at the specified path.")]
     private void CreateDirectory(string path)
     {
-        _logger.LogInformation("Creating directory at {Path}", path.SanitizePath());
+        _logger.LogDebug("Creating directory at {Path}", path);
 
         if (string.IsNullOrWhiteSpace(path))
         {
@@ -301,7 +301,7 @@ public class FileSystemPlugin : BuiltInChatPlugin
     [Description("Writes content to a text file at the specified path. Binary files are not supported.")]
     private async Task WriteTextFile(string path, string content, string encoding = "utf-8", bool append = false)
     {
-        _logger.LogInformation("Writing text file at {Path}, encoding: {Encoding}, append: {Append}", path.SanitizePath(), encoding, append);
+        _logger.LogDebug("Writing text file at {Path}, encoding: {Encoding}, append: {Append}", path, encoding, append);
 
         if (string.IsNullOrWhiteSpace(path))
         {

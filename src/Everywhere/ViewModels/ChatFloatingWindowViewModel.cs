@@ -32,6 +32,15 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
             // notify property changed even if the value is the same
             // so that the view can update its visibility and topmost
             OnPropertyChanged();
+
+            if (value)
+            {
+                _openActivity ??= _activitySource.StartActivity();
+            }
+            else
+            {
+                DisposeCollector.DisposeToDefault(ref _openActivity);
+            }
         }
     }
 
@@ -55,6 +64,12 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
 
     private readonly ObservableList<ChatAttachment> _chatAttachments = [];
     private readonly ReusableCancellationTokenSource _cancellationTokenSource = new();
+    private readonly ActivitySource _activitySource = new(typeof(ChatFloatingWindowViewModel).FullName.NotNull());
+
+    /// <summary>
+    /// Start an activity when the floating window is opened, and dispose it when closed.
+    /// </summary>
+    private Activity? _openActivity;
 
     public ChatFloatingWindowViewModel(
         Settings settings,
@@ -198,7 +213,7 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
             var formats = await Clipboard.GetFormatsAsync();
             if (formats.Length == 0)
             {
-                _logger.LogInformation("Clipboard is empty.");
+                _logger.LogWarning("Clipboard is empty.");
                 return;
             }
 
@@ -285,7 +300,7 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
         if (files.Count <= 0) return;
         if (files[0].TryGetLocalPath() is not { } filePath)
         {
-            _logger.LogInformation("File path is not available.");
+            _logger.LogWarning("File path is not available.");
             return;
         }
 

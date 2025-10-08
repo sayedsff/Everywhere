@@ -428,6 +428,7 @@ public class ChatService(
                     {
                         // ReSharper disable once ExplicitCallerInfoArgument
                         using var functionCallActivity = _activitySource.StartActivity("Tool.InvokeFunction");
+                        functionCallActivity?.SetTag("tool.plugin_name", functionCallContent.PluginName);
                         functionCallActivity?.SetTag("tool.function_name", functionCallContent.FunctionName);
 
                         functionCallChatMessage.Calls.Add(functionCallContent);

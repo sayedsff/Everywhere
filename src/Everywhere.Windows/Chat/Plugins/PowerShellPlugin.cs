@@ -45,7 +45,7 @@ public class PowerShellPlugin : BuiltInChatPlugin
         [Description("A concise description for user, explaining what you are doing")] string description,
         [Description("Signle or multi-line")] string script)
     {
-        _logger.LogInformation("Executing PowerShell script with description: {Description}", description);
+        _logger.LogDebug("Executing PowerShell script with description: {Description}", description);
 
         if (string.IsNullOrWhiteSpace(script))
         {

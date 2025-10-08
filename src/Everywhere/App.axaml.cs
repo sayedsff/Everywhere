@@ -95,6 +95,8 @@ public class App : Application
                 NativeMessageBoxButtons.Ok,
                 NativeMessageBoxIcon.Error);
         }
+
+        Log.Logger.Information("Application started");
     }
 
     public override void OnFrameworkInitializationCompleted()

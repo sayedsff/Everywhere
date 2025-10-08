@@ -51,7 +51,7 @@ public class WatchdogManager : IWatchdogManager, IAsyncInitializer
             PipeOptions.Asynchronous);
 
         // 1. Start the Watchdog process.
-        _logger.LogInformation("Launching Watchdog process with pipe name: {PipeName}", pipeName);
+        _logger.LogDebug("Launching Watchdog process with pipe name: {PipeName}", pipeName);
         _watchdogProcess = Process.Start(new ProcessStartInfo
         {
             FileName = "Everywhere.Watchdog.exe",
@@ -69,7 +69,7 @@ public class WatchdogManager : IWatchdogManager, IAsyncInitializer
 
         // 2. Asynchronously wait for the Watchdog client to connect.
         await _serverStream.WaitForConnectionAsync();
-        _logger.LogInformation("Watchdog process connected.");
+        _logger.LogDebug("Watchdog process connected.");
 
         void LogOutput()
         {
@@ -78,7 +78,7 @@ public class WatchdogManager : IWatchdogManager, IAsyncInitializer
             {
                 if (!string.IsNullOrEmpty(e.Data))
                 {
-                    watchdogLogger.LogInformation("{Message}", e.Data);
+                    watchdogLogger.LogDebug("{Message}", e.Data);
                 }
             };
             _watchdogProcess.ErrorDataReceived += (_, e) =>
