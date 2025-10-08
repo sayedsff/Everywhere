@@ -30,7 +30,7 @@ public class KernelMixinFactory : IKernelMixinFactory
         var apiKey = apiKeyOverride ?? modelProvider.ApiKey;
         if (_cachedKernelMixin is not null &&
             _cachedKernelMixin.Schema == modelProvider.Schema &&
-            _cachedKernelMixin.ModelId == modelDefinition.Id &&
+            _cachedKernelMixin.ModelId == modelDefinition.ModelId &&
             _cachedKernelMixin.Endpoint == modelProvider.Endpoint &&
             _cachedKernelMixin.ApiKey == apiKey)
         {
@@ -40,7 +40,7 @@ public class KernelMixinFactory : IKernelMixinFactory
         _cachedKernelMixin?.KernelMixin.Dispose();
         _cachedKernelMixin = new CachedKernelMixin(
             modelProvider.Schema,
-            modelDefinition.Id,
+            modelDefinition.ModelId,
             modelProvider.Endpoint,
             apiKey,
             modelProvider.Schema.ActualValue switch
@@ -81,7 +81,7 @@ public class KernelMixinFactory : IKernelMixinFactory
         public int MaxTokenTotal => definition.MaxTokens;
 
         private readonly OpenAIChatCompletionService _chatCompletionService = new(
-            definition.Id,
+            definition.ModelId,
             new Uri(provider.Endpoint, UriKind.Absolute),
             apiKey);
 
@@ -96,7 +96,7 @@ public class KernelMixinFactory : IKernelMixinFactory
 
         public PromptExecutionSettings GetPromptExecutionSettings(bool isToolRequired = false, bool isToolAutoInvoke = false) => new()
         {
-            ModelId = _definition.Id,
+            ModelId = _definition.ModelId,
             ExtensionData = new Dictionary<string, object>
             {
                 { "temperature", _settings.Temperature },
@@ -156,7 +156,7 @@ public class KernelMixinFactory : IKernelMixinFactory
         {
             _settings = settings;
             _definition = definition;
-            _client = new OllamaApiClient(provider.Endpoint, definition.Id);
+            _client = new OllamaApiClient(provider.Endpoint, definition.ModelId);
             ChatCompletionService = _client
                 .To<IChatClient>()
                 .AsBuilder()

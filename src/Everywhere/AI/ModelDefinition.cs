@@ -1,7 +1,7 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Everywhere.Configuration;
-using MessagePack;
 
 namespace Everywhere.AI;
 
@@ -68,7 +68,7 @@ public partial class ModelDefinition : ObservableObject
     /// This indicates the best (powerful but economical) model in the provider.
     /// </summary>
     [JsonIgnore]
-    [IgnoreMember]
+    [IgnoreDataMember]
     [HiddenSettingsItem]
     public bool IsDefault { get; set; }
 

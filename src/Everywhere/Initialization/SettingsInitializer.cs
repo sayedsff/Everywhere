@@ -552,62 +552,62 @@ public class SettingsInitializer : IAsyncInitializer
     /// <summary>
     /// Applies the model providers from the source list to the destination list, without override custom properties.
     /// </summary>
-    /// <param name="src"></param>
-    /// <param name="dst"></param>
-    private static void ApplyModelProviders(IList<ModelProvider> src, ObservableCollection<ModelProvider> dst)
+    /// <param name="srcList"></param>
+    /// <param name="dstList"></param>
+    private static void ApplyModelProviders(IList<ModelProvider> srcList, ObservableCollection<ModelProvider> dstList)
     {
         var propertyCache = new Dictionary<Type, PropertyInfo[]>();
 
-        foreach (var srcModelProvider in src)
+        foreach (var src in srcList)
         {
-            var dstModelProvider = dst.FirstOrDefault(p => p.Id == srcModelProvider.Id);
-            if (dstModelProvider is null)
+            var dst = dstList.FirstOrDefault(p => p.Id == src.Id);
+            if (dst is null)
             {
-                dst.Add(srcModelProvider);
+                dstList.Add(src);
             }
-            else
+            else if (src.Id != "custom")
             {
-                ApplyProperties(srcModelProvider, dstModelProvider, propertyCache);
-                ApplyModelDefinitions(srcModelProvider.ModelDefinitions, dstModelProvider.ModelDefinitions, propertyCache);
+                ApplyProperties(src, dst, propertyCache);
+                ApplyModelDefinitions(src.ModelDefinitions, dst.ModelDefinitions, propertyCache);
             }
         }
 
-        for (var i = dst.Count - 1; i >= 0; i--)
+        for (var i = dstList.Count - 1; i >= 0; i--)
         {
-            var dstModelProvider = dst[i];
-            if (src.All(p => p.Id != dstModelProvider.Id))
+            var dst = dstList[i];
+            if (srcList.All(p => p.Id != dst.Id))
             {
                 // Remove model provider if it does not exist in the source list
-                dst.RemoveAt(i);
+                dstList.RemoveAt(i);
             }
         }
     }
 
     private static void ApplyModelDefinitions(
-        IList<ModelDefinition> src,
-        ObservableCollection<ModelDefinition> dst,
+        IList<ModelDefinition> srcList,
+        ObservableCollection<ModelDefinition> dstList,
         Dictionary<Type, PropertyInfo[]> propertyCache)
     {
-        foreach (var srcModelDefinition in src)
+        foreach (var src in srcList)
         {
-            var dstModelDefinition = dst.FirstOrDefault(d => d.Id == srcModelDefinition.Id);
-            if (dstModelDefinition is null)
+            var dst = dstList.FirstOrDefault(d => d.Id == src.Id);
+            if (dst is null)
             {
-                dst.Add(srcModelDefinition);
+                dstList.Add(src);
             }
-            else
+            else if (src.Id != "custom")
             {
-                ApplyProperties(srcModelDefinition, dstModelDefinition, propertyCache);
+                ApplyProperties(src, dst, propertyCache);
             }
         }
 
-        for (var i = dst.Count - 1; i >= 0; i--)
+        for (var i = dstList.Count - 1; i >= 0; i--)
         {
-            var dstModelDefinition = dst[i];
-            if (src.All(d => d.Id != dstModelDefinition.Id))
+            var dst = dstList[i];
+            if (srcList.All(d => d.Id != dst.Id))
             {
                 // Remove model definition if it does not exist in the source list
-                dst.RemoveAt(i);
+                dstList.RemoveAt(i);
             }
         }
     }
@@ -648,30 +648,30 @@ public class SettingsInitializer : IAsyncInitializer
         webSearchEngineSettings.SelectedWebSearchEngineProviderId ??= webSearchEngineSettings.WebSearchEngineProviders.FirstOrDefault()?.Id;
     }
 
-    private static void ApplySearchEngineProviders(IList<WebSearchEngineProvider> src, ObservableCollection<WebSearchEngineProvider> dst)
+    private static void ApplySearchEngineProviders(IList<WebSearchEngineProvider> srcList, ObservableCollection<WebSearchEngineProvider> dstList)
     {
         var propertyCache = new Dictionary<Type, PropertyInfo[]>();
 
-        foreach (var srcSearchEngineProvider in src)
+        foreach (var src in srcList)
         {
-            var dstSearchEngineProvider = dst.FirstOrDefault(p => p.Id == srcSearchEngineProvider.Id);
-            if (dstSearchEngineProvider is null)
+            var dst = dstList.FirstOrDefault(p => p.Id == src.Id);
+            if (dst is null)
             {
-                dst.Add(srcSearchEngineProvider);
+                dstList.Add(src);
             }
             else
             {
-                ApplyProperties(srcSearchEngineProvider, dstSearchEngineProvider, propertyCache);
+                ApplyProperties(src, dst, propertyCache);
             }
         }
 
-        for (var i = dst.Count - 1; i >= 0; i--)
+        for (var i = dstList.Count - 1; i >= 0; i--)
         {
-            var dstSearchEngineProvider = dst[i];
-            if (src.All(p => p.Id != dstSearchEngineProvider.Id))
+            var dst = dstList[i];
+            if (srcList.All(p => p.Id != dst.Id))
             {
                 // Remove search engine provider if it does not exist in the source list
-                dst.RemoveAt(i);
+                dstList.RemoveAt(i);
             }
         }
     }

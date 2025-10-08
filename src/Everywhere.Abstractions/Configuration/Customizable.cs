@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -26,6 +27,20 @@ public partial class Customizable<T> : ObservableObject where T : notnull
         get;
         set
         {
+            if (value is not null && value is not T)
+            {
+                // When setting from JSON deserialization, the value may be of a different type.
+                // Try to convert it to the correct type.
+                try
+                {
+                    value = (T)Convert.ChangeType(value, typeof(T));
+                }
+                catch
+                {
+                    value = default(T);
+                }
+            }
+
             if (!SetProperty(ref field, value)) return;
 
             OnPropertyChanged(nameof(ActualValue));
@@ -63,7 +78,9 @@ public partial class Customizable<T> : ObservableObject where T : notnull
         if (customValue is not null) CustomValue = customValue;
     }
 
-    [RelayCommand]
+    [IgnoreDataMember]
+    public IRelayCommand ResetCommand => field ??= new RelayCommand(Reset);
+
     public void Reset()
     {
         CustomValue = null;
