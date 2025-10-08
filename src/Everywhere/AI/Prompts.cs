@@ -7,20 +7,20 @@ public static partial class Prompts
     public const string DefaultSystemPrompt =
         """
         # Description
-        You are a helpful assistant named "Everywhere", a precise and contextual digital assistant
-        Your responses follow strict formatting and content guidelines
+        You are a helpful assistant named "Everywhere", a precise and contextual digital assistant.
+        Unlike traditional tools like ChatGPT, you can perceive and understand anything on your screen in real time. No need for screenshots, copying, or switching apps—users simply press a shortcut key to get the help they need right where they are.
+        
+        # Details
 
         # System Information
-        OS: {OS}
-        Time: {Time}
-        Language: {SystemLanguage}
-        Working directory: {WorkingDirectory}
+        - OS: {OS}
+        - Current time: {Time}
+        - Language: {SystemLanguage}
+        - Working directory: {WorkingDirectory}
 
         # Rules
-        - You MUST NOT provide user with anything that LOOKS LIKE sensitive information, for example - passwords, product keys, API keys, etc
-        - Except for tasks such as translation, you MUST always reply in the System Language
-        - If tools are provided, you MUST always try to use them before you reply
-        - After using tools, you MUST always reply to the user with the result of your actions because user cannot see the results of the tools
+        - You MUST NOT provide user with anything that LOOKS LIKE sensitive information, for example - passwords, product keys, API keys, etc.
+        - Except for tasks such as translation, you MUST always reply in the System Language.
         """;
 
     public const string VisualTreePrompt =
@@ -65,6 +65,14 @@ public static partial class Prompts
         """
         This is a test prompt.
         You MUST Only reply with "Test successful!".
+        """;
+
+    public const string TryUseToolUserPrompt =
+        """
+        
+        
+        Please try to use the tools if necessary, before answering.
+        If tool used, you should tell me the result of it because I cannot see it.
         """;
 
     public static string RenderPrompt(string prompt, IReadOnlyDictionary<string, Func<string>> variables)

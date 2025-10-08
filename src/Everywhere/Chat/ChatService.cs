@@ -48,7 +48,11 @@ public class ChatService(
         var kernelMixin = CreateKernelMixin();
 
         await ProcessUserChatMessageAsync(kernelMixin, chatContext, userMessage, cancellationToken);
-        userMessage.UserPrompt += "\n\nPlease try to use the tools if necessary, before answering.";
+
+        if (settings.Internal.IsToolCallEnabled)
+        {
+            userMessage.UserPrompt += Prompts.TryUseToolUserPrompt;
+        }
 
         var assistantChatMessage = new AssistantChatMessage { IsBusy = true };
         chatContext.Add(assistantChatMessage);
