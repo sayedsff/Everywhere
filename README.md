@@ -29,7 +29,7 @@ Every moment, Every place. Your AI - `Everywhere`
 
 ## About Everywhere
 
-**Everywhere** is an interactive AI assistant with context-aware capabilities. Unlike common tools such as ChatGPT and Claude Desktop, Everywhere is directly integrated into your desktop environment, perceiving your screen content and providing accurate and efficient responses. Additionally, Everywhere supports integration with multiple large language models (LLMs) and tools, offering a wealth of additional functionalities.
+**Everywhere** is an interactive AI assistant with context-aware capabilities, featuring a sleek, modern UI and powerful integrated functionality. Unlike traditional AI tools, Everywhere instantly perceives and understands anything on your screen. No need for screenshots, copying, or switching apps—just press a shortcut key to get the help you need right where you are, delivering seamless AI assistant support.
 
 ### 🌟 Experience Examples
 
@@ -176,8 +176,6 @@ Every moment, Every place. Your AI - `Everywhere`
 | macOS    | **Coming soon** |
 | Linux    | **Coming soon** |
 
----
-
 ## 🚀 Getting Started
 
 ### Installation
@@ -204,8 +202,6 @@ Document is in development. Contributions are welcomed.
 [![](https://dcbadge.limes.pink/api/server/5fyg6nE3yn)](https://discord.gg/5fyg6nE3yn)
 [![Join QQ Group][QQ-Group]](https://qm.qq.com/cgi-bin/qm/qr?k=wp9aDBBnLc7pYATqT99tB-N2ZP2ETmJC&jump_from=webapi&authKey=97qUJfsQoI70dUNcgBZ0C3HCZeiEn8inLT7pzg8x+KinbQwfIrHFu3dB2+aHMbRD)
 
----
-
 ## 🤝 Contributing
 
 We welcome issues, feature ideas, and PRs! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
@@ -216,8 +212,6 @@ We welcome issues, feature ideas, and PRs! See [CONTRIBUTING.md](CONTRIBUTING.md
   <img src="https://contrib.rocks/image?repo=DearVa/Everywhere" alt="contrib.rocks image" />
 </a>
 
----
-
 ## 📄 License
 
 © DearVa, AuroraZiling, feast107 and contributors. All rights reserved.
@@ -225,8 +219,6 @@ We welcome issues, feature ideas, and PRs! See [CONTRIBUTING.md](CONTRIBUTING.md
 Distributed under the Apache 2.0 License. See [LICENSE](LICENSE) for more information.
 
 Third-Party Licenses: See [ThirdPartyNotices.txt](ThirdPartyNotices.txt) for details.
-
----
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

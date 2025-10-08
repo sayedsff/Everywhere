@@ -29,7 +29,7 @@
 
 ## 关于 Everywhere
 
-**Everywhere** 是一款具有上下文感知能力的交互式 AI 助手。与常见的 ChatGPT、Claude Desktop 等不同，Everywhere 直接集成到您的桌面环境中，感知您的屏幕内容，做出准确高效的回答。同时，Everywhere 还支持多种 LLM 和工具集成，提供更丰富的功能。
+**Everywhere** 是一款具备情境感知能力的交互式 AI 助手，拥有简洁现代的用户界面和强大的集成功能。与传统 AI 工具不同，Everywhere 能即时感知并理解您屏幕上的任何内容。无需截图、复制或切换应用——只需按下快捷键，即可在当前位置获得所需帮助，实现无缝的 AI 助手支持。
 
 ### 🌟 使用场景示例
 
@@ -176,12 +176,9 @@
 | macOS   | **即将到来**     |
 | Linux   | **即将到来**     |
 
----
-
 ## 🚀 快速开始
 
 ### 安装
-
 
 - Windows
   
@@ -204,8 +201,6 @@
 [![](https://dcbadge.limes.pink/api/server/5fyg6nE3yn)](https://discord.gg/5fyg6nE3yn)
 [![加入 QQ 群][QQ-Group]](https://qm.qq.com/cgi-bin/qm/qr?k=wp9aDBBnLc7pYATqT99tB-N2ZP2ETmJC&jump_from=webapi&authKey=97qUJfsQoI70dUNcgBZ0C3HCZeiEn8inLT7pzg8x+KinbQwfIrHFu3dB2+aHMbRD)
 
----
-
 ## 🤝 贡献方式
 
 欢迎提交 Issue、提出功能建议或贡献代码！请参考 [CONTRIBUTING.md](CONTRIBUTING.md) 查看具体指南。
@@ -216,8 +211,6 @@
   <img src="https://contrib.rocks/image?repo=DearVa/Everywhere" alt="贡献者图示" />
 </a>
 
----
-
 ## 📄 许可证
 
 © DearVa、AuroraZiling、feast107 和贡献者们。保留所有权利。
@@ -225,8 +218,6 @@
 本项目基于 Apache 2.0 许可证发布，详情请查阅 [LICENSE](LICENSE)。
 
 第三方许可证：参见 [ThirdPartyNotices.txt](ThirdPartyNotices.txt)。
-
----
 
 <p align="right">(<a href="#readme-top">返回顶部</a>)</p>
 
