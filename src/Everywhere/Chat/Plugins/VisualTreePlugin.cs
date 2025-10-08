@@ -38,8 +38,8 @@ public class VisualTreePlugin : BuiltInChatPlugin
     /// <param name="chatContext"></param>
     /// <returns></returns>
     public override IEnumerable<ChatFunction> SnapshotFunctions(ChatContext chatContext) =>
-        _settings.Model.SelectedModelDefinition?.IsImageInputSupported.ActualValue is not true &&
-        !_settings.Internal.IsImageEnabled &&
+        _settings.Model.SelectedModelDefinition?.IsImageInputSupported.ActualValue is not true ||
+        !_settings.Internal.IsImageEnabled ||
         chatContext.VisualElements.Count == 0 ?
             [] :
             base.SnapshotFunctions(chatContext);
