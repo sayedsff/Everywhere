@@ -1,3 +1,21 @@
+## [v0.3.4](https://github.com/DearVa/Everywhere/releases/tag/v0.3.4) - 2025-10-09
+
+### 🔄️ Changed
+- Improved user prompt for tool usage
+- Improved settings saving & loading logic
+- Added logging for telemetry
+- Removed unnecessary telemetry data
+
+### 🐞 Fixed
+- Fixed chat title generation for non-OpenAI models will fail
+- Fixed web search plugin may not work in some cases
+- Fixed custom model not saved or applied
+- Fixed visual tree plugin is not disabled correctly
+
+**Full Changelog**: https://github.com/DearVa/Everywhere/compare/v0.3.3...v0.3.4
+
+
+
 ## [v0.3.3](https://github.com/DearVa/Everywhere/releases/tag/v0.3.3) - 2025-10-08
 
 ### ✨ New Features
