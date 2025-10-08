@@ -1,6 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Everywhere.Configuration;
+using MessagePack;
 
 namespace Everywhere.AI;
 
@@ -67,6 +68,8 @@ public partial class ModelDefinition : ObservableObject
     /// This indicates the best (powerful but economical) model in the provider.
     /// </summary>
     [JsonIgnore]
+    [IgnoreMember]
+    [HiddenSettingsItem]
     public bool IsDefault { get; set; }
 
     public override bool Equals(object? obj) => obj is ModelDefinition other && Id == other.Id;
