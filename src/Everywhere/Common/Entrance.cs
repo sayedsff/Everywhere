@@ -1,5 +1,7 @@
 ﻿#if !DEBUG
 using Everywhere.Interop;
+#else
+#define DISABLE_TELEMETRY
 #endif
 
 using System.Diagnostics;
@@ -38,7 +40,9 @@ public static class Entrance
     public static void Initialize(string[] args)
     {
         InitializeApplicationMutex(args);
+#if !DISABLE_TELEMETRY
         InitializeTelemetry();
+#endif
         InitializeLogger();
         InitializeErrorHandling();
     }
@@ -121,7 +125,9 @@ public static class Entrance
                 new JsonFormatter(),
                 Path.Combine(dataPath, "logs", ".jsonl"),
                 rollingInterval: RollingInterval.Day)
+#if !DISABLE_TELEMETRY
             .WriteTo.Sentry(LogEventLevel.Error, LogEventLevel.Information)
+#endif
             .CreateLogger();
     }
 

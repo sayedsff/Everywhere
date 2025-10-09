@@ -14,7 +14,7 @@ public class HotkeyInitializer(
     ILogger<HotkeyInitializer> logger
 ) : IAsyncInitializer
 {
-    public int Priority => 0;
+    public AsyncInitializerPriority Priority => AsyncInitializerPriority.AfterSettings;
 
     public Task InitializeAsync()
     {

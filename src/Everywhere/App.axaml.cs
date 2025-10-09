@@ -80,7 +80,7 @@ public class App : Application
             foreach (var group in ServiceLocator
                        .Resolve<IEnumerable<IAsyncInitializer>>()
                        .GroupBy(i => i.Priority)
-                       .OrderByDescending(g => g.Key))
+                       .OrderBy(g => g.Key))
             {
                 Task.WhenAll(group.Select(i => i.InitializeAsync())).WaitOnDispatcherFrame();
             }

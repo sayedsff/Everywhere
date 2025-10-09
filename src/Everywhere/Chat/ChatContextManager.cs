@@ -8,6 +8,7 @@ using Everywhere.Configuration;
 using Everywhere.Storage;
 using Everywhere.Utilities;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel.ChatCompletion;
 using ObservableCollections;
 using ZLinq;
@@ -51,10 +52,12 @@ public partial class ChatContextManager : ObservableObject, IChatContextManager,
             // Avalonia will fuck up and crash immediately with IndexOutOfRangeException.
             // The whole call stack is inside Avalonia, so I can't do anything about it.
             // The only workaround is to invoke the removal on the UI thread with a delay.
-            Dispatcher.UIThread.InvokeAsync(() =>
-            {
-                if (IsEmptyContext(previous)) Remove(previous);
-            }, DispatcherPriority.Background);
+            Dispatcher.UIThread.InvokeAsync(
+                () =>
+                {
+                    if (IsEmptyContext(previous)) Remove(previous);
+                },
+                DispatcherPriority.Background);
 
             OnPropertyChanged(nameof(ChatMessageNodes));
             RemoveCommand.NotifyCanExecuteChanged();
@@ -93,13 +96,19 @@ public partial class ChatContextManager : ObservableObject, IChatContextManager,
     private readonly Settings _settings;
     private readonly IChatContextStorage _chatContextStorage;
     private readonly IRuntimeConstantProvider _runtimeConstantProvider;
+    private readonly ILogger<ChatContextManager> _logger;
     private readonly DebounceExecutor<ChatContextManager> _saveDebounceExecutor;
 
-    public ChatContextManager(Settings settings, IChatContextStorage chatContextStorage, IRuntimeConstantProvider runtimeConstantProvider)
+    public ChatContextManager(
+        Settings settings,
+        IChatContextStorage chatContextStorage,
+        IRuntimeConstantProvider runtimeConstantProvider,
+        ILogger<ChatContextManager> logger)
     {
         _settings = settings;
         _chatContextStorage = chatContextStorage;
         _runtimeConstantProvider = runtimeConstantProvider;
+        _logger = logger;
         _saveDebounceExecutor = new DebounceExecutor<ChatContextManager>(
             () => this,
             static that =>
@@ -110,7 +119,8 @@ public partial class ChatContextManager : ObservableObject, IChatContextManager,
                     toSave = that._saveBuffer.ToArray();
                     that._saveBuffer.Clear();
                 }
-                Task.WhenAll(toSave.AsValueEnumerable().Select(c => that._chatContextStorage.SaveChatContextAsync(c)).ToArray()).Detach();
+                Task.WhenAll(toSave.AsValueEnumerable().Select(c => that._chatContextStorage.SaveChatContextAsync(c)).ToList())
+                    .Detach(that._logger.ToExceptionHandler());
             },
             TimeSpan.FromSeconds(0.5)
         );
@@ -136,13 +146,13 @@ public partial class ChatContextManager : ObservableObject, IChatContextManager,
                 { "OS", () => Environment.OSVersion.ToString() },
                 { "Time", () => DateTime.Now.ToString("F") },
                 { "SystemLanguage", () => _settings.Common.Language },
-                { "WorkingDirectory", () => _runtimeConstantProvider.EnsureWritableDataFolderPath($"plugins/{DateTime.Now:yyyy-MM-dd}")}
+                { "WorkingDirectory", () => _runtimeConstantProvider.EnsureWritableDataFolderPath($"plugins/{DateTime.Now:yyyy-MM-dd}") }
             });
 
         _current = new ChatContext(renderedSystemPrompt);
         _current.Changed += HandleChatContextChanged;
         _history.Add(_current.Metadata.Id, _current);
-        Task.Run(() => _chatContextStorage.AddChatContextAsync(_current)).Detach();
+        Task.Run(() => _chatContextStorage.AddChatContextAsync(_current)).Detach(_logger.ToExceptionHandler());
 
         OnPropertyChanged(nameof(History));
         OnPropertyChanged(nameof(Current));
@@ -159,7 +169,7 @@ public partial class ChatContextManager : ObservableObject, IChatContextManager,
         if (!_history.Remove(chatContext.Metadata.Id)) return;
 
         chatContext.Changed -= HandleChatContextChanged;
-        Task.Run(() => _chatContextStorage.DeleteChatContextAsync(chatContext.Metadata.Id)).Detach();
+        Task.Run(() => _chatContextStorage.DeleteChatContextAsync(chatContext.Metadata.Id)).Detach(_logger.ToExceptionHandler());
 
         // If the current chat context is being removed, we need to set a new current context
         if (ReferenceEquals(chatContext, _current))
@@ -203,10 +213,19 @@ public partial class ChatContextManager : ObservableObject, IChatContextManager,
                 continue;
             }
 
-            var chatContext = await _chatContextStorage.GetChatContextAsync(metadata.Id);
-            chatContext.Changed += HandleChatContextChanged;
-            _current ??= chatContext;
-            _history.Add(metadata.Id, chatContext);
+            try
+            {
+                var chatContext = await _chatContextStorage.GetChatContextAsync(metadata.Id).ConfigureAwait(false);
+                chatContext.Changed += HandleChatContextChanged;
+                _current ??= chatContext;
+                _history.Add(metadata.Id, chatContext);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to load chat context {ChatContextId}, auto delete", metadata.Id);
+
+                await _chatContextStorage.DeleteChatContextAsync(metadata.Id).ConfigureAwait(false);
+            }
         }
 
         // Remove any chat contexts that are no longer in the storage
@@ -219,13 +238,12 @@ public partial class ChatContextManager : ObservableObject, IChatContextManager,
         RemoveCommand.NotifyCanExecuteChanged();
     });
 
-    public int Priority => 10;
+    public AsyncInitializerPriority Priority => AsyncInitializerPriority.Startup;
 
     public Task InitializeAsync() => UpdateHistoryAsync(8);
 
     private static bool IsEmptyContext([NotNullWhen(true)] ChatContext? chatContext) => chatContext is { Count: 1 };
 }
-
 
 public static class ChatContextManagerExtension
 {

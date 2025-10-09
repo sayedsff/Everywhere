@@ -6,6 +6,7 @@
   <TextBox
     x:Name="HotKeyTextBox" CaretBrush="Transparent"
     IsReadOnly="True" SelectionBrush="Transparent"
+    SelectionForegroundBrush="{Binding $self.Foreground}"
     Watermark="{I18N {x:Static LocaleKey.KeyboardHotkeyInputBox_Watermark}}">
     <TextBox.InnerRightContent>
       <Button

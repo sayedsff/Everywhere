@@ -290,13 +290,13 @@ public class I18NSourceGenerator : IIncrementalGenerator
                             
                             var oldLocaleName = field;
                             field = value;
-                            if (value is null || !Locales.TryGetValue(value, out var newLocale))
+                            if (field is null || !Locales.TryGetValue(field, out var newLocale))
                             {
                                 (field, newLocale) = Locales.First();
                             }
                             
                             app.Resources.MergedDictionaries.Add(newLocale);
-                            LocaleChanged?.Invoke(oldLocaleName, field!);
+                            LocaleChanged?.Invoke(oldLocaleName, field);
                         });
                     }
                 }

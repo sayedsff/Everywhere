@@ -1,11 +1,21 @@
 ﻿namespace Everywhere.Common;
 
+public enum AsyncInitializerPriority
+{
+    Database = 10,
+
+    Settings = 100,
+    AfterSettings = 101,
+
+    Startup = int.MaxValue,
+}
+
 public interface IAsyncInitializer
 {
     /// <summary>
-    /// Larger numbers are initialized first.
+    /// Smaller numbers are initialized first.
     /// </summary>
-    int Priority { get; }
+    AsyncInitializerPriority Priority { get; }
 
     Task InitializeAsync();
 }

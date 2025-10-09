@@ -82,7 +82,7 @@ public sealed class ChatDbContext(DbContextOptions<ChatDbContext> options) : DbC
 
 public class ChatDbInitializer(IDbContextFactory<ChatDbContext> dbFactory) : IAsyncInitializer
 {
-    public int Priority => 100;
+    public AsyncInitializerPriority Priority => AsyncInitializerPriority.Database;
 
     public async Task InitializeAsync()
     {
