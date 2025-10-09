@@ -89,6 +89,8 @@ public class ChatService(
             var kernelMixin = kernelMixinFactory.GetOrCreate(settings.Model);
             activity?.SetTag("llm.provider.id", settings.Model.SelectedModelProviderId ?? "unknown");
             activity?.SetTag("llm.model.id", settings.Model.SelectedModelDefinitionId ?? "unknown");
+            activity?.SetTag("llm.model.actual_id", settings.Model.SelectedModelDefinition?.ModelId ?? "unknown");
+            activity?.SetTag("llm.model.max_tokens", settings.Model.SelectedModelDefinition?.MaxTokens.ToString() ?? "unknown");
             return kernelMixin;
         }
         catch (Exception e)
@@ -314,6 +316,10 @@ public class ChatService(
                 using (var llmStreamActivity = _activitySource.StartActivity("ChatCompletionService.GetStreamingChatMessageContents"))
                 {
                     llmStreamActivity?.SetTag("chat.context.id", chatContext.Metadata.Id);
+                    llmStreamActivity?.SetTag("llm.provider.id", settings.Model.SelectedModelProviderId ?? "unknown");
+                    llmStreamActivity?.SetTag("llm.model.id", settings.Model.SelectedModelDefinitionId ?? "unknown");
+                    llmStreamActivity?.SetTag("llm.model.actual_id", settings.Model.SelectedModelDefinition?.ModelId ?? "unknown");
+                    llmStreamActivity?.SetTag("llm.model.max_tokens", settings.Model.SelectedModelDefinition?.MaxTokens?.ToString() ?? "unknown");
 
                     await foreach (var streamingContent in kernelMixin.ChatCompletionService.GetStreamingChatMessageContentsAsync(
                                        chatHistory,

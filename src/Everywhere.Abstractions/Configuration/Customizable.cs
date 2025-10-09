@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -69,16 +68,18 @@ public partial class Customizable<T> : ObservableObject where T : notnull
         }
     }
 
+    [JsonConstructor]
     public Customizable() { }
 
     [SetsRequiredMembers]
     public Customizable(T defaultValue, T? customValue = default) : this()
     {
         DefaultValue = defaultValue;
-        if (customValue is not null) CustomValue = customValue;
+        CustomValue = customValue;
     }
 
     [IgnoreDataMember]
+    [field: AllowNull, MaybeNull]
     public IRelayCommand ResetCommand => field ??= new RelayCommand(Reset);
 
     public void Reset()
@@ -89,4 +90,6 @@ public partial class Customizable<T> : ObservableObject where T : notnull
     public static implicit operator Customizable<T>(T value) => new() { DefaultValue = value };
 
     public static implicit operator T(Customizable<T> customizable) => customizable.ActualValue;
+
+    public override string? ToString() => ActualValue.ToString();
 }

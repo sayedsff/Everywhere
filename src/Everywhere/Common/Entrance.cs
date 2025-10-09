@@ -121,7 +121,7 @@ public static class Entrance
                 new JsonFormatter(),
                 Path.Combine(dataPath, "logs", ".jsonl"),
                 rollingInterval: RollingInterval.Day)
-            .WriteTo.Sentry(LogEventLevel.Information, LogEventLevel.Information)
+            .WriteTo.Sentry(LogEventLevel.Error, LogEventLevel.Information)
             .CreateLogger();
     }
 
