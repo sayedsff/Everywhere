@@ -5,6 +5,7 @@ using Avalonia.Threading;
 using Everywhere.Common;
 using Everywhere.Configuration;
 using Everywhere.Interop;
+using Everywhere.Utilities;
 
 namespace Everywhere.Views;
 
@@ -18,6 +19,8 @@ public partial class KeyboardHotkeyInputBox : UserControl
         get => GetValue(HotkeyProperty);
         set => SetValue(HotkeyProperty, value);
     }
+
+    private IKeyboardHotkeyScope? _hotkeyScope;
 
     public KeyboardHotkeyInputBox()
     {
@@ -45,19 +48,27 @@ public partial class KeyboardHotkeyInputBox : UserControl
     {
         base.OnGotFocus(e);
 
-        var hotkeyScope = ServiceLocator.Resolve<IHotkeyListener>().StartCaptureKeyboardHotkey();
-        hotkeyScope.PropertyChanging += (sender, _) =>
-            Dispatcher.UIThread.InvokeOnDemand(() => HotKeyTextBox.Text = sender.NotNull<IKeyboardHotkeyScope>().PressingHotkey.ToString());
-        hotkeyScope.PropertyChanged += (sender, _) =>
+        if (_hotkeyScope is not null) return;
+
+        _hotkeyScope = ServiceLocator.Resolve<IHotkeyListener>().StartCaptureKeyboardHotkey();
+        _hotkeyScope.PressingHotkeyChanged += (_, hotkey) => Dispatcher.UIThread.InvokeOnDemand(() => HotKeyTextBox.Text = hotkey.ToString());
+        _hotkeyScope.HotkeyFinished += (_, hotkey) =>
         {
             Dispatcher.UIThread.InvokeOnDemand(() =>
             {
-                Hotkey = sender.NotNull<IKeyboardHotkeyScope>().PressingHotkey;
-#pragma warning disable CS0618 // 类型或成员已过时
-                TopLevel.GetTopLevel(this)?.FocusManager?.ClearFocus();
-#pragma warning restore CS0618 // 类型或成员已过时
+                Hotkey = hotkey;
+                TopLevel.GetTopLevel(this)?.Focus();
             });
-            hotkeyScope.Dispose();
+
+            DisposeCollector.DisposeToDefault(ref _hotkeyScope);
         };
+    }
+
+    protected override void OnLostFocus(RoutedEventArgs e)
+    {
+        base.OnLostFocus(e);
+
+        TopLevel.GetTopLevel(this)?.Focus(); // Ensure the focus is moved away from this control.
+        DisposeCollector.DisposeToDefault(ref _hotkeyScope);
     }
 }

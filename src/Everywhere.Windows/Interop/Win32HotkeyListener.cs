@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Windows.Win32;
 using Windows.Win32.Foundation;
@@ -39,6 +38,8 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
     private const nuint InjectExtra = 0x0d000721;
     private const uint WM_REGISTER_HOTKEY = (uint)WINDOW_MESSAGE.WM_USER;
 
+    private static readonly SemaphoreSlim OperationLock = new(1, 1);
+
     private static PointerHotkeyActivatedHandler? _pointerHotkeyActivated;
     private static KeyboardHotkeyActivatedHandler? _keyboardHotkeyActivated;
 
@@ -52,10 +53,7 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
     private static uint _pressedXButton;
     private static bool _isXButtonEventTriggered;
 
-    /// <summary>
-    /// Indicates whether a keyboard hotkey scope is currently active.
-    /// </summary>
-    private static bool _isKeyboardHotkeyScoped;
+    private static IKeyboardHotkeyScope? _currentKeyboardHotkeyScope;
 
     static Win32HotkeyListener()
     {
@@ -66,7 +64,19 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
         }).Start();
     }
 
-    public IKeyboardHotkeyScope StartCaptureKeyboardHotkey() => new KeyboardHotkeyScopeImpl();
+    public IKeyboardHotkeyScope StartCaptureKeyboardHotkey()
+    {
+        OperationLock.Wait();
+        try
+        {
+            if (_currentKeyboardHotkeyScope is not { IsDisposed: false }) _currentKeyboardHotkeyScope = new KeyboardHotkeyScopeImpl();
+            return _currentKeyboardHotkeyScope;
+        }
+        finally
+        {
+            OperationLock.Release();
+        }
+    }
 
     private static void HookWindowMessageLoop()
     {
@@ -135,8 +145,9 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
 
                     break;
                 }
-                case (uint)WINDOW_MESSAGE.WM_HOTKEY when !_isKeyboardHotkeyScoped:
+                case (uint)WINDOW_MESSAGE.WM_HOTKEY when _currentKeyboardHotkeyScope is null or { IsDisposed: true }:
                 {
+                    // only trigger hotkey when not capturing
                     _keyboardHotkeyActivated?.Invoke();
                     break;
                 }
@@ -164,7 +175,11 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
 
     private static void KeyboardHotkeyHookProc(UIntPtr wParam, ref KBDLLHOOKSTRUCT lParam, ref bool blockNext)
     {
-        if (_isKeyboardHotkeyScoped) return;
+        // If we are currently capturing a hotkey, do not process the global hotkey hook.
+        if (_currentKeyboardHotkeyScope is { IsDisposed: false })
+        {
+            return;
+        }
 
         var virtualKey = (VIRTUAL_KEY)lParam.vkCode;
         var key = virtualKey.ToAvaloniaKey();
@@ -303,25 +318,23 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
         return PInvoke.CallNextHookEx(null, code, wParam, lParam);
     }
 
-    private class KeyboardHotkeyScopeImpl : IKeyboardHotkeyScope
+    private sealed class KeyboardHotkeyScopeImpl : IKeyboardHotkeyScope
     {
         public KeyboardHotkey PressingHotkey { get; private set; }
 
-        private readonly PropertyChangingEventArgs _changingEventArgsCache = new(nameof(PressingHotkey));
-        private readonly PropertyChangedEventArgs _changedEventArgsCache = new(nameof(PressingHotkey));
+        public bool IsDisposed { get; private set; }
+
+        public event IKeyboardHotkeyScope.PressingHotkeyChangedHandler? PressingHotkeyChanged;
+
+        public event IKeyboardHotkeyScope.HotkeyFinishedHandler? HotkeyFinished;
+
         private readonly LowLevelKeyboardHook _keyboardHook;
 
         private KeyModifiers _pressedKeyModifiers = KeyModifiers.None;
 
         public KeyboardHotkeyScopeImpl()
         {
-            if (_isKeyboardHotkeyScoped)
-            {
-                throw new InvalidOperationException("Only one keyboard hotkey scope can be active at a time.");
-            }
-
             _keyboardHook = new LowLevelKeyboardHook(KeyboardHookCallback);
-            _isKeyboardHotkeyScoped = true;
         }
 
         private void KeyboardHookCallback(UIntPtr wParam, ref KBDLLHOOKSTRUCT lParam, ref bool blockNext)
@@ -334,14 +347,14 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
                 case WINDOW_MESSAGE.WM_KEYDOWN when keyModifiers == KeyModifiers.None:
                 {
                     PressingHotkey = PressingHotkey with { Key = virtualKey.ToAvaloniaKey() };
-                    PropertyChanging?.Invoke(this, _changingEventArgsCache);
+                    PressingHotkeyChanged?.Invoke(this, PressingHotkey);
                     break;
                 }
                 case WINDOW_MESSAGE.WM_KEYDOWN:
                 {
                     _pressedKeyModifiers |= keyModifiers;
                     PressingHotkey = PressingHotkey with { Modifiers = _pressedKeyModifiers };
-                    PropertyChanging?.Invoke(this, _changingEventArgsCache);
+                    PressingHotkeyChanged?.Invoke(this, PressingHotkey);
                     break;
                 }
                 case WINDOW_MESSAGE.WM_KEYUP:
@@ -355,8 +368,8 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
                         }
 
                         // system key is all released, capture is done
-                        PropertyChanging?.Invoke(this, _changingEventArgsCache);
-                        PropertyChanged?.Invoke(this, _changedEventArgsCache);
+                        PressingHotkeyChanged?.Invoke(this, PressingHotkey);
+                        HotkeyFinished?.Invoke(this, PressingHotkey);
                     }
                     break;
                 }
@@ -367,11 +380,10 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
 
         public void Dispose()
         {
-            _keyboardHook.Dispose();
-            _isKeyboardHotkeyScoped = false;
-        }
+            if (IsDisposed) return;
+            IsDisposed = true;
 
-        public event PropertyChangingEventHandler? PropertyChanging;
-        public event PropertyChangedEventHandler? PropertyChanged;
+            _keyboardHook.Dispose();
+        }
     }
 }

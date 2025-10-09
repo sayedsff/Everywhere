@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using Everywhere.Configuration;
+﻿using Everywhere.Configuration;
 
 namespace Everywhere.Interop;
 
@@ -24,7 +23,24 @@ public interface IHotkeyListener
     IKeyboardHotkeyScope StartCaptureKeyboardHotkey();
 }
 
-public interface IKeyboardHotkeyScope : INotifyPropertyChanging, INotifyPropertyChanged, IDisposable
+/// <summary>
+/// Represents a scope for capturing keyboard hotkeys.
+/// </summary>
+public interface IKeyboardHotkeyScope : IDisposable
 {
+    /// <summary>
+    /// Raised when the hotkey is changed during capturing.
+    /// e.g., when the user is pressing ctrl+alt+K, this event will be raised when ctrl is pressed, then alt is pressed, then K is pressed.
+    /// </summary>
+    delegate void PressingHotkeyChangedHandler(IKeyboardHotkeyScope scope, KeyboardHotkey currentHotkey);
+
+    delegate void HotkeyFinishedHandler(IKeyboardHotkeyScope scope, KeyboardHotkey finalHotkey);
+
     KeyboardHotkey PressingHotkey { get; }
+
+    bool IsDisposed { get; }
+
+    event PressingHotkeyChangedHandler PressingHotkeyChanged;
+
+    event HotkeyFinishedHandler HotkeyFinished;
 }
