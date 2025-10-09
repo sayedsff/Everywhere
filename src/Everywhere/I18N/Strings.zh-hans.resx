@@ -75,13 +75,13 @@
         <value>开启工具调用</value>
     </data>
     <data name="Settings_Model_IsToolCallSupported_Description" xml:space="preserve">
-        <value>启用后，在支持工具调用的大模型 (如 DeepSeek-V3、GPT-4o) 中，助手会在合适时机调用外部工具以扩展能力；若模型不支持此功能，则可能导致调用失败。</value>
+        <value>开启后，在支持工具调用的大模型 (如 DeepSeek-V3、GPT-4o) 中，助手会在合适时机调用外部工具以扩展能力；若模型不支持此功能，则可能导致调用失败。</value>
     </data>
     <data name="Settings_Model_IsWebSearchSupported_Header" xml:space="preserve">
         <value>开启网络搜索</value>
     </data>
     <data name="Settings_Model_IsWebSearchSupported_Description" xml:space="preserve">
-        <value>启用后，在支持工具调用的大模型 (如 DeepSeek-V3、GPT-4o) 中，助手会先进行网络搜索并整合结果后再生成回复；若模型不支持此功能，则可能导致调用失败。</value>
+        <value>开启后，在支持工具调用的大模型 (如 DeepSeek-V3、GPT-4o) 中，助手会先进行网络搜索并整合结果后再生成回复；若模型不支持此功能，则可能导致调用失败。</value>
     </data>
     <data name="Settings_Plugin_WebSearchEngine_SelectedWebSearchEngineProvider_Description" xml:space="preserve">
         <value>选择用于网络搜索引擎的服务提供商。</value>
@@ -636,7 +636,7 @@
         <value>自动更新</value>
     </data>
     <data name="Settings_Common_IsAutomaticUpdateCheckEnabled_Description" xml:space="preserve">
-        <value>如果开启，Everywhere 会定期检查更新 (仅在 Everywhere 运行时，不会给系统增加额外负担)。</value>
+        <value>开启后，Everywhere 会定期检查更新 (仅在 Everywhere 运行时，不会给系统增加额外负担)。</value>
     </data>
     <data name="Settings_Common_SoftwareUpdate_Toast_DownloadingUpdate" xml:space="preserve">
         <value>下载更新中...</value>
@@ -832,5 +832,23 @@
     </data>
     <data name="Settings_Common_DiagnosticData_Description" xml:space="preserve">
         <value>为了帮助我们改进，我们需要“遥测”来收集匿名数据。这些数据仅用于分析，不包含也无法从中推断出任何和您个人有关的数据。您可以选择只发送必要数据，该选择不会影响核心功能。</value>
+    </data>
+    <data name="Settings_Behavior_ShowChatStatistics_Header" xml:space="preserve">
+        <value>显示聊天统计数据</value>
+    </data>
+    <data name="Settings_Behavior_ShowChatStatistics_Description" xml:space="preserve">
+        <value>开启后，聊天窗口内每轮对话结束后，会显示用量数据。</value>
+    </data>
+    <data name="ChatFloatingWindow_ChatStatisticsTextBlock_InputTokenCountRun" xml:space="preserve">
+        <value>输入</value>
+    </data>
+    <data name="ChatFloatingWindow_ChatStatisticsTextBlock_ElapsedRun" xml:space="preserve">
+        <value>用时</value>
+    </data>
+    <data name="ChatFloatingWindow_ChatStatisticsTextBlock_OutputTokenCountRun" xml:space="preserve">
+        <value>输出</value>
+    </data>
+    <data name="ChatFloatingWindow_ChatStatisticsTextBlock_TotalTokenCountRun" xml:space="preserve">
+        <value>总计</value>
     </data>
 </root>

@@ -853,4 +853,22 @@ My intelligence comes from powerful Large language models (LLMs), which are prov
     <data name="Settings_Common_DiagnosticData_Description" xml:space="preserve">
         <value>To help us improve, we need the “telemetry” to collect anonymous data. This data is used solely for analysis and does not contain or allow the inference of any personally identifiable information about you. You may choose to send only necessary data; this option will not affect core functionality.</value>
     </data>
+    <data name="Settings_Behavior_ShowChatStatistics_Header" xml:space="preserve">
+        <value>Show Chat Statistics</value>
+    </data>
+    <data name="Settings_Behavior_ShowChatStatistics_Description" xml:space="preserve">
+        <value>If enabled, usage data will be displayed at the end of each conversation round within the chat window.</value>
+    </data>
+    <data name="ChatFloatingWindow_ChatStatisticsTextBlock_InputTokenCountRun" xml:space="preserve">
+        <value>Input</value>
+    </data>
+    <data name="ChatFloatingWindow_ChatStatisticsTextBlock_OutputTokenCountRun" xml:space="preserve">
+        <value>Outpout</value>
+    </data>
+    <data name="ChatFloatingWindow_ChatStatisticsTextBlock_TotalTokenCountRun" xml:space="preserve">
+        <value>Total</value>
+    </data>
+    <data name="ChatFloatingWindow_ChatStatisticsTextBlock_ElapsedRun" xml:space="preserve">
+        <value>Elapsed</value>
+    </data>
 </root>

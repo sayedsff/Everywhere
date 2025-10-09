@@ -1,6 +1,4 @@
-﻿using System.Runtime.Serialization;
-using System.Text.Json.Serialization;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Everywhere.Configuration;
 
 namespace Everywhere.AI;
@@ -67,8 +65,6 @@ public partial class ModelDefinition : ObservableObject
     /// Gets or sets the default model in a model provider.
     /// This indicates the best (powerful but economical) model in the provider.
     /// </summary>
-    [JsonIgnore]
-    [IgnoreDataMember]
     [HiddenSettingsItem]
     public bool IsDefault { get; set; }
 

@@ -10,6 +10,7 @@ using MessagePack;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using ObservableCollections;
+using ZLinq;
 
 namespace Everywhere.Chat;
 
@@ -50,6 +51,87 @@ public partial class AssistantChatMessage : ChatMessage
 {
     public override AuthorRole Role => AuthorRole.Assistant;
 
+    [Key(0)]
+    private string? Content
+    {
+        get => null; // for forward compatibility
+        init
+        {
+            if (!value.IsNullOrEmpty()) EnsureInitialSpan().MarkdownBuilder.Append(value);
+        }
+    }
+
+    [Key(1)]
+    [ObservableProperty]
+    public partial DynamicResourceKeyBase? ErrorMessageKey { get; set; }
+
+    [Key(2)]
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ElapsedSeconds))]
+    public partial DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+
+    [Key(3)]
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ElapsedSeconds))]
+    public partial DateTimeOffset FinishedAt { get; set; }
+
+    [IgnoreMember]
+    [JsonIgnore]
+    public double ElapsedSeconds => Math.Max((FinishedAt - CreatedAt).TotalSeconds, 0);
+
+    [Key(4)]
+    private ObservableList<FunctionCallChatMessage>? FunctionCalls
+    {
+        get => null; // for forward compatibility
+        init
+        {
+            if (value is { Count: > 0 }) EnsureInitialSpan().FunctionCalls.AddRange(value);
+        }
+    }
+
+    /// <summary>
+    /// Each span represents a part of the message content and function calls.
+    /// </summary>
+    [Key(5)]
+    public ObservableList<AssistantChatMessageSpan> Spans { get; set; } = [];
+
+    [Key(6)]
+    [ObservableProperty]
+    public partial long InputTokenCount { get; set; }
+
+    [Key(7)]
+    [ObservableProperty]
+    public partial long OutputTokenCount { get; set; }
+
+    [Key(8)]
+    [ObservableProperty]
+    public partial double TotalTokenCount { get; set; }
+
+    private AssistantChatMessageSpan EnsureInitialSpan()
+    {
+        if (Spans.Count == 0) Spans.Add(new AssistantChatMessageSpan());
+        return Spans[^1];
+    }
+
+    public override string ToString()
+    {
+        var builder = new System.Text.StringBuilder();
+        foreach (var span in Spans.AsValueEnumerable().Where(s => s.MarkdownBuilder.Length > 0))
+        {
+            builder.AppendLine(span.MarkdownBuilder.ToString());
+        }
+
+        return builder.TrimEnd().ToString();
+    }
+}
+
+/// <summary>
+/// Represents a span of content in an assistant chat message.
+/// A span can contain markdown content and associated function calls.
+/// </summary>
+[MessagePackObject(AllowPrivate = true, OnlyIncludeKeyedMembers = true)]
+public partial class AssistantChatMessageSpan : ObservableObject
+{
     public ObservableStringBuilder MarkdownBuilder { get; }
 
     [Key(0)]
@@ -60,31 +142,29 @@ public partial class AssistantChatMessage : ChatMessage
     }
 
     [Key(1)]
-    [ObservableProperty]
-    public partial DynamicResourceKeyBase? ErrorMessageKey { get; set; }
-
-    [Key(2)]
-    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
-
-    [Key(3)]
-    public DateTimeOffset FinishedAt { get; set; } = DateTimeOffset.UtcNow;
-
-    [Key(4)]
     public ObservableList<FunctionCallChatMessage> FunctionCalls { get; set; } = [];
 
-    public AssistantChatMessage()
+    [Key(2)]
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ElapsedSeconds))]
+    public partial DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+
+    [Key(3)]
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ElapsedSeconds))]
+    public partial DateTimeOffset FinishedAt { get; set; }
+
+    [IgnoreMember]
+    [JsonIgnore]
+    public double ElapsedSeconds => Math.Max((FinishedAt - CreatedAt).TotalSeconds, 0);
+
+    public AssistantChatMessageSpan()
     {
         MarkdownBuilder = new ObservableStringBuilder();
         MarkdownBuilder.Changed += delegate
         {
             OnPropertyChanged(nameof(Content));
         };
-    }
-
-    public override string ToString()
-    {
-        if (ErrorMessageKey is null) return Content;
-        return Content + ErrorMessageKey;
     }
 }
 
@@ -145,7 +225,18 @@ public partial class ActionChatMessage : ChatMessage
     public partial DynamicResourceKeyBase? ErrorMessageKey { get; set; }
 
     [Key(5)]
-    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ElapsedSeconds))]
+    public partial DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+
+    [Key(6)]
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ElapsedSeconds))]
+    public partial DateTimeOffset FinishedAt { get; set; }
+
+    [IgnoreMember]
+    [JsonIgnore]
+    public double ElapsedSeconds => Math.Max((FinishedAt - CreatedAt).TotalSeconds, 0);
 
     [SerializationConstructor]
     protected ActionChatMessage() { }
@@ -162,13 +253,46 @@ public partial class ActionChatMessage : ChatMessage
 /// Represents a function call action message in the chat.
 /// </summary>
 [MessagePackObject(AllowPrivate = true, OnlyIncludeKeyedMembers = true)]
-public partial class FunctionCallChatMessage : ActionChatMessage, IChatMessageWithAttachments
+public partial class FunctionCallChatMessage : ChatMessage, IChatMessageWithAttachments
 {
+    [Key(0)]
+    public override AuthorRole Role => AuthorRole.Tool;
+
+    [Key(1)]
+    [ObservableProperty]
+    public partial LucideIconKind Icon { get; set; }
+
+    [Key(2)]
+    [ObservableProperty]
+    public partial DynamicResourceKey? HeaderKey { get; set; }
+
+    [Key(3)]
+    public string? Content { get; set; }
+
+    [Key(4)]
+    [ObservableProperty]
+    public partial DynamicResourceKeyBase? ErrorMessageKey { get; set; }
+
+    [Key(5)]
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ElapsedSeconds))]
+    public partial DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+
     [Key(6)]
     public List<FunctionCallContent> Calls { get; set; } = [];
 
     [Key(7)]
     public List<FunctionResultContent> Results { get; set; } = [];
+
+    [Key(8)]
+    [ObservableProperty]
+
+    [NotifyPropertyChangedFor(nameof(ElapsedSeconds))]
+    public partial DateTimeOffset FinishedAt { get; set; } = DateTimeOffset.UtcNow;
+
+    [IgnoreMember]
+    [JsonIgnore]
+    public double ElapsedSeconds => Math.Max((FinishedAt - CreatedAt).TotalSeconds, 0);
 
     /// <summary>
     /// Attachments associated with this action message. Used to provide additional context of a tool call result.
@@ -179,7 +303,7 @@ public partial class FunctionCallChatMessage : ActionChatMessage, IChatMessageWi
     [SerializationConstructor]
     private FunctionCallChatMessage() { }
 
-    public FunctionCallChatMessage(LucideIconKind icon, DynamicResourceKey? headerKey) : base(AuthorRole.Tool, icon, headerKey)
+    public FunctionCallChatMessage(LucideIconKind icon, DynamicResourceKey? headerKey)
     {
         Icon = icon;
         HeaderKey = headerKey;

@@ -444,25 +444,42 @@
                     <StackPanel
                       Classes="ChatMessage Assistant" Background="Transparent"
                       Orientation="Vertical" Spacing="4">
-                      <ItemsControl ItemsSource="{Binding FunctionCalls, Converter={x:Static vc:ObservableListConverters.ObservableOnDispatcher}}">
+                      <ItemsControl ItemsSource="{Binding Spans, Converter={x:Static vc:ObservableListConverters.ObservableOnDispatcher}}">
                         <ItemsControl.ItemsPanel>
                           <ItemsPanelTemplate>
-                            <StackPanel Spacing="2"/>
+                            <StackPanel/>
                           </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
 
                         <ItemsControl.ItemTemplate>
                           <DataTemplate>
-                            <ContentControl
-                              Classes="ChatMessage"
-                              Content="{Binding}"/>
+                            <StackPanel Orientation="Vertical">
+                              <md:MarkdownRenderer
+                                InlineHyperlinkCommand="{Binding $parent[v:ChatFloatingWindow].LaunchInlineHyperlinkCommand}"
+                                MarkdownBuilder="{Binding MarkdownBuilder}"/>
+
+                              <ItemsControl
+                                Margin="0,6"
+                                IsVisible="{Binding !!$self.ItemCount}"
+                                ItemsSource="{Binding FunctionCalls, Converter={x:Static vc:ObservableListConverters.ObservableOnDispatcher}}">
+                                <ItemsControl.ItemsPanel>
+                                  <ItemsPanelTemplate>
+                                    <StackPanel Spacing="4"/>
+                                  </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+
+                                <ItemsControl.ItemTemplate>
+                                  <DataTemplate>
+                                    <ContentControl
+                                      Classes="ChatMessage"
+                                      Content="{Binding}"/>
+                                  </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                              </ItemsControl>
+                            </StackPanel>
                           </DataTemplate>
                         </ItemsControl.ItemTemplate>
                       </ItemsControl>
-
-                      <md:MarkdownRenderer
-                        InlineHyperlinkCommand="{Binding $parent[v:ChatFloatingWindow].LaunchInlineHyperlinkCommand}"
-                        MarkdownBuilder="{Binding MarkdownBuilder}"/>
 
                       <Border
                         Padding="8,4" HorizontalAlignment="Left"
@@ -480,6 +497,28 @@
                         Background="{DynamicResource PrimaryColor}"
                         CornerRadius="8"
                         IsVisible="{Binding IsBusy}"/>
+
+                      <SelectableTextBlock
+                        Classes="Muted" FontSize="10">
+                        <TextBlock.IsVisible>
+                          <MultiBinding Converter="{x:Static BoolConverters.And}">
+                            <Binding Path="$parent[v:ChatFloatingWindow].ViewModel.Settings.Behavior.ShowChatStatistics"/>
+                            <Binding Path="!IsBusy"/>
+                          </MultiBinding>
+                        </TextBlock.IsVisible>
+
+                        <Run Text="{I18N {x:Static LocaleKey.ChatFloatingWindow_ChatStatisticsTextBlock_InputTokenCountRun}}"/>
+                        <Run Text="{Binding InputTokenCount}"/>
+                        <Run Text="·"/>
+                        <Run Text="{I18N {x:Static LocaleKey.ChatFloatingWindow_ChatStatisticsTextBlock_OutputTokenCountRun}}"/>
+                        <Run Text="{Binding OutputTokenCount}"/>
+                        <Run Text="·"/>
+                        <Run Text="{I18N {x:Static LocaleKey.ChatFloatingWindow_ChatStatisticsTextBlock_TotalTokenCountRun}}"/>
+                        <Run Text="{Binding TotalTokenCount}"/>
+                        <Run Text="·"/>
+                        <Run Text="{I18N {x:Static LocaleKey.ChatFloatingWindow_ChatStatisticsTextBlock_ElapsedRun}}"/>
+                        <Run Text="{Binding ElapsedSeconds, StringFormat='{}{0:F1}s'}"/>
+                      </SelectableTextBlock>
 
                       <StackPanel
                         x:Name="ChatMessageOperationPanel"
@@ -654,10 +693,10 @@
                               Width="12" Height="12"
                               VerticalAlignment="Center" IsHitTestVisible="False"
                               IsVisible="{Binding IsBusy}"/>
-                            <LucideIcon
-                              Margin="0,1,0,0" VerticalAlignment="Center"
-                              Foreground="{DynamicResource SuccessColor}"
-                              Kind="Check" Size="14">
+                            <TextBlock
+                              VerticalAlignment="Bottom" FontSize="10"
+                              Foreground="{DynamicResource SuccessColor60}"
+                              Text="{Binding ElapsedSeconds, StringFormat='{}{0:F1}s'}">
                               <LucideIcon.IsVisible>
                                 <MultiBinding Converter="{x:Static BoolConverters.And}">
                                   <Binding Path="!IsBusy"/>
@@ -666,7 +705,7 @@
                                     Path="ErrorMessageKey"/>
                                 </MultiBinding>
                               </LucideIcon.IsVisible>
-                            </LucideIcon>
+                            </TextBlock>
                             <LucideIcon
                               Margin="0,1,0,0" VerticalAlignment="Center"
                               Foreground="{DynamicResource ErrorColor}"
@@ -688,7 +727,99 @@
                           IsVisible="{Binding #PART_ExpandToggleButton.IsChecked}">
                           <Border
                             Margin="8,0,8,4"
-                            Background="{DynamicResource ErrorColor20}"
+                            Background="{DynamicResource ErrorColor60}"
+                            CornerRadius="4"
+                            IsVisible="{Binding ErrorMessageKey, Converter={x:Static ObjectConverters.IsNotNull}, FallbackValue=false}">
+                            <SelectableTextBlock
+                              Margin="6,4"
+                              Text="{Binding ErrorMessageKey^, FallbackValue={x:Null}}"
+                              TextWrapping="Wrap"/>
+                          </Border>
+                        </Panel>
+                      </StackPanel>
+                    </Border>
+                  </DataTemplate>
+
+                  <DataTemplate DataType="chat:FunctionCallChatMessage">
+                    <Border
+                      Classes="ChatMessage Action ChatBubble" Margin="0,0,36,0"
+                      Padding="0" HorizontalAlignment="Left">
+                      <Border.Styles>
+                        <Style Selector="Expander:not(.CanExpand)">
+                          <Style Selector="^ ToggleButton#PART_ToggleButton">
+                            <Setter Property="IsEnabled" Value="False"/>
+                          </Style>
+                          <Style Selector="^ LucideIcon#PART_Icon">
+                            <Setter Property="IsVisible" Value="False"/>
+                          </Style>
+                          <Style Selector="^ ContentControl#ContentExpandControlContainer">
+                            <Setter Property="IsVisible" Value="False"/>
+                          </Style>
+                        </Style>
+                      </Border.Styles>
+
+                      <StackPanel>
+                        <Panel>
+                          <ToggleButton
+                            x:Name="PART_ExpandToggleButton" MinHeight="0"
+                            Background="Transparent" Focusable="False">
+                            <ToggleButton.Template>
+                              <ControlTemplate TargetType="ToggleButton">
+                                <Panel Background="Transparent"/>
+                              </ControlTemplate>
+                            </ToggleButton.Template>
+                          </ToggleButton>
+
+                          <StackPanel
+                            Margin="8,4" VerticalAlignment="Center"
+                            IsHitTestVisible="False" Orientation="Horizontal"
+                            Spacing="4">
+                            <LucideIcon
+                              VerticalAlignment="Center"
+                              Kind="{Binding Icon}"
+                              Size="14"/>
+                            <TextBlock
+                              VerticalAlignment="Center" FontSize="12"
+                              Text="{Binding HeaderKey^, FallbackValue={x:Null}}"/>
+                            <shadui:Loading
+                              Width="12" Height="12"
+                              VerticalAlignment="Center" IsHitTestVisible="False"
+                              IsVisible="{Binding IsBusy}"/>
+                            <TextBlock
+                              VerticalAlignment="Bottom" FontSize="10"
+                              Foreground="{DynamicResource SuccessColor60}"
+                              Text="{Binding ElapsedSeconds, StringFormat='{}{0:F1}s'}">
+                              <LucideIcon.IsVisible>
+                                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                  <Binding Path="!IsBusy"/>
+                                  <Binding
+                                    Converter="{x:Static ObjectConverters.IsNull}"
+                                    Path="ErrorMessageKey"/>
+                                </MultiBinding>
+                              </LucideIcon.IsVisible>
+                            </TextBlock>
+                            <LucideIcon
+                              Margin="0,1,0,0" VerticalAlignment="Center"
+                              Foreground="{DynamicResource ErrorColor}"
+                              Kind="X" Size="14">
+                              <LucideIcon.IsVisible>
+                                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                  <Binding Path="!IsBusy"/>
+                                  <Binding
+                                    Converter="{x:Static ObjectConverters.IsNotNull}"
+                                    Path="ErrorMessageKey"/>
+                                </MultiBinding>
+                              </LucideIcon.IsVisible>
+                            </LucideIcon>
+                          </StackPanel>
+                        </Panel>
+
+                        <Panel
+                          x:Name="PART_ContentExpand"
+                          IsVisible="{Binding #PART_ExpandToggleButton.IsChecked}">
+                          <Border
+                            Margin="8,0,8,4"
+                            Background="{DynamicResource ErrorColor60}"
                             CornerRadius="4"
                             IsVisible="{Binding ErrorMessageKey, Converter={x:Static ObjectConverters.IsNotNull}, FallbackValue=false}">
                             <SelectableTextBlock

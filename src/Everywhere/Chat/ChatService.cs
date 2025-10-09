@@ -89,8 +89,8 @@ public class ChatService(
             var kernelMixin = kernelMixinFactory.GetOrCreate(settings.Model);
             activity?.SetTag("llm.provider.id", settings.Model.SelectedModelProviderId ?? "unknown");
             activity?.SetTag("llm.model.id", settings.Model.SelectedModelDefinitionId ?? "unknown");
-            activity?.SetTag("llm.model.actual_id", settings.Model.SelectedModelDefinition?.ModelId ?? "unknown");
-            activity?.SetTag("llm.model.max_tokens", settings.Model.SelectedModelDefinition?.MaxTokens.ToString() ?? "unknown");
+            activity?.SetTag("llm.model.actual_id", settings.Model.SelectedModelDefinition?.ModelId.ActualValue ?? "unknown");
+            activity?.SetTag("llm.model.max_embedding", settings.Model.SelectedModelDefinition?.MaxTokens.ToString() ?? "unknown");
             return kernelMixin;
         }
         catch (Exception e)
@@ -306,6 +306,9 @@ public class ChatService(
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
+                var chatSpan = new AssistantChatMessageSpan();
+                assistantChatMessage.Spans.Add(chatSpan);
+
                 AuthorRole? authorRole = null;
                 IReadOnlyList<FunctionCallContent> functionCallContents;
                 var assistantContentBuilder = new StringBuilder();
@@ -318,8 +321,8 @@ public class ChatService(
                     llmStreamActivity?.SetTag("chat.context.id", chatContext.Metadata.Id);
                     llmStreamActivity?.SetTag("llm.provider.id", settings.Model.SelectedModelProviderId ?? "unknown");
                     llmStreamActivity?.SetTag("llm.model.id", settings.Model.SelectedModelDefinitionId ?? "unknown");
-                    llmStreamActivity?.SetTag("llm.model.actual_id", settings.Model.SelectedModelDefinition?.ModelId ?? "unknown");
-                    llmStreamActivity?.SetTag("llm.model.max_tokens", settings.Model.SelectedModelDefinition?.MaxTokens?.ToString() ?? "unknown");
+                    llmStreamActivity?.SetTag("llm.model.actual_id", settings.Model.SelectedModelDefinition?.ModelId.ActualValue ?? "unknown");
+                    llmStreamActivity?.SetTag("llm.model.max_embedding", settings.Model.SelectedModelDefinition?.MaxTokens?.ToString() ?? "unknown");
 
                     await foreach (var streamingContent in kernelMixin.ChatCompletionService.GetStreamingChatMessageContentsAsync(
                                        chatHistory,
@@ -365,7 +368,7 @@ public class ChatService(
                         if (streamingContent.Content is not null)
                         {
                             assistantContentBuilder.Append(streamingContent.Content);
-                            await Dispatcher.UIThread.InvokeAsync(() => assistantChatMessage.MarkdownBuilder.Append(streamingContent.Content));
+                            await Dispatcher.UIThread.InvokeAsync(() => chatSpan.MarkdownBuilder.Append(streamingContent.Content));
                         }
 
                         // for those LLM who doesn't implement function calling correctly,
@@ -391,6 +394,9 @@ public class ChatService(
                     if (assistantContentBuilder.Length > 0) chatHistory.AddAssistantMessage(assistantContentBuilder.ToString());
 
                     functionCallContents = functionCallContentBuilder.Build();
+                    assistantChatMessage.InputTokenCount = inputTokenCount;
+                    assistantChatMessage.OutputTokenCount = outputTokenCount;
+                    assistantChatMessage.TotalTokenCount = totalTokenCount;
 
                     llmStreamActivity?.SetTag("chat.history.count", chatHistory.AsValueEnumerable().Count());
                     llmStreamActivity?.SetTag("chat.embedding.input", inputTokenCount);
@@ -423,7 +429,7 @@ public class ChatService(
                     {
                         IsBusy = true,
                     };
-                    assistantChatMessage.FunctionCalls.Add(functionCallChatMessage);
+                    chatSpan.FunctionCalls.Add(functionCallChatMessage);
 
                     // Add call message to the chat history.
                     var functionCallMessage = new ChatMessageContent(AuthorRole.Assistant, content: null);
@@ -469,9 +475,11 @@ public class ChatService(
                         chatHistory.Add(extraToolCallResultsContent);
                     }
 
-                    // Serialize the function calls and results to JSON.
+                    functionCallChatMessage.FinishedAt = DateTimeOffset.UtcNow;
                     functionCallChatMessage.IsBusy = false;
                 }
+
+                chatSpan.FinishedAt = DateTimeOffset.UtcNow;
             }
 
             activity?.SetTag("tool_calls.count", toolCallCount);
@@ -516,16 +524,21 @@ public class ChatService(
                 }
                 case AssistantChatMessage assistant:
                 {
-                    // If the assistant message has actions, we need to yield them first.
-                    foreach (var functionCallChatMessage in assistant.FunctionCalls)
+                    foreach (var span in assistant.Spans)
                     {
-                        await foreach (var actionChatMessageContent in CreateChatMessageContentsAsync(functionCallChatMessage))
+                        if (span.MarkdownBuilder.Length > 0)
                         {
-                            yield return actionChatMessageContent;
+                            yield return new ChatMessageContent(chatMessage.Role, span.MarkdownBuilder.ToString());
+                        }
+
+                        foreach (var functionCallChatMessage in span.FunctionCalls)
+                        {
+                            await foreach (var actionChatMessageContent in CreateChatMessageContentsAsync(functionCallChatMessage))
+                            {
+                                yield return actionChatMessageContent;
+                            }
                         }
                     }
-
-                    yield return new ChatMessageContent(chatMessage.Role, assistant.MarkdownBuilder.ToString());
                     break;
                 }
                 case UserChatMessage user:

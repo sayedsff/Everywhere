@@ -201,6 +201,9 @@ public partial class BehaviorSettings : SettingsCategory
 
     [ObservableProperty]
     public partial ChatFloatingWindowPinMode ChatFloatingWindowPinMode { get; set; }
+
+    [ObservableProperty]
+    public partial bool ShowChatStatistics { get; set; } = true;
 }
 
 public partial class ModelSettings : SettingsCategory
