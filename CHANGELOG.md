@@ -1,3 +1,14 @@
+## [v0.3.5](https://github.com/DearVa/Everywhere/releases/tag/v0.3.5) - 2025-10-09
+
+### 🐞 Fixed
+- Fixed hotkey input box crashes when clicking twice [#20](https://github.com/DearVa/Everywhere/issues/20)
+- Fixed potential null pointer error when sending message
+- Fixed wrong telemetry log level
+
+**Full Changelog**: https://github.com/DearVa/Everywhere/compare/v0.3.4...v0.3.5
+
+
+
 ## [v0.3.4](https://github.com/DearVa/Everywhere/releases/tag/v0.3.4) - 2025-10-09
 
 ### 🔄️ Changed
