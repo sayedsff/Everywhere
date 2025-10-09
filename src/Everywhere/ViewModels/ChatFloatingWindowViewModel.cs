@@ -386,11 +386,11 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
     }
 
     [RelayCommand(CanExecute = nameof(IsNotBusy))]
-    private Task SendMessage(string message) => ExecuteBusyTaskAsync(
+    private Task SendMessage(string? message) => ExecuteBusyTaskAsync(
         cancellationToken =>
         {
-            message = message.Trim();
-            if (message.Length == 0) return Task.CompletedTask;
+            message = message?.Trim();
+            if (message?.Length is not > 0) return Task.CompletedTask;
 
             var userMessage = new UserChatMessage(message, _chatAttachments.AsValueEnumerable().ToImmutableArray())
             {
