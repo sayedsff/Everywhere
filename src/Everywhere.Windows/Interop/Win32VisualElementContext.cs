@@ -9,7 +9,9 @@ using Windows.Win32.UI.WindowsAndMessaging;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Platform;
+using Everywhere.Common;
 using Everywhere.Extensions;
+using Everywhere.I18N;
 using Everywhere.Interop;
 using FlaUI.Core;
 using FlaUI.Core.AutomationElements;
@@ -114,7 +116,9 @@ public partial class Win32VisualElementContext : IVisualElementContext
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to get AutomationElement");
+            _logger.LogError(
+                new HandledException(ex, new DirectResourceKey("Failed to get AutomationElement")),
+                "Failed to get AutomationElement");
         }
 
         return null;

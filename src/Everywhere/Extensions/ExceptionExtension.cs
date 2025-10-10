@@ -36,7 +36,7 @@ public static class ExceptionExtension
                     LocaleKey.FriendlyExceptionMessage_Aggregate,
                     new AggregateDynamicResourceKey(ae.InnerExceptions.Select(DynamicResourceKeyBase (i) => i.GetFriendlyMessage()).ToList(), "\n"));
             }
-            case EverywhereException ee:
+            case HandledException ee:
             {
                 return new AggregateDynamicResourceKey(
                     [

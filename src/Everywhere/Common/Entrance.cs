@@ -88,7 +88,7 @@ public static class Entrance
             o.Release = typeof(Entrance).Assembly.GetName().Version?.ToString();
 
             o.UseOpenTelemetry();
-            o.SetBeforeSend(evt => evt.Exception.Unwarp() is OperationCanceledException or EverywhereException { IsGeneralError: true } ? null : evt);
+            o.SetBeforeSend(evt => evt.Exception.Unwarp() is OperationCanceledException or HandledException { IsExpected: true } ? null : evt);
             o.SetBeforeSendTransaction(transaction => SendOnlyNecessaryTelemetry ? null : transaction);
             o.SetBeforeBreadcrumb(breadcrumb => SendOnlyNecessaryTelemetry ? null : breadcrumb);
         });
