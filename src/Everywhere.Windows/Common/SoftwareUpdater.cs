@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Everywhere.Common;
 using Everywhere.Configuration;
@@ -18,13 +19,11 @@ public sealed partial class SoftwareUpdater(
     INativeHelper nativeHelper,
     IRuntimeConstantProvider runtimeConstantProvider,
     ILogger<SoftwareUpdater> logger
-) : ObservableObject, ISoftwareUpdater
+) : ObservableObject, ISoftwareUpdater, IDisposable
 {
-    // GitHub API and download URLs
-    private const string GitHubApiUrl = "https://api.github.com/repos/DearVa/Everywhere/releases/latest";
-
-    // Proxies for robustness
-    private static readonly string[] GitHubProxies = ["https://gh-proxy.com/"];
+    private const string CustomUpdateServiceBaseUrl = "https://ghproxy.sylinko.com";
+    private const string ApiUrl = $"{CustomUpdateServiceBaseUrl}/api?product=everywhere";
+    private const string DownloadUrlBase = $"{CustomUpdateServiceBaseUrl}/download?product=everywhere&os=win-x64";
 
     private readonly HttpClient _httpClient = new()
     {
@@ -56,6 +55,9 @@ public sealed partial class SoftwareUpdater(
         Task.Run(
             async () =>
             {
+                // Clean up old update packages on startup.
+                await CleanupOldUpdatesAsync();
+
                 await CheckForUpdatesAsync(cancellationToken); // check immediately on start
 
                 while (await _timer.WaitForNextTickAsync(cancellationToken))
@@ -78,7 +80,9 @@ public sealed partial class SoftwareUpdater(
         {
             if (_updateTask is not null) return;
 
-            var response = await GetResponseAsync(GitHubApiUrl);
+            var response = await _httpClient.GetAsync(ApiUrl, cancellationToken);
+            response.EnsureSuccessStatusCode();
+
             var jsonDoc = JsonDocument.Parse(await response.Content.ReadAsStringAsync(cancellationToken));
             var root = jsonDoc.RootElement;
 
@@ -92,12 +96,26 @@ public sealed partial class SoftwareUpdater(
                 return;
             }
 
-            var assets = root.GetProperty("assets").Deserialize<List<Asset>>();
+            var assets = root.GetProperty("assets").Deserialize<List<AssetMetadata>>();
             var isInstalled = nativeHelper.IsInstalled;
-            _latestAsset = assets?.FirstOrDefault(
-                a => isInstalled ?
-                    a.Name.EndsWith($"-Windows-x64-Setup-v{versionString}.exe", StringComparison.OrdinalIgnoreCase) :
-                    a.Name.EndsWith($"-Windows-x64-v{versionString}.zip", StringComparison.OrdinalIgnoreCase));
+
+            // Determine asset type and construct download URL
+            var assetType = isInstalled ? "setup" : "zip";
+            var assetNameSuffix = isInstalled ?
+                $"-Windows-x64-Setup-v{versionString}.exe" :
+                $"-Windows-x64-v{versionString}.zip";
+
+            var assetMetadata = assets?.FirstOrDefault(a => a.Name.EndsWith(assetNameSuffix, StringComparison.OrdinalIgnoreCase));
+
+            if (assetMetadata is not null)
+            {
+                _latestAsset = new Asset(
+                    assetMetadata.Name,
+                    assetMetadata.Digest,
+                    assetMetadata.Size,
+                    $"{DownloadUrlBase}&type={assetType}"
+                );
+            }
 
             LatestVersion = latestVersion > CurrentVersion ? latestVersion : null;
         }
@@ -139,6 +157,11 @@ public sealed partial class SoftwareUpdater(
                     await UpdateViaPortableAsync(assetPath);
                 }
             }
+            catch (Exception ex)
+            {
+                logger.LogInformation(ex, "Failed to perform update.");
+                throw;
+            }
             finally
             {
                 _updateTask = null;
@@ -146,6 +169,46 @@ public sealed partial class SoftwareUpdater(
         });
 
         await _updateTask;
+    }
+
+    /// <summary>
+    /// Cleans up old update packages from the updates directory.
+    /// </summary>
+    private async Task CleanupOldUpdatesAsync()
+    {
+        await Task.Run(() =>
+        {
+            try
+            {
+                var updatesPath = runtimeConstantProvider.EnsureWritableDataFolderPath("updates");
+                if (!Directory.Exists(updatesPath)) return;
+
+                foreach (var file in Directory.EnumerateFiles(updatesPath))
+                {
+                    var fileName = Path.GetFileName(file);
+                    var match = VersionRegex().Match(fileName);
+
+                    if (!match.Success || !Version.TryParse(match.Groups["version"].Value, out var fileVersion)) continue;
+
+                    // Delete if the package version is older than or same as the current running version.
+                    if (fileVersion > CurrentVersion) continue;
+
+                    try
+                    {
+                        File.Delete(file);
+                        logger.LogDebug("Deleted old update package: {FileName}", fileName);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogInformation(ex, "Failed to delete old update package: {FileName}", fileName);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogInformation(ex, "An error occurred during old updates cleanup.");
+            }
+        });
     }
 
     private async Task<string> DownloadAssetAsync(Asset asset, IProgress<double> progress)
@@ -166,7 +229,8 @@ public sealed partial class SoftwareUpdater(
             logger.LogDebug("Asset {AssetName} exists but is invalid, redownloading.", asset.Name);
         }
 
-        var response = await GetResponseAsync(asset.DownloadUrl);
+        var response = await _httpClient.GetAsync(asset.DownloadUrl, HttpCompletionOption.ResponseHeadersRead);
+        response.EnsureSuccessStatusCode();
         await using var fs = new FileStream(assetDownloadPath, FileMode.Create, FileAccess.ReadWrite, FileShare.None);
 
         var totalBytes = response.Content.Headers.ContentLength ?? asset.Size;
@@ -239,44 +303,28 @@ public sealed partial class SoftwareUpdater(
         Environment.Exit(0);
     }
 
-    private async Task<HttpResponseMessage> GetResponseAsync(string url)
+    public void Dispose()
     {
-        ObjectDisposedException.ThrowIf(_httpClient is null, this);
-
-        try
-        {
-            return await GetResponseImplAsync(url);
-        }
-        catch (Exception ex1)
-        {
-            logger.LogWarning(ex1, "Direct request failed, trying GitHub proxies.");
-            foreach (var proxy in GitHubProxies)
-            {
-                try
-                {
-                    return await GetResponseImplAsync(proxy + url);
-                }
-                catch (Exception ex2)
-                {
-                    logger.LogWarning(ex2, "Request via proxy {Proxy} failed.", proxy);
-                }
-            }
-        }
-
-        throw new Exception("All attempts to get a valid response failed.");
-
-        async Task<HttpResponseMessage> GetResponseImplAsync(string actualUrl)
-        {
-            var response = await _httpClient.GetAsync(actualUrl, HttpCompletionOption.ResponseHeadersRead);
-            response.EnsureSuccessStatusCode();
-            return response;
-        }
+        _httpClient.Dispose();
+#if !DEBUG
+        _timer?.Dispose();
+#endif
     }
 
-    [Serializable]
+    // Represents the full asset details including the constructed download URL.
     private record Asset(
+        string Name,
+        string Digest,
+        long Size,
+        string DownloadUrl);
+
+    // Represents asset metadata deserialized from the API response.
+    [Serializable]
+    private record AssetMetadata(
         [property: JsonPropertyName("name")] string Name,
         [property: JsonPropertyName("digest")] string Digest,
-        [property: JsonPropertyName("size")] long Size,
-        [property: JsonPropertyName("browser_download_url")] string DownloadUrl);
+        [property: JsonPropertyName("size")] long Size);
+
+    [GeneratedRegex(@"-v(?<version>\d+\.\d+\.\d+(\.\d+)?)\.(exe|zip)$", RegexOptions.IgnoreCase | RegexOptions.Compiled, "zh-CN")]
+    private static partial Regex VersionRegex();
 }
