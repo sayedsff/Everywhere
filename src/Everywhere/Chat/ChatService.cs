@@ -478,12 +478,13 @@ public class ChatService(
                         }
                         catch (Exception ex)
                         {
+                            // TODO: ChatFunctionCallException
                             functionCallActivity?.SetStatus(ActivityStatusCode.Error, ex.Message);
 
                             resultContent = new FunctionResultContent(functionCallContent, $"Error: {ex.Message}");
                             functionCallChatMessage.ErrorMessageKey = ex.GetFriendlyMessage();
 
-                            logger.LogError(ex, "Error invoking function '{FunctionName}'", functionCallContent.FunctionName);
+                            logger.LogInformation(ex, "Error invoking function '{FunctionName}'", functionCallContent.FunctionName);
                         }
 
                         functionCallChatMessage.Results.Add(resultContent);

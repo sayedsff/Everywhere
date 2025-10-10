@@ -1,3 +1,28 @@
+## [v0.3.6](https://github.com/DearVa/Everywhere/releases/tag/v0.3.6) - 2025-10-10
+
+### ✨ New Features
+- Added chat statistics in the chat window, which can be toggled in settings.
+- Added a setting to control whether to automatically attach the focused element when opening the chat window.
+- Added a setting to allow the model to continue generating responses in the background after the chat window is closed.
+- Added support for `Claude Sonnet 4.5`.
+
+### 🔄️ Changed
+- Improved tooltips for plugin settings.
+- Most error messages are now translated and provide more detailed hints.
+- Improved the download speed and stability of in-app updates.
+- Model parameter settings are now expanded by default to prevent them from being missed.
+
+### 🐞 Fixed
+- Fixed an issue where the model's tool-call usage was displayed in the wrong position.
+- Fixed an issue where the chat window could not be reopened after being closed while a message was being streamed.
+- Fixed an issue where the `Shift` and `Win` keys could become unresponsive if a hotkey included the `Win` key. You can now set the Copilot key as a hotkey normally.
+
+
+
+**Full Changelog**: https://github.com/DearVa/Everywhere/compare/v0.3.5...v0.3.6
+
+
+
 ## [v0.3.5](https://github.com/DearVa/Everywhere/releases/tag/v0.3.5) - 2025-10-09
 
 ### 🐞 Fixed
