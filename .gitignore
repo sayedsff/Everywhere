@@ -459,3 +459,6 @@ $RECYCLE.BIN/
 /docs/.vitepress/cache
 /docs/.vitepress/dist
 /docs/node_modules
+
+# Local environment files
+*.test.json
