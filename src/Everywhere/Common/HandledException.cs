@@ -117,7 +117,6 @@ public enum KernelRequestExceptionType
     OperationCancelled,
 }
 
-
 /// <summary>
 /// Represents errors that occur during requests to LLM providers.
 /// This class normalizes various provider-specific exceptions into a unified format.
@@ -158,34 +157,24 @@ public class ChatRequestException : HandledException
     {
         OriginalException = originalException;
         ExceptionType = type;
-        FriendlyMessageKey = customFriendlyMessageKey ?? new DynamicResourceKey(type switch
-        {
-            KernelRequestExceptionType.InvalidConfiguration => LocaleKey.KernelRequestException_InvalidConfiguration,
-            KernelRequestExceptionType.InvalidApiKey => LocaleKey.KernelRequestException_InvalidApiKey,
-            KernelRequestExceptionType.QuotaExceeded => LocaleKey.KernelRequestException_QuotaExceeded,
-            KernelRequestExceptionType.RateLimit => LocaleKey.KernelRequestException_RateLimit,
-            KernelRequestExceptionType.EndpointNotReachable => LocaleKey.KernelRequestException_EndpointNotReachable,
-            KernelRequestExceptionType.InvalidEndpoint => LocaleKey.KernelRequestException_InvalidEndpoint,
-            KernelRequestExceptionType.EmptyResponse => LocaleKey.KernelRequestException_EmptyResponse,
-            KernelRequestExceptionType.FeatureNotSupport => LocaleKey.KernelRequestException_FeatureNotSupport,
-            KernelRequestExceptionType.Timeout => LocaleKey.KernelRequestException_Timeout,
-            KernelRequestExceptionType.NetworkError => LocaleKey.KernelRequestException_NetworkError,
-            KernelRequestExceptionType.ServiceUnavailable => LocaleKey.KernelRequestException_ServiceUnavailable,
-            KernelRequestExceptionType.OperationCancelled => LocaleKey.KernelRequestException_OperationCancelled,
-            _ => LocaleKey.KernelRequestException_Unknown,
-        });
+        FriendlyMessageKey = customFriendlyMessageKey ?? new DynamicResourceKey(
+            type switch
+            {
+                KernelRequestExceptionType.InvalidConfiguration => LocaleKey.KernelRequestException_InvalidConfiguration,
+                KernelRequestExceptionType.InvalidApiKey => LocaleKey.KernelRequestException_InvalidApiKey,
+                KernelRequestExceptionType.QuotaExceeded => LocaleKey.KernelRequestException_QuotaExceeded,
+                KernelRequestExceptionType.RateLimit => LocaleKey.KernelRequestException_RateLimit,
+                KernelRequestExceptionType.EndpointNotReachable => LocaleKey.KernelRequestException_EndpointNotReachable,
+                KernelRequestExceptionType.InvalidEndpoint => LocaleKey.KernelRequestException_InvalidEndpoint,
+                KernelRequestExceptionType.EmptyResponse => LocaleKey.KernelRequestException_EmptyResponse,
+                KernelRequestExceptionType.FeatureNotSupport => LocaleKey.KernelRequestException_FeatureNotSupport,
+                KernelRequestExceptionType.Timeout => LocaleKey.KernelRequestException_Timeout,
+                KernelRequestExceptionType.NetworkError => LocaleKey.KernelRequestException_NetworkError,
+                KernelRequestExceptionType.ServiceUnavailable => LocaleKey.KernelRequestException_ServiceUnavailable,
+                KernelRequestExceptionType.OperationCancelled => LocaleKey.KernelRequestException_OperationCancelled,
+                _ => LocaleKey.KernelRequestException_Unknown,
+            });
     }
-
-    private static readonly List<IExceptionParser> Parsers =
-    [
-        new GoogleApiExceptionParser(),
-        new ClientResultExceptionParser(),
-        new HttpRequestExceptionParser(),
-        new OllamaExceptionParser(),
-        new HttpOperationExceptionParser(),
-        new GeneralExceptionParser(),
-        new HttpStatusCodeParser(),
-    ];
 
     /// <summary>
     /// Parses a generic <see cref="Exception"/> into a <see cref="ChatRequestException"/>.
@@ -197,14 +186,13 @@ public class ChatRequestException : HandledException
     public static ChatRequestException Parse(Exception exception, string? modelProviderId = null, string? modelId = null)
     {
         var context = new ExceptionParsingContext(exception);
-
-        foreach (var parser in Parsers)
-        {
-            if (parser.TryParse(context))
-            {
-                break;
-            }
-        }
+        new ParserChain<ClientResultExceptionParser,
+            ParserChain<GoogleApiExceptionParser,
+                ParserChain<HttpRequestExceptionParser,
+                    ParserChain<OllamaExceptionParser,
+                        ParserChain<HttpOperationExceptionParser,
+                            GeneralExceptionParser>>>>>().TryParse(ref context);
+        new HttpStatusCodeParser().TryParse(ref context);
 
         return new ChatRequestException(
             originalException: exception,
@@ -238,7 +226,17 @@ public class ChatFunctionCallException : HandledException
 
 #region Exception Parsers
 
-internal class ExceptionParsingContext(Exception exception)
+internal readonly struct ParserChain<T1, T2> : IExceptionParser
+    where T1 : struct, IExceptionParser
+    where T2 : struct, IExceptionParser
+{
+    public bool TryParse(ref ExceptionParsingContext context)
+    {
+        return default(T1).TryParse(ref context) || default(T2).TryParse(ref context);
+    }
+}
+
+internal ref struct ExceptionParsingContext(Exception exception)
 {
     public Exception Exception { get; } = exception;
     public KernelRequestExceptionType? ExceptionType { get; set; }
@@ -247,12 +245,12 @@ internal class ExceptionParsingContext(Exception exception)
 
 internal interface IExceptionParser
 {
-    bool TryParse(ExceptionParsingContext context);
+    bool TryParse(ref ExceptionParsingContext context);
 }
 
-internal class ClientResultExceptionParser : IExceptionParser
+internal struct ClientResultExceptionParser : IExceptionParser
 {
-    public bool TryParse(ExceptionParsingContext context)
+    public bool TryParse(ref ExceptionParsingContext context)
     {
         if (context.Exception is not ClientResultException clientResult)
         {
@@ -271,9 +269,9 @@ internal class ClientResultExceptionParser : IExceptionParser
     }
 }
 
-internal class GoogleApiExceptionParser : IExceptionParser
+internal struct GoogleApiExceptionParser : IExceptionParser
 {
-    public bool TryParse(ExceptionParsingContext context)
+    public bool TryParse(ref ExceptionParsingContext context)
     {
         if (context.Exception is not GoogleApiException googleApi)
         {
@@ -305,9 +303,9 @@ internal class GoogleApiExceptionParser : IExceptionParser
     }
 }
 
-internal class HttpRequestExceptionParser : IExceptionParser
+internal readonly struct HttpRequestExceptionParser : IExceptionParser
 {
-    public bool TryParse(ExceptionParsingContext context)
+    public bool TryParse(ref ExceptionParsingContext context)
     {
         if (context.Exception is not HttpRequestException httpRequest)
         {
@@ -331,9 +329,9 @@ internal class HttpRequestExceptionParser : IExceptionParser
     }
 }
 
-internal class OllamaExceptionParser : IExceptionParser
+internal readonly struct OllamaExceptionParser : IExceptionParser
 {
-    public bool TryParse(ExceptionParsingContext context)
+    public bool TryParse(ref ExceptionParsingContext context)
     {
         if (context.Exception is not OllamaException ollama)
         {
@@ -354,9 +352,9 @@ internal class OllamaExceptionParser : IExceptionParser
     }
 }
 
-internal class HttpOperationExceptionParser : IExceptionParser
+internal readonly struct HttpOperationExceptionParser : IExceptionParser
 {
-    public bool TryParse(ExceptionParsingContext context)
+    public bool TryParse(ref ExceptionParsingContext context)
     {
         if (context.Exception is not HttpOperationException httpOperation)
         {
@@ -367,9 +365,9 @@ internal class HttpOperationExceptionParser : IExceptionParser
     }
 }
 
-internal class GeneralExceptionParser : IExceptionParser
+internal readonly struct GeneralExceptionParser : IExceptionParser
 {
-    public bool TryParse(ExceptionParsingContext context)
+    public bool TryParse(ref ExceptionParsingContext context)
     {
         context.ExceptionType = context.Exception switch
         {
@@ -384,9 +382,9 @@ internal class GeneralExceptionParser : IExceptionParser
     }
 }
 
-internal class HttpStatusCodeParser : IExceptionParser
+internal readonly struct HttpStatusCodeParser : IExceptionParser
 {
-    public bool TryParse(ExceptionParsingContext context)
+    public bool TryParse(ref ExceptionParsingContext context)
     {
         if (context.ExceptionType.HasValue || !context.StatusCode.HasValue)
         {
@@ -395,10 +393,10 @@ internal class HttpStatusCodeParser : IExceptionParser
 
         context.ExceptionType = context.StatusCode switch
         {
-            HttpStatusCode.BadRequest => KernelRequestExceptionType.InvalidConfiguration,
+            HttpStatusCode.BadRequest => ParseException(context.Exception.Message, KernelRequestExceptionType.InvalidConfiguration),
             HttpStatusCode.Unauthorized => KernelRequestExceptionType.InvalidApiKey,
             HttpStatusCode.PaymentRequired => KernelRequestExceptionType.QuotaExceeded,
-            HttpStatusCode.Forbidden => ParseForbiddenException(context.Exception.Message),
+            HttpStatusCode.Forbidden => ParseException(context.Exception.Message, KernelRequestExceptionType.InvalidApiKey),
             HttpStatusCode.NotFound => KernelRequestExceptionType.InvalidConfiguration,
             HttpStatusCode.Conflict => KernelRequestExceptionType.InvalidConfiguration,
             HttpStatusCode.UnprocessableEntity => KernelRequestExceptionType.InvalidConfiguration,
@@ -413,10 +411,12 @@ internal class HttpStatusCodeParser : IExceptionParser
         return context.ExceptionType.HasValue;
     }
 
-    private static KernelRequestExceptionType ParseForbiddenException(string message)
+    private static KernelRequestExceptionType ParseException(string message, KernelRequestExceptionType fallback)
     {
         if (message.Contains("quota", StringComparison.OrdinalIgnoreCase) ||
-            message.Contains("limit", StringComparison.OrdinalIgnoreCase))
+            message.Contains("limit", StringComparison.OrdinalIgnoreCase) ||
+            message.Contains("exceeded", StringComparison.OrdinalIgnoreCase) ||
+            message.Contains("organization", StringComparison.OrdinalIgnoreCase))
         {
             return KernelRequestExceptionType.QuotaExceeded;
         }
@@ -428,8 +428,15 @@ internal class HttpStatusCodeParser : IExceptionParser
             return KernelRequestExceptionType.InvalidApiKey;
         }
 
+        if (message.Contains("model", StringComparison.OrdinalIgnoreCase) ||
+            message.Contains("not found", StringComparison.OrdinalIgnoreCase) ||
+            message.Contains("invalid", StringComparison.OrdinalIgnoreCase))
+        {
+            return KernelRequestExceptionType.InvalidConfiguration;
+        }
+
         // Default for 403 Forbidden if no specific keywords are found
-        return KernelRequestExceptionType.InvalidApiKey;
+        return fallback;
     }
 }
 

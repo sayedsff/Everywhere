@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Everywhere.AI;
+using Everywhere.Common;
 using Everywhere.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
@@ -159,6 +160,7 @@ public partial class WelcomeViewModel : BusyViewModelBase
         }
         catch (Exception ex)
         {
+            ex = ChatRequestException.Parse(ex);
             _logger.LogError(
                 ex,
                 "Failed to validate API key for provider {ProviderId} and model {ModelId}",

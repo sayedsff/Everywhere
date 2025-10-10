@@ -870,10 +870,10 @@ My intelligence comes from powerful Large language models (LLMs), which are prov
         <value>API key is missing or invalid.</value>
     </data>
     <data name="KernelRequestException_QuotaExceeded" xml:space="preserve">
-        <value>You have exceeded your API usage quota.</value>
+        <value>Exceeded the API usage quota, or lacks permission to access the current model.</value>
     </data>
     <data name="KernelRequestException_RateLimit" xml:space="preserve">
-        <value>You have exceeded the request rate limit. Please try again later.</value>
+        <value>Rate limit exceeded. Please try again later.</value>
     </data>
     <data name="KernelRequestException_EndpointNotReachable" xml:space="preserve">
         <value>Service endpoint is not reachable. Please check your network connection.</value>

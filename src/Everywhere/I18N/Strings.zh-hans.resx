@@ -851,7 +851,7 @@
         <value>模型配置不正确。模型提供商或 ID 可能缺失或无效。</value>
     </data>
     <data name="KernelRequestException_QuotaExceeded" xml:space="preserve">
-        <value>您已超出 API 使用配额。</value>
+        <value>超出 API 使用配额，或者没有访问当前模型的权限。</value>
     </data>
     <data name="KernelRequestException_RateLimit" xml:space="preserve">
         <value>请求频率过高，请稍后重试。</value>

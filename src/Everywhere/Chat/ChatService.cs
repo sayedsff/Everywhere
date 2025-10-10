@@ -223,6 +223,7 @@ public class ChatService(
         }
         finally
         {
+            analyzingContextMessage.FinishedAt = DateTimeOffset.UtcNow;
             analyzingContextMessage.IsBusy = false;
         }
 
@@ -528,10 +529,10 @@ public class ChatService(
         }
         catch (Exception e)
         {
-            var chatRequestException = ChatRequestException.Parse(e);
+            e = ChatRequestException.Parse(e);
             activity?.SetStatus(ActivityStatusCode.Error, e.Message.Trim());
-            assistantChatMessage.ErrorMessageKey = chatRequestException.GetFriendlyMessage();
-            logger.LogError(chatRequestException, "Error generating chat response");
+            assistantChatMessage.ErrorMessageKey = e.GetFriendlyMessage();
+            logger.LogError(e, "Error generating chat response");
         }
         finally
         {
