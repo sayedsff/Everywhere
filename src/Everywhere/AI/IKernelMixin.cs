@@ -4,10 +4,13 @@ using Microsoft.SemanticKernel.ChatCompletion;
 namespace Everywhere.AI;
 
 /// <summary>
-/// This interface mixin Semantic Kernel and Kernel Memory services.
+/// Interface for mixing Semantic Kernel and Kernel Memory services.
 /// </summary>
 public interface IKernelMixin : IDisposable
 {
+    /// <summary>
+    /// Gets the chat completion service.
+    /// </summary>
     IChatCompletionService ChatCompletionService { get; }
 
     /// <summary>
@@ -15,5 +18,11 @@ public interface IKernelMixin : IDisposable
     /// </summary>
     int MaxTokenTotal { get; }
 
+    /// <summary>
+    /// Gets the prompt execution settings.
+    /// </summary>
+    /// <param name="isToolRequired">A value indicating whether a tool is required.</param>
+    /// <param name="isToolAutoInvoke">A value indicating whether to auto-invoke tools.</param>
+    /// <returns>The prompt execution settings.</returns>
     PromptExecutionSettings GetPromptExecutionSettings(bool isToolRequired = false, bool isToolAutoInvoke = false);
 }

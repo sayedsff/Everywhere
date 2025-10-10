@@ -10,10 +10,20 @@ using OllamaSharp;
 
 namespace Everywhere.AI;
 
+/// <summary>
+/// A factory for creating instances of <see cref="IKernelMixin"/>.
+/// </summary>
 public class KernelMixinFactory : IKernelMixinFactory
 {
     private CachedKernelMixin? _cachedKernelMixin;
 
+    /// <summary>
+    /// Gets an existing <see cref="IKernelMixin"/> instance from the cache or creates a new one.
+    /// </summary>
+    /// <param name="modelSettings">Settings for the model.</param>
+    /// <param name="apiKeyOverride">An optional API key to override the one in the settings.</param>
+    /// <returns>A cached or new instance of <see cref="IKernelMixin"/>.</returns>
+    /// <exception cref="ChatRequestException">Thrown if the model provider or definition is not found or not supported.</exception>
     public IKernelMixin GetOrCreate(ModelSettings modelSettings, string? apiKeyOverride = null)
     {
         var modelProvider = modelSettings.SelectedModelProvider;
@@ -63,6 +73,9 @@ public class KernelMixinFactory : IKernelMixinFactory
         return _cachedKernelMixin.KernelMixin;
     }
 
+    /// <summary>
+    /// Represents a cached kernel mixin instance along with its configuration.
+    /// </summary>
     private record CachedKernelMixin(
         ModelProviderSchema Schema,
         string ModelId,
@@ -71,10 +84,15 @@ public class KernelMixinFactory : IKernelMixinFactory
         IKernelMixin KernelMixin
     );
 
+    /// <summary>
+    /// An implementation of <see cref="IKernelMixin"/> for OpenAI models.
+    /// </summary>
     private sealed class OpenAIKernelMixin(ModelSettings settings, ModelProvider provider, ModelDefinition definition, string? apiKey) : IKernelMixin
     {
+        /// <inheritdoc />
         public IChatCompletionService ChatCompletionService => _chatCompletionService;
 
+        /// <inheritdoc />
         public PromptExecutionSettings GetPromptExecutionSettings(bool isToolRequired = false, bool isToolAutoInvoke = false) =>
             new OpenAIPromptExecutionSettings
             {
@@ -88,6 +106,7 @@ public class KernelMixinFactory : IKernelMixinFactory
                         FunctionChoiceBehavior.Auto(autoInvoke: isToolAutoInvoke)
             };
 
+        /// <inheritdoc />
         public int MaxTokenTotal => definition.MaxTokens;
 
         private readonly OpenAIChatCompletionService _chatCompletionService = new(
@@ -95,15 +114,22 @@ public class KernelMixinFactory : IKernelMixinFactory
             new Uri(provider.Endpoint, UriKind.Absolute),
             apiKey);
 
+        /// <inheritdoc />
         public void Dispose() { }
     }
 
+    /// <summary>
+    /// An implementation of <see cref="IKernelMixin"/> for Anthropic models.
+    /// </summary>
     private sealed class AnthropicKernelMixin : IKernelMixin
     {
+        /// <inheritdoc />
         public IChatCompletionService ChatCompletionService { get; }
 
+        /// <inheritdoc />
         public int MaxTokenTotal => _definition.MaxTokens;
 
+        /// <inheritdoc />
         public PromptExecutionSettings GetPromptExecutionSettings(bool isToolRequired = false, bool isToolAutoInvoke = false) => new()
         {
             ModelId = _definition.ModelId,
@@ -124,6 +150,9 @@ public class KernelMixinFactory : IKernelMixinFactory
         private readonly ModelDefinition _definition;
         private readonly IChatClient _chatClient;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AnthropicKernelMixin"/> class.
+        /// </summary>
         public AnthropicKernelMixin(ModelSettings settings, ModelProvider provider, ModelDefinition definition, string? apiKey)
         {
             _settings = settings;
@@ -135,18 +164,25 @@ public class KernelMixinFactory : IKernelMixinFactory
             ChatCompletionService = _chatClient.AsChatCompletionService();
         }
 
+        /// <inheritdoc />
         public void Dispose()
         {
             _chatClient.Dispose();
         }
     }
 
+    /// <summary>
+    /// An implementation of <see cref="IKernelMixin"/> for Ollama models.
+    /// </summary>
     private sealed class OllamaKernelMixin : IKernelMixin
     {
+        /// <inheritdoc />
         public IChatCompletionService ChatCompletionService { get; }
 
+        /// <inheritdoc />
         public int MaxTokenTotal => _definition.MaxTokens;
 
+        /// <inheritdoc />
         public PromptExecutionSettings GetPromptExecutionSettings(bool isToolRequired = false, bool isToolAutoInvoke = false) =>
             new OllamaPromptExecutionSettings
             {
@@ -162,6 +198,9 @@ public class KernelMixinFactory : IKernelMixinFactory
         private readonly ModelDefinition _definition;
         private readonly OllamaApiClient _client;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OllamaKernelMixin"/> class.
+        /// </summary>
         public OllamaKernelMixin(ModelSettings settings, ModelProvider provider, ModelDefinition definition)
         {
             _settings = settings;
@@ -174,6 +213,7 @@ public class KernelMixinFactory : IKernelMixinFactory
                 .AsChatCompletionService();
         }
 
+        /// <inheritdoc />
         public void Dispose()
         {
             _client.Dispose();

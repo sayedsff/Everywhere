@@ -2,6 +2,9 @@
 
 namespace Everywhere.AI;
 
+/// <summary>
+/// Contains predefined prompt strings for AI interactions.
+/// </summary>
 public static partial class Prompts
 {
     public const string DefaultSystemPrompt =

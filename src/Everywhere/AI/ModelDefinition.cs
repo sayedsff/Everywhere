@@ -4,10 +4,13 @@ using Everywhere.Configuration;
 
 namespace Everywhere.AI;
 
+/// <summary>
+/// Defines the properties of an AI model.
+/// </summary>
 public partial class ModelDefinition : ObservableObject
 {
     /// <summary>
-    /// The unique identifier for the model definition.
+    /// Unique identifier for the model definition.
     /// This also serves as the model ID used in API requests.
     /// e.g., "gpt-4", "gpt-3.5-turbo".
     /// </summary>
@@ -15,7 +18,7 @@ public partial class ModelDefinition : ObservableObject
     public required string Id { get; init; }
 
     /// <summary>
-    /// The model id for API calling.
+    /// Model id for API calling.
     /// This is typically the same as <see cref="Id"/>, but can be customized
     /// to use a different identifier for API requests.
     /// </summary>
@@ -23,14 +26,13 @@ public partial class ModelDefinition : ObservableObject
     public required partial Customizable<string> ModelId { get; set; }
 
     /// <summary>
-    /// Minimum version of the Everywhere application required to use this provider.
-    /// If null, the provider does not have a minimum version requirement.
+    /// Minimum version of Everywhere required to use this provider.
     /// </summary>
     [HiddenSettingsItem]
     public Version? MinimumVersion { get; set; }
 
     /// <summary>
-    /// The display name of the model, used for UI representation.
+    /// Display name of the model, used for UI.
     /// </summary>
     [ObservableProperty]
     [HiddenSettingsItem]
@@ -55,7 +57,7 @@ public partial class ModelDefinition : ObservableObject
     public partial Customizable<bool> IsDeepThinkingSupported { get; set; } = false;
 
     /// <summary>
-    /// The maximum number of tokens that the model can process in a single request.
+    /// Maximum number of tokens that the model can process in a single request.
     /// aka, the maximum context length.
     /// </summary>
     [ObservableProperty]
@@ -70,7 +72,9 @@ public partial class ModelDefinition : ObservableObject
     [HiddenSettingsItem]
     public bool IsDefault { get; set; }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj) => obj is ModelDefinition other && Id == other.Id;
 
+    /// <inheritdoc />
     public override int GetHashCode() => Id.GetHashCode();
 }
