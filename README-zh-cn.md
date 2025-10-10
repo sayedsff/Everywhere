@@ -219,6 +219,16 @@
 
 第三方许可证：参见 [ThirdPartyNotices.txt](ThirdPartyNotices.txt)。
 
+## 📈 星标历史
+
+<a href="https://www.star-history.com/#DearVa/Everywhere&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=DearVa/Everywhere&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=DearVa/Everywhere&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=DearVa/Everywhere&type=Date" />
+ </picture>
+</a>
+
 <p align="right">(<a href="#readme-top">返回顶部</a>)</p>
 
 <!-- MARKDOWN LINKS & IMAGES -->

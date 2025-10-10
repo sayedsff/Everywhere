@@ -220,6 +220,16 @@ Distributed under the Apache 2.0 License. See [LICENSE](LICENSE) for more inform
 
 Third-Party Licenses: See [ThirdPartyNotices.txt](ThirdPartyNotices.txt) for details.
 
+## 📈 Star History
+
+<a href="https://www.star-history.com/#DearVa/Everywhere&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=DearVa/Everywhere&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=DearVa/Everywhere&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=DearVa/Everywhere&type=Date" />
+ </picture>
+</a>
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- MARKDOWN LINKS & IMAGES -->
