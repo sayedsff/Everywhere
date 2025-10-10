@@ -1,20 +1,14 @@
-﻿using Everywhere.Configuration;
-
-namespace Everywhere.Interop;
-
-public delegate void PointerHotkeyActivatedHandler(PixelPoint point);
-public delegate void KeyboardHotkeyActivatedHandler();
+﻿namespace Everywhere.Interop;
 
 public interface IHotkeyListener
 {
-    event PointerHotkeyActivatedHandler PointerHotkeyActivated;
+    // Register a keyboard hotkey. Multiple handlers for the same hotkey are supported.
+    // Returns an IDisposable that unregisters this handler only.
+    IDisposable Register(KeyboardHotkey hotkey, Action handler);
 
-    event KeyboardHotkeyActivatedHandler KeyboardHotkeyActivated;
-
-    /// <summary>
-    /// When set, the listener will capture the keyboard hotkey and raise the <see cref="KeyboardHotkeyActivated"/> event
-    /// </summary>
-    KeyboardHotkey KeyboardHotkey { get; set; }
+    // Register a mouse hotkey. Multiple handlers for the same MouseKey (with different delays) are supported.
+    // Returns an IDisposable that unregisters this handler only.
+    IDisposable Register(MouseHotkey hotkey, Action handler);
 
     /// <summary>
     /// Starts capturing the keyboard hotkey

@@ -2,6 +2,7 @@
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
 using Avalonia.Data.Converters;
+using Everywhere.Interop;
 using ZLinq;
 
 namespace Everywhere.Configuration;

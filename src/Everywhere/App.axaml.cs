@@ -215,9 +215,8 @@ file class DesignTimeVisualElementContext : IVisualElementContext
 
 file class DesignTimeHotkeyListener : IHotkeyListener
 {
-    public event PointerHotkeyActivatedHandler? PointerHotkeyActivated;
-    public event KeyboardHotkeyActivatedHandler? KeyboardHotkeyActivated;
-    public KeyboardHotkey KeyboardHotkey { get; set; }
+    public IDisposable Register(KeyboardHotkey hotkey, Action handler) => throw new NotSupportedException();
+    public IDisposable Register(MouseHotkey hotkey, Action handler) => throw new NotSupportedException();
     public IKeyboardHotkeyScope StartCaptureKeyboardHotkey() => throw new NotSupportedException();
 }
 

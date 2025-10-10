@@ -44,7 +44,7 @@ public partial class VisualTreeDebugger : UserControl
         VisualTreeView.ItemsSource = _rootElements;
         PropertyItemsControl.ItemsSource = _properties;
 
-        hotkeyListener.KeyboardHotkeyActivated += () =>
+        hotkeyListener.Register(new KeyboardHotkey(Key.C, KeyModifiers.Control | KeyModifiers.Shift), () =>
         {
             _rootElements.Clear();
             var element = visualElementContext.ElementFromPointer();
@@ -53,7 +53,7 @@ public partial class VisualTreeDebugger : UserControl
                 .GetAncestors()
                 .LastOrDefault() ?? element;
             _rootElements.Add(element);
-        };
+        });
 
         _treeViewPointerOverOverlayWindow = new OverlayWindow
         {

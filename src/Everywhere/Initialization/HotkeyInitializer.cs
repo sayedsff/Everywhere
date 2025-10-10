@@ -16,6 +16,10 @@ public class HotkeyInitializer(
 {
     public AsyncInitializerPriority Priority => AsyncInitializerPriority.AfterSettings;
 
+    private readonly Lock _syncLock = new();
+
+    private IDisposable? _chatHotkeySubscription;
+
     public Task InitializeAsync()
     {
         // initialize hotkey listener
@@ -26,10 +30,20 @@ public class HotkeyInitializer(
                 HandleChatHotkeyChanged(settings.ChatWindow.Hotkey);
             }
         };
-        hotkeyListener.KeyboardHotkey = settings.Behavior.ChatHotkey;
-        hotkeyListener.KeyboardHotkeyActivated += () =>
-        {
-            ThreadPool.QueueUserWorkItem(_ =>
+
+        HandleChatHotkeyChanged(settings.ChatWindow.Hotkey);
+
+        return Task.CompletedTask;
+    }
+
+    private void HandleChatHotkeyChanged(KeyboardHotkey hotkey)
+    {
+        using var _ = _syncLock.EnterScope();
+
+        _chatHotkeySubscription?.Dispose();
+        _chatHotkeySubscription = hotkeyListener.Register(
+            hotkey,
+            () => ThreadPool.QueueUserWorkItem(_ =>
             {
                 var element = visualElementContext.KeyboardFocusedElement ??
                     visualElementContext.ElementFromPointer()?
@@ -45,19 +59,6 @@ public class HotkeyInitializer(
 
                     chatWindow.ViewModel.TryFloatToTargetElementAsync(element).Detach(logger.ToExceptionHandler());
                 });
-            });
-        };
-        // hotkeyListener.PointerHotkeyActivated += point =>
-        // {
-        //     Dispatcher.UIThread.InvokeOnDemandAsync(
-        //         () =>
-        //         {
-        //             var window = ServiceLocator.Resolve<ChatFloatingWindow>();
-        //             window.Position = point;
-        //             window.IsOpened = true;
-        //         });
-        // };
-
-        return Task.CompletedTask;
+            }));
     }
 }

@@ -1,321 +1,554 @@
-﻿using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Windows.Win32.UI.WindowsAndMessaging;
-using Avalonia;
 using Avalonia.Input;
-using Everywhere.Configuration;
-using Everywhere.Extensions;
 using Everywhere.Interop;
-using Everywhere.Utilities;
 using Everywhere.Windows.Extensions;
 
 namespace Everywhere.Windows.Interop;
 
 public unsafe class Win32HotkeyListener : IHotkeyListener
 {
-    public event PointerHotkeyActivatedHandler PointerHotkeyActivated
-    {
-        add => _pointerHotkeyActivated += value;
-        remove => _pointerHotkeyActivated -= value;
-    }
+    private static HWND _hwnd;
 
-    public event KeyboardHotkeyActivatedHandler KeyboardHotkeyActivated
-    {
-        add => _keyboardHotkeyActivated += value;
-        remove => _keyboardHotkeyActivated -= value;
-    }
+    // Unique id generator for RegisterHotKey
+    private static int _nextId = 1;
 
-    public KeyboardHotkey KeyboardHotkey
-    {
-        get => _keyboardHotkey;
-        set => PInvoke.PostMessage(_hotkeyWindowHWnd, WM_REGISTER_HOTKEY, new WPARAM((nuint)value.Key), new LPARAM((nint)value.Modifiers));
-    }
+    // OS-registered keyboard hotkeys: hotkey -> registration bundle (id + handlers)
+    private static readonly Dictionary<KeyboardHotkey, OsReg> OsRegs = new();
+    private static readonly Dictionary<int, OsReg> IdToOsReg = new();
 
-    private const nuint TimerId = 1;
+    // Fallback keyboard hotkeys (when RegisterHotKey fails): (mods,key) -> handlers
+    private static readonly Dictionary<HotkeySig, HandlerList> HookKbHandlers = new();
+
+    // Mouse hotkeys: per-button registrations (each has its own delay/handler/timer)
+    private static readonly Dictionary<MouseButton, List<MouseRegistration>> MouseRegs = new()
+    {
+        { MouseButton.Left, [] },
+        { MouseButton.Right, [] },
+        { MouseButton.Middle, [] },
+        { MouseButton.XButton1, [] },
+        { MouseButton.XButton2, [] },
+    };
+
+    // Hooks (created on demand)
+    private static LowLevelKeyboardHook? _keyboardHook;
+    private static LowLevelMouseHook? _mouseHook;
+
+    // Inject sentinel to ignore self-injected events
     private const nuint InjectExtra = 0x0d000721;
-    private const uint WM_REGISTER_HOTKEY = (uint)WINDOW_MESSAGE.WM_USER;
 
-    private static readonly SemaphoreSlim OperationLock = new(1, 1);
+    // Keyboard hook state
+    private static KeyModifiers _pressedMods;
+    private static bool _triggerActive;
+    private static HotkeySig _activeSig;
+    private static bool _winHeldSuppressed;
+    private static bool _injectedWinDown;
+    private static VIRTUAL_KEY _winVk;
 
-    private static PointerHotkeyActivatedHandler? _pointerHotkeyActivated;
-    private static KeyboardHotkeyActivatedHandler? _keyboardHotkeyActivated;
-
-    private static KeyboardHotkey _keyboardHotkey;
-    private static LowLevelKeyboardHook? _keyboardHotkeyHook;
-    private static KeyModifiers _pressedHookedModifiers;
-    private static bool _isHotkeyTriggered;
-    private static HWND _hotkeyWindowHWnd;
-    private static bool _isHotkeyRegistered;
-
-    private static uint _pressedXButton;
-    private static bool _isXButtonEventTriggered;
+    // Concurrency: light lock for hotkey maps
+    private static readonly Lock SyncLock = new();
 
     private static IKeyboardHotkeyScope? _currentKeyboardHotkeyScope;
 
     static Win32HotkeyListener()
     {
-        new Thread(HookWindowMessageLoop).With(t =>
-        {
-            t.SetApartmentState(ApartmentState.STA);
-            t.Name = "HotKeyThread";
-        }).Start();
+        var t = new Thread(WindowLoop) { IsBackground = true, Name = "HotkeyWindow", };
+        t.SetApartmentState(ApartmentState.STA);
+        t.Start();
     }
 
     public IKeyboardHotkeyScope StartCaptureKeyboardHotkey()
     {
-        OperationLock.Wait();
-        try
+        lock (SyncLock)
         {
             if (_currentKeyboardHotkeyScope is not { IsDisposed: false }) _currentKeyboardHotkeyScope = new KeyboardHotkeyScopeImpl();
             return _currentKeyboardHotkeyScope;
         }
-        finally
+    }
+
+    public IDisposable Register(KeyboardHotkey hotkey, Action handler)
+    {
+        if (hotkey.Key == Key.None || hotkey.Modifiers == KeyModifiers.None)
+            throw new ArgumentException("Invalid keyboard hotkey.", nameof(hotkey));
+        if (handler is null) throw new ArgumentNullException(nameof(handler));
+
+        lock (SyncLock)
         {
-            OperationLock.Release();
+            // If there is already an OS registration for this hotkey, reuse id and append handler.
+            if (OsRegs.TryGetValue(hotkey, out var reg))
+            {
+                reg.Handlers.Add(handler);
+                return new Disposer(() => UnregisterKeyboardHandlerOs(hotkey, handler));
+            }
+
+            // Try OS registration (incl. MOD_WIN).
+            var mods = HOT_KEY_MODIFIERS.MOD_NOREPEAT;
+            if (hotkey.Modifiers.HasFlag(KeyModifiers.Control)) mods |= HOT_KEY_MODIFIERS.MOD_CONTROL;
+            if (hotkey.Modifiers.HasFlag(KeyModifiers.Shift)) mods |= HOT_KEY_MODIFIERS.MOD_SHIFT;
+            if (hotkey.Modifiers.HasFlag(KeyModifiers.Alt)) mods |= HOT_KEY_MODIFIERS.MOD_ALT;
+            if (hotkey.Modifiers.HasFlag(KeyModifiers.Meta)) mods |= HOT_KEY_MODIFIERS.MOD_WIN;
+
+            var id = _nextId++;
+            if (PInvoke.RegisterHotKey(_hwnd, id, mods, (uint)hotkey.Key.ToVirtualKey()))
+            {
+                var bundle = new OsReg(id, new List<Action> { handler });
+                OsRegs[hotkey] = bundle;
+                IdToOsReg[id] = bundle;
+                return new Disposer(() => UnregisterKeyboardHandlerOs(hotkey, handler));
+            }
+
+            // Fallback to LL keyboard hook with Win suppression/compensation.
+            var sig = new HotkeySig(hotkey.Modifiers, hotkey.Key);
+            if (!HookKbHandlers.TryGetValue(sig, out var list))
+            {
+                list = new HandlerList();
+                HookKbHandlers[sig] = list;
+            }
+            list.Add(handler);
+
+            EnsureKeyboardHook();
+            return new Disposer(() => UnregisterKeyboardHandlerHook(sig, handler));
         }
     }
 
-    private static void HookWindowMessageLoop()
+    public IDisposable Register(MouseHotkey hotkey, Action handler)
+    {
+        if (handler is null) throw new ArgumentNullException(nameof(handler));
+
+        lock (SyncLock)
+        {
+            var reg = new MouseRegistration(hotkey, handler);
+            MouseRegs[hotkey.Key].Add(reg);
+            EnsureMouseHook();
+            return new Disposer(() => UnregisterMouseHandler(reg));
+        }
+    }
+
+    public void Dispose()
+    {
+        lock (SyncLock)
+        {
+            // Unregister all OS hotkeys
+            foreach (var kv in OsRegs)
+            {
+                PInvoke.UnregisterHotKey(_hwnd, kv.Value.Id);
+            }
+            OsRegs.Clear();
+            IdToOsReg.Clear();
+
+            // Clear fallback handlers
+            HookKbHandlers.Clear();
+
+            // Clear mouse regs (and cancel timers)
+            foreach (var list in MouseRegs.Values)
+            {
+                foreach (var r in list) r.CancelTimer();
+                list.Clear();
+            }
+
+            // Dispose hooks
+            _keyboardHook?.Dispose();
+            _keyboardHook = null;
+            _mouseHook?.Dispose();
+            _mouseHook = null;
+        }
+    }
+
+    // ---------- window & message loop ----------
+
+    private static void WindowLoop()
     {
         using var hModule = PInvoke.GetModuleHandle(null);
-        _hotkeyWindowHWnd = PInvoke.CreateWindowEx(
+        _hwnd = PInvoke.CreateWindowEx(
             WINDOW_EX_STYLE.WS_EX_NOACTIVATE,
             "STATIC",
-            "Everywhere.HotKeyWindow",
+            "Everywhere.MultiHotkeyWindow",
             WINDOW_STYLE.WS_POPUP,
-            0,
-            0,
-            0,
-            0,
+            0, 0, 0, 0,
             HWND.Null,
             null,
             hModule,
             null);
-        if (_hotkeyWindowHWnd.IsNull)
-        {
+
+        if (_hwnd.IsNull)
             Marshal.ThrowExceptionForHR(Marshal.GetLastWin32Error());
-        }
 
         MSG msg;
         while (PInvoke.GetMessage(&msg, HWND.Null, 0, 0) != 0)
         {
             switch (msg.message)
             {
-                case WM_REGISTER_HOTKEY:
+                case (uint)WINDOW_MESSAGE.WM_HOTKEY:
                 {
-                    var value = new KeyboardHotkey((Key)msg.wParam.Value, (KeyModifiers)msg.lParam.Value);
-                    if (_keyboardHotkey == value) continue;
-
-                    if (_isHotkeyRegistered) PInvoke.UnregisterHotKey(_hotkeyWindowHWnd, 0);
-                    DisposeCollector.DisposeToDefault(ref _keyboardHotkeyHook);
-
-                    if (value.Modifiers == KeyModifiers.None || value.Key == Key.None)
+                    var id = (int)msg.wParam.Value;
+                    OsReg? bundle;
+                    lock (SyncLock)
                     {
-                        // invalid hotkey, ignore
-                        _keyboardHotkey = default;
-                        continue;
+                        IdToOsReg.TryGetValue(id, out bundle);
                     }
-
-                    _keyboardHotkey = value;
-
-                    if (value.Modifiers.HasFlag(KeyModifiers.Meta))
+                    if (bundle is not null)
                     {
-                        // for those keys with Meta modifier, we need a low level keyboard hook to block the Windows key down event
-                        _keyboardHotkeyHook = new LowLevelKeyboardHook(KeyboardHotkeyHookProc);
+                        // Invoke OS-registered handlers
+                        InvokeHandlers(bundle.Handlers);
                     }
-                    else
-                    {
-                        var hotKeyModifiers = HOT_KEY_MODIFIERS.MOD_NOREPEAT;
-                        if (value.Modifiers.HasFlag(KeyModifiers.Control))
-                            hotKeyModifiers |= HOT_KEY_MODIFIERS.MOD_CONTROL;
-                        if (value.Modifiers.HasFlag(KeyModifiers.Shift))
-                            hotKeyModifiers |= HOT_KEY_MODIFIERS.MOD_SHIFT;
-                        if (value.Modifiers.HasFlag(KeyModifiers.Alt))
-                            hotKeyModifiers |= HOT_KEY_MODIFIERS.MOD_ALT;
-                        _isHotkeyRegistered = PInvoke.RegisterHotKey(
-                            _hotkeyWindowHWnd,
-                            0,
-                            hotKeyModifiers,
-                            (uint)value.Key.ToVirtualKey()
-                        );
-                    }
-
-                    break;
-                }
-                case (uint)WINDOW_MESSAGE.WM_HOTKEY when _currentKeyboardHotkeyScope is null or { IsDisposed: true }:
-                {
-                    // only trigger hotkey when not capturing
-                    _keyboardHotkeyActivated?.Invoke();
-                    break;
-                }
-                case (uint)WINDOW_MESSAGE.WM_TIMER when msg.wParam == TimerId:
-                {
-                    _isXButtonEventTriggered = true;
-                    PInvoke.KillTimer(_hotkeyWindowHWnd, TimerId);
-
-                    if (_pointerHotkeyActivated is not { } handler) continue;
-                    PInvoke.GetCursorPos(out var point);
-                    handler.Invoke(new PixelPoint(point.X, point.Y));
                     break;
                 }
             }
 
             PInvoke.DispatchMessage(&msg);
         }
-
-        // Cleanup
-        if (_isHotkeyRegistered) PInvoke.UnregisterHotKey(_hotkeyWindowHWnd, 0);
-        DisposeCollector.DisposeToDefault(ref _keyboardHotkeyHook);
-
-        PInvoke.DestroyWindow(_hotkeyWindowHWnd);
     }
 
-    private static void KeyboardHotkeyHookProc(UIntPtr wParam, ref KBDLLHOOKSTRUCT lParam, ref bool blockNext)
+    private static void InvokeHandlers(List<Action> handlers)
     {
-        // If we are currently capturing a hotkey, do not process the global hotkey hook.
-        if (_currentKeyboardHotkeyScope is { IsDisposed: false })
+        // Execute handlers safely; avoid holding locks while invoking.
+        foreach (var handler in handlers.ToArray())
         {
-            return;
+            try { handler(); } catch { /* swallow */ }
         }
+    }
 
-        var virtualKey = (VIRTUAL_KEY)lParam.vkCode;
-        var key = virtualKey.ToAvaloniaKey();
-        var keyModifiers = virtualKey.ToKeyModifiers();
+    // ---------- keyboard hook (fallback) ----------
 
-        switch ((WINDOW_MESSAGE)wParam)
+    private static void EnsureKeyboardHook()
+    {
+        if (_keyboardHook is not null) return;
+        _keyboardHook = new LowLevelKeyboardHook(KeyboardHookProc);
+    }
+
+    private static void KeyboardHookProc(UIntPtr wParam, ref KBDLLHOOKSTRUCT lParam, ref bool blockNext)
+    {
+        if (lParam.dwExtraInfo == InjectExtra) return;
+
+        var msg = (WINDOW_MESSAGE)wParam;
+        var vk = (VIRTUAL_KEY)lParam.vkCode;
+        var key = vk.ToAvaloniaKey();
+        var mod = vk.ToKeyModifiers();
+
+        static bool IsWin(VIRTUAL_KEY v) => v is VIRTUAL_KEY.VK_LWIN or VIRTUAL_KEY.VK_RWIN;
+
+        switch (msg)
         {
-            case WINDOW_MESSAGE.WM_KEYDOWN or WINDOW_MESSAGE.WM_SYSKEYDOWN:
+            case WINDOW_MESSAGE.WM_KEYDOWN:
+            case WINDOW_MESSAGE.WM_SYSKEYDOWN:
             {
-                // If a modifier key is pressed, add it to our state.
-                if (keyModifiers != KeyModifiers.None)
-                {
-                    _pressedHookedModifiers |= keyModifiers;
-                }
+                if (mod != KeyModifiers.None)
+                    _pressedMods |= mod;
 
-                // Check if the pressed key is the main key of the hotkey,
-                // all required modifiers are pressed, and the hotkey hasn't been triggered yet.
-                var isMainKeyPressed = key == _keyboardHotkey.Key && key != Key.None;
-                var areModifiersPressed = _pressedHookedModifiers == _keyboardHotkey.Modifiers;
-
-                if (!_isHotkeyTriggered && isMainKeyPressed && areModifiersPressed)
+                if (IsWin(vk) && AnyHookMetaHotkey())
                 {
-                    // Mark as triggered to prevent re-firing.
-                    _isHotkeyTriggered = true;
-                    // Block this key event.
+                    _winHeldSuppressed = true;
+                    _injectedWinDown = false;
+                    _winVk = vk;
                     blockNext = true;
-                    // Invoke the hotkey activated event.
-                    _keyboardHotkeyActivated?.Invoke();
                     return;
                 }
 
-                // If any part of the hotkey combination is pressed, block the event.
-                // This is to prevent side effects, e.g., opening the Start Menu with the Win key.
-                if ((_pressedHookedModifiers & _keyboardHotkey.Modifiers) != 0 || isMainKeyPressed)
+                if (mod == KeyModifiers.None)
                 {
-                    blockNext = true;
+                    var sig = new HotkeySig(_pressedMods, key);
+                    List<Action>? handlers;
+                    lock (SyncLock)
+                    {
+                        handlers = HookKbHandlers.TryGetValue(sig, out var list) ? list.Snapshot() : null;
+                    }
+
+                    if (!_triggerActive && handlers is not null)
+                    {
+                        _triggerActive = true;
+                        _activeSig = sig;
+                        blockNext = true; // block main key down
+                        foreach (var h in handlers)
+                        {
+                            try { h(); } catch { /* swallow */ }
+                        }
+                        return;
+                    }
+
+                    if (_winHeldSuppressed)
+                    {
+                        // Not our hotkey: compensate Win down then let OS see this key
+                        if (!_injectedWinDown)
+                        {
+                            InjectKey(_winVk, true);
+                            _injectedWinDown = true;
+                            _winHeldSuppressed = false;
+                        }
+                        return;
+                    }
                 }
 
-                break;
+                return;
             }
-            case WINDOW_MESSAGE.WM_KEYUP or WINDOW_MESSAGE.WM_SYSKEYUP:
+
+            case WINDOW_MESSAGE.WM_KEYUP:
+            case WINDOW_MESSAGE.WM_SYSKEYUP:
             {
-                // If a modifier key is released, remove it from our state.
-                if (keyModifiers != KeyModifiers.None)
+                if (mod != KeyModifiers.None)
+                    _pressedMods &= ~mod;
+
+                if (_triggerActive && key == _activeSig.Key)
                 {
-                    _pressedHookedModifiers &= ~keyModifiers;
+                    blockNext = true; // block main key up
                 }
 
-                // If all modifier keys are released, reset the triggered flag.
-                // This allows the hotkey to be triggered again.
-                if (_pressedHookedModifiers == KeyModifiers.None)
+                if (IsWin(vk) && AnyHookMetaHotkey())
                 {
-                    _isHotkeyTriggered = false;
+                    if (_triggerActive && _activeSig.Modifiers.HasFlag(KeyModifiers.Meta))
+                    {
+                        // Our combo contained Meta: swallow Win up to avoid Start menu
+                        blockNext = true;
+                    }
+                    else if (_injectedWinDown)
+                    {
+                        // We injected Win down: swallow real up, inject up
+                        blockNext = true;
+                        InjectKey(_winVk, false);
+                    }
+                    else if (_winHeldSuppressed)
+                    {
+                        // Single-tap Win: swallow real up, inject down+up to open Start
+                        blockNext = true;
+                        InjectKey(_winVk, true);
+                        InjectKey(_winVk, false);
+                    }
+
+                    _winHeldSuppressed = false;
+                    _injectedWinDown = false;
+                    _winVk = 0;
                 }
 
-                // Block the key up event if it was part of the hotkey combination
-                // to ensure consistent behavior.
-                if ((_keyboardHotkey.Modifiers.HasFlag(keyModifiers) && keyModifiers != KeyModifiers.None) || key == _keyboardHotkey.Key)
+                if (_pressedMods == KeyModifiers.None)
                 {
-                    blockNext = true;
+                    _triggerActive = false;
+                    _activeSig = default;
                 }
-                break;
+
+                return;
             }
         }
     }
 
-    private static LRESULT MouseHookProc(int code, WPARAM wParam, LPARAM lParam)
+    private static bool AnyHookMetaHotkey()
     {
-        if (code < 0) return PInvoke.CallNextHookEx(null, code, wParam, lParam);
-
-        ref var hookStruct = ref Unsafe.AsRef<MSLLHOOKSTRUCT>(lParam.Value.ToPointer());
-        if (hookStruct.dwExtraInfo == InjectExtra)
-            return PInvoke.CallNextHookEx(null, code, wParam, lParam);
-
-        var button = hookStruct.mouseData >> 16 & 0xFFFF;
-        switch (wParam.Value)
+        lock (SyncLock)
         {
-            case (uint)WINDOW_MESSAGE.WM_XBUTTONDOWN when button is PInvoke.XBUTTON1:
-            {
-                _pressedXButton = button;
-                PInvoke.SetTimer(_hotkeyWindowHWnd, TimerId, 500, null);
-                return new LRESULT(1); // block XButton1 down event
-            }
-            case (uint)WINDOW_MESSAGE.WM_XBUTTONUP when button == _pressedXButton:
-            {
-                _pressedXButton = 0;
+            foreach (var k in HookKbHandlers.Keys)
+                if ((k.Modifiers & KeyModifiers.Meta) != 0) return true;
+        }
+        return false;
+    }
 
-                if (_isXButtonEventTriggered)
+    private static void InjectKey(VIRTUAL_KEY vk, bool down)
+    {
+        var inputs = new INPUT[1];
+        inputs[0] = new INPUT
+        {
+            type = INPUT_TYPE.INPUT_KEYBOARD,
+            Anonymous = new INPUT._Anonymous_e__Union
+            {
+                ki = new KEYBDINPUT
                 {
-                    _isXButtonEventTriggered = false;
-                    return new LRESULT(1); // block XButton1 up event
+                    wVk = vk,
+                    wScan = 0,
+                    dwFlags = down ? 0 : KEYBD_EVENT_FLAGS.KEYEVENTF_KEYUP,
+                    time = 0,
+                    dwExtraInfo = InjectExtra
                 }
+            }
+        };
+        fixed (INPUT* p = inputs)
+        {
+            PInvoke.SendInput(new ReadOnlySpan<INPUT>(p, 1), sizeof(INPUT));
+        }
+    }
 
-                PInvoke.KillTimer(_hotkeyWindowHWnd, TimerId);
+    // ---------- mouse hook ----------
 
-                // send XButton1 down and up event to the system in new thread
-                // otherwise it will cause a deadlock
-                Task.Run(() =>
-                {
-                    PInvoke.SendInput(
-                        [
-                            new INPUT
-                            {
-                                type = INPUT_TYPE.INPUT_MOUSE,
-                                Anonymous = new INPUT._Anonymous_e__Union
-                                {
-                                    mi = new MOUSEINPUT
-                                    {
-                                        dwFlags = MOUSE_EVENT_FLAGS.MOUSEEVENTF_XDOWN,
-                                        mouseData = button,
-                                        dwExtraInfo = InjectExtra
-                                    }
-                                }
-                            },
-                            new INPUT
-                            {
-                                type = INPUT_TYPE.INPUT_MOUSE,
-                                Anonymous = new INPUT._Anonymous_e__Union
-                                {
-                                    mi = new MOUSEINPUT
-                                    {
-                                        dwFlags = MOUSE_EVENT_FLAGS.MOUSEEVENTF_XUP,
-                                        mouseData = button,
-                                        dwExtraInfo = InjectExtra
-                                    }
-                                }
-                            },
-                        ],
-                        sizeof(INPUT));
-                });
+    private static void EnsureMouseHook()
+    {
+        if (_mouseHook is not null) return;
+        _mouseHook = new LowLevelMouseHook(MouseHookProc);
+    }
 
+    private static void MouseHookProc(nuint wParam, ref MSLLHOOKSTRUCT hs, ref bool blockNext)
+    {
+        if (hs.dwExtraInfo == InjectExtra) return;
+
+        var msg = (WINDOW_MESSAGE)wParam;
+        var button = (hs.mouseData >> 16) & 0xFFFF;
+
+        switch (msg)
+        {
+            case WINDOW_MESSAGE.WM_LBUTTONDOWN:
+            case WINDOW_MESSAGE.WM_RBUTTONDOWN:
+            case WINDOW_MESSAGE.WM_MBUTTONDOWN:
+            case WINDOW_MESSAGE.WM_XBUTTONDOWN:
+            {
+                if (GetRegistrations() is not { Count: > 0 } registrations) break;
+
+                // Schedule or fire per registration
+                foreach (var r in registrations) r.OnDown();
+                break;
+            }
+
+            case WINDOW_MESSAGE.WM_LBUTTONUP:
+            case WINDOW_MESSAGE.WM_RBUTTONUP:
+            case WINDOW_MESSAGE.WM_MBUTTONUP:
+            case WINDOW_MESSAGE.WM_XBUTTONUP:
+            {
+                if (GetRegistrations() is not { Count: > 0 } registrations) break;
+
+                // Cancel pending per registration
+                foreach (var r in registrations) r.OnUp();
                 break;
             }
         }
 
-        return PInvoke.CallNextHookEx(null, code, wParam, lParam);
+        List<MouseRegistration>? GetRegistrations()
+        {
+            var mk = msg switch
+            {
+                WINDOW_MESSAGE.WM_LBUTTONUP => MouseButton.Left,
+                WINDOW_MESSAGE.WM_RBUTTONUP => MouseButton.Right,
+                WINDOW_MESSAGE.WM_MBUTTONUP => MouseButton.Middle,
+                WINDOW_MESSAGE.WM_XBUTTONUP when button == PInvoke.XBUTTON1 => MouseButton.XButton1,
+                WINDOW_MESSAGE.WM_XBUTTONUP when button == PInvoke.XBUTTON2 => MouseButton.XButton2,
+                _ => MouseButton.None
+            };
+            if (mk == MouseButton.None) return null;
+
+            lock (SyncLock) return MouseRegs[mk].Count > 0 ? [..MouseRegs[mk]] : null;
+        }
+    }
+
+    // ---------- unregister helpers ----------
+
+    private static void UnregisterKeyboardHandlerOs(KeyboardHotkey hotkey, Action handler)
+    {
+        lock (SyncLock)
+        {
+            if (!OsRegs.TryGetValue(hotkey, out var bundle)) return;
+            bundle.Handlers.Remove(handler);
+            if (bundle.Handlers.Count > 0) return;
+
+            OsRegs.Remove(hotkey);
+            IdToOsReg.Remove(bundle.Id);
+            PInvoke.UnregisterHotKey(_hwnd, bundle.Id);
+        }
+    }
+
+    private static void UnregisterKeyboardHandlerHook(HotkeySig sig, Action handler)
+    {
+        lock (SyncLock)
+        {
+            if (!HookKbHandlers.TryGetValue(sig, out var list)) return;
+            list.Remove(handler);
+            if (list.Count == 0) HookKbHandlers.Remove(sig);
+            if (HookKbHandlers.Count == 0 && _keyboardHook is not null)
+            {
+                _keyboardHook.Dispose();
+                _keyboardHook = null;
+            }
+        }
+    }
+
+    private static void UnregisterMouseHandler(MouseRegistration reg)
+    {
+        lock (SyncLock)
+        {
+            if (MouseRegs.TryGetValue(reg.Hotkey.Key, out var list))
+            {
+                list.Remove(reg);
+                reg.CancelTimer();
+            }
+            if (MouseRegs.Values.Sum(l => l.Count) == 0 && _mouseHook is not null)
+            {
+                _mouseHook.Dispose();
+                _mouseHook = null;
+            }
+        }
+    }
+
+    // ---------- small types ----------
+
+    private readonly record struct Disposer(Action DisposeAction) : IDisposable
+    {
+        public void Dispose() => DisposeAction?.Invoke();
+    }
+
+    private sealed class OsReg(int id, List<Action> handlers)
+    {
+        public int Id { get; } = id;
+        public List<Action> Handlers { get; } = handlers;
+    }
+
+    private readonly struct HotkeySig(KeyModifiers modifiers, Key key) : IEquatable<HotkeySig>
+    {
+        public KeyModifiers Modifiers { get; } = modifiers;
+        public Key Key { get; } = key;
+        public bool Equals(HotkeySig other) => Modifiers == other.Modifiers && Key == other.Key;
+        public override bool Equals(object? obj) => obj is HotkeySig o && Equals(o);
+        public override int GetHashCode() => ((int)Modifiers << 16) ^ (int)Key;
+    }
+
+    private sealed class HandlerList
+    {
+        private readonly List<Action> _handlers = [];
+        public void Add(Action h) => _handlers.Add(h);
+        public void Remove(Action h) => _handlers.Remove(h);
+        public int Count => _handlers.Count;
+        public List<Action> Snapshot() => [.._handlers];
+    }
+
+    // Per-registration mouse state (timer lifecycle)
+    private sealed class MouseRegistration(MouseHotkey hotkey, Action handler)
+    {
+        public MouseHotkey Hotkey { get; } = hotkey;
+        public Action Handler { get; } = handler;
+        private Timer? _timer;
+        private int _armed;    // 1 when button is considered pressed/pending
+
+        public void OnDown()
+        {
+            // mark pressed
+            Interlocked.Exchange(ref _armed, 1);
+
+            if (Hotkey.Delay <= TimeSpan.Zero)
+            {
+                SafeInvoke();
+                return;
+            }
+
+            CancelTimer(); // defensive
+            _timer = new Timer(_ =>
+            {
+                if (Interlocked.CompareExchange(ref _armed, 1, 1) == 1)
+                {
+                    SafeInvoke();
+                }
+            }, null, Hotkey.Delay, Timeout.InfiniteTimeSpan);
+        }
+
+        public void OnUp()
+        {
+            Interlocked.Exchange(ref _armed, 0);
+            CancelTimer();
+        }
+
+        public void CancelTimer()
+        {
+            var t = Interlocked.Exchange(ref _timer, null);
+            t?.Dispose();
+        }
+
+        private void SafeInvoke()
+        {
+            try { Handler(); } catch { /* swallow */ }
+        }
     }
 
     private sealed class KeyboardHotkeyScopeImpl : IKeyboardHotkeyScope

@@ -2,7 +2,7 @@
 using System.Text.Json.Serialization;
 using Avalonia.Input;
 
-namespace Everywhere.Configuration;
+namespace Everywhere.Interop;
 
 public readonly record struct KeyboardHotkey(Key Key, KeyModifiers Modifiers)
 {
