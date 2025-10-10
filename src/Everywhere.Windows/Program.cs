@@ -66,8 +66,8 @@ public static class Program
                 #region View & ViewModel
 
                 .AddSingleton<VisualTreeDebugger>()
-                .AddSingleton<ChatFloatingWindowViewModel>()
-                .AddSingleton<ChatFloatingWindow>()
+                .AddSingleton<ChatWindowViewModel>()
+                .AddSingleton<ChatWindow>()
                 .AddTransient<IMainViewPageFactory, SettingsCategoryPageFactory>()
                 .AddSingleton<ChatPluginPageViewModel>()
                 .AddSingleton<IMainViewPage, ChatPluginPage>()

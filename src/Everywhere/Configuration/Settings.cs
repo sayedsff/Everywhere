@@ -35,7 +35,7 @@ public class Settings : ObservableObject
 
     public ModelSettings Model { get; set; } = new();
 
-    public BehaviorSettings Behavior { get; set; } = new();
+    public ChatWindowSettings ChatWindow { get; set; } = new();
 
     [HiddenSettingsItem]
     public PluginSettings Plugin { get; set; } = new();
@@ -190,18 +190,33 @@ public partial class CommonSettings : SettingsCategory
         .ShowError();
 }
 
-public partial class BehaviorSettings : SettingsCategory
+public partial class ChatWindowSettings : SettingsCategory
 {
-    public override string Header => "Behavior";
+    public override string Header => "ChatWindow";
 
-    public override LucideIconKind Icon => LucideIconKind.Keyboard;
-
-    [ObservableProperty]
-    public partial KeyboardHotkey ChatHotkey { get; set; } = new(Key.E, KeyModifiers.Control | KeyModifiers.Shift);
+    public override LucideIconKind Icon => LucideIconKind.BotMessageSquare;
 
     [ObservableProperty]
-    public partial ChatFloatingWindowPinMode ChatFloatingWindowPinMode { get; set; }
+    public partial KeyboardHotkey Hotkey { get; set; } = new(Key.E, KeyModifiers.Control | KeyModifiers.Shift);
 
+    [ObservableProperty]
+    public partial ChatWindowPinMode WindowPinMode { get; set; }
+
+    /// <summary>
+    /// When enabled, automatically add focused element as attachment when opening chat window.
+    /// </summary>
+    [ObservableProperty]
+    public partial bool AutomaticallyAddElement { get; set; } = true;
+
+    /// <summary>
+    /// When enabled, chat window can generate response in the background when closed.
+    /// </summary>
+    [ObservableProperty]
+    public partial bool AllowRunInBackground { get; set; } = true;
+
+    /// <summary>
+    /// When enabled, show chat statistics in the chat window.
+    /// </summary>
     [ObservableProperty]
     public partial bool ShowChatStatistics { get; set; } = true;
 }
@@ -338,7 +353,7 @@ public partial class InternalSettings : SettingsCategory
     public partial bool IsMainViewSidebarExpanded { get; set; }
 
     [ObservableProperty]
-    public partial bool IsChatFloatingWindowPinned { get; set; }
+    public partial bool IsChatWindowPinned { get; set; }
 
     [ObservableProperty]
     public partial string? ChatInputBoxText { get; set; }

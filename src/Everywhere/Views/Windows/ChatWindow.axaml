@@ -1,5 +1,5 @@
 ﻿<v:ReactiveWindow
-  x:Class="Everywhere.Views.ChatFloatingWindow" xmlns="https://github.com/avaloniaui"
+  x:Class="Everywhere.Views.ChatWindow" xmlns="https://github.com/avaloniaui"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:at="clr-namespace:Everywhere.AttachedProperties"
   xmlns:be="clr-namespace:Everywhere.Behaviors" xmlns:chat="clr-namespace:Everywhere.Chat"
   xmlns:common="clr-namespace:Everywhere.Common" xmlns:interop="clr-namespace:Everywhere.Interop"
@@ -7,8 +7,8 @@
   xmlns:sys="clr-namespace:System;assembly=System.Runtime" xmlns:themes="clr-namespace:ShadUI.Themes;assembly=ShadUI"
   xmlns:v="clr-namespace:Everywhere.Views" xmlns:vc="clr-namespace:Everywhere.ValueConverters"
   xmlns:vm="clr-namespace:Everywhere.ViewModels" MinWidth="400"
-  MinHeight="144.8" x:DataType="vm:ChatFloatingWindowViewModel"
-  x:TypeArguments="vm:ChatFloatingWindowViewModel" Background="Transparent"
+  MinHeight="144.8" x:DataType="vm:ChatWindowViewModel"
+  x:TypeArguments="vm:ChatWindowViewModel" Background="Transparent"
   CanResize="False" ExtendClientAreaChromeHints="NoChrome"
   ExtendClientAreaToDecorationsHint="True"
   IsOpened="{Binding IsOpened, Mode=OneWayToSource}"
@@ -90,7 +90,7 @@
         <Button
           x:Name="HistoryButton" Classes="Ghost TitleBar"
           Command="{Binding ChatContextManager.UpdateHistory}"
-          ToolTip.Tip="{I18N {x:Static LocaleKey.ChatFloatingWindow_History_ToolTip}}">
+          ToolTip.Tip="{I18N {x:Static LocaleKey.ChatWindow_History_ToolTip}}">
           <Button.Flyout>
             <Flyout ShowMode="Transient">
               <ScrollViewer
@@ -121,7 +121,7 @@
                           BorderThickness="0"
                           ItemsSource="{Binding Contexts}"
                           ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                          SelectedItem="{Binding $parent[v:ChatFloatingWindow].((vm:ChatFloatingWindowViewModel)DataContext).ChatContextManager.Current, FallbackValue={x:Null}}">
+                          SelectedItem="{Binding $parent[v:ChatWindow].((vm:ChatWindowViewModel)DataContext).ChatContextManager.Current, FallbackValue={x:Null}}">
                           <ListBox.Styles>
                             <Style Selector="Button.More">
                               <Setter Property="Padding" Value="4"/>
@@ -179,9 +179,9 @@
                                             <MenuFlyout Placement="BottomEdgeAlignedLeft">
                                               <!--  <MenuItem  -->
                                               <!--  Classes="MenuFlyoutMenuItem"  -->
-                                              <!--  Command="{Binding $parent[v:ChatFloatingWindow].((vm:ChatFloatingWindowViewModel)DataContext).ChatContextManager.RenameCommand, FallbackValue={x:Null}}"  -->
+                                              <!--  Command="{Binding $parent[v:ChatWindow].((vm:ChatWindowViewModel)DataContext).ChatContextManager.RenameCommand, FallbackValue={x:Null}}"  -->
                                               <!--  CommandParameter="{Binding $parent[ListBoxItem].Content}"  -->
-                                              <!--  Header="{I18N {x:Static LocaleKey.ChatFloatingWindow_HistoryAction_Rename}}">  -->
+                                              <!--  Header="{I18N {x:Static LocaleKey.ChatWindow_HistoryAction_Rename}}">  -->
                                               <!--   <MenuItem.Icon> -->
                                               <!--  <LucideIcon  -->
                                               <!--  Classes="MenuFlyoutIcon" Kind="Pencil"/>  -->
@@ -189,10 +189,10 @@
                                               <!-- </MenuItem> -->
                                               <MenuItem
                                                 Classes="MenuFlyoutMenuItem"
-                                                Command="{Binding $parent[v:ChatFloatingWindow].((vm:ChatFloatingWindowViewModel)DataContext).ChatContextManager.RemoveCommand, FallbackValue={x:Null}}"
+                                                Command="{Binding $parent[v:ChatWindow].((vm:ChatWindowViewModel)DataContext).ChatContextManager.RemoveCommand, FallbackValue={x:Null}}"
                                                 CommandParameter="{Binding $parent[ListBoxItem].Content}"
                                                 Foreground="{DynamicResource ErrorColor}"
-                                                Header="{I18N {x:Static LocaleKey.ChatFloatingWindow_HistoryAction_Delete}}">
+                                                Header="{I18N {x:Static LocaleKey.ChatWindow_HistoryAction_Delete}}">
                                                 <MenuItem.Icon>
                                                   <LucideIcon
                                                     Classes="MenuFlyoutIcon"
@@ -239,14 +239,14 @@
         <Button
           Classes="Ghost TitleBar"
           Command="{Binding ChatContextManager.CreateNewCommand}"
-          ToolTip.Tip="{I18N {x:Static LocaleKey.ChatFloatingWindow_CreateNew_ToolTip}}">
+          ToolTip.Tip="{I18N {x:Static LocaleKey.ChatWindow_CreateNew_ToolTip}}">
           <LucideIcon Kind="Plus"/>
         </Button>
 
         <ToggleButton
           Classes="Ghost TitleBar"
-          IsChecked="{Binding $parent[v:ChatFloatingWindow].IsWindowPinned, Mode=TwoWay}"
-          ToolTip.Tip="{I18N {x:Static LocaleKey.ChatFloatingWindow_TogglePin_ToolTip}}">
+          IsChecked="{Binding $parent[v:ChatWindow].IsWindowPinned, Mode=TwoWay}"
+          ToolTip.Tip="{I18N {x:Static LocaleKey.ChatWindow_TogglePin_ToolTip}}">
           <LucideIcon
             Kind="Pin" Size="16"/>
         </ToggleButton>
@@ -254,7 +254,7 @@
         <Button
           Classes="Ghost TitleBar Close"
           Command="{Binding CloseCommand}"
-          ToolTip.Tip="{I18N {x:Static LocaleKey.ChatFloatingWindow_Close_ToolTip}}">
+          ToolTip.Tip="{I18N {x:Static LocaleKey.ChatWindow_Close_ToolTip}}">
           <LucideIcon Kind="X"/>
         </Button>
       </StackPanel>
@@ -262,7 +262,7 @@
       <TextBlock
         Classes="Large" Margin="8,0,0,0"
         VerticalAlignment="Center" IsHitTestVisible="False"
-        Text="{I18N {x:Static LocaleKey.ChatFloatingWindow_Title}}"/>
+        Text="{I18N {x:Static LocaleKey.ChatWindow_Title}}"/>
     </DockPanel>
 
     <ScrollViewer
@@ -454,8 +454,33 @@
                         <ItemsControl.ItemTemplate>
                           <DataTemplate>
                             <StackPanel Orientation="Vertical">
+                              <ToggleButton
+                                x:Name="ReasoningIndicatorToggleButton"
+                                IsVisible="{Binding ReasoningOutput, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                <v:LazyContentControl IsActive="{Binding #ReasoningIndicatorToggleButton.IsChecked}">
+                                  <ControlTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                      <TextBlock/>
+                                      <shadui:Loading
+                                        Width="12" Height="12"
+                                        VerticalAlignment="Center" IsHitTestVisible="False"
+                                        IsVisible="{Binding ReasoningFinishedAt, Converter={x:Static ObjectConverters.IsNull}}"/>
+                                      <TextBlock
+                                        VerticalAlignment="Bottom" FontSize="10"
+                                        Foreground="{DynamicResource SuccessColor60}"
+                                        IsVisible="{Binding ReasoningFinishedAt, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                        Text="{Binding ReasoningElapsedSeconds, StringFormat='{}{0:F1}s', Mode=OneWay}"/>
+                                    </StackPanel>
+                                  </ControlTemplate>
+
+                                  <ControlTemplate>
+                                    <SelectableTextBlock Text="{Binding ReasoningOutput}"/>
+                                  </ControlTemplate>
+                                </v:LazyContentControl>
+                              </ToggleButton>
+
                               <md:MarkdownRenderer
-                                InlineHyperlinkCommand="{Binding $parent[v:ChatFloatingWindow].LaunchInlineHyperlinkCommand}"
+                                InlineHyperlinkCommand="{Binding $parent[v:ChatWindow].LaunchInlineHyperlinkCommand}"
                                 MarkdownBuilder="{Binding MarkdownBuilder}"/>
 
                               <ItemsControl
@@ -502,22 +527,22 @@
                         Classes="Muted" FontSize="10">
                         <TextBlock.IsVisible>
                           <MultiBinding Converter="{x:Static BoolConverters.And}">
-                            <Binding Path="$parent[v:ChatFloatingWindow].ViewModel.Settings.Behavior.ShowChatStatistics"/>
+                            <Binding Path="$parent[v:ChatWindow].ViewModel.Settings.ChatWindow.ShowChatStatistics"/>
                             <Binding Path="!IsBusy"/>
                           </MultiBinding>
                         </TextBlock.IsVisible>
 
-                        <Run Text="{I18N {x:Static LocaleKey.ChatFloatingWindow_ChatStatisticsTextBlock_InputTokenCountRun}}"/>
+                        <Run Text="{I18N {x:Static LocaleKey.ChatWindow_ChatStatisticsTextBlock_InputTokenCountRun}}"/>
                         <Run Text="{Binding InputTokenCount}"/>
                         <Run Text="·"/>
-                        <Run Text="{I18N {x:Static LocaleKey.ChatFloatingWindow_ChatStatisticsTextBlock_OutputTokenCountRun}}"/>
+                        <Run Text="{I18N {x:Static LocaleKey.ChatWindow_ChatStatisticsTextBlock_OutputTokenCountRun}}"/>
                         <Run Text="{Binding OutputTokenCount}"/>
                         <Run Text="·"/>
-                        <Run Text="{I18N {x:Static LocaleKey.ChatFloatingWindow_ChatStatisticsTextBlock_TotalTokenCountRun}}"/>
+                        <Run Text="{I18N {x:Static LocaleKey.ChatWindow_ChatStatisticsTextBlock_TotalTokenCountRun}}"/>
                         <Run Text="{Binding TotalTokenCount}"/>
                         <Run Text="·"/>
-                        <Run Text="{I18N {x:Static LocaleKey.ChatFloatingWindow_ChatStatisticsTextBlock_ElapsedRun}}"/>
-                        <Run Text="{Binding ElapsedSeconds, StringFormat='{}{0:F1}s'}"/>
+                        <Run Text="{I18N {x:Static LocaleKey.ChatWindow_ChatStatisticsTextBlock_ElapsedRun}}"/>
+                        <Run Text="{Binding ElapsedSeconds, StringFormat='{}{0:F1}s', Mode=OneWay}"/>
                       </SelectableTextBlock>
 
                       <StackPanel
@@ -533,16 +558,16 @@
 
                         <Button
                           Classes="Ghost"
-                          Command="{Binding $parent[v:ChatFloatingWindow].ViewModel.RetryCommand}"
+                          Command="{Binding $parent[v:ChatWindow].ViewModel.RetryCommand}"
                           CommandParameter="{Binding $parent[ContentControl].DataContext}"
-                          ToolTip.Tip="{I18N {x:Static LocaleKey.ChatFloatingWindow_ChatMessage_Assistant_Regenerate}}">
+                          ToolTip.Tip="{I18N {x:Static LocaleKey.ChatWindow_ChatMessage_Assistant_Regenerate}}">
                           <LucideIcon Kind="RefreshCcw"/>
                         </Button>
                         <Button
                           Classes="Ghost"
-                          Command="{Binding $parent[v:ChatFloatingWindow].ViewModel.CopyCommand}"
+                          Command="{Binding $parent[v:ChatWindow].ViewModel.CopyCommand}"
                           CommandParameter="{Binding}"
-                          ToolTip.Tip="{I18N {x:Static LocaleKey.ChatFloatingWindow_ChatMessage_Assistant_Copy}}">
+                          ToolTip.Tip="{I18N {x:Static LocaleKey.ChatWindow_ChatMessage_Assistant_Copy}}">
                           <LucideIcon Kind="Copy"/>
                         </Button>
                       </StackPanel>
@@ -696,15 +721,15 @@
                             <TextBlock
                               VerticalAlignment="Bottom" FontSize="10"
                               Foreground="{DynamicResource SuccessColor60}"
-                              Text="{Binding ElapsedSeconds, StringFormat='{}{0:F1}s'}">
-                              <LucideIcon.IsVisible>
+                              Text="{Binding ElapsedSeconds, StringFormat='{}{0:F1}s', Mode=OneWay}">
+                              <TextBlock.IsVisible>
                                 <MultiBinding Converter="{x:Static BoolConverters.And}">
                                   <Binding Path="!IsBusy"/>
                                   <Binding
                                     Converter="{x:Static ObjectConverters.IsNull}"
                                     Path="ErrorMessageKey"/>
                                 </MultiBinding>
-                              </LucideIcon.IsVisible>
+                              </TextBlock.IsVisible>
                             </TextBlock>
                             <LucideIcon
                               Margin="0,1,0,0" VerticalAlignment="Center"
@@ -788,7 +813,7 @@
                             <TextBlock
                               VerticalAlignment="Bottom" FontSize="10"
                               Foreground="{DynamicResource SuccessColor60}"
-                              Text="{Binding ElapsedSeconds, StringFormat='{}{0:F1}s'}">
+                              Text="{Binding ElapsedSeconds, StringFormat='{}{0:F1}s', Mode=OneWay}">
                               <LucideIcon.IsVisible>
                                 <MultiBinding Converter="{x:Static BoolConverters.And}">
                                   <Binding Path="!IsBusy"/>
@@ -878,7 +903,7 @@
             <MenuItem
               Command="{Binding PickElementCommand}"
               CommandParameter="{x:Static interop:PickElementMode.Screen}"
-              Header="{I18N {x:Static LocaleKey.ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_PickScreen}}">
+              Header="{I18N {x:Static LocaleKey.ChatWindow_ChatInputBox_AddAttachmentMenuItems_PickScreen}}">
               <MenuItem.Icon>
                 <LucideIcon
                   Width="18" Height="18"
@@ -888,7 +913,7 @@
             <MenuItem
               Command="{Binding PickElementCommand}"
               CommandParameter="{x:Static interop:PickElementMode.Window}"
-              Header="{I18N {x:Static LocaleKey.ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_PickWindow}}">
+              Header="{I18N {x:Static LocaleKey.ChatWindow_ChatInputBox_AddAttachmentMenuItems_PickWindow}}">
               <MenuItem.Icon>
                 <LucideIcon
                   Width="18" Height="18"
@@ -898,7 +923,7 @@
             <MenuItem
               Command="{Binding PickElementCommand}"
               CommandParameter="{x:Static interop:PickElementMode.Element}"
-              Header="{I18N {x:Static LocaleKey.ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_PickElement}}">
+              Header="{I18N {x:Static LocaleKey.ChatWindow_ChatInputBox_AddAttachmentMenuItems_PickElement}}">
               <MenuItem.Icon>
                 <LucideIcon
                   Width="18" Height="18"
@@ -907,7 +932,7 @@
             </MenuItem>
             <MenuItem
               Command="{Binding AddClipboardCommand}"
-              Header="{I18N {x:Static LocaleKey.ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_ClipboardContent}}">
+              Header="{I18N {x:Static LocaleKey.ChatWindow_ChatInputBox_AddAttachmentMenuItems_ClipboardContent}}">
               <MenuItem.Icon>
                 <LucideIcon
                   Width="18" Height="18"
@@ -916,7 +941,7 @@
             </MenuItem>
             <MenuItem
               Command="{Binding AddFileCommand}"
-              Header="{I18N {x:Static LocaleKey.ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AttachFile}}">
+              Header="{I18N {x:Static LocaleKey.ChatWindow_ChatInputBox_AddAttachmentMenuItems_AttachFile}}">
               <MenuItem.Icon>
                 <LucideIcon
                   Width="18" Height="18"

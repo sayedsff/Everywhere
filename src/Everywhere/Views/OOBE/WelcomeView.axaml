@@ -160,7 +160,7 @@
             MinWidth="160" MinHeight="32"
             Margin="-10,-6" Background="Transparent"
             BorderThickness="0"
-            Hotkey="{Binding Settings.Behavior.ChatHotkey, Mode=TwoWay}"/>
+            Hotkey="{Binding Settings.ChatWindow.Hotkey, Mode=TwoWay}"/>
           <TextBlock
             Classes="Muted"
             Text="{I18N {x:Static LocaleKey.WelcomeView_HotkeyStep_Message2}}"/>

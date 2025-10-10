@@ -19,7 +19,7 @@ using ZLinq;
 
 namespace Everywhere.ViewModels;
 
-public partial class ChatFloatingWindowViewModel : BusyViewModelBase
+public partial class ChatWindowViewModel : BusyViewModelBase
 {
     public Settings Settings { get; }
 
@@ -60,25 +60,25 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
     private readonly IVisualElementContext _visualElementContext;
     private readonly INativeHelper _nativeHelper;
     private readonly IBlobStorage _blobStorage;
-    private readonly ILogger<ChatFloatingWindowViewModel> _logger;
+    private readonly ILogger<ChatWindowViewModel> _logger;
 
     private readonly ObservableList<ChatAttachment> _chatAttachments = [];
     private readonly ReusableCancellationTokenSource _cancellationTokenSource = new();
-    private readonly ActivitySource _activitySource = new(typeof(ChatFloatingWindowViewModel).FullName.NotNull());
+    private readonly ActivitySource _activitySource = new(typeof(ChatWindowViewModel).FullName.NotNull());
 
     /// <summary>
-    /// Start an activity when the floating window is opened, and dispose it when closed.
+    /// Start an activity when the window is opened, and dispose it when closed.
     /// </summary>
     private Activity? _openActivity;
 
-    public ChatFloatingWindowViewModel(
+    public ChatWindowViewModel(
         Settings settings,
         IChatContextManager chatContextManager,
         IChatService chatService,
         IVisualElementContext visualElementContext,
         INativeHelper nativeHelper,
         IBlobStorage blobStorage,
-        ILogger<ChatFloatingWindowViewModel> logger)
+        ILogger<ChatWindowViewModel> logger)
     {
         Settings = settings;
         ChatContextManager = chatContextManager;
@@ -94,34 +94,40 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
 
     private void InitializeCommands()
     {
-        DynamicNamedCommand[] textEditActions =
+        QuickActions =
         [
-            new(
+            new DynamicNamedCommand(
                 LucideIconKind.Languages,
-                LocaleKey.ChatFloatingWindowViewModel_TextEditActions_Translate,
+                LocaleKey.ChatWindowViewModel_QuickActions_Translate,
                 null,
                 SendMessageCommand,
-                $"Translate the content in focused element to {GetLanguageDisplayName()}. " +
+                $"Please translate the focal elements and related content into {GetLanguageDisplayName()}. " +
                 $"If it's already in target language, translate it to English. " +
-                $"You MUST only reply with the translated content, without any other text or explanation"
+                $"Provide only the translation, do not include any other text or explanation."
             ),
-            new(
-                LucideIconKind.StepForward,
-                LocaleKey.ChatFloatingWindowViewModel_TextEditActions_ContinueWriting,
-                null,
-                SendMessageCommand,
-                "I have already written a beginning as the content of the focused element. " +
-                "You MUST imitate my writing style and tone, then continue writing in my perspective. " +
-                "You MUST only reply with the continue written content, without any other text or explanation"
-            ),
-            new(
+            new DynamicNamedCommand(
                 LucideIconKind.ScrollText,
-                LocaleKey.ChatFloatingWindowViewModel_TextEditActions_Summarize,
+                LocaleKey.ChatWindowViewModel_QuickActions_Summarize,
                 null,
                 SendMessageCommand,
-                "Please summarize the content in focused element. " +
-                "You MUST only reply with the summarize content, without any other text or explanation"
-            )
+                "Please summarize the key elements and related content into a paragraph and extract several key points. " +
+                "Provide only the summary, do not include any other text or explanation."
+            ),
+            new DynamicNamedCommand(
+                LucideIconKind.SearchCheck,
+                LocaleKey.ChatWindowViewModel_QuickActions_Verify,
+                null,
+                SendMessageCommand,
+                "Please verify the authenticity of the focal elements and related content, and point out any suspicious or incorrect parts."
+            ),
+            new DynamicNamedCommand(
+                LucideIconKind.Sparkle,
+                LocaleKey.ChatWindowViewModel_QuickActions_Solve,
+                null,
+                SendMessageCommand,
+                "Please solve the problem described by the focal elements and related content. " +
+                "If no problem is described, provide some relevant suggestions or improvements."
+            ),
         ];
 
         string GetLanguageDisplayName()
@@ -139,17 +145,6 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
                 return "English (United States)";
             }
         }
-
-        void HandleChatAttachmentsCollectionChanged(in NotifyCollectionChangedEventArgs<ChatAttachment> x)
-        {
-            Task.Run(() => QuickActions = _chatAttachments switch
-            {
-                [ChatVisualElementAttachment { Element.Target.Type: VisualElementType.TextEdit }] => textEditActions,
-                _ => null
-            }).Detach(_logger.ToExceptionHandler());
-        }
-
-        _chatAttachments.CollectionChanged += HandleChatAttachmentsCollectionChanged;
     }
 
     private CancellationTokenSource? _targetElementChangedTokenSource;
@@ -166,30 +161,30 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
         }
         catch (OperationCanceledException) { }
 
-        await ExecuteBusyTaskAsync(
-            async token =>
+        try
+        {
+            if (_chatAttachments.Any(a => a is ChatVisualElementAttachment vea && Equals(vea.Element?.Target, targetElement)))
             {
-                if (_chatAttachments.Any(a => a is ChatVisualElementAttachment vea && Equals(vea.Element?.Target, targetElement)))
-                {
-                    IsOpened = true;
-                    return;
-                }
-
-                Reset();
-
-                if (targetElement == null) return;
-
-                var (boundingRect, attachment) = await Task
-                    .Run(() => (targetElement.BoundingRectangle, CreateFromVisualElement(targetElement)), token)
-                    .WaitAsync(TimeSpan.FromSeconds(1), token);
-                TargetBoundingRect = boundingRect;
-                _chatAttachments.Clear();
-                _chatAttachments.Add(attachment.With(a => a.IsFocusedElement = true));
                 IsOpened = true;
-            },
-            _logger.ToExceptionHandler(),
-            ExecutionFlags.EnqueueIfBusy,
-            cancellationToken);
+                return;
+            }
+
+            TargetBoundingRect = default;
+            if (targetElement == null) return;
+
+            var createElement = Settings.ChatWindow.AutomaticallyAddElement;
+            var (boundingRect, attachment) = await Task
+                .Run(() => (targetElement.BoundingRectangle, createElement ? CreateFromVisualElement(targetElement) : null), cancellationToken)
+                .WaitAsync(TimeSpan.FromSeconds(1), cancellationToken);
+            TargetBoundingRect = boundingRect;
+            _chatAttachments.Clear();
+            if (attachment is not null) _chatAttachments.Add(attachment.With(a => a.IsFocusedElement = true));
+            IsOpened = true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to float to target element.");
+        }
     }
 
     [RelayCommand(CanExecute = nameof(IsNotBusy))]
@@ -422,13 +417,7 @@ public partial class ChatFloatingWindowViewModel : BusyViewModelBase
     private void Close()
     {
         IsOpened = false;
-    }
-
-    private void Reset()
-    {
-        _cancellationTokenSource.Cancel();
-        TargetBoundingRect = default;
-        QuickActions = [];
+        if (!Settings.ChatWindow.AllowRunInBackground) _cancellationTokenSource.Cancel();
     }
 
     protected override void OnPropertyChanged(PropertyChangedEventArgs e)

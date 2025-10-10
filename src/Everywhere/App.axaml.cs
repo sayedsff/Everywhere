@@ -64,8 +64,8 @@ public class App : Application
                     #region View & ViewModel
 
                     .AddSingleton<VisualTreeDebugger>()
-                    .AddSingleton<ChatFloatingWindowViewModel>()
-                    .AddSingleton<ChatFloatingWindow>()
+                    .AddSingleton<ChatWindowViewModel>()
+                    .AddSingleton<ChatWindow>()
                     .AddSingleton<MainViewModel>()
                     .AddSingleton<MainView>()
 

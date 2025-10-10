@@ -40,10 +40,10 @@ public class HotkeyInitializer(
                 var hWnd = element.NativeWindowHandle;
                 Dispatcher.UIThread.Invoke(() =>
                 {
-                    var chatFloatingWindow = ServiceLocator.Resolve<ChatFloatingWindow>();
-                    if (hWnd == chatFloatingWindow.TryGetPlatformHandle()?.Handle) return;
+                    var chatWindow = ServiceLocator.Resolve<ChatWindow>();
+                    if (hWnd == chatWindow.TryGetPlatformHandle()?.Handle) return;
 
-                    chatFloatingWindow.ViewModel.TryFloatToTargetElementAsync(element).Detach(logger.ToExceptionHandler());
+                    chatWindow.ViewModel.TryFloatToTargetElementAsync(element).Detach(logger.ToExceptionHandler());
                 });
             });
         };

@@ -12,10 +12,10 @@ using LiveMarkdown.Avalonia;
 
 namespace Everywhere.Views;
 
-public partial class ChatFloatingWindow : ReactiveWindow<ChatFloatingWindowViewModel>
+public partial class ChatWindow : ReactiveWindow<ChatWindowViewModel>
 {
-    public static readonly DirectProperty<ChatFloatingWindow, bool> IsOpenedProperty =
-        AvaloniaProperty.RegisterDirect<ChatFloatingWindow, bool>(nameof(IsOpened), o => o.IsOpened);
+    public static readonly DirectProperty<ChatWindow, bool> IsOpenedProperty =
+        AvaloniaProperty.RegisterDirect<ChatWindow, bool>(nameof(IsOpened), o => o.IsOpened);
 
     public bool IsOpened
     {
@@ -24,7 +24,7 @@ public partial class ChatFloatingWindow : ReactiveWindow<ChatFloatingWindowViewM
     }
 
     public static readonly StyledProperty<PixelRect> TargetBoundingRectProperty =
-        AvaloniaProperty.Register<ChatFloatingWindow, PixelRect>(nameof(TargetBoundingRect));
+        AvaloniaProperty.Register<ChatWindow, PixelRect>(nameof(TargetBoundingRect));
 
     public PixelRect TargetBoundingRect
     {
@@ -33,7 +33,7 @@ public partial class ChatFloatingWindow : ReactiveWindow<ChatFloatingWindowViewM
     }
 
     public static readonly StyledProperty<PlacementMode> PlacementProperty =
-        AvaloniaProperty.Register<ChatFloatingWindow, PlacementMode>(nameof(Placement));
+        AvaloniaProperty.Register<ChatWindow, PlacementMode>(nameof(Placement));
 
     public PlacementMode Placement
     {
@@ -41,7 +41,7 @@ public partial class ChatFloatingWindow : ReactiveWindow<ChatFloatingWindowViewM
         set => SetValue(PlacementProperty, value);
     }
 
-    public static readonly StyledProperty<bool> IsWindowPinnedProperty = AvaloniaProperty.Register<ChatFloatingWindow, bool>(
+    public static readonly StyledProperty<bool> IsWindowPinnedProperty = AvaloniaProperty.Register<ChatWindow, bool>(
         nameof(IsWindowPinned));
 
     public bool IsWindowPinned
@@ -53,7 +53,7 @@ public partial class ChatFloatingWindow : ReactiveWindow<ChatFloatingWindowViewM
     private readonly ILauncher _launcher;
     private readonly Settings _settings;
 
-    public ChatFloatingWindow(ILauncher launcher, IChatContextManager chatContextManager, Settings settings)
+    public ChatWindow(ILauncher launcher, IChatContextManager chatContextManager, Settings settings)
     {
         _launcher = launcher;
         _settings = settings;
@@ -99,7 +99,7 @@ public partial class ChatFloatingWindow : ReactiveWindow<ChatFloatingWindowViewM
         else if (change.Property == IsWindowPinnedProperty)
         {
             var value = change.NewValue is true;
-            _settings.Internal.IsChatFloatingWindowPinned = value;
+            _settings.Internal.IsChatWindowPinned = value;
 
             if (value)
             {
@@ -310,20 +310,20 @@ public partial class ChatFloatingWindow : ReactiveWindow<ChatFloatingWindowViewM
             Topmost = true;
             ChatInputBox.Focus();
 
-            switch (_settings.Behavior.ChatFloatingWindowPinMode)
+            switch (_settings.ChatWindow.WindowPinMode)
             {
-                case ChatFloatingWindowPinMode.RememberLast:
+                case ChatWindowPinMode.RememberLast:
                 {
-                    IsWindowPinned = _settings.Internal.IsChatFloatingWindowPinned;
+                    IsWindowPinned = _settings.Internal.IsChatWindowPinned;
                     break;
                 }
-                case ChatFloatingWindowPinMode.AlwaysPinned:
+                case ChatWindowPinMode.AlwaysPinned:
                 {
                     IsWindowPinned = true;
                     break;
                 }
-                case ChatFloatingWindowPinMode.AlwaysUnpinned:
-                case ChatFloatingWindowPinMode.PinOnInput:
+                case ChatWindowPinMode.AlwaysUnpinned:
+                case ChatWindowPinMode.PinOnInput:
                 {
                     IsWindowPinned = false;
                     break;
@@ -338,7 +338,7 @@ public partial class ChatFloatingWindow : ReactiveWindow<ChatFloatingWindowViewM
 
     private void HandleChatInputBoxTextChanged(object? sender, TextChangedEventArgs e)
     {
-        if (_settings.Behavior.ChatFloatingWindowPinMode == ChatFloatingWindowPinMode.PinOnInput)
+        if (_settings.ChatWindow.WindowPinMode == ChatWindowPinMode.PinOnInput)
         {
             IsWindowPinned = true;
         }

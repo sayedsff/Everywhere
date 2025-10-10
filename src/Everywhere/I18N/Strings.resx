@@ -32,7 +32,7 @@
         <value>Language</value>
     </data>
     <data name="SettingsCategory_Common_Header" xml:space="preserve">
-        <value>Common Settings</value>
+        <value>General Settings</value>
     </data>
     <data name="Settings_Common_Language_Description" xml:space="preserve">
         <value>Select the display language for the software.</value>
@@ -55,13 +55,13 @@
     <data name="SettingsSelectionItem_Common_Theme_Light" xml:space="preserve">
         <value>Light</value>
     </data>
-    <data name="SettingsCategory_Behavior_Header" xml:space="preserve">
-        <value>Behavior Settings</value>
+    <data name="SettingsCategory_ChatWindow_Header" xml:space="preserve">
+        <value>Chat Window Settings</value>
     </data>
-    <data name="Settings_Behavior_ChatHotkey_Header" xml:space="preserve">
-        <value>Chat Hotkey</value>
+    <data name="Settings_ChatWindow_Hotkey_Header" xml:space="preserve">
+        <value>Hotkey</value>
     </data>
-    <data name="Settings_Behavior_ChatHotkey_Description" xml:space="preserve">
+    <data name="Settings_ChatWindow_Hotkey_Description" xml:space="preserve">
         <value>Set a hotkey to invoke the chat window at any time.</value>
     </data>
     <data name="SettingsCategory_Model_Header" xml:space="preserve">
@@ -169,10 +169,10 @@
     <data name="ActionChatMessage_Header_WebSearching" xml:space="preserve">
         <value>Web Search</value>
     </data>
-    <data name="ChatFloatingWindow_ChatMessage_Assistant_Regenerate" xml:space="preserve">
+    <data name="ChatWindow_ChatMessage_Assistant_Regenerate" xml:space="preserve">
         <value>Regenerate</value>
     </data>
-    <data name="ChatFloatingWindow_ChatMessage_Assistant_Copy" xml:space="preserve">
+    <data name="ChatWindow_ChatMessage_Assistant_Copy" xml:space="preserve">
         <value>Copy</value>
     </data>
     <data name="Application_TrayIcon_Menu_OpenMainWindow" xml:space="preserve">
@@ -184,44 +184,44 @@
     <data name="Application_TrayIcon_Menu_OpenDebugWindow" xml:space="preserve">
         <value>Open Debug Window</value>
     </data>
-    <data name="ChatFloatingWindow_History_ToolTip" xml:space="preserve">
+    <data name="ChatWindow_History_ToolTip" xml:space="preserve">
         <value>Chat History</value>
     </data>
-    <data name="ChatFloatingWindow_CreateNew_ToolTip" xml:space="preserve">
+    <data name="ChatWindow_CreateNew_ToolTip" xml:space="preserve">
         <value>Create New Session</value>
     </data>
-    <data name="ChatFloatingWindow_Close_ToolTip" xml:space="preserve">
+    <data name="ChatWindow_Close_ToolTip" xml:space="preserve">
         <value>Close (Esc)</value>
     </data>
-    <data name="ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_PickScreen"
+    <data name="ChatWindow_ChatInputBox_AddAttachmentMenuItems_PickScreen"
         xml:space="preserve">
         <value>Pick screen</value>
     </data>
-    <data name="ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_PickWindow"
+    <data name="ChatWindow_ChatInputBox_AddAttachmentMenuItems_PickWindow"
         xml:space="preserve">
         <value>Pick window</value>
     </data>
-    <data name="ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_PickElement"
+    <data name="ChatWindow_ChatInputBox_AddAttachmentMenuItems_PickElement"
         xml:space="preserve">
         <value>Pick element</value>
     </data>
-    <data name="ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_ClipboardContent"
+    <data name="ChatWindow_ChatInputBox_AddAttachmentMenuItems_ClipboardContent"
         xml:space="preserve">
         <value>Clipboard content</value>
     </data>
-    <data name="ChatFloatingWindow_ChatInputBox_AddAttachmentMenuItems_AttachFile" xml:space="preserve">
+    <data name="ChatWindow_ChatInputBox_AddAttachmentMenuItems_AttachFile" xml:space="preserve">
         <value>Attach File</value>
     </data>
-    <data name="ChatFloatingWindowViewModel_TextEditActions_Translate" xml:space="preserve">
+    <data name="ChatWindowViewModel_QuickActions_Translate" xml:space="preserve">
         <value>Translate</value>
     </data>
-    <data name="ChatFloatingWindowViewModel_TextEditActions_ContinueWriting" xml:space="preserve">
-        <value>Continue</value>
+    <data name="ChatWindowViewModel_QuickActions_Verify" xml:space="preserve">
+        <value>Key Points</value>
     </data>
-    <data name="ChatFloatingWindowViewModel_TextEditActions_Summarize" xml:space="preserve">
+    <data name="ChatWindowViewModel_QuickActions_Summarize" xml:space="preserve">
         <value>Summary</value>
     </data>
-    <data name="ChatFloatingWindow_Title" xml:space="preserve">
+    <data name="ChatWindow_Title" xml:space="preserve">
         <value>How can I assist you?</value>
     </data>
     <data name="KeyboardHotkeyInputBox_Watermark" xml:space="preserve">
@@ -461,10 +461,10 @@
     <data name="MainView_EverywhereHasMinimizedToTray" xml:space="preserve">
         <value>Everywhere has minimized to tray</value>
     </data>
-    <data name="ChatFloatingWindow_HistoryAction_Rename" xml:space="preserve">
+    <data name="ChatWindow_HistoryAction_Rename" xml:space="preserve">
         <value>Rename</value>
     </data>
-    <data name="ChatFloatingWindow_HistoryAction_Delete" xml:space="preserve">
+    <data name="ChatWindow_HistoryAction_Delete" xml:space="preserve">
         <value>Delete</value>
     </data>
     <data name="AboutPage_WelcomePage" xml:space="preserve">
@@ -491,26 +491,26 @@
     <data name="WelcomeView_DiscordHyperlinkButton_Content" xml:space="preserve">
         <value>Discord</value>
     </data>
-    <data name="ChatFloatingWindow_TogglePin_ToolTip" xml:space="preserve">
+    <data name="ChatWindow_TogglePin_ToolTip" xml:space="preserve">
         <value>Pin Window (Ctrl+D)</value>
     </data>
-    <data name="ChatFloatingWindowPinMode_RememberPrevious" xml:space="preserve">
+    <data name="ChatWindowPinMode_RememberPrevious" xml:space="preserve">
         <value>Remember previous status</value>
     </data>
-    <data name="ChatFloatingWindowPinMode_AlwaysPinned" xml:space="preserve">
+    <data name="ChatWindowPinMode_AlwaysPinned" xml:space="preserve">
         <value>Always pinned</value>
     </data>
-    <data name="ChatFloatingWindowPinMode_AlwaysUnpinned" xml:space="preserve">
+    <data name="ChatWindowPinMode_AlwaysUnpinned" xml:space="preserve">
         <value>Always unpinned</value>
     </data>
-    <data name="ChatFloatingWindowPinMode_PinOnInput" xml:space="preserve">
+    <data name="ChatWindowPinMode_PinOnInput" xml:space="preserve">
         <value>Pin on input</value>
     </data>
-    <data name="Settings_Behavior_ChatFloatingWindowPinMode_Header" xml:space="preserve">
-        <value>Chat Floating Window Pin Mode</value>
+    <data name="Settings_ChatWindow_WindowPinMode_Header" xml:space="preserve">
+        <value>Window Pin Mode</value>
     </data>
-    <data name="Settings_Behavior_ChatFloatingWindowPinMode_Description" xml:space="preserve">
-        <value>Specifies the pin mode for the chat floating window when it is opened. When the window is not fixed, it will be hidden automatically when it loses focus.</value>
+    <data name="Settings_ChatWindow_WindowPinMode_Description" xml:space="preserve">
+        <value>Specifies the pin mode for the chat window when it is opened. When the window is not fixed, it will be hidden automatically when it loses focus.</value>
     </data>
     <data name="FriendlyExceptionMessage_ClientResult" xml:space="preserve">
         <value>Client error.</value>
@@ -851,22 +851,22 @@ My intelligence comes from powerful Large language models (LLMs), which are prov
     <data name="Settings_Common_DiagnosticData_Description" xml:space="preserve">
         <value>To help us improve, we need the “telemetry” to collect anonymous data. This data is used solely for analysis and does not contain or allow the inference of any personally identifiable information about you. You may choose to send only necessary data; this option will not affect core functionality.</value>
     </data>
-    <data name="Settings_Behavior_ShowChatStatistics_Header" xml:space="preserve">
+    <data name="Settings_ChatWindow_ShowChatStatistics_Header" xml:space="preserve">
         <value>Show Chat Statistics</value>
     </data>
-    <data name="Settings_Behavior_ShowChatStatistics_Description" xml:space="preserve">
-        <value>If enabled, usage data will be displayed at the end of each conversation round within the chat window.</value>
+    <data name="Settings_ChatWindow_ShowChatStatistics_Description" xml:space="preserve">
+        <value>When enabled, usage data will be displayed at the end of each conversation round within the chat window.</value>
     </data>
-    <data name="ChatFloatingWindow_ChatStatisticsTextBlock_InputTokenCountRun" xml:space="preserve">
+    <data name="ChatWindow_ChatStatisticsTextBlock_InputTokenCountRun" xml:space="preserve">
         <value>Input</value>
     </data>
-    <data name="ChatFloatingWindow_ChatStatisticsTextBlock_OutputTokenCountRun" xml:space="preserve">
+    <data name="ChatWindow_ChatStatisticsTextBlock_OutputTokenCountRun" xml:space="preserve">
         <value>Output</value>
     </data>
-    <data name="ChatFloatingWindow_ChatStatisticsTextBlock_TotalTokenCountRun" xml:space="preserve">
+    <data name="ChatWindow_ChatStatisticsTextBlock_TotalTokenCountRun" xml:space="preserve">
         <value>Total</value>
     </data>
-    <data name="ChatFloatingWindow_ChatStatisticsTextBlock_ElapsedRun" xml:space="preserve">
+    <data name="ChatWindow_ChatStatisticsTextBlock_ElapsedRun" xml:space="preserve">
         <value>Elapsed</value>
     </data>
     <data name="KernelRequestException_InvalidConfiguration" xml:space="preserve">
@@ -913,5 +913,20 @@ My intelligence comes from powerful Large language models (LLMs), which are prov
     </data>
     <data name="KernelMixinFactory_NoModelProvider" xml:space="preserve">
         <value>No model provider found with the selected ID.</value>
+    </data>
+    <data name="ChatWindowViewModel_QuickActions_Solve" xml:space="preserve">
+        <value>Solve</value>
+    </data>
+    <data name="Settings_ChatWindow_AutomaticallyAddElement_Header" xml:space="preserve">
+        <value>Automatically Add Element</value>
+    </data>
+    <data name="Settings_ChatWindow_AutomaticallyAddElement_Description" xml:space="preserve">
+        <value>When enabled, automatically add focused element as attachment when opening chat window.</value>
+    </data>
+    <data name="Settings_ChatWindow_AllowRunInBackground_Header" xml:space="preserve">
+        <value>Allow Run in Background</value>
+    </data>
+    <data name="Settings_ChatWindow_AllowRunInBackground_Description" xml:space="preserve">
+        <value>When enabled, closing the chat window will not terminate the current task.</value>
     </data>
 </root>
