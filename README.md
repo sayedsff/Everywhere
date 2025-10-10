@@ -16,7 +16,7 @@ Every moment, Every place. Your AI - `Everywhere`
   </h1>
 
   <p align="center">
-    <a href="https://everywhere.sylinko.com"><strong>(WIP) Explore the docs »</strong></a>
+    <a href="https://everywhere.sylinko.com"><strong>Explore the docs »</strong></a>
     <br />
     <br />
     <a href="https://github.com/DearVa/Everywhere">View Demo</a>
@@ -104,8 +104,8 @@ Every moment, Every place. Your AI - `Everywhere`
         • <img style="margin-top:3px;margin-bottom:-3px;" alt="Google logo" src="https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/gemini-color.svg"> Google (Gemini)<br>
         • <img style="margin-top:3px;margin-bottom:-3px;" alt="DeepSeek logo" src="https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/deepseek-color.svg"> DeepSeek<br>
         • <img style="margin-top:3px;margin-bottom:-3px;" alt="Moonshot logo" src="https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/moonshot.svg"> Moonshot (Kimi)<br>
-        • <img style="margin-top:3px;margin-bottom:-3px;" alt="Moonshot logo" src="https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/openrouter.svg"> OpenRouter<br>
-        • <img style="margin-top:3px;margin-bottom:-3px;" alt="Moonshot logo" src="https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/siliconcloud-color.svg"> SiliconCloud<br>
+        • <img style="margin-top:3px;margin-bottom:-3px;" alt="OpenRouter logo" src="https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/openrouter.svg"> OpenRouter<br>
+        • <img style="margin-top:3px;margin-bottom:-3px;" alt="SiliconCloud logo" src="https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/siliconcloud-color.svg"> SiliconCloud<br>
         • <img style="margin-top:3px;margin-bottom:-3px;" alt="ollama logo" src="https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/ollama.svg"> Ollama<br>
         • Custom endpoints<br>
       </td>
