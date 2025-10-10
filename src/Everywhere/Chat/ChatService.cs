@@ -298,14 +298,13 @@ public class ChatService(
             }
 
             var toolCallCount = 0;
-            var inputTokenCount = 0L;
-            var outputTokenCount = 0L;
-            var totalTokenCount = 0L;
-
             while (true)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
+                var inputTokenCount = 0L;
+                var outputTokenCount = 0L;
+                var totalTokenCount = 0L;
                 var chatSpan = new AssistantChatMessageSpan();
                 assistantChatMessage.Spans.Add(chatSpan);
 
@@ -336,30 +335,30 @@ public class ChatService(
                             {
                                 case UsageContent usageContent:
                                 {
-                                    inputTokenCount += usageContent.Details.InputTokenCount ?? 0;
-                                    outputTokenCount += usageContent.Details.OutputTokenCount ?? 0;
-                                    totalTokenCount += usageContent.Details.TotalTokenCount ?? 0;
+                                    inputTokenCount = Math.Max(inputTokenCount, usageContent.Details.InputTokenCount ?? 0);
+                                    outputTokenCount = Math.Max(outputTokenCount, usageContent.Details.OutputTokenCount ?? 0);
+                                    totalTokenCount = Math.Max(totalTokenCount, usageContent.Details.TotalTokenCount ?? 0);
                                     break;
                                 }
                                 case UsageDetails usageDetails:
                                 {
-                                    inputTokenCount += usageDetails.InputTokenCount ?? 0;
-                                    outputTokenCount += usageDetails.OutputTokenCount ?? 0;
-                                    totalTokenCount += usageDetails.TotalTokenCount ?? 0;
+                                    inputTokenCount = Math.Max(inputTokenCount, usageDetails.InputTokenCount ?? 0);
+                                    outputTokenCount = Math.Max(outputTokenCount, usageDetails.OutputTokenCount ?? 0);
+                                    totalTokenCount = Math.Max(totalTokenCount, usageDetails.TotalTokenCount ?? 0);
                                     break;
                                 }
                                 case Usage anthropicUsage:
                                 {
-                                    inputTokenCount += anthropicUsage.InputTokens;
-                                    outputTokenCount += anthropicUsage.OutputTokens;
-                                    totalTokenCount += anthropicUsage.InputTokens + anthropicUsage.OutputTokens;
+                                    inputTokenCount = Math.Max(inputTokenCount, anthropicUsage.InputTokens);
+                                    outputTokenCount = Math.Max(outputTokenCount, anthropicUsage.OutputTokens);
+                                    totalTokenCount = Math.Max(totalTokenCount, anthropicUsage.InputTokens + anthropicUsage.OutputTokens);
                                     break;
                                 }
                                 case ChatTokenUsage openAIUsage:
                                 {
-                                    inputTokenCount += openAIUsage.InputTokenCount;
-                                    outputTokenCount += openAIUsage.OutputTokenCount;
-                                    totalTokenCount += openAIUsage.TotalTokenCount;
+                                    inputTokenCount = Math.Max(inputTokenCount, openAIUsage.InputTokenCount);
+                                    outputTokenCount = Math.Max(outputTokenCount, openAIUsage.OutputTokenCount);
+                                    totalTokenCount = Math.Max(totalTokenCount, openAIUsage.TotalTokenCount);
                                     break;
                                 }
                             }
@@ -419,9 +418,9 @@ public class ChatService(
                     if (assistantContentBuilder.Length > 0) chatHistory.AddAssistantMessage(assistantContentBuilder.ToString());
 
                     functionCallContents = functionCallContentBuilder.Build();
-                    assistantChatMessage.InputTokenCount = inputTokenCount;
-                    assistantChatMessage.OutputTokenCount = outputTokenCount;
-                    assistantChatMessage.TotalTokenCount = totalTokenCount;
+                    assistantChatMessage.InputTokenCount += inputTokenCount;
+                    assistantChatMessage.OutputTokenCount += outputTokenCount;
+                    assistantChatMessage.TotalTokenCount += totalTokenCount;
 
                     llmStreamActivity?.SetTag("chat.history.count", chatHistory.AsValueEnumerable().Count());
                     llmStreamActivity?.SetTag("chat.embedding.input", inputTokenCount);
