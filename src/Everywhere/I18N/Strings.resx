@@ -107,7 +107,7 @@
         <value>Google</value>
     </data>
     <data name="SettingsSelectionItem_Model_WebSearchProvider_brave" xml:space="preserve">
-        <value>brave</value>
+        <value>Brave</value>
     </data>
     <data name="SettingsSelectionItem_Model_WebSearchProvider_bocha" xml:space="preserve">
         <value>Bocha</value>
@@ -164,7 +164,7 @@
         <value>Rewrite as required</value>
     </data>
     <data name="ActionChatMessage_Header_AnalyzingContext" xml:space="preserve">
-        <value>Analyze context</value>
+        <value>Analyze Context</value>
     </data>
     <data name="ActionChatMessage_Header_WebSearching" xml:space="preserve">
         <value>Web Search</value>
@@ -185,7 +185,7 @@
         <value>Open Debug Window</value>
     </data>
     <data name="ChatFloatingWindow_History_ToolTip" xml:space="preserve">
-        <value>Conversation History</value>
+        <value>Chat History</value>
     </data>
     <data name="ChatFloatingWindow_CreateNew_ToolTip" xml:space="preserve">
         <value>Create New Session</value>
@@ -387,26 +387,25 @@
         <value>Unknown error, please try again later.</value>
     </data>
     <data name="FriendlyExceptionMessage_Aggregate" xml:space="preserve">
-        <value>One or more errors occurred.
-{0}</value>
+        <value>One or more errors occurred.</value>
     </data>
     <data name="FriendlyExceptionMessage_TaskCanceled" xml:space="preserve">
-        <value>Task canceled. {0}</value>
+        <value>Task canceled.</value>
     </data>
     <data name="FriendlyExceptionMessage_OperationCanceled" xml:space="preserve">
-        <value>Operation canceled. {0}</value>
+        <value>Operation canceled.</value>
     </data>
     <data name="FriendlyExceptionMessage_Timeout" xml:space="preserve">
-        <value>Maximum wait time exceeded. {0}</value>
+        <value>Maximum wait time exceeded.</value>
     </data>
     <data name="FriendlyExceptionMessage_Json" xml:space="preserve">
-        <value>Could not parse JSON data. {0}</value>
+        <value>Could not parse JSON data.</value>
     </data>
     <data name="FriendlyExceptionMessage_Format" xml:space="preserve">
-        <value>Format error. {0}</value>
+        <value>Format error.</value>
     </data>
     <data name="FriendlyExceptionMessage_Argument" xml:space="preserve">
-        <value>Argument error. {0}</value>
+        <value>Argument error.</value>
     </data>
     <data name="SettingsSelectionItem_Common_Language_de" xml:space="preserve">
         <value>Deutsch</value>
@@ -514,7 +513,7 @@
         <value>Specifies the pin mode for the chat floating window when it is opened. When the window is not fixed, it will be hidden automatically when it loses focus.</value>
     </data>
     <data name="FriendlyExceptionMessage_ClientResult" xml:space="preserve">
-        <value>Client error. {0}</value>
+        <value>Client error.</value>
     </data>
     <data name="Settings_Model_PresencePenalty_Header" xml:space="preserve">
         <value>Expression Divergence (presence_penalty)</value>
@@ -523,8 +522,7 @@
         <value>The higher the value, the more inclined to use different expressions and avoid concept repetition; the lower the value, the more inclined to use repeated concepts or narratives, resulting in more consistent expression. This setting is only effective for some models. If you encounter an error, try restoring the default value.</value>
     </data>
     <data name="Settings_Model_FrequencyPenalty_Header" xml:space="preserve">
-        <value>Vocabulary Richness 
-(frequency_penalty)</value>
+        <value>Vocabulary Richness (frequency_penalty)</value>
     </data>
     <data name="Settings_Model_FrequencyPenalty_Description" xml:space="preserve">
         <value>The higher the value, the more diverse and rich the vocabulary; the lower the value, the simpler and more straightforward the language. This setting is only effective for some models. If you encounter an error, try restoring the default value.</value>
@@ -545,7 +543,7 @@
         <value>API Url</value>
     </data>
     <data name="Settings_Model_SelectedModelProvider_Endpoint_Description" xml:space="preserve">
-        <value>Leaving this to default if you dont't know what to do. Must starts with "http(s)://".</value>
+        <value>Leaving this to default if you don't know what to do. Must starts with "http(s)://".</value>
     </data>
     <data name="Settings_Model_SelectedModelProvider_ApiKey_Header" xml:space="preserve">
         <value>API Key</value>
@@ -644,7 +642,7 @@
         <value>Software Update</value>
     </data>
     <data name="Settings_Common_SoftwareUpdate_Description" xml:space="preserve">
-        <value>Manage software updates for Everywhere. If an update is available, click Update and Everywhere will automatically download and install the latest version. You may need to select “Yes” in the pop-up window during the process.</value>
+        <value>If an update is available, click Update and Everywhere will automatically download and install the latest version. You may need to select “Yes” in the pop-up window during the process.</value>
     </data>
     <data name="Settings_Common_IsAutomaticUpdateCheckEnabled_Header" xml:space="preserve">
         <value>Automatic Update</value>
@@ -662,7 +660,7 @@
         <value>Model identifier used for API calls, such as gpt-4o. If you are unsure what this is, keep the default value.</value>
     </data>
     <data name="ChatPluginPage_Title" xml:space="preserve">
-        <value>Chat plugins</value>
+        <value>Chat Plugins</value>
     </data>
     <data name="ChatPluginPage_Description" xml:space="preserve">
         <value>Chat plugins include built-in plugins and MCP plugins. LLMs that support tool calls will use these plugins at appropriate times (such as searching the web or accessing local files) to gain more powerful functionality.</value>
@@ -701,7 +699,7 @@
         <value>Provides the ability to access files, such as enumerating, creating, deleting, renaming, reading, or writing.</value>
     </data>
     <data name="FriendlyExceptionMessage_InvalidOperation" xml:space="preserve">
-        <value>Invalid operation. {0}</value>
+        <value>Invalid operation.</value>
     </data>
     <data name="FriendlyExceptionMessage_Win32" xml:space="preserve">
         <value>Windows system error. {0}</value>
@@ -833,7 +831,7 @@ My intelligence comes from powerful Large language models (LLMs), which are prov
         <value>If there's no response, it might be occupied by other software. You can click to change the shortcut key.</value>
     </data>
     <data name="FriendlyExceptionMessage_Authentication" xml:space="preserve">
-        <value>Authentication error. {0}</value>
+        <value>Authentication error.</value>
     </data>
     <data name="WelcomeView_TelemetryStep_Message1" xml:space="preserve">
         <value>To help me improve, I need to enable “telemetry” to collect anonymous data. This data is used solely for analysis and does not contain or allow the inference of any personally identifiable information about you.</value>
@@ -863,7 +861,7 @@ My intelligence comes from powerful Large language models (LLMs), which are prov
         <value>Input</value>
     </data>
     <data name="ChatFloatingWindow_ChatStatisticsTextBlock_OutputTokenCountRun" xml:space="preserve">
-        <value>Outpout</value>
+        <value>Output</value>
     </data>
     <data name="ChatFloatingWindow_ChatStatisticsTextBlock_TotalTokenCountRun" xml:space="preserve">
         <value>Total</value>
@@ -872,48 +870,48 @@ My intelligence comes from powerful Large language models (LLMs), which are prov
         <value>Elapsed</value>
     </data>
     <data name="KernelRequestException_InvalidConfiguration" xml:space="preserve">
-        <value />
+        <value>Model is not configured correctly. The model provider or ID might be missing or incorrect.</value>
     </data>
     <data name="KernelRequestException_InvalidApiKey" xml:space="preserve">
-        <value />
+        <value>API key is missing or invalid.</value>
     </data>
     <data name="KernelRequestException_QuotaExceeded" xml:space="preserve">
-        <value />
+        <value>You have exceeded your API usage quota.</value>
     </data>
     <data name="KernelRequestException_RateLimit" xml:space="preserve">
-        <value />
+        <value>You have exceeded the request rate limit. Please try again later.</value>
     </data>
     <data name="KernelRequestException_EndpointNotReachable" xml:space="preserve">
-        <value />
+        <value>Service endpoint is not reachable. Please check your network connection.</value>
     </data>
     <data name="KernelRequestException_InvalidEndpoint" xml:space="preserve">
-        <value />
+        <value>Provided service endpoint is invalid.</value>
     </data>
     <data name="KernelRequestException_EmptyResponse" xml:space="preserve">
-        <value />
+        <value>Service returned an empty response, which may indicate a network or service issue.</value>
     </data>
     <data name="KernelRequestException_FeatureNotSupport" xml:space="preserve">
-        <value />
+        <value>Selected model does not support the requested feature.</value>
     </data>
     <data name="KernelRequestException_Timeout" xml:space="preserve">
-        <value />
+        <value>Request to the service timed out. Please try again.</value>
     </data>
     <data name="KernelRequestException_NetworkError" xml:space="preserve">
-        <value />
+        <value>A network error occurred. Please check your connection and try again.</value>
     </data>
     <data name="KernelRequestException_ServiceUnavailable" xml:space="preserve">
-        <value />
+        <value>Service is currently unavailable. Please try again later.</value>
     </data>
     <data name="KernelRequestException_Unknown" xml:space="preserve">
-        <value />
+        <value>An unknown error occurred.</value>
     </data>
     <data name="KernelMixinFactory_NoModelDefinition" xml:space="preserve">
-        <value />
+        <value>No model definition found with the selected ID.</value>
     </data>
     <data name="KernelMixinFactory_UnsupportedModelProviderSchema" xml:space="preserve">
-        <value />
+        <value>Unsupported model provider API schema.</value>
     </data>
     <data name="KernelMixinFactory_NoModelProvider" xml:space="preserve">
-        <value />
+        <value>No model provider found with the selected ID.</value>
     </data>
 </root>

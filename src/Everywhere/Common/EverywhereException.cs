@@ -28,12 +28,12 @@ public abstract class EverywhereException : Exception
 public enum KernelRequestExceptionType
 {
     /// <summary>
-    /// Unknown error.
+    /// An unknown error occurred.
     /// </summary>
     Unknown,
 
     /// <summary>
-    /// model is not configured properly. e.g. model provider or id is missing or invalid.
+    /// Model is not configured correctly. The model provider or ID might be missing or incorrect.
     /// </summary>
     InvalidConfiguration,
 
@@ -43,50 +43,51 @@ public enum KernelRequestExceptionType
     InvalidApiKey,
 
     /// <summary>
-    /// Quota exceeded.
+    /// You have exceeded your API usage quota.
     /// </summary>
     QuotaExceeded,
 
     /// <summary>
-    /// Rate limit exceeded.
+    /// You have exceeded the request rate limit. Please try again later.
     /// </summary>
     RateLimit,
 
     /// <summary>
-    /// Endpoint is not reachable.
+    /// Service endpoint is not reachable. Please check your network connection.
     /// </summary>
     EndpointNotReachable,
 
     /// <summary>
-    /// Endpoint is invalid.
+    /// Provided service endpoint is invalid.
     /// </summary>
     InvalidEndpoint,
 
     /// <summary>
-    /// The response from the model provider is empty, this may indicate a network issue.
+    /// Service returned an empty response, which may indicate a network or service issue.
     /// </summary>
     EmptyResponse,
 
     /// <summary>
-    /// The model does not support the requested feature,
+    /// Selected model does not support the requested feature.
     /// </summary>
     FeatureNotSupport,
 
     /// <summary>
-    /// The request to the model provider timed out.
+    /// Request to the service timed out. Please try again.
     /// </summary>
     Timeout,
 
     /// <summary>
-    /// A network error occurred.
+    /// A network error occurred. Please check your connection and try again.
     /// </summary>
     NetworkError,
 
     /// <summary>
-    /// The model provider service is currently error or unavailable.
+    /// Service is currently unavailable. Please try again later.
     /// </summary>
     ServiceUnavailable,
 }
+
 
 /// <summary>
 /// Represents errors that occur during requests to LLM providers.

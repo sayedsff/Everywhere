@@ -93,7 +93,7 @@
         <value>Google</value>
     </data>
     <data name="SettingsSelectionItem_Model_WebSearchProvider_brave" xml:space="preserve">
-        <value>brave</value>
+        <value>Brave</value>
     </data>
     <data name="SettingsSelectionItem_Model_WebSearchProvider_bocha" xml:space="preserve">
         <value>博查</value>
@@ -321,13 +321,13 @@
         <value>HTTP 请求错误 ({0}): {1}</value>
     </data>
     <data name="FriendlyExceptionMessage_HttpRequest_BadRequest" xml:space="preserve">
-        <value>错误的请求，可能是 API 密钥错误或网络/地区不支持。</value>
+        <value>错误的请求。</value>
     </data>
     <data name="FriendlyExceptionMessage_HttpRequest_Unauthorized" xml:space="preserve">
-        <value>请求未授权，可能是 API 密钥错误或网络/地区不支持。</value>
+        <value>请求未授权。</value>
     </data>
     <data name="FriendlyExceptionMessage_HttpRequest_Forbidden" xml:space="preserve">
-        <value>请求被阻止，可能是 API 密钥错误或网络/地区不支持。</value>
+        <value>请求被阻止。</value>
     </data>
     <data name="FriendlyExceptionMessage_HttpRequest_NotFound" xml:space="preserve">
         <value>未找到结果。</value>
@@ -368,26 +368,25 @@
     <data name="FriendlyExceptionMessage_Socket_0" xml:space="preserve">
         <value>未知错误，请稍后再试。</value>
     </data><data name="FriendlyExceptionMessage_Aggregate" xml:space="preserve">
-        <value>发生一个或多个错误。
-{0}</value>
+        <value>发生一个或多个错误。</value>
     </data>
     <data name="FriendlyExceptionMessage_TaskCanceled" xml:space="preserve">
-        <value>任务已取消。{0}</value>
+        <value>任务已取消。</value>
     </data>
     <data name="FriendlyExceptionMessage_OperationCanceled" xml:space="preserve">
-        <value>操作已取消。{0}</value>
+        <value>操作已取消。</value>
     </data>
     <data name="FriendlyExceptionMessage_Timeout" xml:space="preserve">
-        <value>已超过最长等待时间。{0}</value>
+        <value>已超过最长等待时间。</value>
     </data>
     <data name="FriendlyExceptionMessage_Json" xml:space="preserve">
-        <value>无法解析 Json 数据。{0}</value>
+        <value>无法解析 Json 数据。</value>
     </data>
     <data name="FriendlyExceptionMessage_Format" xml:space="preserve">
-        <value>格式错误。{0}</value>
+        <value>格式错误。</value>
     </data>
     <data name="FriendlyExceptionMessage_Argument" xml:space="preserve">
-        <value>参数错误。{0}</value>
+        <value>参数错误。</value>
     </data>
     <data name="Settings_Common_Theme_Header" xml:space="preserve">
         <value>主题</value>
@@ -501,7 +500,7 @@
         <value>指定聊天浮动窗口打开时的固定模式，当窗口没有固定时，失去焦点会自动隐藏。</value>
     </data>
     <data name="FriendlyExceptionMessage_ClientResult" xml:space="preserve">
-        <value>客户端错误。{0}</value>
+        <value>客户端错误。</value>
     </data>
     <data name="Settings_Model_PresencePenalty_Description" xml:space="preserve">
         <value>值越大，越倾向不同的表达方式，避免概念重复；值越小，越倾向使用重复的概念或叙述，表达更具一致性。该设置仅对部分模型有效，如果遇到错误，请尝试还原默认值。</value>
@@ -630,7 +629,7 @@
         <value>软件更新</value>
     </data>
     <data name="Settings_Common_SoftwareUpdate_Description" xml:space="preserve">
-        <value>管理 Everywhere 的软件更新。如果有更新，点击更新之后 Everywhere 会自动下载并安装最新版本。过程中可能需要你在弹出窗口中选择“是”。</value>
+        <value>如果有更新，点击更新之后 Everywhere 会自动下载并安装最新版本。过程中可能需要你在弹出窗口中选择“是”。</value>
     </data>
     <data name="Settings_Common_IsAutomaticUpdateCheckEnabled_Header" xml:space="preserve">
         <value>自动更新</value>
@@ -687,7 +686,7 @@
         <value>提供访问系统文件的能力，如枚举、创建、删除、重命名、读取或写入文件等。</value>
     </data>
     <data name="FriendlyExceptionMessage_InvalidOperation" xml:space="preserve">
-        <value>无效的操作。{0}</value>
+        <value>无效的操作。</value>
     </data>
     <data name="FriendlyExceptionMessage_Win32" xml:space="preserve">
         <value>Windows 系统错误。{0}</value>
@@ -708,7 +707,7 @@
         <value>提供屏幕内元素的感知能力。</value>
     </data>
     <data name="ChangeLogView_ViewOnGitHubHyperlinkButton_Content" xml:space="preserve">
-        <value>在 GitHub 查看</value>
+        <value>访问 GitHub</value>
     </data>
     <data name="ChangeLogView_Header" xml:space="preserve">
         <value>Everywhere 已更新到最新版本 🎉</value>
@@ -813,7 +812,7 @@
         <value>如果没反应，可能是被其他软件占用，可以点击换一个快捷键哦。</value>
     </data>
     <data name="FriendlyExceptionMessage_Authentication" xml:space="preserve">
-        <value>认证错误。{0}</value>
+        <value>认证错误。</value>
     </data>
     <data name="WelcomeView_EnableTelemetryButton_Content" xml:space="preserve">
         <value>启用遥测</value>
@@ -850,5 +849,50 @@
     </data>
     <data name="ChatFloatingWindow_ChatStatisticsTextBlock_TotalTokenCountRun" xml:space="preserve">
         <value>总计</value>
+    </data>
+    <data name="KernelRequestException_Unknown" xml:space="preserve">
+        <value>未知错误。</value>
+    </data>
+    <data name="KernelRequestException_InvalidConfiguration" xml:space="preserve">
+        <value>模型配置不正确。模型提供商或 ID 可能缺失或无效。</value>
+    </data>
+    <data name="KernelRequestException_QuotaExceeded" xml:space="preserve">
+        <value>您已超出 API 使用配额。</value>
+    </data>
+    <data name="KernelRequestException_RateLimit" xml:space="preserve">
+        <value>请求频率过高，请稍后重试。</value>
+    </data>
+    <data name="KernelRequestException_EndpointNotReachable" xml:space="preserve">
+        <value>无法连接到服务端点，请检查您的网络连接。</value>
+    </data>
+    <data name="KernelRequestException_InvalidEndpoint" xml:space="preserve">
+        <value>提供的服务端点无效。</value>
+    </data>
+    <data name="KernelRequestException_EmptyResponse" xml:space="preserve">
+        <value>服务提供商返回了空响应，这可能表示存在网络或服务问题。</value>
+    </data>
+    <data name="KernelRequestException_FeatureNotSupport" xml:space="preserve">
+        <value>所选模型不支持所请求的功能。</value>
+    </data>
+    <data name="KernelRequestException_Timeout" xml:space="preserve">
+        <value>请求服务超时，请重试。</value>
+    </data>
+    <data name="KernelRequestException_NetworkError" xml:space="preserve">
+        <value>发生网络错误，请检查网络/服务提供商地区不支持。</value>
+    </data>
+    <data name="KernelRequestException_ServiceUnavailable" xml:space="preserve">
+        <value>服务当前不可用，请稍后重试。</value>
+    </data>
+    <data name="KernelRequestException_InvalidApiKey" xml:space="preserve">
+        <value>API 密钥缺失或无效。</value>
+    </data>
+    <data name="KernelMixinFactory_NoModelDefinition" xml:space="preserve">
+        <value>未找到具有所选 ID 的模型定义。</value>
+    </data>
+    <data name="KernelMixinFactory_NoModelProvider" xml:space="preserve">
+        <value>未找到具有所选 ID 的模型提供商。</value>
+    </data>
+    <data name="KernelMixinFactory_UnsupportedModelProviderSchema" xml:space="preserve">
+        <value>不支持的模型提供商 API 协议。</value>
     </data>
 </root>
