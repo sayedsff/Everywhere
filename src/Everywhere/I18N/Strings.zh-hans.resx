@@ -556,12 +556,6 @@
     <data name="Settings_Model_SelectedModelDefinition_IsDeepThinkingSupported_Description" xml:space="preserve">
         <value>模型会先思考再回答。如果你不确定这是什么，请保持默认值。如果模型不支持，开启此选项可能会导致调用失败。</value>
     </data>
-    <data name="Settings_Model_SelectedModelDefinition_IsWebSearchSupported_Header" xml:space="preserve">
-        <value>支持网络搜索</value>
-    </data>
-    <data name="Settings_Model_SelectedModelDefinition_IsWebSearchSupported_Description" xml:space="preserve">
-        <value>模型会先搜索网络再回答。如果你不确定这是什么，请保持默认值。如果模型不支持，开启此选项可能会导致调用失败。</value>
-    </data>
     <data name="Settings_Model_SelectedModelDefinition_MaxTokens_Description" xml:space="preserve">
         <value>单个对话的最大上下文长度。如果你不确定在做什么，请保持默认值。设为大于默认值可能导致调用失败。</value>
     </data>
@@ -671,7 +665,7 @@
         <value>网络搜索</value>
     </data>
     <data name="NativeChatPlugin_WebSearchEngine_Description" xml:space="preserve">
-        <value>提供网络搜索能力，先搜索后回答，可减少大语言模型幻觉，并提供最新信息。</value>
+        <value>提供网络搜索能力，先搜索后回答，可减少大语言模型幻觉，并提供最新信息。注意：使用 web_search 工具需要配置搜索引擎 API 密钥（和大模型 API 密钥是不同的）。如果你不打算配置 API 密钥，可是取消勾选 web_search 工具，仅使用 web_snapshot 工具。</value>
     </data>
     <data name="NativeChatPlugin_Shell_Header" xml:space="preserve">
         <value>终端</value>
@@ -912,5 +906,8 @@
     </data>
     <data name="KernelRequestException_OperationCancelled" xml:space="preserve">
         <value>操作已取消。</value>
+    </data>
+    <data name="ChatPluginPage_SelectToViewDetails" xml:space="preserve">
+        <value>在左侧选择一个项目以查看详情</value>
     </data>
 </root>

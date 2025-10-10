@@ -569,12 +569,6 @@
     <data name="Settings_Model_SelectedModelDefinition_IsDeepThinkingSupported_Header" xml:space="preserve">
         <value>Support Deep Thinking</value>
     </data>
-    <data name="Settings_Model_SelectedModelDefinition_IsWebSearchSupported_Header" xml:space="preserve">
-        <value>Support Web Search</value>
-    </data>
-    <data name="Settings_Model_SelectedModelDefinition_IsWebSearchSupported_Description" xml:space="preserve">
-        <value>Model can search web before replies. If you're not sure what you're doing, keep the default value. If the model doesn’t support deep thinking, enabling this may cause failures.</value>
-    </data>
     <data name="Settings_Model_SelectedModelDefinition_MaxTokens_Description" xml:space="preserve">
         <value>The maximum context length of single chat. If you're not sure what you're doing, keep the default value. Setting this larger than the default value may cause failures.</value>
     </data>
@@ -684,7 +678,7 @@
         <value>Web Search</value>
     </data>
     <data name="NativeChatPlugin_WebSearchEngine_Description" xml:space="preserve">
-        <value>Provides the ability to search the web before answering, can reduce large language model hallucinations and provide the latest information.</value>
+        <value>Provides the ability to search the web before answering, can reduce large language model hallucinations and provide the latest information. Note: Using the web_search tool requires configuring a search engine API key (which is different from the LLM API key). If you do not intend to configure an API key, you can uncheck the web_search tool and use only the web_snapshot tool.</value>
     </data>
     <data name="NativeChatPlugin_Shell_Header" xml:space="preserve">
         <value>Terminal</value>
@@ -931,5 +925,8 @@ My intelligence comes from powerful Large language models (LLMs), which are prov
     </data>
     <data name="KernelRequestException_OperationCancelled" xml:space="preserve">
         <value>Operation cancelled.</value>
+    </data>
+    <data name="ChatPluginPage_SelectToViewDetails" xml:space="preserve">
+        <value>Select an item on the left to view details</value>
     </data>
 </root>

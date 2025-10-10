@@ -88,6 +88,13 @@
       Grid.Column="1" Margin="4,0"
       VerticalAlignment="Stretch" Background="Transparent"/>
 
+    <TextBlock
+      Classes="h4" Grid.Row="0"
+      Grid.RowSpan="2" Grid.Column="2"
+      HorizontalAlignment="Center" VerticalAlignment="Center"
+      IsVisible="{Binding SelectedPlugin, Converter={x:Static ObjectConverters.IsNull}}"
+      Text="{I18N {x:Static LocaleKey.ChatPluginPage_SelectToViewDetails}}"/>
+
     <Grid
       Grid.Row="0" Grid.Column="2"
       Margin="0,8" ColumnDefinitions="Auto,*"
@@ -97,13 +104,13 @@
         Grid.Column="0" Width="128"
         Height="128" Margin="0,0,16,0"
         md:AsyncImageLoader.Source="{Binding SelectedPlugin.BeautifulIcon, FallbackValue={x:Null}}"
-        IsVisible="{Binding !!SelectedPlugin.BeautifulIcon, FallbackValue=false}"
+        IsVisible="{Binding SelectedPlugin.BeautifulIcon, FallbackValue=false, Converter={x:Static ObjectConverters.IsNotNull}}"
         Stretch="Uniform"/>
       <LucideIcon
         Grid.Row="0" Grid.RowSpan="3"
         Grid.Column="0" Width="128"
         Height="128" Margin="0,0,16,0"
-        IsVisible="{Binding !SelectedPlugin.BeautifulIcon, FallbackValue=false}"
+        IsVisible="{Binding SelectedPlugin.BeautifulIcon, FallbackValue=false, Converter={x:Static ObjectConverters.IsNull}}"
         Kind="{Binding SelectedPlugin.Icon, FallbackValue=Hammer}"
         Size="128"/>
 
