@@ -169,6 +169,16 @@ public class SettingsInitializer : IAsyncInitializer
                     [
                         new ModelDefinition
                         {
+                            Id = "claude-sonnet-4-5-20250929",
+                            ModelId = "claude-sonnet-4-5-20250929",
+                            DisplayName = "Claude Sonnet 4.5",
+                            MaxTokens = 200_000,
+                            IsImageInputSupported = true,
+                            IsFunctionCallingSupported = true,
+                            IsDeepThinkingSupported = true,
+                        },
+                        new ModelDefinition
+                        {
                             Id = "claude-opus-4-1-20250805",
                             ModelId = "claude-opus-4-1-20250805",
                             DisplayName = "Claude Opus 4.1",
@@ -282,6 +292,89 @@ public class SettingsInitializer : IAsyncInitializer
                         }
                     ]
                 },
+                // TODO: Enable it after xAI API is fixed.
+                // new ModelProvider
+                // {
+                //     Id = "xai",
+                //     DisplayName = "xAI (Grok)",
+                //     Endpoint = "https://api.x.ai/v1",
+                //     IconUrl = "https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/xai.svg",
+                //     Schema = ModelProviderSchema.OpenAI,
+                //     ModelDefinitions =
+                //     [
+                //         new ModelDefinition
+                //         {
+                //             Id = "grok-code-fast-1",
+                //             ModelId = "grok-code-fast-1",
+                //             DisplayName = "Grok Code Fast",
+                //             MaxTokens = 256_000,
+                //             IsImageInputSupported = true,
+                //             IsFunctionCallingSupported = true,
+                //             IsDeepThinkingSupported = true,
+                //         },
+                //         new ModelDefinition
+                //         {
+                //             Id = "grok-4-fast-reasoning",
+                //             ModelId = "grok-4-fast-reasoning",
+                //             DisplayName = "Grok 4 Fast",
+                //             MaxTokens = 2_000_000,
+                //             IsImageInputSupported = true,
+                //             IsFunctionCallingSupported = true,
+                //             IsDeepThinkingSupported = true,
+                //         },
+                //         new ModelDefinition
+                //         {
+                //             Id = "grok-4-fast-non-reasoning",
+                //             ModelId = "grok-4-fast-non-reasoning",
+                //             DisplayName = "Grok 4 Fast (No Reasoning)",
+                //             MaxTokens = 2_000_000,
+                //             IsImageInputSupported = true,
+                //             IsFunctionCallingSupported = true,
+                //             IsDeepThinkingSupported = false,
+                //             IsDefault = true,
+                //         },
+                //         new ModelDefinition
+                //         {
+                //             Id = "grok-4-0709",
+                //             ModelId = "grok-4-0709",
+                //             DisplayName = "Grok 4",
+                //             MaxTokens = 256_000,
+                //             IsImageInputSupported = true,
+                //             IsFunctionCallingSupported = true,
+                //             IsDeepThinkingSupported = true,
+                //         },
+                //         new ModelDefinition
+                //         {
+                //             Id = "grok-3-mini",
+                //             ModelId = "grok-3-mini",
+                //             DisplayName = "Grok 3 Mini",
+                //             MaxTokens = 131_072,
+                //             IsImageInputSupported = true,
+                //             IsFunctionCallingSupported = true,
+                //             IsDeepThinkingSupported = true,
+                //         },
+                //         new ModelDefinition
+                //         {
+                //             Id = "grok-3",
+                //             ModelId = "grok-3",
+                //             DisplayName = "Grok 3",
+                //             MaxTokens = 131_072,
+                //             IsImageInputSupported = true,
+                //             IsFunctionCallingSupported = true,
+                //             IsDeepThinkingSupported = false,
+                //         },
+                //         new ModelDefinition
+                //         {
+                //             Id = "custom",
+                //             ModelId = "MODEL_ID_HERE",
+                //             DisplayName = "Custom Model",
+                //             MaxTokens = 128_000,
+                //             IsImageInputSupported = false,
+                //             IsFunctionCallingSupported = false,
+                //             IsDeepThinkingSupported = false,
+                //         }
+                //     ]
+                // },
                 new ModelProvider
                 {
                     Id = "deepseek",
@@ -557,30 +650,35 @@ public class SettingsInitializer : IAsyncInitializer
     private static void ApplyModelProviders(IList<ModelProvider> srcList, ObservableCollection<ModelProvider> dstList)
     {
         var propertyCache = new Dictionary<Type, PropertyInfo[]>();
+        var final = new List<ModelProvider>();
+        var dstMap = dstList.AsValueEnumerable().ToDictionary(p => p.Id);
 
         foreach (var src in srcList)
         {
-            var dst = dstList.FirstOrDefault(p => p.Id == src.Id);
-            if (dst is null)
+            if (dstMap.TryGetValue(src.Id, out var dst))
             {
-                dstList.Add(src);
+                // Update existing provider
+                if (src.Id != "custom")
+                {
+                    ApplyProperties(src, dst, propertyCache);
+                    ApplyModelDefinitions(src.ModelDefinitions, dst.ModelDefinitions, propertyCache);
+                }
+
+                final.Add(dst);
+                dstMap.Remove(src.Id);
             }
-            else if (src.Id != "custom")
+            else
             {
-                ApplyProperties(src, dst, propertyCache);
-                ApplyModelDefinitions(src.ModelDefinitions, dst.ModelDefinitions, propertyCache);
+                // Add new provider from source
+                final.Add(src);
             }
         }
 
-        for (var i = dstList.Count - 1; i >= 0; i--)
-        {
-            var dst = dstList[i];
-            if (srcList.All(p => p.Id != dst.Id))
-            {
-                // Remove model provider if it does not exist in the source list
-                dstList.RemoveAt(i);
-            }
-        }
+        // Add remaining custom providers from the original destination list
+        final.AddRange(dstMap.Values);
+
+        // Reset the collection to reflect the new order and content
+        dstList.Reset(final);
     }
 
     private static void ApplyModelDefinitions(
@@ -588,28 +686,34 @@ public class SettingsInitializer : IAsyncInitializer
         ObservableCollection<ModelDefinition> dstList,
         Dictionary<Type, PropertyInfo[]> propertyCache)
     {
+        var final = new List<ModelDefinition>();
+        var dstMap = dstList.AsValueEnumerable().ToDictionary(p => p.Id);
+
         foreach (var src in srcList)
         {
-            var dst = dstList.FirstOrDefault(d => d.Id == src.Id);
-            if (dst is null)
+            if (dstMap.TryGetValue(src.Id, out var dst))
             {
-                dstList.Add(src);
+                // Update existing definition
+                if (src.Id != "custom")
+                {
+                    ApplyProperties(src, dst, propertyCache);
+                }
+
+                final.Add(dst);
+                dstMap.Remove(src.Id);
             }
-            else if (src.Id != "custom")
+            else
             {
-                ApplyProperties(src, dst, propertyCache);
+                // Add new definition from source
+                final.Add(src);
             }
         }
 
-        for (var i = dstList.Count - 1; i >= 0; i--)
-        {
-            var dst = dstList[i];
-            if (srcList.All(d => d.Id != dst.Id))
-            {
-                // Remove model definition if it does not exist in the source list
-                dstList.RemoveAt(i);
-            }
-        }
+        // Add remaining custom definition from the original destination list
+        final.AddRange(dstMap.Values);
+
+        // Reset the collection to reflect the new order and content
+        dstList.Reset(final);
     }
 
     private void InitializeSearchEngineProviders()
