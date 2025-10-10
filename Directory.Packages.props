@@ -3,7 +3,7 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <MicrosoftPackageVersion>9.0.9</MicrosoftPackageVersion>
     <EntityFrameworkVersion>9.0.7</EntityFrameworkVersion>
-    <SemanticKernelVersion>1.63.0</SemanticKernelVersion>
+    <SemanticKernelVersion>1.66.0</SemanticKernelVersion>
     <AvaloniaVersion>11.3.4</AvaloniaVersion>
     <SkiaSharpVersion>3.119.1</SkiaSharpVersion>
   </PropertyGroup>

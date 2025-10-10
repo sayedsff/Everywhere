@@ -19,11 +19,11 @@ public class HotkeyInitializer(
     public Task InitializeAsync()
     {
         // initialize hotkey listener
-        settings.Behavior.PropertyChanged += (_, args) =>
+        settings.ChatWindow.PropertyChanged += (_, args) =>
         {
-            if (args.PropertyName == nameof(settings.Behavior.ChatHotkey))
+            if (args.PropertyName == nameof(settings.ChatWindow.Hotkey))
             {
-                hotkeyListener.KeyboardHotkey = settings.Behavior.ChatHotkey;
+                HandleChatHotkeyChanged(settings.ChatWindow.Hotkey);
             }
         };
         hotkeyListener.KeyboardHotkey = settings.Behavior.ChatHotkey;

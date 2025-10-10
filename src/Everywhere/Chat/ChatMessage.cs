@@ -158,6 +158,19 @@ public partial class AssistantChatMessageSpan : ObservableObject
     [JsonIgnore]
     public double ElapsedSeconds => Math.Max((FinishedAt - CreatedAt).TotalSeconds, 0);
 
+    [Key(4)]
+    [ObservableProperty]
+    public partial string? ReasoningOutput { get; set; }
+
+    [Key(5)]
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ReasoningElapsedSeconds))]
+    public partial DateTimeOffset? ReasoningFinishedAt { get; set; }
+
+    [IgnoreMember]
+    [JsonIgnore]
+    public double ReasoningElapsedSeconds => Math.Max((ReasoningFinishedAt.GetValueOrDefault() - CreatedAt).TotalSeconds, 0);
+
     public AssistantChatMessageSpan()
     {
         MarkdownBuilder = new ObservableStringBuilder();

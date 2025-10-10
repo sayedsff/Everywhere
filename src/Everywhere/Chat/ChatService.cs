@@ -365,10 +365,35 @@ public class ChatService(
                             }
                         }
 
-                        if (streamingContent.Content is not null)
+                        foreach (var item in streamingContent.Items)
                         {
-                            assistantContentBuilder.Append(streamingContent.Content);
-                            await Dispatcher.UIThread.InvokeAsync(() => chatSpan.MarkdownBuilder.Append(streamingContent.Content));
+                            switch (item)
+                            {
+                                case StreamingChatMessageContent { Content.Length: > 0 } chatMessage:
+                                {
+                                    // Mark the reasoning as finished when we receive the first content chunk.
+                                    chatSpan.ReasoningFinishedAt ??= DateTimeOffset.UtcNow;
+
+                                    assistantContentBuilder.Append(chatMessage.Content);
+                                    await Dispatcher.UIThread.InvokeAsync(() => chatSpan.MarkdownBuilder.Append(chatMessage.Content));
+                                    break;
+                                }
+                                case StreamingTextContent { Text.Length: > 0 } text:
+                                {
+                                    // Mark the reasoning as finished when we receive the first content chunk.
+                                    chatSpan.ReasoningFinishedAt ??= DateTimeOffset.UtcNow;
+
+                                    assistantContentBuilder.Append(text.Text);
+                                    await Dispatcher.UIThread.InvokeAsync(() => chatSpan.MarkdownBuilder.Append(text.Text));
+                                    break;
+                                }
+                                case StreamingReasoningContent reasoning:
+                                {
+                                    if (chatSpan.ReasoningOutput is null) chatSpan.ReasoningOutput = reasoning.Text;
+                                    else chatSpan.ReasoningOutput += reasoning.Text;
+                                    break;
+                                }
+                            }
                         }
 
                         // for those LLM who doesn't implement function calling correctly,

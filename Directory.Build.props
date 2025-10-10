@@ -6,46 +6,39 @@
         <Nullable>enable</Nullable>
         <WarningsAsErrors>nullable</WarningsAsErrors>
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-        <NoWarn>$(NoWarn);SKEXP0001,SKEXP0010,SKEXP0050,KMEXP00,OPENAI001,CA1826,AVLN3001</NoWarn>
+        <NoWarn>$(NoWarn),CA1826,SKEXP0001,SKEXP0010,SKEXP0050,SKEXP0110,KMEXP00,OPENAI001,AVLN3001</NoWarn>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <CETCompat>false</CETCompat>
     </PropertyGroup>
 
-    <!-- Windows 平台检测 -->
     <PropertyGroup Condition="$([System.String]::Copy($(RuntimeIdentifier)).StartsWith('win')) OR $([MSBuild]::IsOSPlatform('Windows'))">
         <DefineConstants>$(DefineConstants);WINDOWS;IsWindows</DefineConstants>
     </PropertyGroup>
 
-    <!-- Linux 平台检测 -->
     <PropertyGroup Condition="$([System.String]::Copy($(RuntimeIdentifier)).StartsWith('linux')) OR $([MSBuild]::IsOSPlatform('Linux'))">
         <DefineConstants>$(DefineConstants);LINUX;IsLinux</DefineConstants>
     </PropertyGroup>
 
-    <!-- macOS 平台检测 -->
     <PropertyGroup Condition="$([System.String]::Copy($(RuntimeIdentifier)).StartsWith('osx')) OR $([MSBuild]::IsOSPlatform('OSX'))">
         <DefineConstants>$(DefineConstants);OSX;MACOS;IsOSX;IsMacOS</DefineConstants>
     </PropertyGroup>
 
-    <!-- iOS 平台检测 -->
     <PropertyGroup Condition="$([System.String]::Copy($(RuntimeIdentifier)).StartsWith('ios'))">
         <DefineConstants>$(DefineConstants);IOS;IsIOS</DefineConstants>
     </PropertyGroup>
 
-    <!-- Android 平台检测 -->
     <PropertyGroup Condition="$([System.String]::Copy($(RuntimeIdentifier)).StartsWith('android'))">
         <DefineConstants>$(DefineConstants);ANDROID;IsAndroid</DefineConstants>
     </PropertyGroup>
 
-    <!-- Mac Catalyst 平台检测 -->
     <PropertyGroup Condition="$([System.String]::Copy($(RuntimeIdentifier)).StartsWith('maccatalyst'))">
         <DefineConstants>$(DefineConstants);MACCATALYST;IsMacCatalyst</DefineConstants>
     </PropertyGroup>
 
-    <!-- Browser/WASM 平台检测 -->
     <PropertyGroup Condition="$([System.String]::Copy($(RuntimeIdentifier)).StartsWith('browser'))">
         <DefineConstants>$(DefineConstants);BROWSER;WASM;IsBrowser;IsWasm</DefineConstants>
     </PropertyGroup>
 
-    <!-- 架构检测 -->
     <PropertyGroup Condition="$([System.String]::Copy($(RuntimeIdentifier)).Contains('x64')) OR $([System.String]::Copy($(RuntimeIdentifier)).Contains('win-x64'))">
         <DefineConstants>$(DefineConstants);X64;IsX64</DefineConstants>
     </PropertyGroup>
@@ -62,17 +55,14 @@
         <DefineConstants>$(DefineConstants);ARM;IsARM</DefineConstants>
     </PropertyGroup>
 
-    <!-- 移动平台通用检测 -->
     <PropertyGroup Condition="$([System.String]::Copy($(RuntimeIdentifier)).StartsWith('ios')) OR $([System.String]::Copy($(RuntimeIdentifier)).StartsWith('android'))">
         <DefineConstants>$(DefineConstants);MOBILE;IsMobile</DefineConstants>
     </PropertyGroup>
 
-    <!-- 桌面平台通用检测 -->
     <PropertyGroup Condition="$([System.String]::Copy($(RuntimeIdentifier)).StartsWith('win')) OR $([System.String]::Copy($(RuntimeIdentifier)).StartsWith('linux')) OR $([System.String]::Copy($(RuntimeIdentifier)).StartsWith('osx'))">
         <DefineConstants>$(DefineConstants);DESKTOP;IsDesktop</DefineConstants>
     </PropertyGroup>
 
-    <!-- Unix-like 系统检测 -->
     <PropertyGroup Condition="$([System.String]::Copy($(RuntimeIdentifier)).StartsWith('linux')) OR $([System.String]::Copy($(RuntimeIdentifier)).StartsWith('osx'))">
         <DefineConstants>$(DefineConstants);UNIX;IsUnix</DefineConstants>
     </PropertyGroup>
