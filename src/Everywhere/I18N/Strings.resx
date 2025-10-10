@@ -871,4 +871,49 @@ My intelligence comes from powerful Large language models (LLMs), which are prov
     <data name="ChatFloatingWindow_ChatStatisticsTextBlock_ElapsedRun" xml:space="preserve">
         <value>Elapsed</value>
     </data>
+    <data name="KernelRequestException_InvalidConfiguration" xml:space="preserve">
+        <value />
+    </data>
+    <data name="KernelRequestException_InvalidApiKey" xml:space="preserve">
+        <value />
+    </data>
+    <data name="KernelRequestException_QuotaExceeded" xml:space="preserve">
+        <value />
+    </data>
+    <data name="KernelRequestException_RateLimit" xml:space="preserve">
+        <value />
+    </data>
+    <data name="KernelRequestException_EndpointNotReachable" xml:space="preserve">
+        <value />
+    </data>
+    <data name="KernelRequestException_InvalidEndpoint" xml:space="preserve">
+        <value />
+    </data>
+    <data name="KernelRequestException_EmptyResponse" xml:space="preserve">
+        <value />
+    </data>
+    <data name="KernelRequestException_FeatureNotSupport" xml:space="preserve">
+        <value />
+    </data>
+    <data name="KernelRequestException_Timeout" xml:space="preserve">
+        <value />
+    </data>
+    <data name="KernelRequestException_NetworkError" xml:space="preserve">
+        <value />
+    </data>
+    <data name="KernelRequestException_ServiceUnavailable" xml:space="preserve">
+        <value />
+    </data>
+    <data name="KernelRequestException_Unknown" xml:space="preserve">
+        <value />
+    </data>
+    <data name="KernelMixinFactory_NoModelDefinition" xml:space="preserve">
+        <value />
+    </data>
+    <data name="KernelMixinFactory_UnsupportedModelProviderSchema" xml:space="preserve">
+        <value />
+    </data>
+    <data name="KernelMixinFactory_NoModelProvider" xml:space="preserve">
+        <value />
+    </data>
 </root>

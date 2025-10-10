@@ -31,7 +31,7 @@ public class RestartAsAdministratorControl : ContentControl
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(ex, "Failed to restart as administrator.");
+                    logger.LogInformation(ex, "Failed to restart as administrator.");
                     toastManager
                         .CreateToast(LocaleKey.Common_Error.I18N())
                         .WithContent(ex.GetFriendlyMessage())

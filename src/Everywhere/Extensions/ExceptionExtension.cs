@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Sockets;
+using Everywhere.Common;
 using Microsoft.SemanticKernel;
 
 namespace Everywhere.Extensions;
@@ -10,7 +11,7 @@ public static class ExceptionExtension
     /// 将Exception转换为用户友好的消息
     /// </summary>
     /// <returns></returns>
-    public static DynamicResourceKey GetFriendlyMessage(this Exception e)
+    public static DynamicResourceKeyBase GetFriendlyMessage(this Exception e)
     {
         switch (e)
         {
@@ -33,17 +34,48 @@ public static class ExceptionExtension
             {
                 return new FormattedDynamicResourceKey(
                     LocaleKey.FriendlyExceptionMessage_Aggregate,
-                    new AggregateDynamicResourceKey(ae.InnerExceptions.Select(DynamicResourceKeyBase (i) => i.GetFriendlyMessage()).ToArray()));
+                    new AggregateDynamicResourceKey(ae.InnerExceptions.Select(DynamicResourceKeyBase (i) => i.GetFriendlyMessage()).ToList(), "\n"));
+            }
+            case EverywhereException ee:
+            {
+                return new AggregateDynamicResourceKey(
+                    [
+                        ee.FriendlyMessageKey,
+                        new DirectResourceKey(ee.Message)
+                    ],
+                    "\n");
             }
             default:
             {
                 var exceptionName = e.GetType().Name;
                 if (exceptionName.EndsWith("Exception")) exceptionName = exceptionName[..^"Exception".Length];
-                return new FormattedDynamicResourceKey(
-                    $"FriendlyExceptionMessage_{exceptionName}",
-                    new DirectResourceKey(e.Message));
+
+                var messageKey = $"FriendlyExceptionMessage_{exceptionName}";
+                return DynamicResourceKey.Exists(messageKey) ?
+                    new AggregateDynamicResourceKey(
+                        [
+                            new DynamicResourceKey(messageKey),
+                            new DirectResourceKey(e.Message)
+                        ],
+                        "\n") :
+                    new DirectResourceKey(e.Message);
             }
         }
+    }
+
+    /// <summary>
+    /// Unwarp the aggregate exception to get the inner exception (if only one), otherwise return itself.
+    /// </summary>
+    /// <param name="e"></param>
+    /// <returns></returns>
+    public static Exception? Unwarp(this Exception? e)
+    {
+        while (e is AggregateException { InnerExceptions.Count: 1 } ae)
+        {
+            e = ae.InnerExceptions[0];
+        }
+
+        return e;
     }
 
     private static FormattedDynamicResourceKey FormatHttpExceptionMessage(string baseKey, HttpStatusCode? statusCode)

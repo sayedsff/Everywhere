@@ -16,6 +16,11 @@ namespace Everywhere.I18N;
 [Union(3, typeof(AggregateDynamicResourceKey))]
 public abstract partial class DynamicResourceKeyBase : IObservable<object?>
 {
+    /// <summary>
+    /// so why axaml DOES NOT SUPPORT {Binding .^} ???????
+    /// </summary>
+    public DynamicResourceKeyBase Self => this;
+
     public abstract IDisposable Subscribe(IObserver<object?> observer);
 }
 
@@ -39,11 +44,6 @@ public class EmptyDynamicResourceKey : DynamicResourceKeyBase
 [MessagePackObject(OnlyIncludeKeyedMembers = true, AllowPrivate = true)]
 public partial class DynamicResourceKey(object key) : DynamicResourceKeyBase
 {
-    /// <summary>
-    /// so why axaml DOES NOT SUPPORT {Binding .^} ???????
-    /// </summary>
-    public DynamicResourceKey Self => this;
-
     [Key(0)]
     protected object Key { get; } = key;
 
@@ -139,11 +139,18 @@ public partial class FormattedDynamicResourceKey(object key, params DynamicResou
     }
 }
 
+/// <summary>
+/// Aggregates multiple dynamic resource keys into one.
+/// </summary>
+/// <param name="keys"></param>
 [MessagePackObject(OnlyIncludeKeyedMembers = true, AllowPrivate = true)]
-public partial class AggregateDynamicResourceKey(params DynamicResourceKeyBase[] keys) : DynamicResourceKeyBase
+public partial class AggregateDynamicResourceKey(IReadOnlyList<DynamicResourceKeyBase> keys, string separator = ", ") : DynamicResourceKeyBase
 {
     [Key(0)]
-    private DynamicResourceKeyBase[] Keys { get; } = keys;
+    private IReadOnlyList<DynamicResourceKeyBase> Keys { get; } = keys;
+
+    [Key(1)]
+    private string Separator { get; } = separator;
 
     public override IDisposable Subscribe(IObserver<object?> observer)
     {
@@ -155,19 +162,19 @@ public partial class AggregateDynamicResourceKey(params DynamicResourceKeyBase[]
 
     public override string ToString()
     {
-        if (Keys is not { Length: > 0 })
+        if (Keys is not { Count: > 0 })
         {
             return string.Empty;
         }
 
-        var resolvedKeys = new object?[Keys.Length];
-        for (var i = 0; i < Keys.Length; i++)
+        var resolvedKeys = new object?[Keys.Count];
+        for (var i = 0; i < Keys.Count; i++)
         {
             if (Keys[i] is DynamicResourceKey dynamicKey) resolvedKeys[i] = dynamicKey.ToString();
             else resolvedKeys[i] = Keys[i];
         }
 
-        return string.Join(", ", resolvedKeys);
+        return string.Join(Separator, resolvedKeys);
     }
 }
 

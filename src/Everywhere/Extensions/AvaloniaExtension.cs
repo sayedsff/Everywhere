@@ -191,7 +191,7 @@ public static class AvaloniaExtension
         return result ?? throw new InvalidOperationException("Task result is null");
     }
 
-    public static TextBlock ToTextBlock(this DynamicResourceKey dynamicResourceKey)
+    public static TextBlock ToTextBlock(this DynamicResourceKeyBase dynamicResourceKey)
     {
         return new TextBlock
         {

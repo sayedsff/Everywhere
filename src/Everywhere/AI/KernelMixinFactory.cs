@@ -1,4 +1,5 @@
 ﻿using Anthropic.SDK;
+using Everywhere.Common;
 using Everywhere.Configuration;
 using Microsoft.Extensions.AI;
 using Microsoft.SemanticKernel;
@@ -18,13 +19,19 @@ public class KernelMixinFactory : IKernelMixinFactory
         var modelProvider = modelSettings.SelectedModelProvider;
         if (modelProvider is null)
         {
-            throw new InvalidOperationException("No model provider found with the selected ID.");
+            throw new ChatRequestException(
+                new InvalidOperationException("No model provider found with the selected ID."),
+                KernelRequestExceptionType.InvalidConfiguration,
+                new DynamicResourceKey(LocaleKey.KernelMixinFactory_NoModelProvider));
         }
 
         var modelDefinition = modelSettings.SelectedModelDefinition;
         if (modelDefinition is null)
         {
-            throw new InvalidOperationException("No model definition found with the selected ID.");
+            throw new ChatRequestException(
+                new InvalidOperationException("No model definition found with the selected ID."),
+                KernelRequestExceptionType.InvalidConfiguration,
+                new DynamicResourceKey(LocaleKey.KernelMixinFactory_NoModelDefinition));
         }
 
         var apiKey = apiKeyOverride ?? modelProvider.ApiKey;
@@ -48,7 +55,10 @@ public class KernelMixinFactory : IKernelMixinFactory
                 ModelProviderSchema.OpenAI => new OpenAIKernelMixin(modelSettings, modelProvider, modelDefinition, apiKey),
                 ModelProviderSchema.Anthropic => new AnthropicKernelMixin(modelSettings, modelProvider, modelDefinition, apiKey),
                 ModelProviderSchema.Ollama => new OllamaKernelMixin(modelSettings, modelProvider, modelDefinition),
-                _ => throw new NotSupportedException($"Model provider schema '{modelProvider.Schema}' is not supported.")
+                _ => throw new ChatRequestException(
+                    new NotSupportedException($"Model provider schema '{modelProvider.Schema}' is not supported."),
+                    KernelRequestExceptionType.InvalidConfiguration,
+                    new DynamicResourceKey(LocaleKey.KernelMixinFactory_UnsupportedModelProviderSchema))
             });
         return _cachedKernelMixin.KernelMixin;
     }

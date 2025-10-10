@@ -103,7 +103,7 @@ public sealed partial class SoftwareUpdater(
         }
         catch (Exception ex)
         {
-            logger.LogWarning(ex, "Failed to check for updates.");
+            logger.LogInformation(ex, "Failed to check for updates.");
             LatestVersion = null;
         }
 
