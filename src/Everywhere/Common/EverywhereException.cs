@@ -86,6 +86,11 @@ public enum KernelRequestExceptionType
     /// Service is currently unavailable. Please try again later.
     /// </summary>
     ServiceUnavailable,
+
+    /// <summary>
+    /// Operation was cancelled.
+    /// </summary>
+    OperationCancelled,
 }
 
 
@@ -131,6 +136,7 @@ public class ChatRequestException : EverywhereException
             KernelRequestExceptionType.Timeout => LocaleKey.KernelRequestException_Timeout,
             KernelRequestExceptionType.NetworkError => LocaleKey.KernelRequestException_NetworkError,
             KernelRequestExceptionType.ServiceUnavailable => LocaleKey.KernelRequestException_ServiceUnavailable,
+            KernelRequestExceptionType.OperationCancelled => LocaleKey.KernelRequestException_OperationCancelled,
             _ => LocaleKey.KernelRequestException_Unknown,
         });
     }
@@ -221,6 +227,11 @@ public class ChatRequestException : EverywhereException
                 exceptionType = KernelRequestExceptionType.InvalidEndpoint;
                 break;
             }
+            case OperationCanceledException:
+            {
+                exceptionType = KernelRequestExceptionType.OperationCancelled;
+                break;
+            }
         }
 
         exceptionType ??= httpStatusCode switch
@@ -230,8 +241,10 @@ public class ChatRequestException : EverywhereException
             HttpStatusCode.Forbidden => KernelRequestExceptionType.QuotaExceeded,
             HttpStatusCode.NotFound => KernelRequestExceptionType.InvalidConfiguration,
             HttpStatusCode.RequestTimeout => KernelRequestExceptionType.Timeout,
+            HttpStatusCode.UnprocessableEntity => KernelRequestExceptionType.InvalidConfiguration,
             HttpStatusCode.InternalServerError => KernelRequestExceptionType.ServiceUnavailable,
             HttpStatusCode.BadGateway => KernelRequestExceptionType.ServiceUnavailable,
+            HttpStatusCode.ServiceUnavailable => KernelRequestExceptionType.ServiceUnavailable,
             HttpStatusCode.GatewayTimeout => KernelRequestExceptionType.Timeout,
             HttpStatusCode.TooManyRequests => KernelRequestExceptionType.RateLimit,
             _ => KernelRequestExceptionType.Unknown,

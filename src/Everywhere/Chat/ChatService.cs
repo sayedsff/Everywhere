@@ -312,7 +312,8 @@ public class ChatService(
                 IReadOnlyList<FunctionCallContent> functionCallContents;
                 var assistantContentBuilder = new StringBuilder();
                 var functionCallContentBuilder = new FunctionCallContentBuilder();
-                var promptExecutionSettings = kernelMixin.GetPromptExecutionSettings();
+                var promptExecutionSettings = kernelMixin.GetPromptExecutionSettings(
+                    settings.Internal.IsToolCallEnabled ? FunctionChoiceBehavior.Auto(autoInvoke: false) : null);
 
                 // ReSharper disable once ExplicitCallerInfoArgument
                 using (var llmStreamActivity = _activitySource.StartActivity("ChatCompletionService.GetStreamingChatMessageContents"))
@@ -518,7 +519,6 @@ public class ChatService(
                 // we can generate a title for the chat context.
                 GenerateTitleAsync(
                     kernelMixin.ChatCompletionService,
-                    kernelMixin.GetPromptExecutionSettings(),
                     userMessage,
                     assistantMessage,
                     chatContext.Metadata,
@@ -527,9 +527,10 @@ public class ChatService(
         }
         catch (Exception e)
         {
-            activity?.SetStatus(ActivityStatusCode.Error, e.Message);
-            assistantChatMessage.ErrorMessageKey = e.GetFriendlyMessage();
-            logger.LogError(e, "Error generating chat response");
+            var chatRequestException = ChatRequestException.Parse(e);
+            activity?.SetStatus(ActivityStatusCode.Error, e.Message.Trim());
+            assistantChatMessage.ErrorMessageKey = chatRequestException.GetFriendlyMessage();
+            logger.LogError(chatRequestException, "Error generating chat response");
         }
         finally
         {
@@ -664,7 +665,6 @@ public class ChatService(
 
     private async Task GenerateTitleAsync(
         IChatCompletionService chatCompletionService,
-        PromptExecutionSettings promptExecutionSettings,
         string userMessage,
         string assistantMessage,
         ChatContextMetadata metadata,
@@ -694,7 +694,6 @@ public class ChatService(
             };
             var chatMessageContent = await chatCompletionService.GetChatMessageContentAsync(
                 chatHistory,
-                promptExecutionSettings,
                 cancellationToken: cancellationToken);
             metadata.Topic = chatMessageContent.Content;
             activity?.SetTag("topic.length", metadata.Topic?.Length ?? 0);

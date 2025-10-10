@@ -5,7 +5,6 @@ using Everywhere.Interop;
 #endif
 
 using System.Diagnostics;
-using Everywhere.AI;
 using OpenTelemetry;
 using OpenTelemetry.Trace;
 using Sentry.OpenTelemetry;

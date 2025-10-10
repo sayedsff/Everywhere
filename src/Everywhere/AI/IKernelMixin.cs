@@ -21,8 +21,7 @@ public interface IKernelMixin : IDisposable
     /// <summary>
     /// Gets the prompt execution settings.
     /// </summary>
-    /// <param name="isToolRequired">A value indicating whether a tool is required.</param>
-    /// <param name="isToolAutoInvoke">A value indicating whether to auto-invoke tools.</param>
+    /// <param name="functionChoiceBehavior"></param>
     /// <returns>The prompt execution settings.</returns>
-    PromptExecutionSettings GetPromptExecutionSettings(bool isToolRequired = false, bool isToolAutoInvoke = false);
+    PromptExecutionSettings? GetPromptExecutionSettings(FunctionChoiceBehavior? functionChoiceBehavior = null);
 }

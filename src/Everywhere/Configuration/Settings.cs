@@ -257,7 +257,7 @@ public partial class ModelSettings : SettingsCategory
     public partial string? SelectedModelDefinitionId { get; set; }
 
     [JsonIgnore]
-    [SettingsItems]
+    [SettingsItems(IsExpanded = true)]
     [SettingsSelectionItem(
         ItemsSourceBindingPath = $"{nameof(SelectedModelProvider)}.{nameof(ModelProvider.ModelDefinitions)}",
         DataTemplateKey = typeof(ModelDefinition))]

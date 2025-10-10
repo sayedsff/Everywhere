@@ -929,4 +929,7 @@ My intelligence comes from powerful Large language models (LLMs), which are prov
     <data name="Settings_ChatWindow_AllowRunInBackground_Description" xml:space="preserve">
         <value>When enabled, closing the chat window will not terminate the current task.</value>
     </data>
+    <data name="KernelRequestException_OperationCancelled" xml:space="preserve">
+        <value>Operation cancelled.</value>
+    </data>
 </root>

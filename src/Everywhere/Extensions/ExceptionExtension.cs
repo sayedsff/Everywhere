@@ -41,7 +41,7 @@ public static class ExceptionExtension
                 return new AggregateDynamicResourceKey(
                     [
                         ee.FriendlyMessageKey,
-                        new DirectResourceKey(ee.Message)
+                        new DirectResourceKey(ee.Message.Trim())
                     ],
                     "\n");
             }
@@ -55,10 +55,10 @@ public static class ExceptionExtension
                     new AggregateDynamicResourceKey(
                         [
                             new DynamicResourceKey(messageKey),
-                            new DirectResourceKey(e.Message)
+                            new DirectResourceKey(e.Message.Trim())
                         ],
                         "\n") :
-                    new DirectResourceKey(e.Message);
+                    new DirectResourceKey(e.Message.Trim());
             }
         }
     }

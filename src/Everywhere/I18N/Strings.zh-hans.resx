@@ -910,4 +910,7 @@
     <data name="Settings_ChatWindow_AllowRunInBackground_Description" xml:space="preserve">
         <value>开启后，关闭聊天窗口不会终止当前的任务。</value>
     </data>
+    <data name="KernelRequestException_OperationCancelled" xml:space="preserve">
+        <value>操作已取消。</value>
+    </data>
 </root>

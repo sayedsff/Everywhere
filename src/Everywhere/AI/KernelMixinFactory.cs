@@ -93,18 +93,31 @@ public class KernelMixinFactory : IKernelMixinFactory
         public IChatCompletionService ChatCompletionService => _chatCompletionService;
 
         /// <inheritdoc />
-        public PromptExecutionSettings GetPromptExecutionSettings(bool isToolRequired = false, bool isToolAutoInvoke = false) =>
-            new OpenAIPromptExecutionSettings
+        public PromptExecutionSettings? GetPromptExecutionSettings(FunctionChoiceBehavior? functionChoiceBehavior = null)
+        {
+            double? temperature = settings.Temperature.IsCustomValueSet ? settings.Temperature.ActualValue : null;
+            double? topP = settings.TopP.IsCustomValueSet ? settings.TopP.ActualValue : null;
+            double? presencePenalty = settings.PresencePenalty.IsCustomValueSet ? settings.PresencePenalty.ActualValue : null;
+            double? frequencyPenalty = settings.FrequencyPenalty.IsCustomValueSet ? settings.FrequencyPenalty.ActualValue : null;
+
+            if (temperature is null &&
+                topP is null &&
+                presencePenalty is null &&
+                frequencyPenalty is null &&
+                functionChoiceBehavior is null)
             {
-                Temperature = settings.Temperature.IsCustomValueSet ? settings.Temperature.ActualValue : null,
-                TopP = settings.TopP.IsCustomValueSet ? settings.TopP.ActualValue : null,
-                PresencePenalty = settings.PresencePenalty.IsCustomValueSet ? settings.PresencePenalty.ActualValue : null,
-                FrequencyPenalty = settings.FrequencyPenalty.IsCustomValueSet ? settings.FrequencyPenalty.ActualValue : null,
-                FunctionChoiceBehavior =
-                    isToolRequired ?
-                        FunctionChoiceBehavior.Required(autoInvoke: isToolAutoInvoke) :
-                        FunctionChoiceBehavior.Auto(autoInvoke: isToolAutoInvoke)
+                return null;
+            }
+
+            return new OpenAIPromptExecutionSettings
+            {
+                Temperature = temperature,
+                TopP = topP,
+                PresencePenalty = presencePenalty,
+                FrequencyPenalty = frequencyPenalty,
+                FunctionChoiceBehavior = functionChoiceBehavior
             };
+        }
 
         /// <inheritdoc />
         public int MaxTokenTotal => definition.MaxTokens;
@@ -130,7 +143,7 @@ public class KernelMixinFactory : IKernelMixinFactory
         public int MaxTokenTotal => _definition.MaxTokens;
 
         /// <inheritdoc />
-        public PromptExecutionSettings GetPromptExecutionSettings(bool isToolRequired = false, bool isToolAutoInvoke = false) => new()
+        public PromptExecutionSettings GetPromptExecutionSettings(FunctionChoiceBehavior? functionChoiceBehavior = null) => new()
         {
             ModelId = _definition.ModelId,
             ExtensionData = new Dictionary<string, object>
@@ -140,10 +153,7 @@ public class KernelMixinFactory : IKernelMixinFactory
                 { "presence_penalty", _settings.PresencePenalty },
                 { "frequency_penalty", _settings.FrequencyPenalty },
             },
-            FunctionChoiceBehavior =
-                isToolRequired ?
-                    FunctionChoiceBehavior.Required(autoInvoke: isToolAutoInvoke) :
-                    FunctionChoiceBehavior.Auto(autoInvoke: isToolAutoInvoke)
+            FunctionChoiceBehavior = functionChoiceBehavior
         };
 
         private readonly ModelSettings _settings;
@@ -183,15 +193,12 @@ public class KernelMixinFactory : IKernelMixinFactory
         public int MaxTokenTotal => _definition.MaxTokens;
 
         /// <inheritdoc />
-        public PromptExecutionSettings GetPromptExecutionSettings(bool isToolRequired = false, bool isToolAutoInvoke = false) =>
+        public PromptExecutionSettings GetPromptExecutionSettings(FunctionChoiceBehavior? functionChoiceBehavior = null) =>
             new OllamaPromptExecutionSettings
             {
                 Temperature = (float)_settings.Temperature,
                 TopP = (float)_settings.TopP,
-                FunctionChoiceBehavior =
-                    isToolRequired ?
-                        FunctionChoiceBehavior.Required(autoInvoke: isToolAutoInvoke) :
-                        FunctionChoiceBehavior.Auto(autoInvoke: isToolAutoInvoke)
+                FunctionChoiceBehavior = functionChoiceBehavior
             };
 
         private readonly ModelSettings _settings;
