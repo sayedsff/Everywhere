@@ -1,3 +1,12 @@
+## [v0.3.7](https://github.com/DearVa/Everywhere/releases/tag/v0.3.7) - 2025-10-11
+
+### 🐞 Fixed
+- Fixed error messages were incorrectly parsed as "unknown".
+
+**Full Changelog**: https://github.com/DearVa/Everywhere/compare/v0.3.6...v0.3.7
+
+
+
 ## [v0.3.6](https://github.com/DearVa/Everywhere/releases/tag/v0.3.6) - 2025-10-10
 
 ### ✨ New Features
@@ -16,8 +25,6 @@
 - Fixed an issue where the model's tool-call usage was displayed in the wrong position.
 - Fixed an issue where the chat window could not be reopened after being closed while a message was being streamed.
 - Fixed an issue where the `Shift` and `Win` keys could become unresponsive if a hotkey included the `Win` key. You can now set the Copilot key as a hotkey normally.
-
-
 
 **Full Changelog**: https://github.com/DearVa/Everywhere/compare/v0.3.5...v0.3.6
 
