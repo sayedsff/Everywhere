@@ -10,6 +10,7 @@ using Everywhere.Configuration;
 using Everywhere.Extensions;
 using Everywhere.I18N;
 using Everywhere.Interop;
+using Everywhere.Windows.Interop;
 using Microsoft.Extensions.Logging;
 #if !DEBUG
 using Everywhere.Utilities;
@@ -42,6 +43,7 @@ public sealed partial class SoftwareUpdater(
 
     private Task? _updateTask;
     private Asset? _latestAsset;
+    private Version? _notifiedVersion;
 
     public Version CurrentVersion { get; } = typeof(SoftwareUpdater).Assembly.GetName().Version ?? new Version(0, 0, 0);
 
@@ -121,6 +123,14 @@ public sealed partial class SoftwareUpdater(
             }
 
             LatestVersion = latestVersion > CurrentVersion ? latestVersion : null;
+
+            if (_notifiedVersion != LatestVersion && LatestVersion is not null)
+            {
+                _notifiedVersion = LatestVersion;
+                new Win32NativeHelper().ShowDesktopNotification(
+                    LocaleKey.SoftwareUpdater_UpdateAvailable_Toast_Message.I18N(),
+                    LocaleKey.Common_Info.I18N());
+            }
         }
         catch (Exception ex)
         {

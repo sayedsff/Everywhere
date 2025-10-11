@@ -919,4 +919,7 @@
     <data name="ChatWindow_ChatInputBox_SettingsMenuItems_VisualTreeTokenLimit" xml:space="preserve">
         <value>视觉树长度限制</value>
     </data>
+    <data name="SoftwareUpdater_UpdateAvailable_Toast_Message" xml:space="preserve">
+        <value>有新版本可用。</value>
+    </data>
 </root>

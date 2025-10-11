@@ -938,4 +938,7 @@ My intelligence comes from powerful Large language models (LLMs), which are prov
     <data name="ChatWindow_ChatInputBox_SettingsMenuItems_VisualTreeTokenLimit" xml:space="preserve">
         <value>Visual tree length limit</value>
     </data>
+    <data name="SoftwareUpdater_UpdateAvailable_Toast_Message" xml:space="preserve">
+        <value>Update available.</value>
+    </data>
 </root>

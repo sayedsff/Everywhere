@@ -1,20 +1,21 @@
 ## [v0.3.8](https://github.com/DearVa/Everywhere/releases/tag/v0.3.8) - 2025-10-11
 
 🚀 Features
-Software updates can now be cancelled by dismissing the toast notification
-Added more keyboard shortcuts: `Ctrl+N` for a new chat, `Ctrl+T` to for tools switch
-Added a visual tree length limit setting to save tokens
+- Software updates can now be cancelled by dismissing the toast notification
+- Added more keyboard shortcuts: `Ctrl+N` for a new chat, `Ctrl+T` to for tools switch
+- Added a visual tree length limit setting to save tokens
+- Added a notification when an update is available
 
 ✨ Improvements
-Optimized the button layout in the chat window
-Added more friendly error messages for a better user experience
+- Optimized the button layout in the chat window
+- Added more friendly error messages for a better user experience
 
 🐛 Bug Fixes
-Fixed a potential error when loading settings
-Fixed an issue where the chat window could not be reopened after being accidentally closed due to an exception
-Fixed a missing scrollbar on the chat plugin page (#28)
-Fixed unnecessary telemetry logging
-Corrected a typo for an Ollama model: deepseek R1 8B -> deepseek R1 7B
+- Fixed a potential error when loading settings
+- Fixed an issue where the chat window could not be reopened after being accidentally closed
+- Fixed a missing scrollbar on the chat plugin page (#28)
+- Fixed unnecessary telemetry logging
+- Corrected a typo for an Ollama model: deepseek R1 8B -> deepseek R1 7B
 
 **Full Changelog**: https://github.com/DearVa/Everywhere/compare/v0.3.7...v0.3.8
 
