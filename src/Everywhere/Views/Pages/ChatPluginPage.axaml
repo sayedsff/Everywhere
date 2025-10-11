@@ -146,43 +146,46 @@
 
       <TabItem Header="{I18N {x:Static LocaleKey.ChatPluginPage_TabItem_Functions_Header}}">
         <Border
-          Background="{DynamicResource CardBackgroundColor}"
           BorderBrush="{DynamicResource BorderColor}"
           BorderThickness="1" CornerRadius="8">
-          <ItemsControl
-            Classes="FunctionItemsControl" Padding="12,8"
-            ItemsSource="{Binding SelectedPlugin.Functions, FallbackValue={x:Null}}">
-            <ItemsControl.DataTemplates>
-              <DataTemplate DataType="p:ChatFunction">
-                <Grid
-                  ColumnDefinitions="Auto,Auto,*" RowDefinitions="Auto,Auto">
-                  <CheckBox
-                    Grid.Row="0" Grid.RowSpan="2"
-                    Grid.Column="0" Margin="4,0,12,0"
-                    IsChecked="{Binding IsEnabled}"/>
+          <ScrollViewer
+            Background="{DynamicResource CardBackgroundColor}"
+            HorizontalScrollBarVisibility="Disabled">
+            <ItemsControl
+              Classes="FunctionItemsControl" Padding="12,8"
+              ItemsSource="{Binding SelectedPlugin.Functions, FallbackValue={x:Null}}">
+              <ItemsControl.DataTemplates>
+                <DataTemplate DataType="p:ChatFunction">
+                  <Grid
+                    ColumnDefinitions="Auto,Auto,*" RowDefinitions="Auto,Auto">
+                    <CheckBox
+                      Grid.Row="0" Grid.RowSpan="2"
+                      Grid.Column="0" Margin="4,0,12,0"
+                      IsChecked="{Binding IsEnabled}"/>
 
-                  <LucideIcon
-                    Grid.Row="0" Grid.RowSpan="2"
-                    Grid.Column="1" Margin="0,0,12,0"
-                    VerticalAlignment="Center"
-                    IsVisible="{Binding !!Icon}"
-                    Kind="{Binding Icon}"
-                    Size="22"/>
+                    <LucideIcon
+                      Grid.Row="0" Grid.RowSpan="2"
+                      Grid.Column="1" Margin="0,0,12,0"
+                      VerticalAlignment="Center"
+                      IsVisible="{Binding !!Icon}"
+                      Kind="{Binding Icon}"
+                      Size="22"/>
 
-                  <TextBlock
-                    Classes="p" Grid.Row="0"
-                    Grid.Column="2" Margin="0,-4,0,0"
-                    Text="{Binding KernelFunction.Name}"
-                    TextWrapping="Wrap"/>
-                  <TextBlock
-                    Classes="Muted" Grid.Row="1"
-                    Grid.Column="2" Margin="0,0,0,4"
-                    Text="{Binding KernelFunction.Description}"
-                    TextWrapping="Wrap"/>
-                </Grid>
-              </DataTemplate>
-            </ItemsControl.DataTemplates>
-          </ItemsControl>
+                    <TextBlock
+                      Classes="p" Grid.Row="0"
+                      Grid.Column="2" Margin="0,-4,0,0"
+                      Text="{Binding KernelFunction.Name}"
+                      TextWrapping="Wrap"/>
+                    <TextBlock
+                      Classes="Muted" Grid.Row="1"
+                      Grid.Column="2" Margin="0,0,0,4"
+                      Text="{Binding KernelFunction.Description}"
+                      TextWrapping="Wrap"/>
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.DataTemplates>
+            </ItemsControl>
+          </ScrollViewer>
         </Border>
       </TabItem>
     </TabControl>

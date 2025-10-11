@@ -64,7 +64,8 @@
                       HorizontalAlignment="Left" Orientation="Horizontal"
                       Spacing="8">
                       <Slider
-                        Width="320" IsSnapToTickEnabled="True"
+                        Width="320" VerticalAlignment="Center"
+                        IsSnapToTickEnabled="True"
                         IsVisible="{Binding IsSliderVisible}"
                         Maximum="{Binding MaxValue}"
                         Minimum="{Binding MinValue}"
@@ -80,7 +81,8 @@
                       HorizontalAlignment="Left" Orientation="Horizontal"
                       Spacing="8">
                       <Slider
-                        Width="320" IsSnapToTickEnabled="True"
+                        Width="320" VerticalAlignment="Center"
+                        IsSnapToTickEnabled="True"
                         IsVisible="{Binding IsSliderVisible}"
                         Maximum="{Binding MaxValue}"
                         Minimum="{Binding MinValue}"
