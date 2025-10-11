@@ -7,8 +7,10 @@ using Avalonia.Layout;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.Input;
 using Everywhere.Chat;
+using Everywhere.Common;
 using Everywhere.Configuration;
 using LiveMarkdown.Avalonia;
+using Microsoft.Extensions.Logging;
 
 namespace Everywhere.Views;
 
@@ -369,6 +371,22 @@ public partial class ChatWindow : ReactiveWindow<ChatWindowViewModel>
         base.OnPointerCaptureLost(e);
 
         CanResize = false;
+    }
+
+    protected override void OnClosing(WindowClosingEventArgs e)
+    {
+        // do not allow closing, just hide the window
+        e.Cancel = true;
+        IsOpened = false;
+
+        base.OnClosing(e);
+    }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        base.OnClosed(e);
+
+        ServiceLocator.Resolve<ILogger<ChatWindow>>().LogError("Chat window was closed unexpectedly. This should not happen.");
     }
 
     [RelayCommand]
