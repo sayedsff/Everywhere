@@ -941,4 +941,7 @@ My intelligence comes from powerful Large language models (LLMs), which are prov
     <data name="SoftwareUpdater_UpdateAvailable_Toast_Message" xml:space="preserve">
         <value>Update available.</value>
     </data>
+    <data name="ChatWindow_ChatMessage_Assistant_DeepThinking" xml:space="preserve">
+        <value>Deep thinking</value>
+    </data>
 </root>

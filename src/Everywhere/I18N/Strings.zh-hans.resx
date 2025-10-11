@@ -922,4 +922,7 @@
     <data name="SoftwareUpdater_UpdateAvailable_Toast_Message" xml:space="preserve">
         <value>有新版本可用。</value>
     </data>
+    <data name="ChatWindow_ChatMessage_Assistant_DeepThinking" xml:space="preserve">
+        <value>深度思考</value>
+    </data>
 </root>

@@ -5,8 +5,9 @@ namespace Everywhere.Extensions;
 
 public static class StringExtension
 {
-    public static bool IsNullOrEmpty([NotNullWhen(false)] this string? str) => 
-        string.IsNullOrEmpty(str);
+    public static bool IsNullOrEmpty([NotNullWhen(false)] this string? str) => string.IsNullOrEmpty(str);
+
+    public static bool IsNullOrWhiteSpace([NotNullWhen(false)] this string? str) => string.IsNullOrWhiteSpace(str);
         
     [return: NotNullIfNotNull(nameof(str))]
     public static string? SafeSubstring(this string? str, int startIndex, int length)

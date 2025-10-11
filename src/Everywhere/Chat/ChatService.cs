@@ -10,6 +10,7 @@ using Everywhere.Configuration;
 using Everywhere.Interop;
 using Everywhere.Storage;
 using Everywhere.Utilities;
+using LiveMarkdown.Avalonia;
 using Lucide.Avalonia;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.DependencyInjection;
@@ -371,33 +372,61 @@ public class ChatService(
                         {
                             switch (item)
                             {
-                                case StreamingChatMessageContent { Content.Length: > 0 } chatMessage:
+                                case StreamingChatMessageContent { Content.Length: > 0 } chatMessageContent:
                                 {
-                                    // Mark the reasoning as finished when we receive the first content chunk.
-                                    chatSpan.ReasoningFinishedAt ??= DateTimeOffset.UtcNow;
-
-                                    assistantContentBuilder.Append(chatMessage.Content);
-                                    await Dispatcher.UIThread.InvokeAsync(() => chatSpan.MarkdownBuilder.Append(chatMessage.Content));
+                                    if (IsReasoningContent(chatMessageContent))
+                                    {
+                                        HandleReasoningMessage(chatMessageContent.Content);
+                                    }
+                                    else
+                                    {
+                                        await HandleTextMessage(chatMessageContent.Content);
+                                    }
                                     break;
                                 }
-                                case StreamingTextContent { Text.Length: > 0 } text:
+                                case StreamingTextContent { Text.Length: > 0 } textContent:
                                 {
-                                    // Mark the reasoning as finished when we receive the first content chunk.
-                                    chatSpan.ReasoningFinishedAt ??= DateTimeOffset.UtcNow;
-
-                                    assistantContentBuilder.Append(text.Text);
-                                    await Dispatcher.UIThread.InvokeAsync(() => chatSpan.MarkdownBuilder.Append(text.Text));
+                                    if (IsReasoningContent(textContent))
+                                    {
+                                        HandleReasoningMessage(textContent.Text);
+                                    }
+                                    else
+                                    {
+                                        await HandleTextMessage(textContent.Text);
+                                    }
                                     break;
                                 }
-                                case StreamingReasoningContent reasoning:
+                                case StreamingReasoningContent reasoningContent:
                                 {
-                                    if (chatSpan.ReasoningOutput is null) chatSpan.ReasoningOutput = reasoning.Text;
-                                    else chatSpan.ReasoningOutput += reasoning.Text;
+                                    HandleReasoningMessage(reasoningContent.Text);
                                     break;
                                 }
                             }
+
+                            bool IsReasoningContent(StreamingKernelContent content) =>
+                                streamingContent.Metadata?.TryGetValue("reasoning", out var reasoning) is true && reasoning is true ||
+                                content.Metadata?.TryGetValue("reasoning", out reasoning) is true && reasoning is true;
+
+                            DispatcherOperation<ObservableStringBuilder> HandleTextMessage(string text)
+                            {
+                                // Mark the reasoning as finished when we receive the first content chunk.
+                                if (chatSpan.ReasoningOutput is not null && chatSpan.ReasoningFinishedAt is null)
+                                {
+                                    chatSpan.ReasoningFinishedAt = DateTimeOffset.UtcNow;
+                                }
+
+                                assistantContentBuilder.Append(text);
+                                return Dispatcher.UIThread.InvokeAsync(() => chatSpan.MarkdownBuilder.Append(text));
+                            }
+
+                            void HandleReasoningMessage(string text)
+                            {
+                                if (chatSpan.ReasoningOutput is null) chatSpan.ReasoningOutput = text;
+                                else chatSpan.ReasoningOutput += text;
+                            }
                         }
 
+                        // TODO: move to openai sdk
                         // for those LLM who doesn't implement function calling correctly,
                         // we need to generate a unique ToolCallId for each tool call update.
                         for (var i = 0; i < streamingContent.Items.Count; i++)

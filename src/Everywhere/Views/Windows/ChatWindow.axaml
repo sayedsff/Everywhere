@@ -84,6 +84,18 @@
               <Setter Property="Background" Value="{DynamicResource SecondaryCardBackgroundColor}"/>
             </Style>
           </Style>
+
+          <Style Selector="Expander:not(.CanExpand)">
+            <Style Selector="^ ToggleButton#PART_ToggleButton">
+              <Setter Property="IsEnabled" Value="False"/>
+            </Style>
+            <Style Selector="^ LucideIcon#PART_Icon">
+              <Setter Property="IsVisible" Value="False"/>
+            </Style>
+            <Style Selector="^ ContentControl#ContentExpandControlContainer">
+              <Setter Property="IsVisible" Value="False"/>
+            </Style>
+          </Style>
         </StackPanel.Styles>
 
         <Button
@@ -453,30 +465,46 @@
                         <ItemsControl.ItemTemplate>
                           <DataTemplate>
                             <StackPanel Orientation="Vertical">
-                              <ToggleButton
-                                x:Name="ReasoningIndicatorToggleButton"
-                                IsVisible="{Binding ReasoningOutput, Converter={x:Static ObjectConverters.IsNotNull}}">
-                                <v:LazyContentControl IsActive="{Binding #ReasoningIndicatorToggleButton.IsChecked}">
-                                  <ControlTemplate>
-                                    <StackPanel Orientation="Horizontal">
-                                      <TextBlock/>
-                                      <shadui:Loading
-                                        Width="12" Height="12"
-                                        VerticalAlignment="Center" IsHitTestVisible="False"
-                                        IsVisible="{Binding ReasoningFinishedAt, Converter={x:Static ObjectConverters.IsNull}}"/>
-                                      <TextBlock
-                                        VerticalAlignment="Bottom" FontSize="10"
-                                        Foreground="{DynamicResource SuccessColor60}"
-                                        IsVisible="{Binding ReasoningFinishedAt, Converter={x:Static ObjectConverters.IsNotNull}}"
-                                        Text="{Binding ReasoningElapsedSeconds, StringFormat='{}{0:F1}s', Mode=OneWay}"/>
-                                    </StackPanel>
-                                  </ControlTemplate>
+                              <v:LazyContentControl IsVisible="{Binding ReasoningOutput, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                <ControlTemplate>
+                                  <StackPanel Orientation="Vertical">
+                                    <Border
+                                      Padding="0" HorizontalAlignment="Left"
+                                      Background="{DynamicResource CardBackgroundColor}"
+                                      BorderBrush="{DynamicResource BorderColor}"
+                                      BorderThickness="1" CornerRadius="12">
+                                      <ToggleButton
+                                        x:Name="ReasoningToggleButton" Classes="Ghost"
+                                        MinHeight="0" Padding="8,4"
+                                        CornerRadius="12" IsChecked="True">
+                                        <StackPanel
+                                          Orientation="Horizontal" Spacing="4">
+                                          <TextBlock Text="{I18N {x:Static LocaleKey.ChatWindow_ChatMessage_Assistant_DeepThinking}}"/>
+                                          <shadui:Loading
+                                            Width="12" Height="12"
+                                            VerticalAlignment="Center" IsHitTestVisible="False"
+                                            IsVisible="{Binding ReasoningFinishedAt, Converter={x:Static ObjectConverters.IsNull}}"/>
+                                          <TextBlock
+                                            VerticalAlignment="Bottom" FontSize="10"
+                                            Foreground="{DynamicResource SuccessColor60}"
+                                            IsVisible="{Binding ReasoningFinishedAt, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                            Text="{Binding ReasoningElapsedSeconds, StringFormat='{}{0:F1}s', Mode=OneWay}"/>
+                                        </StackPanel>
+                                      </ToggleButton>
+                                    </Border>
 
-                                  <ControlTemplate>
-                                    <SelectableTextBlock Text="{Binding ReasoningOutput}"/>
-                                  </ControlTemplate>
-                                </v:LazyContentControl>
-                              </ToggleButton>
+                                    <Border
+                                      Margin="0,4"
+                                      BorderBrush="{DynamicResource PrimaryColor}"
+                                      BorderThickness="3,0,0,0" CornerRadius="3">
+                                      <SelectableTextBlock
+                                        Classes="Muted" Margin="6,4"
+                                        IsVisible="{Binding #ReasoningToggleButton.IsChecked}"
+                                        Text="{Binding ReasoningOutput}"/>
+                                    </Border>
+                                  </StackPanel>
+                                </ControlTemplate>
+                              </v:LazyContentControl>
 
                               <md:MarkdownRenderer
                                 InlineHyperlinkCommand="{Binding $parent[v:ChatWindow].LaunchInlineHyperlinkCommand}"
@@ -676,20 +704,6 @@
                     <Border
                       Classes="ChatMessage Action ChatBubble" Margin="0,0,36,0"
                       Padding="0" HorizontalAlignment="Left">
-                      <Border.Styles>
-                        <Style Selector="Expander:not(.CanExpand)">
-                          <Style Selector="^ ToggleButton#PART_ToggleButton">
-                            <Setter Property="IsEnabled" Value="False"/>
-                          </Style>
-                          <Style Selector="^ LucideIcon#PART_Icon">
-                            <Setter Property="IsVisible" Value="False"/>
-                          </Style>
-                          <Style Selector="^ ContentControl#ContentExpandControlContainer">
-                            <Setter Property="IsVisible" Value="False"/>
-                          </Style>
-                        </Style>
-                      </Border.Styles>
-
                       <StackPanel>
                         <Panel>
                           <ToggleButton
@@ -768,20 +782,6 @@
                     <Border
                       Classes="ChatMessage Action ChatBubble" Margin="0,0,36,0"
                       Padding="0" HorizontalAlignment="Left">
-                      <Border.Styles>
-                        <Style Selector="Expander:not(.CanExpand)">
-                          <Style Selector="^ ToggleButton#PART_ToggleButton">
-                            <Setter Property="IsEnabled" Value="False"/>
-                          </Style>
-                          <Style Selector="^ LucideIcon#PART_Icon">
-                            <Setter Property="IsVisible" Value="False"/>
-                          </Style>
-                          <Style Selector="^ ContentControl#ContentExpandControlContainer">
-                            <Setter Property="IsVisible" Value="False"/>
-                          </Style>
-                        </Style>
-                      </Border.Styles>
-
                       <StackPanel>
                         <Panel>
                           <ToggleButton
