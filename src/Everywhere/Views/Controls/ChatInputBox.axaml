@@ -266,8 +266,8 @@
             </ToggleButton>
 
             <ToggleButton
-              Classes="Outline Rounded" CornerRadius="15,0,0,15"
-              Focusable="False"
+              Classes="Outline Rounded" Width="30"
+              Height="30" Focusable="False"
               IsChecked="{Binding IsToolCallEnabled, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
               IsVisible="{TemplateBinding IsToolCallSupported}"
               ToolTip.Tip="{I18N {x:Static LocaleKey.ChatInputBox_ToolCallButton_ToolTip}}">
