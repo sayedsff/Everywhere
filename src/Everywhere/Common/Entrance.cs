@@ -127,7 +127,11 @@ public static class Entrance
                 Path.Combine(dataPath, "logs", ".jsonl"),
                 rollingInterval: RollingInterval.Day)
 #if !DISABLE_TELEMETRY
-            .WriteTo.Sentry(LogEventLevel.Error, LogEventLevel.Information)
+            .WriteTo.Logger(lc => lc
+                .Filter.ByIncludingOnly(logEvent =>
+                    logEvent.Properties.TryGetValue("SourceContext", out var sourceContextValue) &&
+                    sourceContextValue.As<ScalarValue>()?.Value?.ToString()?.StartsWith("Everywhere.") is true)
+                .WriteTo.Sentry(LogEventLevel.Error, LogEventLevel.Information))
 #endif
             .CreateLogger();
     }
