@@ -55,13 +55,14 @@ public partial class ChatContextManager : ObservableObject, IChatContextManager,
             Dispatcher.UIThread.InvokeAsync(
                 () =>
                 {
+                    RemoveCommand.NotifyCanExecuteChanged();
+                    CreateNewCommand.NotifyCanExecuteChanged();
+
                     if (IsEmptyContext(previous)) Remove(previous);
                 },
                 DispatcherPriority.Background);
 
             OnPropertyChanged(nameof(ChatMessageNodes));
-            RemoveCommand.NotifyCanExecuteChanged();
-            CreateNewCommand.NotifyCanExecuteChanged();
         }
     }
 

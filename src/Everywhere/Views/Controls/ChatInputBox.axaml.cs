@@ -1,5 +1,5 @@
-﻿using System.Collections.ObjectModel;
-using System.Collections.Specialized;
+﻿using System.Collections.Specialized;
+using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
@@ -32,10 +32,15 @@ public partial class ChatInputBox : TextBox
     public static readonly StyledProperty<int> MaxChatAttachmentCountProperty =
         AvaloniaProperty.Register<ChatInputBox, int>(nameof(MaxChatAttachmentCount));
 
-    public static readonly DirectProperty<ChatInputBox, ObservableCollection<MenuItem>> AddChatAttachmentMenuItemsProperty =
-        AvaloniaProperty.RegisterDirect<ChatInputBox, ObservableCollection<MenuItem>>(
+    public static readonly DirectProperty<ChatInputBox, AvaloniaList<MenuItem>> AddChatAttachmentMenuItemsProperty =
+        AvaloniaProperty.RegisterDirect<ChatInputBox, AvaloniaList<MenuItem>>(
             nameof(AddChatAttachmentMenuItems),
             o => o.AddChatAttachmentMenuItems);
+
+    public static readonly DirectProperty<ChatInputBox, AvaloniaList<MenuItem>> SettingsMenuItemsProperty =
+        AvaloniaProperty.RegisterDirect<ChatInputBox, AvaloniaList<MenuItem>>(
+            nameof(SettingsMenuItems),
+            o => o.SettingsMenuItems);
 
     public static readonly StyledProperty<bool> IsImageSupportedProperty =
         AvaloniaProperty.Register<ChatInputBox, bool>(nameof(IsImageSupported));
@@ -88,10 +93,16 @@ public partial class ChatInputBox : TextBox
         set => SetValue(MaxChatAttachmentCountProperty, value);
     }
 
-    public ObservableCollection<MenuItem> AddChatAttachmentMenuItems
+    public AvaloniaList<MenuItem> AddChatAttachmentMenuItems
     {
         get;
         set => SetAndRaise(AddChatAttachmentMenuItemsProperty, ref field, value);
+    } = [];
+
+    public AvaloniaList<MenuItem> SettingsMenuItems
+    {
+        get;
+        set => SetAndRaise(SettingsMenuItemsProperty, ref field, value);
     } = [];
 
     public bool IsImageSupported

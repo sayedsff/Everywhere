@@ -60,8 +60,13 @@
                 TextWrapping="{TemplateBinding TextWrapping}">
                 <TextBlock.IsVisible>
                   <MultiBinding Converter="{x:Static BoolConverters.And}">
-                    <Binding ElementName="PART_TextPresenter" Path="PreeditText" Converter="{x:Static StringConverters.IsNullOrEmpty}"/>
-                    <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Text" Converter="{x:Static StringConverters.IsNullOrEmpty}"/>
+                    <Binding
+                      Converter="{x:Static StringConverters.IsNullOrEmpty}"
+                      ElementName="PART_TextPresenter" Path="PreeditText"/>
+                    <Binding
+                      Converter="{x:Static StringConverters.IsNullOrEmpty}"
+                      Path="Text"
+                      RelativeSource="{RelativeSource TemplatedParent}"/>
                   </MultiBinding>
                 </TextBlock.IsVisible>
               </TextBlock>
@@ -226,10 +231,11 @@
             Orientation="Horizontal" Spacing="4">
             <Menu Focusable="False">
               <MenuItem
-                Classes="Outline Rounded" shadui:MenuItemAssist.PopupPlacement="TopEdgeAlignedLeft"
+                Classes="Outline Rounded" Width="30"
+                Height="30" shadui:MenuItemAssist.PopupPlacement="TopEdgeAlignedLeft"
                 shadui:MenuItemAssist.PopupVerticalOffset="-4"
                 ItemsSource="{TemplateBinding AddChatAttachmentMenuItems}"
-                ToolTip.Tip="{I18N {x:Static LocaleKey.ChatInputBox_AddAttachmentButton_ToolTip}}">
+                ToolTip.Tip="{I18N {x:Static LocaleKey.ChatInputBox_AddAttachmentMenuItem_ToolTip}}">
                 <shadui:MenuItemAssist.Label>
                   <TextBlock>
                     <Run Text="{I18N {x:Static LocaleKey.ChatInputBox_AddAttachmentMenuItem_Header}}"/>
@@ -244,40 +250,46 @@
                 <MenuItem.Header>
                   <LucideIcon
                     HorizontalAlignment="Center" VerticalAlignment="Center"
-                    Kind="Paperclip" Size="18"/>
+                    Kind="Paperclip" Size="16"/>
                 </MenuItem.Header>
               </MenuItem>
             </Menu>
 
             <ToggleButton
-              Classes="Outline Rounded" Focusable="False"
+              Classes="Outline Rounded" Width="30"
+              Height="30" Focusable="False"
               IsChecked="{Binding IsImageEnabled, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
               IsVisible="{TemplateBinding IsImageSupported}"
               ToolTip.Tip="{I18N {x:Static LocaleKey.ChatInputBox_ImageButton_ToolTip}}">
-              <StackPanel
-                Orientation="Horizontal" Spacing="2">
-                <LucideIcon
-                  Kind="Image" Size="16"/>
-                <TextBlock
-                  Classes="Caption"
-                  Text="{I18N {x:Static LocaleKey.ChatInputBox_ImageButton_Text}}"/>
-              </StackPanel>
+              <LucideIcon
+                Kind="Image" Size="16"/>
             </ToggleButton>
 
             <ToggleButton
-              Classes="Outline Rounded" Focusable="False"
+              Classes="Outline Rounded" CornerRadius="15,0,0,15"
+              Focusable="False"
               IsChecked="{Binding IsToolCallEnabled, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
               IsVisible="{TemplateBinding IsToolCallSupported}"
               ToolTip.Tip="{I18N {x:Static LocaleKey.ChatInputBox_ToolCallButton_ToolTip}}">
-              <StackPanel
-                Orientation="Horizontal" Spacing="2">
-                <LucideIcon
-                  Kind="Hammer" Size="16"/>
-                <TextBlock
-                  Classes="Caption"
-                  Text="{I18N {x:Static LocaleKey.ChatInputBox_ToolCallButton_Text}}"/>
-              </StackPanel>
+              <LucideIcon
+                Margin="-1,-1,1,1" Kind="Hammer"
+                Size="16"/>
             </ToggleButton>
+
+            <Menu Focusable="False">
+              <MenuItem
+                Classes="Outline Rounded" Width="30"
+                Height="30" shadui:MenuItemAssist.PopupPlacement="Top"
+                shadui:MenuItemAssist.PopupVerticalOffset="-4"
+                ItemsSource="{TemplateBinding SettingsMenuItems}"
+                ToolTip.Tip="{I18N {x:Static LocaleKey.ChatInputBox_SettingsMenuItem_ToolTip}}">
+                <MenuItem.Header>
+                  <LucideIcon
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    Kind="Settings" Size="16"/>
+                </MenuItem.Header>
+              </MenuItem>
+            </Menu>
           </StackPanel>
 
           <StackPanel

@@ -170,10 +170,8 @@ public class ChatService(
         {
             chatContext.Add(analyzingContextMessage);
 
-            var xmlBuilder = new VisualElementXmlBuilder(
-                validVisualElements,
-                kernelMixin.ContextWindow / 20,
-                chatContext.VisualElements.Count + 1);
+            var approximateTokenLimit = Math.Min(settings.Internal.VisualTreeTokenLimit, kernelMixin.ContextWindow / 2);
+            var xmlBuilder = new VisualElementXmlBuilder(validVisualElements, approximateTokenLimit, chatContext.VisualElements.Count + 1);
             var renderedVisualTreePrompt = await Task.Run(
                 () =>
                 {
@@ -183,6 +181,7 @@ public class ChatService(
                     var xml = xmlBuilder.BuildXml(cancellationToken);
                     var builtVisualElements = xmlBuilder.BuiltVisualElements;
                     builderActivity?.SetTag("xml.length", xml.Length);
+                    builderActivity?.SetTag("xml.length_limit", approximateTokenLimit);
                     builderActivity?.SetTag("xml.built_visual_elements.count", builtVisualElements.Count);
 
                     string focusedElementIdString;
@@ -704,6 +703,7 @@ public class ChatService(
         }
         catch (Exception e)
         {
+            e = ChatRequestException.Parse(e);
             activity?.SetStatus(ActivityStatusCode.Error, e.Message);
             logger.LogError(e, "Failed to generate chat title");
         }

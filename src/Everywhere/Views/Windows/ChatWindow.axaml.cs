@@ -5,6 +5,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Platform.Storage;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.Input;
 using Everywhere.Chat;
 using Everywhere.Common;
@@ -102,6 +103,7 @@ public partial class ChatWindow : ReactiveWindow<ChatWindowViewModel>
         {
             var value = change.NewValue is true;
             _settings.Internal.IsChatWindowPinned = value;
+            ShowInTaskbar = value;
 
             if (value)
             {
@@ -290,13 +292,20 @@ public partial class ChatWindow : ReactiveWindow<ChatWindowViewModel>
 
     private void HandleTitleBarPointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        BeginMoveDrag(e);
+        try
+        {
+            BeginMoveDrag(e);
+        }
+        catch
+        {
+            // ignored
+        }
     }
 
     private void HandleChatContextManagerPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName != nameof(IChatContextManager.Current)) return;
-        SizeToContent = SizeToContent.WidthAndHeight; // Update size to content when chat context changes
+        Dispatcher.UIThread.InvokeOnDemand(() => SizeToContent = SizeToContent.WidthAndHeight); // Update size to content when chat context changes
         _isResizedByUser = false;
     }
 
@@ -307,10 +316,15 @@ public partial class ChatWindow : ReactiveWindow<ChatWindowViewModel>
         IsOpened = ViewModel.IsOpened;
         if (IsOpened)
         {
+            ShowInTaskbar = true; // temporarily show in taskbar to avoid window blink in the bottom left corner
+            WindowState = WindowState.Minimized;
             Show();
+            WindowState = WindowState.Normal;
+
             Topmost = false;
-            Topmost = true;
+            Focus();
             ChatInputBox.Focus();
+            Topmost = true;
 
             switch (_settings.ChatWindow.WindowPinMode)
             {
@@ -331,6 +345,8 @@ public partial class ChatWindow : ReactiveWindow<ChatWindowViewModel>
                     break;
                 }
             }
+
+            ShowInTaskbar = IsWindowPinned; // restore show in taskbar state
         }
         else
         {

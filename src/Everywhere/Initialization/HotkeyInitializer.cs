@@ -39,11 +39,11 @@ public class HotkeyInitializer(
 
     private void HandleChatHotkeyChanged(KeyboardHotkey hotkey)
     {
-        if (!hotkey.IsValid) return;
-
         using var _ = _syncLock.EnterScope();
 
         _chatHotkeySubscription?.Dispose();
+        if (!hotkey.IsValid) return;
+
         _chatHotkeySubscription = hotkeyListener.Register(
             hotkey,
             () => ThreadPool.QueueUserWorkItem(_ =>

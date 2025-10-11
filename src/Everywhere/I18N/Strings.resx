@@ -127,7 +127,7 @@
     <data name="ChatInputBox_Watermark" xml:space="preserve">
         <value>Ask Everywhere, or just chat</value>
     </data>
-    <data name="ChatInputBox_AddAttachmentButton_ToolTip" xml:space="preserve">
+    <data name="ChatInputBox_AddAttachmentMenuItem_ToolTip" xml:space="preserve">
         <value>Add attachments to the conversation</value>
     </data>
     <data name="ChatInputBox_AddAttachmentMenuItem_Header" xml:space="preserve">
@@ -931,5 +931,11 @@ My intelligence comes from powerful Large language models (LLMs), which are prov
     </data>
     <data name="SoftwareUpdater_PerformUpdate_FailedToast_Message" xml:space="preserve">
         <value>Failed to perform update.</value>
+    </data>
+    <data name="ChatInputBox_SettingsMenuItem_ToolTip" xml:space="preserve">
+        <value>Settings</value>
+    </data>
+    <data name="ChatWindow_ChatInputBox_SettingsMenuItems_VisualTreeTokenLimit" xml:space="preserve">
+        <value>Visual tree length limit</value>
     </data>
 </root>

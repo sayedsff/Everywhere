@@ -351,6 +351,9 @@ public partial class InternalSettings : SettingsCategory
 
     [ObservableProperty]
     public partial string? ChatInputBoxText { get; set; }
+
+    [ObservableProperty]
+    public partial int VisualTreeTokenLimit { get; set; } = 4096;
 }
 
 public static class SettingsExtensions

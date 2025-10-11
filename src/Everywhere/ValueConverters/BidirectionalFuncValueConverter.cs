@@ -3,18 +3,19 @@ using Avalonia.Data.Converters;
 
 namespace Everywhere.ValueConverters;
 
-public class BidirectionalFuncValueConverter<TInput, TOutput>(Func<TInput, TOutput> convert, Func<TOutput, TInput> convertBack) : IValueConverter
+public class BidirectionalFuncValueConverter<TInput, TOutput>(Func<TInput, object?, TOutput> convert, Func<TOutput, object?, TInput> convertBack)
+    : IValueConverter
 {
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is TInput input)
         {
-            return convert(input);
+            return convert(input, parameter);
         }
 
         if (System.Convert.ChangeType(value, typeof(TInput)) is TInput converted)
         {
-            return convert(converted);
+            return convert(converted, parameter);
         }
 
         return null;
@@ -24,12 +25,12 @@ public class BidirectionalFuncValueConverter<TInput, TOutput>(Func<TInput, TOutp
     {
         if (value is TOutput output)
         {
-            return convertBack(output);
+            return convertBack(output, parameter);
         }
 
         if (System.Convert.ChangeType(value, targetType) is TOutput converted)
         {
-            return convertBack(converted);
+            return convertBack(converted, parameter);
         }
 
         return null;

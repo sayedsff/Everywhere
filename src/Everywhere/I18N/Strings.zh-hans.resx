@@ -113,7 +113,7 @@
     <data name="ChatInputBox_Watermark" xml:space="preserve">
         <value>向 Everywhere 提问，或是随便聊聊</value>
     </data>
-    <data name="ChatInputBox_AddAttachmentButton_ToolTip" xml:space="preserve">
+    <data name="ChatInputBox_AddAttachmentMenuItem_ToolTip" xml:space="preserve">
         <value>添加附件到对话</value>
     </data>
     <data name="ChatInputBox_AddAttachmentMenuItem_Header" xml:space="preserve">
@@ -912,5 +912,11 @@
     </data>
     <data name="SoftwareUpdater_PerformUpdate_FailedToast_Message" xml:space="preserve">
         <value>更新失败</value>
+    </data>
+    <data name="ChatInputBox_SettingsMenuItem_ToolTip" xml:space="preserve">
+        <value>设置</value>
+    </data>
+    <data name="ChatWindow_ChatInputBox_SettingsMenuItems_VisualTreeTokenLimit" xml:space="preserve">
+        <value>视觉树长度限制</value>
     </data>
 </root>

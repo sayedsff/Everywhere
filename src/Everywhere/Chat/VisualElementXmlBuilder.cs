@@ -12,8 +12,8 @@ namespace Everywhere.Chat;
 ///     This class builds an XML representation of the core elements, which is limited by the soft token limit and finally used by a LLM.
 /// </summary>
 /// <param name="coreElements"></param>
-/// <param name="softTokenLimit"></param>
-public partial class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreElements, int softTokenLimit, int startingId)
+/// <param name="approximateTokenLimit"></param>
+public partial class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreElements, int approximateTokenLimit, int startingId)
 {
     private enum QueueOrigin
     {
@@ -60,7 +60,7 @@ public partial class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreE
             cancellationToken.ThrowIfCancellationRequested();
 
             var accumulatedTokenCount = visitedElements.Values.Sum(e => e.TokenCount);
-            var remainingTokenCount = softTokenLimit - accumulatedTokenCount;
+            var remainingTokenCount = approximateTokenLimit - accumulatedTokenCount;
             if (remainingTokenCount <= 0) break;
 
             var (element, queueOrigin, parentId) = buildQueue.Dequeue();

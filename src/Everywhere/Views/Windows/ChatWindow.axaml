@@ -13,7 +13,6 @@
   ExtendClientAreaToDecorationsHint="True"
   IsOpened="{Binding IsOpened, Mode=OneWayToSource}"
   RequestedThemeVariant="{x:Static themes:ThemeVariants.Acrylic}"
-  ShowInTaskbar="{Binding $self.IsWindowPinned}"
   SizeToContent="WidthAndHeight" SystemDecorations="BorderOnly"
   TargetBoundingRect="{Binding TargetBoundingRect}"
   Topmost="True" TransparencyLevelHint="AcrylicBlur"
@@ -287,8 +286,8 @@
             <MultiBinding Converter="{x:Static BoolConverters.And}">
               <Binding Path="!!$self.ItemCount"/>
               <Binding
-                Converter="{x:Static vc:NumberConverters.NotGreaterThanOne}"
-                Path="ChatContextManager.ChatMessageNodes.Count"/>
+                Converter="{x:Static vc:Int32Converters.NotGreaterThan}"
+                ConverterParameter="1" Path="ChatContextManager.ChatMessageNodes.Count"/>
             </MultiBinding>
           </ItemsControl.IsVisible>
 
@@ -551,10 +550,10 @@
                         Orientation="Horizontal">
                         <NumericUpDown
                           x:Name="ChoiceSelector" Margin="0,0,4,0"
-                          IsVisible="{Binding $parent[ContentControl].((chat:ChatMessageNode)DataContext).Parent.ChoiceCount, FallbackValue=False, Converter={x:Static vc:NumberConverters.GreaterThanOne}}"
+                          IsVisible="{Binding $parent[ContentControl].((chat:ChatMessageNode)DataContext).Parent.ChoiceCount, FallbackValue=False, Converter={x:Static vc:Int32Converters.GreaterThan}, ConverterParameter=1}"
                           Maximum="{Binding $parent[ContentControl].((chat:ChatMessageNode)DataContext).Parent.ChoiceCount, FallbackValue=1}"
                           Minimum="1"
-                          Value="{Binding $parent[ContentControl].((chat:ChatMessageNode)DataContext).Parent.ChoiceIndex, FallbackValue=1, Converter={x:Static vc:NumberConverters.PlusOne}}"/>
+                          Value="{Binding $parent[ContentControl].((chat:ChatMessageNode)DataContext).Parent.ChoiceIndex, FallbackValue=1, Converter={x:Static vc:Int32Converters.Plus}, ConverterParameter=1}"/>
 
                         <Button
                           Classes="Ghost"
@@ -948,6 +947,37 @@
               </MenuItem.Icon>
             </MenuItem>
           </v:ChatInputBox.AddChatAttachmentMenuItems>
+
+          <v:ChatInputBox.SettingsMenuItems>
+            <MenuItem StaysOpenOnClick="True">
+              <MenuItem.Header>
+                <StackPanel
+                  Orientation="Vertical" Spacing="4">
+                  <StackPanel
+                    Orientation="Horizontal" Spacing="4">
+                    <TextBlock
+                      Classes="Muted" VerticalAlignment="Center"
+                      FontSize="12"
+                      Text="{I18N {x:Static LocaleKey.ChatWindow_ChatInputBox_SettingsMenuItems_VisualTreeTokenLimit}}"/>
+                    <TextBlock
+                      Classes="Muted" VerticalAlignment="Center"
+                      FontSize="12"
+                      Text="{Binding Settings.Internal.VisualTreeTokenLimit, Mode=OneWay}"/>
+                  </StackPanel>
+
+                  <Slider
+                    MinWidth="200" VerticalAlignment="Center">
+                    <Interaction.Behaviors>
+                      <be:LogarithmicSliderBehavior
+                        Maximum="{Binding Settings.Model.SelectedModelDefinition.MaxTokens.ActualValue, FallbackValue=8192, Converter={x:Static vc:DoubleConverters.Multiply}, ConverterParameter=0.5}"
+                        Minimum="512"
+                        Value="{Binding Settings.Internal.VisualTreeTokenLimit, Mode=TwoWay}"/>
+                    </Interaction.Behaviors>
+                  </Slider>
+                </StackPanel>
+              </MenuItem.Header>
+            </MenuItem>
+          </v:ChatInputBox.SettingsMenuItems>
         </v:ChatInputBox>
       </ExperimentalAcrylicBorder>
     </Border>

@@ -9,8 +9,8 @@ public static class CommonConverters
     );
 
     public static IValueConverter StringToUri { get; } = new BidirectionalFuncValueConverter<string?, Uri?>(
-        convert: x => x == null ? null : new Uri(x, UriKind.RelativeOrAbsolute),
-        convertBack: x => x?.ToString()
+        convert: (x, _) => x == null ? null : new Uri(x, UriKind.RelativeOrAbsolute),
+        convertBack: (x, _) => x?.ToString()
     );
 
     public static IValueConverter DateTimeOffsetToString { get; } = new DateTimeOffsetToStringConverter();
