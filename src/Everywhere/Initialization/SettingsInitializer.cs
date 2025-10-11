@@ -586,7 +586,7 @@ public class SettingsInitializer : IAsyncInitializer
                         {
                             Id = "deepseek-r1:8b",
                             ModelId = "deepseek-r1:8b",
-                            DisplayName = "DeepSeek R1 7B",
+                            DisplayName = "DeepSeek R1 8B",
                             MaxTokens = 65_536,
                             IsImageInputSupported = false,
                             IsFunctionCallingSupported = false,
