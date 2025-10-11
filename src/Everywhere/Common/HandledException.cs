@@ -16,11 +16,6 @@ namespace Everywhere.Common;
 public class HandledException : Exception
 {
     /// <summary>
-    /// Gets the original exception that caused this exception.
-    /// </summary>
-    public required Exception OriginalException { get; init; }
-
-    /// <summary>
     /// Gets the key for a localized, user-friendly error message.
     /// </summary>
     public required DynamicResourceKey FriendlyMessageKey { get; init; }
@@ -30,17 +25,13 @@ public class HandledException : Exception
     /// </summary>
     public virtual bool IsExpected { get; }
 
-    /// <summary>
-    /// Gets the message of the original exception.
-    /// </summary>
-    public override string Message => OriginalException.Message;
-
-    protected HandledException() { }
+    protected HandledException(Exception originalException) : base(originalException.Message, originalException)
+    {
+    }
 
     [SetsRequiredMembers]
-    public HandledException(Exception originalException, DynamicResourceKey friendlyMessageKey, bool isExpected = true)
+    public HandledException(Exception originalException, DynamicResourceKey friendlyMessageKey, bool isExpected = true) : this(originalException)
     {
-        OriginalException = originalException;
         FriendlyMessageKey = friendlyMessageKey;
         IsExpected = isExpected;
     }
@@ -153,9 +144,9 @@ public class ChatRequestException : HandledException
     public ChatRequestException(
         Exception originalException,
         KernelRequestExceptionType type,
-        DynamicResourceKey? customFriendlyMessageKey = null)
+        DynamicResourceKey? customFriendlyMessageKey = null
+    ) : base(originalException)
     {
-        OriginalException = originalException;
         ExceptionType = type;
         FriendlyMessageKey = customFriendlyMessageKey ?? new DynamicResourceKey(
             type switch
@@ -216,9 +207,12 @@ public class ChatFunctionCallException : HandledException
     public override bool IsExpected { get; }
 
     [SetsRequiredMembers]
-    public ChatFunctionCallException(Exception originalException, DynamicResourceKey friendlyMessageKey, bool isGeneralError)
+    public ChatFunctionCallException(
+        Exception originalException,
+        DynamicResourceKey friendlyMessageKey,
+        bool isGeneralError
+    ) : base(originalException)
     {
-        OriginalException = originalException;
         FriendlyMessageKey = friendlyMessageKey;
         IsExpected = isGeneralError;
     }
@@ -391,21 +385,33 @@ internal readonly struct HttpStatusCodeParser : IExceptionParser
             return false;
         }
 
+        var message = context.Exception.Message;
         context.ExceptionType = context.StatusCode switch
         {
-            HttpStatusCode.BadRequest => ParseException(context.Exception.Message, KernelRequestExceptionType.InvalidConfiguration),
-            HttpStatusCode.Unauthorized => KernelRequestExceptionType.InvalidApiKey,
-            HttpStatusCode.PaymentRequired => KernelRequestExceptionType.QuotaExceeded,
-            HttpStatusCode.Forbidden => ParseException(context.Exception.Message, KernelRequestExceptionType.InvalidApiKey),
-            HttpStatusCode.NotFound => KernelRequestExceptionType.InvalidConfiguration,
-            HttpStatusCode.Conflict => KernelRequestExceptionType.InvalidConfiguration,
-            HttpStatusCode.UnprocessableEntity => KernelRequestExceptionType.InvalidConfiguration,
-            HttpStatusCode.TooManyRequests => KernelRequestExceptionType.RateLimit,
-            HttpStatusCode.RequestTimeout => KernelRequestExceptionType.Timeout,
-            HttpStatusCode.InternalServerError => KernelRequestExceptionType.ServiceUnavailable,
-            HttpStatusCode.BadGateway => KernelRequestExceptionType.ServiceUnavailable,
-            HttpStatusCode.ServiceUnavailable => KernelRequestExceptionType.ServiceUnavailable,
-            HttpStatusCode.GatewayTimeout => KernelRequestExceptionType.Timeout,
+            // 4xx Client Errors
+            HttpStatusCode.BadRequest => ParseException(message, KernelRequestExceptionType.InvalidConfiguration), // 400
+            HttpStatusCode.Unauthorized => ParseException(message, KernelRequestExceptionType.InvalidApiKey), // 401
+            HttpStatusCode.PaymentRequired => KernelRequestExceptionType.QuotaExceeded, // 402
+            HttpStatusCode.Forbidden => ParseException(message, KernelRequestExceptionType.InvalidApiKey), // 403
+            HttpStatusCode.NotFound => ParseException(message, KernelRequestExceptionType.InvalidConfiguration), // 404
+            HttpStatusCode.MethodNotAllowed => ParseException(message, KernelRequestExceptionType.InvalidConfiguration), // 405
+            HttpStatusCode.NotAcceptable => ParseException(message, KernelRequestExceptionType.InvalidConfiguration), // 406
+            HttpStatusCode.RequestTimeout => KernelRequestExceptionType.Timeout, // 408
+            HttpStatusCode.Conflict => ParseException(message, KernelRequestExceptionType.InvalidConfiguration), // 409
+            HttpStatusCode.Gone => KernelRequestExceptionType.InvalidConfiguration, // 410
+            HttpStatusCode.LengthRequired => KernelRequestExceptionType.InvalidConfiguration, // 411
+            HttpStatusCode.RequestEntityTooLarge => KernelRequestExceptionType.InvalidConfiguration, // 413
+            HttpStatusCode.RequestUriTooLong => KernelRequestExceptionType.InvalidEndpoint, // 414
+            HttpStatusCode.UnsupportedMediaType => KernelRequestExceptionType.InvalidConfiguration, // 415
+            HttpStatusCode.UnprocessableEntity => KernelRequestExceptionType.InvalidConfiguration, // 422
+            HttpStatusCode.TooManyRequests => KernelRequestExceptionType.RateLimit, // 429
+
+            // 5xx Server Errors
+            HttpStatusCode.InternalServerError => ParseException(message, KernelRequestExceptionType.ServiceUnavailable), // 500
+            HttpStatusCode.NotImplemented => ParseException(message, KernelRequestExceptionType.FeatureNotSupport), // 501
+            HttpStatusCode.BadGateway => ParseException(message, KernelRequestExceptionType.ServiceUnavailable), // 502
+            HttpStatusCode.ServiceUnavailable => ParseException(message, KernelRequestExceptionType.ServiceUnavailable), // 503
+            HttpStatusCode.GatewayTimeout => KernelRequestExceptionType.Timeout, // 504
             _ => null
         };
         return context.ExceptionType.HasValue;
@@ -413,24 +419,33 @@ internal readonly struct HttpStatusCodeParser : IExceptionParser
 
     private static KernelRequestExceptionType ParseException(string message, KernelRequestExceptionType fallback)
     {
+        if (string.IsNullOrWhiteSpace(message))
+        {
+            return fallback;
+        }
+
         if (message.Contains("quota", StringComparison.OrdinalIgnoreCase) ||
             message.Contains("limit", StringComparison.OrdinalIgnoreCase) ||
             message.Contains("exceeded", StringComparison.OrdinalIgnoreCase) ||
+            message.Contains("usage", StringComparison.OrdinalIgnoreCase) ||
             message.Contains("organization", StringComparison.OrdinalIgnoreCase))
         {
             return KernelRequestExceptionType.QuotaExceeded;
         }
 
         if (message.Contains("key", StringComparison.OrdinalIgnoreCase) ||
+            message.Contains("token", StringComparison.OrdinalIgnoreCase) ||
             message.Contains("credential", StringComparison.OrdinalIgnoreCase) ||
-            message.Contains("authentication", StringComparison.OrdinalIgnoreCase))
+            message.Contains("authentication", StringComparison.OrdinalIgnoreCase) ||
+            message.Contains("permission", StringComparison.OrdinalIgnoreCase))
         {
             return KernelRequestExceptionType.InvalidApiKey;
         }
 
         if (message.Contains("model", StringComparison.OrdinalIgnoreCase) ||
             message.Contains("not found", StringComparison.OrdinalIgnoreCase) ||
-            message.Contains("invalid", StringComparison.OrdinalIgnoreCase))
+            message.Contains("invalid", StringComparison.OrdinalIgnoreCase) ||
+            message.Contains("parameter", StringComparison.OrdinalIgnoreCase))
         {
             return KernelRequestExceptionType.InvalidConfiguration;
         }
