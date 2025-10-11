@@ -139,14 +139,8 @@
     <data name="ChatInputBox_ImageButton_Text" xml:space="preserve">
         <value>Image</value>
     </data>
-    <data name="ChatInputBox_WebSearchButton_ToolTip" xml:space="preserve">
-        <value>Search the web</value>
-    </data>
-    <data name="ChatInputBox_WebSearchButton_Text" xml:space="preserve">
-        <value>Search</value>
-    </data>
     <data name="ChatInputBox_ToolCallButton_ToolTip" xml:space="preserve">
-        <value>Use tools to enhance assistant capabilities</value>
+        <value>Use tools to enhance assistant capabilities (Ctrl+T)</value>
     </data>
     <data name="ChatInputBox_ToolCallButton_Text" xml:space="preserve">
         <value>Tools</value>
@@ -188,7 +182,7 @@
         <value>Chat History</value>
     </data>
     <data name="ChatWindow_CreateNew_ToolTip" xml:space="preserve">
-        <value>Create New Session</value>
+        <value>Create New Chat (Ctrl+N)</value>
     </data>
     <data name="ChatWindow_Close_ToolTip" xml:space="preserve">
         <value>Close (Esc)</value>

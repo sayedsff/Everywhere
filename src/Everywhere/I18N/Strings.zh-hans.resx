@@ -125,14 +125,8 @@
     <data name="ChatInputBox_ImageButton_Text" xml:space="preserve">
         <value>图像</value>
     </data>
-    <data name="ChatInputBox_WebSearchButton_ToolTip" xml:space="preserve">
-        <value>在网络上搜索</value>
-    </data>
-    <data name="ChatInputBox_WebSearchButton_Text" xml:space="preserve">
-        <value>搜索</value>
-    </data>
     <data name="ChatInputBox_ToolCallButton_ToolTip" xml:space="preserve">
-        <value>使用工具强化助手能力</value>
+        <value>使用工具强化助手能力 (Ctrl+T)</value>
     </data>
     <data name="ChatInputBox_ToolCallButton_Text" xml:space="preserve">
         <value>工具</value>
@@ -174,7 +168,7 @@
         <value>对话历史</value>
     </data>
     <data name="ChatWindow_CreateNew_ToolTip" xml:space="preserve">
-        <value>创建新会话</value>
+        <value>创建新对话 (Ctrl+N)</value>
     </data>
     <data name="ChatWindow_Close_ToolTip" xml:space="preserve">
         <value>关闭 (Esc)</value>
