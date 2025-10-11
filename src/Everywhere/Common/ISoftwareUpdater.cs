@@ -32,5 +32,6 @@ public interface ISoftwareUpdater : INotifyPropertyChanged
     /// Performs the update process.
     /// </summary>
     /// <param name="progress">a 0-1 progress indicator for the update process</param>
-    Task PerformUpdateAsync(IProgress<double> progress);
+    /// <param name="cancellationToken"></param>
+    Task PerformUpdateAsync(IProgress<double> progress, CancellationToken cancellationToken = default);
 }

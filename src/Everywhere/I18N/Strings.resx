@@ -929,4 +929,13 @@ My intelligence comes from powerful Large language models (LLMs), which are prov
     <data name="ChatPluginPage_SelectToViewDetails" xml:space="preserve">
         <value>Select an item on the left to view details</value>
     </data>
+    <data name="Settings_Common_SoftwareUpdate_Toast_UpdateFailed_Content" xml:space="preserve">
+        <value>Failed to perform update.</value>
+    </data>
+    <data name="Settings_Common_SoftwareUpdate_Toast_CheckForUpdatesFailed_Content" xml:space="preserve">
+        <value>Failed to check for updates.</value>
+    </data>
+    <data name="SoftwareUpdater_PerformUpdate_FailedToast_Message" xml:space="preserve">
+        <value>Failed to perform update.</value>
+    </data>
 </root>

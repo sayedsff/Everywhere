@@ -7,6 +7,8 @@ using System.Text.RegularExpressions;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Everywhere.Common;
 using Everywhere.Configuration;
+using Everywhere.Extensions;
+using Everywhere.I18N;
 using Everywhere.Interop;
 using Microsoft.Extensions.Logging;
 #if !DEBUG
@@ -32,6 +34,7 @@ public sealed partial class SoftwareUpdater(
             { "User-Agent", "libcurl/7.64.1 r-curl/4.3.2 httr/1.4.2 EverywhereUpdater" }
         }
     };
+    private readonly ActivitySource _activitySource = new(typeof(SoftwareUpdater).FullName.NotNull());
 
 #if !DEBUG
     private PeriodicTimer? _timer;
@@ -128,7 +131,7 @@ public sealed partial class SoftwareUpdater(
         LastCheckTime = DateTimeOffset.UtcNow;
     }
 
-    public async Task PerformUpdateAsync(IProgress<double> progress)
+    public async Task PerformUpdateAsync(IProgress<double> progress, CancellationToken cancellationToken = default)
     {
         if (_updateTask is not null)
         {
@@ -142,31 +145,39 @@ public sealed partial class SoftwareUpdater(
             return;
         }
 
-        _updateTask = Task.Run(async () =>
-        {
-            try
+        _updateTask = Task.Run(
+            async () =>
             {
-                var assetPath = await DownloadAssetAsync(asset, progress);
+                using var activity = _activitySource.StartActivity();
 
-                if (assetPath.EndsWith(".exe"))
+                try
                 {
-                    UpdateViaInstaller(assetPath);
+                    var assetPath = await DownloadAssetAsync(asset, progress, cancellationToken);
+
+                    if (assetPath.EndsWith(".exe"))
+                    {
+                        UpdateViaInstaller(assetPath);
+                    }
+                    else
+                    {
+                        await UpdateViaPortableAsync(assetPath, cancellationToken);
+                    }
                 }
-                else
+                catch (OperationCanceledException) { }
+                catch (Exception ex)
                 {
-                    await UpdateViaPortableAsync(assetPath);
+                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+
+                    ex = new HandledException(ex, LocaleKey.SoftwareUpdater_PerformUpdate_FailedToast_Message);
+                    logger.LogError(ex, "Failed to perform update.");
+                    throw;
                 }
-            }
-            catch (Exception ex)
-            {
-                logger.LogInformation(ex, "Failed to perform update.");
-                throw;
-            }
-            finally
-            {
-                _updateTask = null;
-            }
-        });
+                finally
+                {
+                    _updateTask = null;
+                }
+            },
+            cancellationToken);
 
         await _updateTask;
     }
@@ -211,7 +222,7 @@ public sealed partial class SoftwareUpdater(
         });
     }
 
-    private async Task<string> DownloadAssetAsync(Asset asset, IProgress<double> progress)
+    private async Task<string> DownloadAssetAsync(Asset asset, IProgress<double> progress, CancellationToken cancellationToken = default)
     {
         var installPath = runtimeConstantProvider.EnsureWritableDataFolderPath("updates");
         var assetDownloadPath = Path.Combine(installPath, asset.Name);
@@ -229,25 +240,28 @@ public sealed partial class SoftwareUpdater(
             logger.LogDebug("Asset {AssetName} exists but is invalid, redownloading.", asset.Name);
         }
 
-        var response = await _httpClient.GetAsync(asset.DownloadUrl, HttpCompletionOption.ResponseHeadersRead);
+        var response = await _httpClient.GetAsync(asset.DownloadUrl, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
         response.EnsureSuccessStatusCode();
         await using var fs = new FileStream(assetDownloadPath, FileMode.Create, FileAccess.ReadWrite, FileShare.None);
 
         var totalBytes = response.Content.Headers.ContentLength ?? asset.Size;
-        await using var contentStream = await response.Content.ReadAsStreamAsync();
+        await using var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken);
         var totalBytesRead = 0L;
         var buffer = new byte[81920];
         int bytesRead;
 
-        while ((bytesRead = await contentStream.ReadAsync(buffer)) > 0)
+        while ((bytesRead = await contentStream.ReadAsync(buffer, cancellationToken)) > 0)
         {
-            await fs.WriteAsync(buffer.AsMemory(0, bytesRead));
+            await fs.WriteAsync(buffer.AsMemory(0, bytesRead), cancellationToken);
             totalBytesRead += bytesRead;
             progress.Report((double)totalBytesRead / totalBytes);
         }
 
         fs.Position = 0;
-        if (!string.Equals("sha256:" + Convert.ToHexString(await SHA256.HashDataAsync(fs)), asset.Digest, StringComparison.OrdinalIgnoreCase))
+        if (!string.Equals(
+                "sha256:" + Convert.ToHexString(await SHA256.HashDataAsync(fs, cancellationToken)),
+                asset.Digest,
+                StringComparison.OrdinalIgnoreCase))
         {
             throw new InvalidOperationException($"Downloaded asset {asset.Name} hash does not match expected digest.");
         }
@@ -257,7 +271,7 @@ public sealed partial class SoftwareUpdater(
         async Task<string> HashFileAsync()
         {
             await using var fileStream = new FileStream(fileInfo.FullName, FileMode.Open, FileAccess.Read, FileShare.Read);
-            var sha256 = await SHA256.HashDataAsync(fileStream);
+            var sha256 = await SHA256.HashDataAsync(fileStream, cancellationToken);
             return "sha256:" + Convert.ToHexString(sha256);
         }
     }
@@ -268,7 +282,7 @@ public sealed partial class SoftwareUpdater(
         Environment.Exit(0);
     }
 
-    private async static Task UpdateViaPortableAsync(string zipPath)
+    private async static Task UpdateViaPortableAsync(string zipPath, CancellationToken cancellationToken = default)
     {
         var scriptPath = Path.Combine(Path.GetTempPath(), "update.bat");
         var exeLocation = Assembly.GetExecutingAssembly().Location;
@@ -297,8 +311,9 @@ public sealed partial class SoftwareUpdater(
              del "{scriptPath}"
              """;
 
-        await File.WriteAllTextAsync(scriptPath, scriptContent);
+        await File.WriteAllTextAsync(scriptPath, scriptContent, cancellationToken);
 
+        cancellationToken.ThrowIfCancellationRequested();
         Process.Start(new ProcessStartInfo(scriptPath) { UseShellExecute = true, Verb = "runas" });
         Environment.Exit(0);
     }
@@ -316,14 +331,16 @@ public sealed partial class SoftwareUpdater(
         string Name,
         string Digest,
         long Size,
-        string DownloadUrl);
+        string DownloadUrl
+    );
 
     // Represents asset metadata deserialized from the API response.
     [Serializable]
     private record AssetMetadata(
         [property: JsonPropertyName("name")] string Name,
         [property: JsonPropertyName("digest")] string Digest,
-        [property: JsonPropertyName("size")] long Size);
+        [property: JsonPropertyName("size")] long Size
+    );
 
     [GeneratedRegex(@"-v(?<version>\d+\.\d+\.\d+(\.\d+)?)\.(exe|zip)$", RegexOptions.IgnoreCase | RegexOptions.Compiled, "zh-CN")]
     private static partial Regex VersionRegex();

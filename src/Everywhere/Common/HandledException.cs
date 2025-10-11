@@ -25,16 +25,18 @@ public class HandledException : Exception
     /// </summary>
     public virtual bool IsExpected { get; }
 
-    protected HandledException(Exception originalException) : base(originalException.Message, originalException)
-    {
-    }
-
     [SetsRequiredMembers]
-    public HandledException(Exception originalException, DynamicResourceKey friendlyMessageKey, bool isExpected = true) : this(originalException)
+    public HandledException(
+        Exception originalException,
+        DynamicResourceKey friendlyMessageKey,
+        bool isExpected = true
+    ) : base(originalException.Message, originalException)
     {
         FriendlyMessageKey = friendlyMessageKey;
         IsExpected = isExpected;
     }
+
+    protected HandledException(Exception originalException) : base(originalException.Message, originalException) { }
 }
 
 /// <summary>
