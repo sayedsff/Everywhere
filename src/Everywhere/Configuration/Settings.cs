@@ -339,13 +339,7 @@ public partial class InternalSettings : SettingsCategory
     public partial bool IsFirstTimeHideToTrayIcon { get; set; } = true;
 
     [ObservableProperty]
-    public partial bool IsImageEnabled { get; set; }
-
-    [ObservableProperty]
     public partial bool IsToolCallEnabled { get; set; }
-
-    [ObservableProperty]
-    public partial bool IsWebSearchEnabled { get; set; }
 
     public int MaxChatAttachmentCount { get; set; } = 10;
 
