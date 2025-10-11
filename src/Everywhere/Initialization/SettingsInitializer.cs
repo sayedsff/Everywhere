@@ -81,7 +81,7 @@ public class SettingsInitializer : IAsyncInitializer
                     Id = "openai",
                     DisplayName = "OpenAI",
                     Endpoint = "https://api.openai.com/v1",
-                    IconUrl = "https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/openai.svg",
+                    IconUrl = "avares://Everywhere/Assets/Icons/openai.svg",
                     Schema = ModelProviderSchema.OpenAI,
                     ModelDefinitions =
                     [
@@ -163,7 +163,7 @@ public class SettingsInitializer : IAsyncInitializer
                     Id = "anthropic",
                     DisplayName = "Anthropic (Claude)",
                     Endpoint = "https://api.anthropic.com",
-                    IconUrl = "https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/anthropic.svg",
+                    IconUrl = "avares://Everywhere/Assets/Icons/anthropic.svg",
                     Schema = ModelProviderSchema.Anthropic,
                     ModelDefinitions =
                     [
@@ -245,7 +245,7 @@ public class SettingsInitializer : IAsyncInitializer
                     Id = "google",
                     DisplayName = "Google (Gemini)",
                     Endpoint = "https://generativelanguage.googleapis.com/v1beta/openai",
-                    IconUrl = "https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/google-color.svg",
+                    IconUrl = "avares://Everywhere/Assets/Icons/google-color.svg",
                     Schema = ModelProviderSchema.OpenAI,
                     ModelDefinitions =
                     [
@@ -380,7 +380,7 @@ public class SettingsInitializer : IAsyncInitializer
                     Id = "deepseek",
                     DisplayName = "DeepSeek",
                     Endpoint = "https://api.deepseek.com",
-                    IconUrl = "https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/deepseek-color.svg",
+                    IconUrl = "avares://Everywhere/Assets/Icons/deepseek-color.svg",
                     Schema = ModelProviderSchema.OpenAI,
                     ModelDefinitions =
                     [
@@ -422,7 +422,7 @@ public class SettingsInitializer : IAsyncInitializer
                     Id = "moonshot",
                     DisplayName = "Moonshot (Kimi)",
                     Endpoint = "https://api.moonshot.cn/v1",
-                    IconUrl = "https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/moonshot.svg",
+                    IconUrl = "avares://Everywhere/Assets/Icons/moonshot.svg",
                     Schema = ModelProviderSchema.OpenAI,
                     ModelDefinitions =
                     [
@@ -474,7 +474,7 @@ public class SettingsInitializer : IAsyncInitializer
                     Id = "openrouter",
                     DisplayName = "OpenRouter",
                     Endpoint = "https://openrouter.ai/api/v1",
-                    IconUrl = "https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/openrouter.svg",
+                    IconUrl = "avares://Everywhere/Assets/Icons/openrouter.svg",
                     Schema = ModelProviderSchema.OpenAI,
                     ModelDefinitions =
                     [
@@ -526,7 +526,7 @@ public class SettingsInitializer : IAsyncInitializer
                     Id = "siliconflow",
                     DisplayName = "SiliconCloud (SiliconFlow)",
                     Endpoint = "https://api.siliconflow.cn/v1",
-                    IconUrl = "https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/siliconcloud-color.svg",
+                    IconUrl = "avares://Everywhere/Assets/Icons/siliconcloud-color.svg",
                     Schema = ModelProviderSchema.OpenAI,
                     ModelDefinitions =
                     [
@@ -568,7 +568,7 @@ public class SettingsInitializer : IAsyncInitializer
                     Id = "ollama",
                     DisplayName = "Ollama",
                     Endpoint = "http://127.0.0.1:11434",
-                    IconUrl = "https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/ollama.svg",
+                    IconUrl = "avares://Everywhere/Assets/Icons/ollama.svg",
                     Schema = ModelProviderSchema.Ollama,
                     ModelDefinitions =
                     [
