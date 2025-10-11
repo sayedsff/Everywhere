@@ -172,7 +172,7 @@ public class ChatService(
 
             var xmlBuilder = new VisualElementXmlBuilder(
                 validVisualElements,
-                kernelMixin.MaxTokenTotal / 20,
+                kernelMixin.ContextWindow / 20,
                 chatContext.VisualElements.Count + 1);
             var renderedVisualTreePrompt = await Task.Run(
                 () =>
@@ -257,7 +257,7 @@ public class ChatService(
         builder.Services.AddSingleton(kernelMixin.ChatCompletionService);
         builder.Services.AddSingleton(chatContext);
 
-        if (settings.Internal.IsToolCallEnabled)
+        if (kernelMixin.IsFunctionCallingSupported && settings.Internal.IsToolCallEnabled)
         {
             var chatPluginScope = chatPluginManager.CreateScope(chatContext);
             builder.Services.AddSingleton(chatPluginScope);
@@ -314,7 +314,9 @@ public class ChatService(
                 var assistantContentBuilder = new StringBuilder();
                 var functionCallContentBuilder = new FunctionCallContentBuilder();
                 var promptExecutionSettings = kernelMixin.GetPromptExecutionSettings(
-                    settings.Internal.IsToolCallEnabled ? FunctionChoiceBehavior.Auto(autoInvoke: false) : null);
+                    kernelMixin.IsFunctionCallingSupported && settings.Internal.IsToolCallEnabled ?
+                        FunctionChoiceBehavior.Auto(autoInvoke: false) :
+                        null);
 
                 // ReSharper disable once ExplicitCallerInfoArgument
                 using (var llmStreamActivity = _activitySource.StartActivity("ChatCompletionService.GetStreamingChatMessageContents"))

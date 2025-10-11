@@ -16,7 +16,13 @@ public interface IKernelMixin : IDisposable
     /// <summary>
     /// Gets the maximum number of tokens allowed in a single request to the model.
     /// </summary>
-    int MaxTokenTotal { get; }
+    int ContextWindow { get; }
+
+    bool IsImageInputSupported { get; }
+
+    bool IsFunctionCallingSupported { get; }
+
+    bool IsDeepThinkingSupported { get; }
 
     /// <summary>
     /// Gets the prompt execution settings.
