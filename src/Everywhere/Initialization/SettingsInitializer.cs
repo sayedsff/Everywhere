@@ -651,7 +651,7 @@ public class SettingsInitializer : IAsyncInitializer
     {
         var propertyCache = new Dictionary<Type, PropertyInfo[]>();
         var final = new List<ModelProvider>();
-        var dstMap = dstList.AsValueEnumerable().ToDictionary(p => p.Id);
+        var dstMap = dstList.AsValueEnumerable().Where(p => p.Id is { Length: > 0 }).ToDictionary(p => p.Id);
 
         foreach (var src in srcList)
         {
@@ -687,7 +687,7 @@ public class SettingsInitializer : IAsyncInitializer
         Dictionary<Type, PropertyInfo[]> propertyCache)
     {
         var final = new List<ModelDefinition>();
-        var dstMap = dstList.AsValueEnumerable().ToDictionary(p => p.Id);
+        var dstMap = dstList.AsValueEnumerable().Where(p => p.Id is { Length: > 0 }).ToDictionary(p => p.Id);
 
         foreach (var src in srcList)
         {
@@ -722,7 +722,7 @@ public class SettingsInitializer : IAsyncInitializer
 
         // Remove duplicate search engine providers by Id
         webSearchEngineSettings.WebSearchEngineProviders.Reset(
-            webSearchEngineSettings.WebSearchEngineProviders.AsValueEnumerable().DistinctBy(p => p.Id).ToList());
+            webSearchEngineSettings.WebSearchEngineProviders.AsValueEnumerable().Where(p => p.Id is { Length: > 0 }).DistinctBy(p => p.Id).ToList());
 
         ApplySearchEngineProviders(
             [

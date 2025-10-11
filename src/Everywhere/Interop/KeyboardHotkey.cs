@@ -9,18 +9,21 @@ public readonly record struct KeyboardHotkey(Key Key, KeyModifiers Modifiers)
     [JsonIgnore]
     public bool IsEmpty => Key == Key.None && Modifiers == KeyModifiers.None;
 
+    [JsonIgnore]
+    public bool IsValid => Key != Key.None && Modifiers != KeyModifiers.None;
+
     public override string ToString()
     {
 #if IsOSX
-        const string control = "⌃";
-        const string shift = "⇧";
-        const string alt = "⌥";
-        const string meta = "⌘";
+        const char meta = '⌘';
+        const char control = '⌃';
+        const char shift = '⇧';
+        const char alt = '⌥';
 #else
+        const string meta = "Win+";
         const string control = "Ctrl+";
         const string shift = "Shift+";
         const string alt = "Alt+";
-        const string meta = "Win+";
 
         if (Modifiers == (KeyModifiers.Shift | KeyModifiers.Meta) && Key == Key.F23)
         {
@@ -29,10 +32,10 @@ public readonly record struct KeyboardHotkey(Key Key, KeyModifiers Modifiers)
 #endif
 
         var sb = new StringBuilder();
+        if (Modifiers.HasFlag(KeyModifiers.Meta)) sb.Append(meta);
         if (Modifiers.HasFlag(KeyModifiers.Control)) sb.Append(control);
         if (Modifiers.HasFlag(KeyModifiers.Shift)) sb.Append(shift);
         if (Modifiers.HasFlag(KeyModifiers.Alt)) sb.Append(alt);
-        if (Modifiers.HasFlag(KeyModifiers.Meta)) sb.Append(meta);
         if (Key != Key.None) sb.Append(Key);
         return sb.ToString();
     }

@@ -1,4 +1,5 @@
-﻿using Avalonia.Threading;
+﻿using Avalonia.Input;
+using Avalonia.Threading;
 using Everywhere.Common;
 using Everywhere.Configuration;
 using Everywhere.Interop;
@@ -38,6 +39,8 @@ public class HotkeyInitializer(
 
     private void HandleChatHotkeyChanged(KeyboardHotkey hotkey)
     {
+        if (!hotkey.IsValid) return;
+
         using var _ = _syncLock.EnterScope();
 
         _chatHotkeySubscription?.Dispose();
