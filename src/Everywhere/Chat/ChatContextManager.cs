@@ -146,7 +146,7 @@ public partial class ChatContextManager : ObservableObject, IChatContextManager,
             {
                 { "OS", () => Environment.OSVersion.ToString() },
                 { "Time", () => DateTime.Now.ToString("F") },
-                { "SystemLanguage", () => _settings.Common.Language },
+                { "SystemLanguage", () => _settings.Common.Language == "default" ? "en-US" : _settings.Common.Language },
                 { "WorkingDirectory", () => _runtimeConstantProvider.EnsureWritableDataFolderPath($"plugins/{DateTime.Now:yyyy-MM-dd}") }
             });
 

@@ -66,6 +66,15 @@ public partial class CommonSettings : SettingsCategory
     [HiddenSettingsItem]
     public static IEnumerable<string> LanguageSource => LocaleManager.AvailableLocaleNames;
 
+    /// <summary>
+    /// Gets or sets the current application language.
+    /// </summary>
+    /// <remarks>
+    /// Warn that this may be "default", which stands for en-US.
+    /// </remarks>
+    /// <example>
+    /// default, zh-hans, ru, de, ja, it, fr, es, ko, zh-hant, zh-hant-hk
+    /// </example>
     [SettingsSelectionItem(ItemsSourceBindingPath = nameof(LanguageSource), I18N = true)]
     public string Language
     {

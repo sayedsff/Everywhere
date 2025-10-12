@@ -28,8 +28,10 @@ public sealed class OpenAIKernelMixin(ModelSettings settings, ModelProvider prov
             new OpenAIClientOptions
             {
                 Endpoint = new Uri(provider.Endpoint, UriKind.Absolute)
-            }).AsIChatClient(),
-        definition).AsChatCompletionService();
+            }
+        ).AsIChatClient(),
+        definition
+    ).AsChatCompletionService();
 
     public override PromptExecutionSettings? GetPromptExecutionSettings(FunctionChoiceBehavior? functionChoiceBehavior = null)
     {
@@ -142,10 +144,11 @@ public sealed class OpenAIKernelMixin(ModelSettings settings, ModelProvider prov
                         continue;
                     }
 
-                    update.Contents.Add(new TextContent(reasoningContent)
-                    {
-                        AdditionalProperties = ReasoningProperties
-                    });
+                    update.Contents.Add(
+                        new TextContent(reasoningContent)
+                        {
+                            AdditionalProperties = ReasoningProperties
+                        });
                     update.AdditionalProperties = ApplyReasoningProperties(update.AdditionalProperties);
                 }
 

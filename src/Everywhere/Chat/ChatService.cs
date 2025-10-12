@@ -707,10 +707,12 @@ public class ChatService(
 
         try
         {
+            var language = settings.Common.Language == "default" ? "en-US" : settings.Common.Language;
+
             activity?.SetTag("chat.context.id", metadata.Id);
             activity?.SetTag("user_message.length", userMessage.Length);
             activity?.SetTag("assistant_message.length", assistantMessage.Length);
-            activity?.SetTag("system_language", settings.Common.Language);
+            activity?.SetTag("system_language", language);
 
             var chatHistory = new ChatHistory
             {
@@ -722,7 +724,7 @@ public class ChatService(
                         {
                             { "UserMessage", () => userMessage.SafeSubstring(0, 2048) },
                             { "AssistantMessage", () => assistantMessage.SafeSubstring(0, 2048) },
-                            { "SystemLanguage", () => settings.Common.Language }
+                            { "SystemLanguage", () => language }
                         })),
             };
             var chatMessageContent = await chatCompletionService.GetChatMessageContentAsync(
