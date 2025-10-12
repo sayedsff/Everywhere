@@ -1,3 +1,21 @@
+## [v0.3.9](https://github.com/DearVa/Everywhere/releases/tag/v0.3.9) - 2025-10-13
+
+🚀 Features
+Provider icons in settings are now loaded as local resources for faster display
+Added deep-thought output support for Ollama, SiliconFlow, and some OpenAI-compatible models; fixed SiliconFlow and similar models not outputting results
+Added option to show chat plugin permissions in settings
+
+✨ Improvements
+Enhanced error handling and user-friendly messages
+
+🐛 Bug Fixes
+Fixed dialog covering the title bar, making the window undraggable or unresponsive
+Fixed some prompt tasks (e.g. translation) may use the wrong target language
+
+**Full Changelog**: https://github.com/DearVa/Everywhere/compare/v0.3.8...v0.3.9
+
+
+
 ## [v0.3.8](https://github.com/DearVa/Everywhere/releases/tag/v0.3.8) - 2025-10-11
 
 🚀 Features
