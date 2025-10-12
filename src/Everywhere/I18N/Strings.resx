@@ -944,4 +944,28 @@ My intelligence comes from powerful Large language models (LLMs), which are prov
     <data name="ChatWindow_ChatMessage_Assistant_DeepThinking" xml:space="preserve">
         <value>Deep thinking</value>
     </data>
+    <data name="ChatFunctionPermissions_ScreenRead" xml:space="preserve">
+        <value>Read screen</value>
+    </data>
+    <data name="ChatFunctionPermissions_ScreenAccess" xml:space="preserve">
+        <value>Access screen</value>
+    </data>
+    <data name="ChatFunctionPermissions_NetworkAccess" xml:space="preserve">
+        <value>Access network</value>
+    </data>
+    <data name="ChatFunctionPermissions_ClipboardRead" xml:space="preserve">
+        <value>Read clipboard</value>
+    </data>
+    <data name="ChatFunctionPermissions_ClipboardAccess" xml:space="preserve">
+        <value>Access clipboard</value>
+    </data>
+    <data name="ChatFunctionPermissions_FileRead" xml:space="preserve">
+        <value>Read file</value>
+    </data>
+    <data name="ChatFunctionPermissions_FileAccess" xml:space="preserve">
+        <value>Access file</value>
+    </data>
+    <data name="ChatFunctionPermissions_ShellExecute" xml:space="preserve">
+        <value>Execute shell script</value>
+    </data>
 </root>

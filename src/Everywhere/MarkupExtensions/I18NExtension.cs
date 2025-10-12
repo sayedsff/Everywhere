@@ -39,7 +39,7 @@ public class I18NExtension : MarkupExtension
         return target?.TargetProperty is AvaloniaProperty ?
             new Binding
             {
-                Path = "Self^",
+                Path = $"{nameof(DynamicResourceKeyBase.Self)}^",
                 Source = dynamicResourceKey,
                 Converter = Converter,
                 ConverterParameter = ConverterParameter,

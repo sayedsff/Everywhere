@@ -85,11 +85,11 @@ public partial class WebSearchEnginePlugin : BuiltInChatPlugin
         _functions.Add(
             new AnonymousChatFunction(
                 WebSearchAsync,
-                ChatFunctionPermissions.InternetAccess));
+                ChatFunctionPermissions.NetworkAccess));
         _functions.Add(
             new AnonymousChatFunction(
                 WebSnapshotAsync,
-                ChatFunctionPermissions.InternetAccess));
+                ChatFunctionPermissions.NetworkAccess));
 
         SettingsItems = SettingsItemFactory.CreateForObject(_settings, "Plugin_WebSearchEngine");
 

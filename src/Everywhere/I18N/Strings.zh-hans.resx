@@ -925,4 +925,28 @@
     <data name="ChatWindow_ChatMessage_Assistant_DeepThinking" xml:space="preserve">
         <value>深度思考</value>
     </data>
+    <data name="ChatFunctionPermissions_ClipboardAccess" xml:space="preserve">
+        <value>操作剪切板</value>
+    </data>
+    <data name="ChatFunctionPermissions_ClipboardRead" xml:space="preserve">
+        <value>读取剪切板</value>
+    </data>
+    <data name="ChatFunctionPermissions_FileAccess" xml:space="preserve">
+        <value>操作文件</value>
+    </data>
+    <data name="ChatFunctionPermissions_FileRead" xml:space="preserve">
+        <value>读取文件</value>
+    </data>
+    <data name="ChatFunctionPermissions_NetworkAccess" xml:space="preserve">
+        <value>访问网络</value>
+    </data>
+    <data name="ChatFunctionPermissions_ScreenAccess" xml:space="preserve">
+        <value>操作屏幕</value>
+    </data>
+    <data name="ChatFunctionPermissions_ScreenRead" xml:space="preserve">
+        <value>读取屏幕</value>
+    </data>
+    <data name="ChatFunctionPermissions_ShellExecute" xml:space="preserve">
+        <value>执行终端脚本</value>
+    </data>
 </root>

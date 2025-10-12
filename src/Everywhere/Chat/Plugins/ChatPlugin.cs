@@ -37,7 +37,11 @@ public abstract partial class ChatPlugin(string name) : KernelPlugin(name)
     /// Gets or sets the allowed permissions for the plugin.
     /// </summary>
     [ObservableProperty]
-    public partial Customizable<ChatFunctionPermissions> AllowedPermissions { get; set; } = ChatFunctionPermissions.None;
+    public partial Customizable<ChatFunctionPermissions> AllowedPermissions { get; set; } =
+        ChatFunctionPermissions.ScreenAccess |
+        ChatFunctionPermissions.NetworkAccess |
+        ChatFunctionPermissions.ClipboardAccess |
+        ChatFunctionPermissions.FileRead;
 
     /// <summary>
     /// Gets the list of functions provided by this plugin for Binding use in the UI.
