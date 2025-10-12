@@ -26,7 +26,7 @@
       <ExperimentalAcrylicBorder.Material>
         <ExperimentalAcrylicMaterial
           FallbackColor="#CC000000" MaterialOpacity="0.7"
-          TintColor="Black" TintOpacity="0.4"/>
+          TintColor="Black" TintOpacity="0.9"/>
       </ExperimentalAcrylicBorder.Material>
     </ExperimentalAcrylicBorder>
 
@@ -473,6 +473,13 @@
                                       Background="{DynamicResource CardBackgroundColor}"
                                       BorderBrush="{DynamicResource BorderColor}"
                                       BorderThickness="1" CornerRadius="12">
+                                      <Border.Styles>
+                                        <Style Selector="ToggleButton:checked /template/ Border#RootBorder">
+                                          <Setter Property="Background" Value="{DynamicResource PrimaryColor50}"/>
+                                          <Setter Property="BorderBrush" Value="{DynamicResource PrimaryColor50}"/>
+                                        </Style>
+                                      </Border.Styles>
+
                                       <ToggleButton
                                         x:Name="ReasoningToggleButton" Classes="Ghost"
                                         MinHeight="0" Padding="8,4"
@@ -499,6 +506,7 @@
                                       BorderThickness="3,0,0,0" CornerRadius="3">
                                       <SelectableTextBlock
                                         Classes="Muted" Margin="6,4"
+                                        FontSize="13"
                                         IsVisible="{Binding #ReasoningToggleButton.IsChecked}"
                                         Text="{Binding ReasoningOutput}"/>
                                     </Border>
@@ -879,7 +887,7 @@
         <ExperimentalAcrylicBorder.Material>
           <ExperimentalAcrylicMaterial
             FallbackColor="#99000000" MaterialOpacity="0.7"
-            TintColor="Black" TintOpacity="0"/>
+            TintColor="#222222" TintOpacity="0.7"/>
         </ExperimentalAcrylicBorder.Material>
 
         <v:ChatInputBox
