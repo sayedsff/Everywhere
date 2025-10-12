@@ -1,4 +1,5 @@
-﻿using Everywhere.Configuration;
+﻿using System.Text.RegularExpressions;
+using Everywhere.Configuration;
 using Microsoft.Extensions.AI;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
@@ -11,7 +12,7 @@ namespace Everywhere.AI;
 /// <summary>
 /// An implementation of <see cref="IKernelMixin"/> for Ollama models.
 /// </summary>
-public sealed class OllamaKernelMixin : KernelMixinBase
+public sealed partial class OllamaKernelMixin : KernelMixinBase
 {
     public override IChatCompletionService ChatCompletionService { get; }
 
@@ -39,21 +40,33 @@ public sealed class OllamaKernelMixin : KernelMixinBase
         _client.Dispose();
     }
 
-    private sealed class OptimizedOllamaApiClient(OllamaApiClient client, ModelDefinition definition) : IChatClient
+    private sealed partial class OptimizedOllamaApiClient(OllamaApiClient client, ModelDefinition definition) : IChatClient
     {
         private IChatClient ChatClient => client;
 
-        private readonly AdditionalPropertiesDictionary _reasoningProperties = new()
-        {
-            ["reasoning"] = true
-        };
-
-        public Task<ChatResponse> GetResponseAsync(
+        public async Task<ChatResponse> GetResponseAsync(
             IEnumerable<ChatMessage> messages,
             ChatOptions? options = null,
             CancellationToken cancellationToken = default)
         {
-            return ChatClient.GetResponseAsync(messages, options, cancellationToken);
+            var response = await ChatClient.GetResponseAsync(messages, options, cancellationToken);
+            if (!definition.IsDeepThinkingSupported.ActualValue) return response;
+
+            // handle reasoning in non-streaming mode, only actual response
+            // use regex to extract parts <think>[reasoning]</think>[response]
+            // then return only response part with reasoning property if exists
+            var text = response.Text;
+            var regex = ReasoningRegex();
+            var match = regex.Match(text);
+            if (!match.Success) return response;
+
+            return new ChatResponse(
+                new ChatMessage(
+                    ChatRole.Assistant,
+                    [
+                        new TextReasoningContent(match.Groups[1].Value.Trim()),
+                        new TextContent(match.Groups[2].Value.Trim())
+                    ]));
         }
 
         public async IAsyncEnumerable<ChatResponseUpdate> GetStreamingResponseAsync(
@@ -90,30 +103,24 @@ public sealed class OllamaKernelMixin : KernelMixinBase
                                 // ignore <think> token
                                 break;
                             }
-                            case 1 when !textContent.Text.IsNullOrWhiteSpace():
+                            case 1 when textContent.Text.IsNullOrWhiteSpace():
+                            {
+                                break;
+                            }
+                            case 1:
                             {
                                 reasoningState = 2;
                                 processedContents.Add(
-                                    new TextContent(textContent.Text.TrimStart())
+                                    new TextContent(textContent.Text)
                                     {
-                                        AdditionalProperties = _reasoningProperties
+                                        AdditionalProperties = ReasoningProperties
                                     });
                                 hasReasoningContent = true;
                                 break;
                             }
-                            case 2 when textContent.Text.EndsWith("</think>"):
+                            case 2 when textContent.Text == "</think>":
                             {
                                 reasoningState = 3;
-                                var reasoningText = textContent.Text[..^"</think>".Length];
-                                if (!reasoningText.IsNullOrEmpty())
-                                {
-                                    processedContents.Add(
-                                        new TextContent(reasoningText)
-                                        {
-                                            AdditionalProperties = _reasoningProperties
-                                        });
-                                    hasReasoningContent = true;
-                                }
                                 break;
                             }
                             case 2:
@@ -121,7 +128,7 @@ public sealed class OllamaKernelMixin : KernelMixinBase
                                 processedContents.Add(
                                     new TextContent(textContent.Text)
                                     {
-                                        AdditionalProperties = _reasoningProperties
+                                        AdditionalProperties = ReasoningProperties
                                     });
                                 hasReasoningContent = true;
                                 break;
@@ -146,7 +153,7 @@ public sealed class OllamaKernelMixin : KernelMixinBase
 
                 yield return new ChatResponseUpdate(update.Role, processedContents)
                 {
-                    AdditionalProperties = hasReasoningContent ? _reasoningProperties : null,
+                    AdditionalProperties = hasReasoningContent ? ReasoningProperties : null,
                 };
             }
         }
@@ -160,5 +167,8 @@ public sealed class OllamaKernelMixin : KernelMixinBase
         {
             client.Dispose();
         }
+
+        [GeneratedRegex(@"<think>(.*?)</think>(.*)", RegexOptions.Singleline)]
+        private static partial Regex ReasoningRegex();
     }
 }

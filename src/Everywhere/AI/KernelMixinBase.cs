@@ -1,4 +1,5 @@
 ﻿using Everywhere.Configuration;
+using Microsoft.Extensions.AI;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 
@@ -23,6 +24,14 @@ public abstract class KernelMixinBase(ModelSettings settings, ModelProvider prov
     /// WARNING: properties are mutable!
     /// </summary>
     protected readonly ModelSettings _settings = settings;
+
+    /// <summary>
+    /// indicates whether the model is reasoning
+    /// </summary>
+    protected static readonly AdditionalPropertiesDictionary ReasoningProperties = new()
+    {
+        ["reasoning"] = true
+    };
 
     public abstract PromptExecutionSettings? GetPromptExecutionSettings(FunctionChoiceBehavior? functionChoiceBehavior = null);
 

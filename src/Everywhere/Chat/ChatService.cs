@@ -412,6 +412,7 @@ public class ChatService(
                                 // Mark the reasoning as finished when we receive the first content chunk.
                                 if (chatSpan.ReasoningOutput is not null && chatSpan.ReasoningFinishedAt is null)
                                 {
+                                    chatSpan.ReasoningOutput = chatSpan.ReasoningOutput.TrimEnd();
                                     chatSpan.ReasoningFinishedAt = DateTimeOffset.UtcNow;
                                 }
 
