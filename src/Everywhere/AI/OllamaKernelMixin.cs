@@ -32,7 +32,7 @@ public sealed partial class OllamaKernelMixin : KernelMixinBase
     public OllamaKernelMixin(ModelSettings settings, ModelProvider provider, ModelDefinition definition) : base(settings, provider, definition)
     {
         _client = new OllamaApiClient(provider.Endpoint, definition.ModelId);
-        ChatCompletionService = new OptimizedOllamaApiClient(_client, definition).AsBuilder().Build().AsChatCompletionService();
+        ChatCompletionService = new OptimizedOllamaApiClient(_client, definition).AsChatCompletionService();
     }
 
     public override void Dispose()
@@ -151,10 +151,10 @@ public sealed partial class OllamaKernelMixin : KernelMixinBase
                     continue;
                 }
 
-                yield return new ChatResponseUpdate(update.Role, processedContents)
-                {
-                    AdditionalProperties = hasReasoningContent ? ReasoningProperties : null,
-                };
+                update.Contents = processedContents;
+                if (hasReasoningContent) update.AdditionalProperties = ApplyReasoningProperties(update.AdditionalProperties);
+
+                yield return update;
             }
         }
 

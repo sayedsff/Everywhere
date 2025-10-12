@@ -33,6 +33,13 @@ public abstract class KernelMixinBase(ModelSettings settings, ModelProvider prov
         ["reasoning"] = true
     };
 
+    protected static AdditionalPropertiesDictionary ApplyReasoningProperties(AdditionalPropertiesDictionary? dictionary)
+    {
+        if (dictionary is null) return ReasoningProperties;
+        dictionary["reasoning"] = true;
+        return dictionary;
+    }
+
     public abstract PromptExecutionSettings? GetPromptExecutionSettings(FunctionChoiceBehavior? functionChoiceBehavior = null);
 
     public virtual void Dispose() { }

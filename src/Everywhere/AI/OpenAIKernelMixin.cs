@@ -1,7 +1,17 @@
-﻿using Everywhere.Configuration;
+﻿using System.ClientModel;
+using System.Reflection;
+using System.Security.Authentication;
+using System.Text.Json;
+using Everywhere.Common;
+using Everywhere.Configuration;
+using Microsoft.Extensions.AI;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
+using OpenAI;
+using OpenAI.Chat;
+using ChatMessage = Microsoft.Extensions.AI.ChatMessage;
+using TextContent = Microsoft.Extensions.AI.TextContent;
 
 namespace Everywhere.AI;
 
@@ -11,7 +21,15 @@ namespace Everywhere.AI;
 public sealed class OpenAIKernelMixin(ModelSettings settings, ModelProvider provider, ModelDefinition definition, string? apiKey)
     : KernelMixinBase(settings, provider, definition)
 {
-    public override IChatCompletionService ChatCompletionService => _chatCompletionService;
+    public override IChatCompletionService ChatCompletionService { get; } = new OptimizedOpenAIApiClient(
+        new ChatClient(
+            definition.ModelId,
+            new ApiKeyCredential(apiKey ?? throw new ChatRequestException(new AuthenticationException(), KernelRequestExceptionType.InvalidApiKey)),
+            new OpenAIClientOptions
+            {
+                Endpoint = new Uri(provider.Endpoint, UriKind.Absolute)
+            }).AsIChatClient(),
+        definition).AsChatCompletionService();
 
     public override PromptExecutionSettings? GetPromptExecutionSettings(FunctionChoiceBehavior? functionChoiceBehavior = null)
     {
@@ -39,8 +57,110 @@ public sealed class OpenAIKernelMixin(ModelSettings settings, ModelProvider prov
         };
     }
 
-    private readonly OpenAIChatCompletionService _chatCompletionService = new(
-        definition.ModelId,
-        new Uri(provider.Endpoint, UriKind.Absolute),
-        apiKey);
+    private sealed class OptimizedOpenAIApiClient(IChatClient client, ModelDefinition definition) : IChatClient
+    {
+        private static readonly PropertyInfo? ChoicesProperty =
+            typeof(StreamingChatCompletionUpdate).GetProperty("Choices", BindingFlags.NonPublic | BindingFlags.Instance);
+        private static PropertyInfo? _choiceCountProperty;
+        private static PropertyInfo? _choiceIndexerProperty;
+        private static PropertyInfo? _choiceDeltaProperty;
+        private static PropertyInfo? _deltaRawDataProperty;
+
+        public Task<ChatResponse> GetResponseAsync(
+            IEnumerable<ChatMessage> messages,
+            ChatOptions? options = null,
+            CancellationToken cancellationToken = default)
+        {
+            return client.GetResponseAsync(messages, options, cancellationToken);
+        }
+
+        public async IAsyncEnumerable<ChatResponseUpdate> GetStreamingResponseAsync(
+            IEnumerable<ChatMessage> messages,
+            ChatOptions? options = null,
+            [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        {
+            var isDeepThinkingSupported = definition.IsDeepThinkingSupported.ActualValue;
+            await foreach (var update in client.GetStreamingResponseAsync(messages, options, cancellationToken))
+            {
+                // Why you keep reasoning in the fucking internal properties, OpenAI???
+                if (isDeepThinkingSupported && update is { Text: not { Length: > 0 }, RawRepresentation: StreamingChatCompletionUpdate detail })
+                {
+                    // Get the value of the internal 'Choices' property.
+                    var choices = ChoicesProperty?.GetValue(detail);
+                    if (choices is null)
+                    {
+                        yield return update;
+                        continue;
+                    }
+
+                    // Cache PropertyInfo for the 'Count' property of the Choices collection.
+                    _choiceCountProperty ??= choices.GetType().GetProperty("Count");
+                    if (_choiceCountProperty?.GetValue(choices) is not int count || count == 0)
+                    {
+                        yield return update;
+                        continue;
+                    }
+
+                    // Cache PropertyInfo for the indexer 'Item' property of the Choices collection.
+                    _choiceIndexerProperty ??= choices.GetType().GetProperty("Item");
+                    if (_choiceIndexerProperty is null)
+                    {
+                        yield return update;
+                        continue;
+                    }
+
+                    // Get the first choice from the collection.
+                    var firstChoice = _choiceIndexerProperty.GetValue(choices, [0]);
+                    if (firstChoice is null)
+                    {
+                        yield return update;
+                        continue;
+                    }
+
+                    // Cache PropertyInfo for the 'Delta' property of a choice.
+                    _choiceDeltaProperty ??= firstChoice.GetType().GetProperty("Delta", BindingFlags.Instance | BindingFlags.NonPublic);
+                    var delta = _choiceDeltaProperty?.GetValue(firstChoice);
+                    if (delta is null)
+                    {
+                        yield return update;
+                        continue;
+                    }
+
+                    // Cache PropertyInfo for the internal 'SerializedAdditionalRawData' property of the delta.
+                    _deltaRawDataProperty ??= delta.GetType().GetProperty(
+                        "SerializedAdditionalRawData",
+                        BindingFlags.Instance | BindingFlags.NonPublic);
+
+                    // Extract and process the raw data if it exists.
+                    if (_deltaRawDataProperty?.GetValue(delta) is not IDictionary<string, BinaryData?> source ||
+                        !source.TryGetValue("reasoning_content", out var reasoningContentBinaryData) ||
+                        reasoningContentBinaryData is null ||
+                        reasoningContentBinaryData.Length <= 2 || // start and end are quotes
+                        JsonSerializer.Deserialize<string>(reasoningContentBinaryData.ToString()) is not { Length: > 0 } reasoningContent)
+                    {
+                        yield return update;
+                        continue;
+                    }
+
+                    update.Contents.Add(new TextContent(reasoningContent)
+                    {
+                        AdditionalProperties = ReasoningProperties
+                    });
+                    update.AdditionalProperties = ApplyReasoningProperties(update.AdditionalProperties);
+                }
+
+                yield return update;
+            }
+        }
+
+        public object? GetService(Type serviceType, object? serviceKey = null)
+        {
+            return client.GetService(serviceType, serviceKey);
+        }
+
+        public void Dispose()
+        {
+            client.Dispose();
+        }
+    }
 }
