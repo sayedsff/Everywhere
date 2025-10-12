@@ -64,18 +64,32 @@ public static class ExceptionExtension
     }
 
     /// <summary>
-    /// Unwarp the aggregate exception to get the inner exception (if only one), otherwise return itself.
+    /// segregate the exception if it is an AggregateException
     /// </summary>
     /// <param name="e"></param>
     /// <returns></returns>
-    public static Exception? Unwarp(this Exception? e)
+    public static IEnumerable<Exception> Segregate(this Exception? e)
     {
-        while (e is AggregateException { InnerExceptions.Count: 1 } ae)
+        switch (e)
         {
-            e = ae.InnerExceptions[0];
+            case null:
+            {
+                yield break;
+            }
+            case AggregateException ae:
+            {
+                foreach (var inner in ae.InnerExceptions.SelectMany(ie => ie.Segregate()))
+                {
+                    yield return inner;
+                }
+                break;
+            }
+            default:
+            {
+                yield return e;
+                break;
+            }
         }
-
-        return e;
     }
 
     private static FormattedDynamicResourceKey FormatHttpExceptionMessage(string baseKey, HttpStatusCode? statusCode)

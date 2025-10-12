@@ -12,6 +12,7 @@ using Serilog;
 using Serilog.Core;
 using Serilog.Events;
 using Serilog.Formatting.Json;
+using ZLinq;
 
 namespace Everywhere.Common;
 
@@ -89,7 +90,11 @@ public static class Entrance
 
             o.UseOpenTelemetry();
             o.SetBeforeSend(evt =>
-                evt.Exception.Unwarp() is null or OperationCanceledException or HandledException { IsExpected: true } ? null : evt);
+                evt.Exception.Segregate()
+                    .AsValueEnumerable()
+                    .Any(e => e is not OperationCanceledException and not HandledException { IsExpected: true }) ?
+                    evt :
+                    null);
             o.SetBeforeSendTransaction(transaction => SendOnlyNecessaryTelemetry ? null : transaction);
             o.SetBeforeBreadcrumb(breadcrumb => SendOnlyNecessaryTelemetry ? null : breadcrumb);
         });

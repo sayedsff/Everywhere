@@ -390,6 +390,16 @@ internal readonly struct HttpStatusCodeParser : IExceptionParser
         var message = context.Exception.Message;
         context.ExceptionType = context.StatusCode switch
         {
+            // 3xx Redirection
+            HttpStatusCode.MultipleChoices => KernelRequestExceptionType.NetworkError,
+            HttpStatusCode.MovedPermanently => KernelRequestExceptionType.NetworkError, // 301
+            HttpStatusCode.Found => KernelRequestExceptionType.NetworkError, // 302
+            HttpStatusCode.SeeOther => KernelRequestExceptionType.NetworkError, // 303
+            HttpStatusCode.NotModified => KernelRequestExceptionType.NetworkError, // 304
+            HttpStatusCode.UseProxy => KernelRequestExceptionType.NetworkError, // 305
+            HttpStatusCode.TemporaryRedirect => KernelRequestExceptionType.NetworkError, // 307
+            HttpStatusCode.PermanentRedirect => KernelRequestExceptionType.NetworkError, // 308
+
             // 4xx Client Errors
             HttpStatusCode.BadRequest => ParseException(message, KernelRequestExceptionType.InvalidConfiguration), // 400
             HttpStatusCode.Unauthorized => ParseException(message, KernelRequestExceptionType.InvalidApiKey), // 401
