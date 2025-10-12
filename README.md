@@ -15,6 +15,8 @@ Every moment, Every place. Your AI - `Everywhere`
 
   </h1>
 
+  <a href="https://trendshift.io/repositories/15106" target="_blank"><img src="https://trendshift.io/api/badge/repositories/15106" alt="DearVa%2FEverywhere | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+
   <p align="center">
     <a href="https://everywhere.sylinko.com"><strong>Explore the docs »</strong></a>
     <br />
