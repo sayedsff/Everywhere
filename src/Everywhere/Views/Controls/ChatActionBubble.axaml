@@ -1,0 +1,118 @@
+﻿<ResourceDictionary
+  xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI" xmlns:v="using:Everywhere.Views">
+  <Design.PreviewWith>
+    <v:ChatActionBubble/>
+  </Design.PreviewWith>
+
+  <ControlTheme
+    x:Key="{x:Type v:ChatActionBubble}"
+    TargetType="v:ChatActionBubble">
+
+    <Setter Property="HorizontalAlignment" Value="Left"/>
+    <Setter Property="Background" Value="{DynamicResource CardBackgroundColor}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="CornerRadius" Value="12"/>
+    <Setter Property="Padding" Value="8,4"/>
+
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel Orientation="Vertical">
+          <Border
+            HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
+            Background="{TemplateBinding Background}"
+            BorderBrush="{TemplateBinding BorderBrush}"
+            BorderThickness="{TemplateBinding BorderThickness}"
+            CornerRadius="{TemplateBinding CornerRadius}">
+            <Border.Styles>
+              <Style Selector="ToggleButton:checked /template/ Border#RootBorder">
+                <Setter Property="Background" Value="{DynamicResource PrimaryColor50}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource PrimaryColor50}"/>
+              </Style>
+            </Border.Styles>
+
+            <ToggleButton
+              x:Name="PART_ToggleButton" Classes="Ghost"
+              MinHeight="0"
+              Padding="{TemplateBinding Padding}"
+              CornerRadius="{TemplateBinding CornerRadius}"
+              IsChecked="True">
+              <StackPanel
+                Orientation="Horizontal" Spacing="4">
+                <LucideIcon
+                  Kind="{TemplateBinding Icon}"
+                  Size="12"/>
+                <ContentPresenter Content="{TemplateBinding Header}"/>
+
+                <shadui:Loading
+                  Width="12" Height="12"
+                  VerticalAlignment="Center" IsHitTestVisible="False"
+                  IsVisible="{TemplateBinding IsBusy}"/>
+                <TextBlock
+                  VerticalAlignment="Bottom" FontSize="10"
+                  Foreground="{DynamicResource SuccessColor60}"
+                  Text="{Binding ElapsedSeconds, StringFormat='{}{0:F1}s', Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}">
+                  <TextBlock.IsVisible>
+                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                      <TemplateBinding
+                        Converter="{x:Static BoolConverters.Not}"
+                        Property="IsError"/>
+                      <TemplateBinding
+                        Converter="{x:Static BoolConverters.Not}"
+                        Property="IsBusy"/>
+                    </MultiBinding>
+                  </TextBlock.IsVisible>
+                </TextBlock>
+                <LucideIcon
+                  Margin="4,0,0,0" VerticalAlignment="Center"
+                  Foreground="{DynamicResource ErrorColor}"
+                  IsHitTestVisible="False" Kind="X"
+                  Size="12">
+                  <LucideIcon.IsVisible>
+                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                      <TemplateBinding Property="IsError"/>
+                      <TemplateBinding
+                        Converter="{x:Static BoolConverters.Not}"
+                        Property="IsBusy"/>
+                    </MultiBinding>
+                  </LucideIcon.IsVisible>
+                </LucideIcon>
+              </StackPanel>
+            </ToggleButton>
+          </Border>
+
+          <Border
+            Margin="0,4"
+            BorderBrush="{DynamicResource PrimaryColor}"
+            BorderThickness="3,0,0,0" CornerRadius="3">
+            <Border.IsVisible>
+              <MultiBinding Converter="{x:Static BoolConverters.And}">
+                <Binding
+                  ElementName="PART_ToggleButton" Path="IsChecked"/>
+                <TemplateBinding
+                  Converter="{x:Static BoolConverters.Not}"
+                  Property="IsError"/>
+              </MultiBinding>
+            </Border.IsVisible>
+            <ContentPresenter Content="{TemplateBinding Content}"/>
+          </Border>
+
+          <Border
+            Margin="0,4"
+            BorderBrush="{DynamicResource PrimaryColor}"
+            BorderThickness="3,0,0,0" CornerRadius="3">
+            <Border.IsVisible>
+              <MultiBinding Converter="{x:Static BoolConverters.And}">
+                <Binding
+                  ElementName="PART_ToggleButton" Path="IsChecked"/>
+                <TemplateBinding Property="IsError"/>
+              </MultiBinding>
+            </Border.IsVisible>
+            <ContentPresenter Content="{TemplateBinding ErrorContent}"/>
+          </Border>
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

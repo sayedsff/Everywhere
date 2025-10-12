@@ -464,53 +464,20 @@
 
                         <ItemsControl.ItemTemplate>
                           <DataTemplate>
-                            <StackPanel Orientation="Vertical">
+                            <StackPanel
+                              Orientation="Vertical" Spacing="8">
                               <v:LazyContentControl IsVisible="{Binding ReasoningOutput, Converter={x:Static ObjectConverters.IsNotNull}}">
                                 <ControlTemplate>
-                                  <StackPanel Orientation="Vertical">
-                                    <Border
-                                      Padding="0" HorizontalAlignment="Left"
-                                      Background="{DynamicResource CardBackgroundColor}"
-                                      BorderBrush="{DynamicResource BorderColor}"
-                                      BorderThickness="1" CornerRadius="12">
-                                      <Border.Styles>
-                                        <Style Selector="ToggleButton:checked /template/ Border#RootBorder">
-                                          <Setter Property="Background" Value="{DynamicResource PrimaryColor50}"/>
-                                          <Setter Property="BorderBrush" Value="{DynamicResource PrimaryColor50}"/>
-                                        </Style>
-                                      </Border.Styles>
-
-                                      <ToggleButton
-                                        x:Name="ReasoningToggleButton" Classes="Ghost"
-                                        MinHeight="0" Padding="8,4"
-                                        CornerRadius="12" IsChecked="True">
-                                        <StackPanel
-                                          Orientation="Horizontal" Spacing="4">
-                                          <TextBlock Text="{I18N {x:Static LocaleKey.ChatWindow_ChatMessage_Assistant_DeepThinking}}"/>
-                                          <shadui:Loading
-                                            Width="12" Height="12"
-                                            VerticalAlignment="Center" IsHitTestVisible="False"
-                                            IsVisible="{Binding ReasoningFinishedAt, Converter={x:Static ObjectConverters.IsNull}}"/>
-                                          <TextBlock
-                                            VerticalAlignment="Bottom" FontSize="10"
-                                            Foreground="{DynamicResource SuccessColor60}"
-                                            IsVisible="{Binding ReasoningFinishedAt, Converter={x:Static ObjectConverters.IsNotNull}}"
-                                            Text="{Binding ReasoningElapsedSeconds, StringFormat='{}{0:F1}s', Mode=OneWay}"/>
-                                        </StackPanel>
-                                      </ToggleButton>
-                                    </Border>
-
-                                    <Border
-                                      Margin="0,4"
-                                      BorderBrush="{DynamicResource PrimaryColor}"
-                                      BorderThickness="3,0,0,0" CornerRadius="3">
-                                      <SelectableTextBlock
-                                        Classes="Muted" Margin="6,4"
-                                        FontSize="13"
-                                        IsVisible="{Binding #ReasoningToggleButton.IsChecked}"
-                                        Text="{Binding ReasoningOutput}"/>
-                                    </Border>
-                                  </StackPanel>
+                                  <v:ChatActionBubble
+                                    ElapsedSeconds="{Binding ReasoningElapsedSeconds}"
+                                    Header="{I18N {x:Static LocaleKey.ChatWindow_ChatMessage_Assistant_DeepThinking}}"
+                                    Icon="Brain"
+                                    IsBusy="{Binding ReasoningFinishedAt, Converter={x:Static ObjectConverters.IsNull}}">
+                                    <SelectableTextBlock
+                                      Classes="Muted" Margin="6,4"
+                                      FontSize="13"
+                                      Text="{Binding ReasoningOutput}"/>
+                                  </v:ChatActionBubble>
                                 </ControlTemplate>
                               </v:LazyContentControl>
 
@@ -519,7 +486,6 @@
                                 MarkdownBuilder="{Binding MarkdownBuilder}"/>
 
                               <ItemsControl
-                                Margin="0,6"
                                 IsVisible="{Binding !!$self.ItemCount}"
                                 ItemsSource="{Binding FunctionCalls, Converter={x:Static vc:ObservableListConverters.ObservableOnDispatcher}}">
                                 <ItemsControl.ItemsPanel>
@@ -709,159 +675,33 @@
                   </DataTemplate>
 
                   <DataTemplate DataType="chat:ActionChatMessage">
-                    <Border
-                      Classes="ChatMessage Action ChatBubble" Margin="0,0,36,0"
-                      Padding="0" HorizontalAlignment="Left">
-                      <StackPanel>
-                        <Panel>
-                          <ToggleButton
-                            x:Name="PART_ExpandToggleButton" MinHeight="0"
-                            Background="Transparent" Focusable="False">
-                            <ToggleButton.Template>
-                              <ControlTemplate TargetType="ToggleButton">
-                                <Panel Background="Transparent"/>
-                              </ControlTemplate>
-                            </ToggleButton.Template>
-                          </ToggleButton>
-
-                          <StackPanel
-                            Margin="8,4" VerticalAlignment="Center"
-                            IsHitTestVisible="False" Orientation="Horizontal"
-                            Spacing="4">
-                            <LucideIcon
-                              VerticalAlignment="Center"
-                              Kind="{Binding Icon}"
-                              Size="14"/>
-                            <TextBlock
-                              VerticalAlignment="Center" FontSize="12"
-                              Text="{Binding HeaderKey^, FallbackValue={x:Null}}"/>
-                            <shadui:Loading
-                              Width="12" Height="12"
-                              VerticalAlignment="Center" IsHitTestVisible="False"
-                              IsVisible="{Binding IsBusy}"/>
-                            <TextBlock
-                              VerticalAlignment="Bottom" FontSize="10"
-                              Foreground="{DynamicResource SuccessColor60}"
-                              Text="{Binding ElapsedSeconds, StringFormat='{}{0:F1}s', Mode=OneWay}">
-                              <TextBlock.IsVisible>
-                                <MultiBinding Converter="{x:Static BoolConverters.And}">
-                                  <Binding Path="!IsBusy"/>
-                                  <Binding
-                                    Converter="{x:Static ObjectConverters.IsNull}"
-                                    Path="ErrorMessageKey"/>
-                                </MultiBinding>
-                              </TextBlock.IsVisible>
-                            </TextBlock>
-                            <LucideIcon
-                              Margin="0,1,0,0" VerticalAlignment="Center"
-                              Foreground="{DynamicResource ErrorColor}"
-                              Kind="X" Size="14">
-                              <LucideIcon.IsVisible>
-                                <MultiBinding Converter="{x:Static BoolConverters.And}">
-                                  <Binding Path="!IsBusy"/>
-                                  <Binding
-                                    Converter="{x:Static ObjectConverters.IsNotNull}"
-                                    Path="ErrorMessageKey"/>
-                                </MultiBinding>
-                              </LucideIcon.IsVisible>
-                            </LucideIcon>
-                          </StackPanel>
-                        </Panel>
-
-                        <Panel
-                          x:Name="PART_ContentExpand"
-                          IsVisible="{Binding #PART_ExpandToggleButton.IsChecked}">
-                          <Border
-                            Margin="8,0,8,4"
-                            Background="{DynamicResource ErrorColor60}"
-                            CornerRadius="4"
-                            IsVisible="{Binding ErrorMessageKey, Converter={x:Static ObjectConverters.IsNotNull}, FallbackValue=false}">
-                            <SelectableTextBlock
-                              Margin="6,4"
-                              Text="{Binding ErrorMessageKey^, FallbackValue={x:Null}}"
-                              TextWrapping="Wrap"/>
-                          </Border>
-                        </Panel>
-                      </StackPanel>
-                    </Border>
+                    <v:ChatActionBubble
+                      ElapsedSeconds="{Binding ElapsedSeconds}"
+                      Header="{Binding HeaderKey^, FallbackValue={x:Null}}"
+                      Icon="{Binding Icon}"
+                      IsBusy="{Binding IsBusy}">
+                      <v:ChatActionBubble.ErrorContent>
+                        <SelectableTextBlock
+                          Classes="Muted" Margin="6,4"
+                          FontSize="13"
+                          Text="{Binding ErrorMessageKey}"/>
+                      </v:ChatActionBubble.ErrorContent>
+                    </v:ChatActionBubble>
                   </DataTemplate>
 
                   <DataTemplate DataType="chat:FunctionCallChatMessage">
-                    <Border
-                      Classes="ChatMessage Action ChatBubble" Margin="0,0,36,0"
-                      Padding="0" HorizontalAlignment="Left">
-                      <StackPanel>
-                        <Panel>
-                          <ToggleButton
-                            x:Name="PART_ExpandToggleButton" MinHeight="0"
-                            Background="Transparent" Focusable="False">
-                            <ToggleButton.Template>
-                              <ControlTemplate TargetType="ToggleButton">
-                                <Panel Background="Transparent"/>
-                              </ControlTemplate>
-                            </ToggleButton.Template>
-                          </ToggleButton>
-
-                          <StackPanel
-                            Margin="8,4" VerticalAlignment="Center"
-                            IsHitTestVisible="False" Orientation="Horizontal"
-                            Spacing="4">
-                            <LucideIcon
-                              VerticalAlignment="Center"
-                              Kind="{Binding Icon}"
-                              Size="14"/>
-                            <TextBlock
-                              VerticalAlignment="Center" FontSize="12"
-                              Text="{Binding HeaderKey^, FallbackValue={x:Null}}"/>
-                            <shadui:Loading
-                              Width="12" Height="12"
-                              VerticalAlignment="Center" IsHitTestVisible="False"
-                              IsVisible="{Binding IsBusy}"/>
-                            <TextBlock
-                              VerticalAlignment="Bottom" FontSize="10"
-                              Foreground="{DynamicResource SuccessColor60}"
-                              Text="{Binding ElapsedSeconds, StringFormat='{}{0:F1}s', Mode=OneWay}">
-                              <LucideIcon.IsVisible>
-                                <MultiBinding Converter="{x:Static BoolConverters.And}">
-                                  <Binding Path="!IsBusy"/>
-                                  <Binding
-                                    Converter="{x:Static ObjectConverters.IsNull}"
-                                    Path="ErrorMessageKey"/>
-                                </MultiBinding>
-                              </LucideIcon.IsVisible>
-                            </TextBlock>
-                            <LucideIcon
-                              Margin="0,1,0,0" VerticalAlignment="Center"
-                              Foreground="{DynamicResource ErrorColor}"
-                              Kind="X" Size="14">
-                              <LucideIcon.IsVisible>
-                                <MultiBinding Converter="{x:Static BoolConverters.And}">
-                                  <Binding Path="!IsBusy"/>
-                                  <Binding
-                                    Converter="{x:Static ObjectConverters.IsNotNull}"
-                                    Path="ErrorMessageKey"/>
-                                </MultiBinding>
-                              </LucideIcon.IsVisible>
-                            </LucideIcon>
-                          </StackPanel>
-                        </Panel>
-
-                        <Panel
-                          x:Name="PART_ContentExpand"
-                          IsVisible="{Binding #PART_ExpandToggleButton.IsChecked}">
-                          <Border
-                            Margin="8,0,8,4"
-                            Background="{DynamicResource ErrorColor60}"
-                            CornerRadius="4"
-                            IsVisible="{Binding ErrorMessageKey, Converter={x:Static ObjectConverters.IsNotNull}, FallbackValue=false}">
-                            <SelectableTextBlock
-                              Margin="6,4"
-                              Text="{Binding ErrorMessageKey^, FallbackValue={x:Null}}"
-                              TextWrapping="Wrap"/>
-                          </Border>
-                        </Panel>
-                      </StackPanel>
-                    </Border>
+                    <v:ChatActionBubble
+                      ElapsedSeconds="{Binding ElapsedSeconds}"
+                      Header="{Binding HeaderKey^, FallbackValue={x:Null}}"
+                      Icon="{Binding Icon}"
+                      IsBusy="{Binding IsBusy}">
+                      <v:ChatActionBubble.ErrorContent>
+                        <SelectableTextBlock
+                          Classes="Muted" Margin="6,4"
+                          FontSize="13"
+                          Text="{Binding ErrorMessageKey}"/>
+                      </v:ChatActionBubble.ErrorContent>
+                    </v:ChatActionBubble>
                   </DataTemplate>
                 </DataTemplates>
               </Setter>

@@ -231,7 +231,8 @@ public partial class ActionChatMessage : ChatMessage
     public partial DynamicResourceKey? HeaderKey { get; set; }
 
     [Key(3)]
-    public string? Content { get; set; }
+    [ObservableProperty]
+    public partial string? Content { get; set; }
 
     [Key(4)]
     [ObservableProperty]
@@ -292,10 +293,10 @@ public partial class FunctionCallChatMessage : ChatMessage, IChatMessageWithAtta
     public partial DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 
     [Key(6)]
-    public List<FunctionCallContent> Calls { get; set; } = [];
+    public ObservableList<FunctionCallContent> Calls { get; set; } = [];
 
     [Key(7)]
-    public List<FunctionResultContent> Results { get; set; } = [];
+    public ObservableList<FunctionResultContent> Results { get; set; } = [];
 
     [Key(8)]
     [ObservableProperty]
