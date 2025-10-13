@@ -19,6 +19,8 @@ Every moment, Every place. Your AI - `Everywhere`
 
   <p align="center">
     <a href="https://everywhere.sylinko.com"><strong>Explore the docs »</strong></a>
+    &nbsp;&middot;&nbsp;
+    <a href="https://youtu.be/BGujYa5hbXo"><strong>Watch the trailer »</strong></a>
     <br />
     <br />
     <a href="https://github.com/DearVa/Everywhere">View Demo</a>

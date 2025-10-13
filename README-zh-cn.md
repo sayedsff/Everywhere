@@ -19,6 +19,8 @@
 
   <p align="center">
     <a href="https://everywhere.sylinko.com/zh-CN/"><strong>查看文档 »</strong></a>
+    &nbsp;&middot;&nbsp;
+    <a href="【你的下一代 AI 助手｜Everywhere】 https://www.bilibili.com/video/BV1mcxvzfESz"><strong>观看宣传片 »</strong></a>
     <br />
     <br />
     <a href="https://github.com/DearVa/Everywhere">查看演示</a>
