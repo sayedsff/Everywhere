@@ -1,7 +1,7 @@
 ﻿#define AppName "Everywhere"
 #define AppPublisher "Sylinko"
 #define AppExeName "Everywhere.Windows.exe"
-#define AppVersion "1.0.0"
+#define AppVersion GetEnv("VERSION")
 
 [Setup]
 ; --- Basic Application Information ---
