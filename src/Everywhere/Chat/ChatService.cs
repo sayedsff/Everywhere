@@ -336,7 +336,11 @@ public class ChatService(
                     llmStreamActivity?.SetTag("llm.model.max_embedding", settings.Model.SelectedModelDefinition?.MaxTokens?.ToString() ?? "unknown");
 
                     await foreach (var streamingContent in kernelMixin.ChatCompletionService.GetStreamingChatMessageContentsAsync(
-                                       chatHistory,
+                                       // They absolutely must modify this ChatHistory internally.
+                                       // I can neither alter it nor inherit it.
+                                       // Well, we'll see about that 😅
+                                       // Let's copy the chat history to avoid modifying the original one.
+                                       new ChatHistory(chatHistory),
                                        promptExecutionSettings,
                                        kernel,
                                        cancellationToken))
@@ -469,7 +473,7 @@ public class ChatService(
                     assistantChatMessage.OutputTokenCount += outputTokenCount;
                     assistantChatMessage.TotalTokenCount += totalTokenCount;
 
-                    llmStreamActivity?.SetTag("chat.history.count", chatHistory.AsValueEnumerable().Count());
+                    llmStreamActivity?.SetTag("chat.history.count", chatHistory.Count);
                     llmStreamActivity?.SetTag("chat.embedding.input", inputTokenCount);
                     llmStreamActivity?.SetTag("chat.embedding.output", outputTokenCount);
                     llmStreamActivity?.SetTag("chat.embedding.total", totalTokenCount);
@@ -536,15 +540,15 @@ public class ChatService(
                         functionCallChatMessage.Results.Add(resultContent);
                         chatHistory.Add(new ChatMessageContent(AuthorRole.Tool, [resultContent]));
 
+                        if (await TryCreateExtraToolCallResultsContentAsync(functionCallChatMessage) is { } extraToolCallResultsContent)
+                        {
+                            chatHistory.Add(extraToolCallResultsContent);
+                        }
+
                         if (functionCallChatMessage.ErrorMessageKey is not null)
                         {
                             break; // If an error occurs, we stop processing further function calls.
                         }
-                    }
-
-                    if (await TryCreateExtraToolCallResultsContentAsync(functionCallChatMessage) is { } extraToolCallResultsContent)
-                    {
-                        chatHistory.Add(extraToolCallResultsContent);
                     }
 
                     functionCallChatMessage.FinishedAt = DateTimeOffset.UtcNow;

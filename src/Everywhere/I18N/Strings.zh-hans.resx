@@ -949,4 +949,7 @@
     <data name="ChatFunctionPermissions_ShellExecute" xml:space="preserve">
         <value>执行终端脚本</value>
     </data>
+    <data name="HandledChatException_ContextLengthExceeded" xml:space="preserve">
+        <value>上下文长度超出限制。</value>
+    </data>
 </root>

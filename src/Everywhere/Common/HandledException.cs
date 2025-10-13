@@ -60,6 +60,11 @@ public enum HandledChatExceptionType
     InvalidApiKey,
 
     /// <summary>
+    /// The request exceeds the model's context length limit.
+    /// </summary>
+    ContextLengthExceeded,
+
+    /// <summary>
     /// You have exceeded your API usage quota.
     /// </summary>
     QuotaExceeded,
@@ -155,6 +160,7 @@ public class HandledChatException : HandledException
             {
                 HandledChatExceptionType.InvalidConfiguration => LocaleKey.HandledChatException_InvalidConfiguration,
                 HandledChatExceptionType.InvalidApiKey => LocaleKey.HandledChatException_InvalidApiKey,
+                HandledChatExceptionType.ContextLengthExceeded => LocaleKey.HandledChatException_ContextLengthExceeded,
                 HandledChatExceptionType.QuotaExceeded => LocaleKey.HandledChatException_QuotaExceeded,
                 HandledChatExceptionType.RateLimit => LocaleKey.HandledChatException_RateLimit,
                 HandledChatExceptionType.EndpointNotReachable => LocaleKey.HandledChatException_EndpointNotReachable,
@@ -436,6 +442,12 @@ internal readonly struct HttpStatusCodeParser : IExceptionParser
         if (string.IsNullOrWhiteSpace(message))
         {
             return fallback;
+        }
+
+        if (message.Contains("context") ||
+            message.Contains("length", StringComparison.OrdinalIgnoreCase))
+        {
+            return HandledChatExceptionType.InvalidConfiguration;
         }
 
         if (message.Contains("quota", StringComparison.OrdinalIgnoreCase) ||

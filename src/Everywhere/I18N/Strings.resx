@@ -968,4 +968,7 @@ My intelligence comes from powerful Large language models (LLMs), which are prov
     <data name="ChatFunctionPermissions_ShellExecute" xml:space="preserve">
         <value>Execute shell script</value>
     </data>
+    <data name="HandledChatException_ContextLengthExceeded" xml:space="preserve">
+        <value>Context length exceeded.</value>
+    </data>
 </root>
