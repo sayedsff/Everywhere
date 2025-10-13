@@ -857,40 +857,40 @@ My intelligence comes from powerful Large language models (LLMs), which are prov
     <data name="ChatWindow_ChatStatisticsTextBlock_ElapsedRun" xml:space="preserve">
         <value>Elapsed</value>
     </data>
-    <data name="KernelRequestException_InvalidConfiguration" xml:space="preserve">
+    <data name="HandledChatException_InvalidConfiguration" xml:space="preserve">
         <value>Model is not configured correctly. The model provider or ID might be missing or incorrect.</value>
     </data>
-    <data name="KernelRequestException_InvalidApiKey" xml:space="preserve">
+    <data name="HandledChatException_InvalidApiKey" xml:space="preserve">
         <value>API key is missing or invalid.</value>
     </data>
-    <data name="KernelRequestException_QuotaExceeded" xml:space="preserve">
+    <data name="HandledChatException_QuotaExceeded" xml:space="preserve">
         <value>Exceeded the API usage quota, or lacks permission to access the current model.</value>
     </data>
-    <data name="KernelRequestException_RateLimit" xml:space="preserve">
+    <data name="HandledChatException_RateLimit" xml:space="preserve">
         <value>Rate limit exceeded. Please try again later.</value>
     </data>
-    <data name="KernelRequestException_EndpointNotReachable" xml:space="preserve">
+    <data name="HandledChatException_EndpointNotReachable" xml:space="preserve">
         <value>Service endpoint is not reachable. Please check your network connection.</value>
     </data>
-    <data name="KernelRequestException_InvalidEndpoint" xml:space="preserve">
+    <data name="HandledChatException_InvalidEndpoint" xml:space="preserve">
         <value>Provided service endpoint is invalid.</value>
     </data>
-    <data name="KernelRequestException_EmptyResponse" xml:space="preserve">
+    <data name="HandledChatException_EmptyResponse" xml:space="preserve">
         <value>Service returned an empty response, which may indicate a network or service issue.</value>
     </data>
-    <data name="KernelRequestException_FeatureNotSupport" xml:space="preserve">
+    <data name="HandledChatException_FeatureNotSupport" xml:space="preserve">
         <value>Selected model does not support the requested feature.</value>
     </data>
-    <data name="KernelRequestException_Timeout" xml:space="preserve">
+    <data name="HandledChatException_Timeout" xml:space="preserve">
         <value>Request to the service timed out. Please try again.</value>
     </data>
-    <data name="KernelRequestException_NetworkError" xml:space="preserve">
+    <data name="HandledChatException_NetworkError" xml:space="preserve">
         <value>A network error occurred. Please check your connection and try again.</value>
     </data>
-    <data name="KernelRequestException_ServiceUnavailable" xml:space="preserve">
+    <data name="HandledChatException_ServiceUnavailable" xml:space="preserve">
         <value>Service is currently unavailable. Please try again later.</value>
     </data>
-    <data name="KernelRequestException_Unknown" xml:space="preserve">
+    <data name="HandledChatException_Unknown" xml:space="preserve">
         <value>An unknown error occurred.</value>
     </data>
     <data name="KernelMixinFactory_NoModelDefinition" xml:space="preserve">
@@ -917,7 +917,7 @@ My intelligence comes from powerful Large language models (LLMs), which are prov
     <data name="Settings_ChatWindow_AllowRunInBackground_Description" xml:space="preserve">
         <value>When enabled, closing the chat window will not terminate the current task.</value>
     </data>
-    <data name="KernelRequestException_OperationCancelled" xml:space="preserve">
+    <data name="HandledChatException_OperationCancelled" xml:space="preserve">
         <value>Operation cancelled.</value>
     </data>
     <data name="ChatPluginPage_SelectToViewDetails" xml:space="preserve">

@@ -37,27 +37,20 @@ public class ChatService(
 {
     private readonly ActivitySource _activitySource = new(typeof(ChatService).FullName.NotNull());
 
-    public async Task SendMessageAsync(UserChatMessage userMessage, CancellationToken cancellationToken)
+    public async Task SendMessageAsync(UserChatMessage message, CancellationToken cancellationToken)
     {
         using var activity = _activitySource.StartActivity();
 
         var chatContext = chatContextManager.Current;
         activity?.SetTag("chat.context.id", chatContext.Metadata.Id);
-        chatContext.Add(userMessage);
+        chatContext.Add(message);
 
-        var kernelMixin = CreateKernelMixin();
-
-        await ProcessUserChatMessageAsync(kernelMixin, chatContext, userMessage, cancellationToken);
-
-        if (settings.Internal.IsToolCallEnabled)
-        {
-            userMessage.UserPrompt += Prompts.TryUseToolUserPrompt;
-        }
+        await ProcessUserChatMessageAsync(chatContext, message, cancellationToken);
 
         var assistantChatMessage = new AssistantChatMessage { IsBusy = true };
         chatContext.Add(assistantChatMessage);
 
-        await GenerateAsync(kernelMixin, chatContext, assistantChatMessage, cancellationToken);
+        await GenerateAsync(chatContext, assistantChatMessage, cancellationToken);
     }
 
     public async Task RetryAsync(ChatMessageNode node, CancellationToken cancellationToken)
@@ -73,7 +66,7 @@ public class ChatService(
         var assistantChatMessage = new AssistantChatMessage { IsBusy = true };
         node.Context.CreateBranchOn(node, assistantChatMessage);
 
-        await GenerateAsync(CreateKernelMixin(), node.Context, assistantChatMessage, cancellationToken);
+        await GenerateAsync(node.Context, assistantChatMessage, cancellationToken);
     }
 
     public Task EditAsync(ChatMessageNode node, CancellationToken cancellationToken)
@@ -81,29 +74,7 @@ public class ChatService(
         throw new NotImplementedException();
     }
 
-    private IKernelMixin CreateKernelMixin()
-    {
-        using var activity = _activitySource.StartActivity();
-
-        try
-        {
-            var kernelMixin = kernelMixinFactory.GetOrCreate(settings.Model);
-            activity?.SetTag("llm.provider.id", settings.Model.SelectedModelProviderId ?? "unknown");
-            activity?.SetTag("llm.model.id", settings.Model.SelectedModelDefinitionId ?? "unknown");
-            activity?.SetTag("llm.model.actual_id", settings.Model.SelectedModelDefinition?.ModelId.ActualValue ?? "unknown");
-            activity?.SetTag("llm.model.max_embedding", settings.Model.SelectedModelDefinition?.MaxTokens.ToString() ?? "unknown");
-            return kernelMixin;
-        }
-        catch (Exception e)
-        {
-            // This method may throw if the model settings are invalid.
-            logger.LogError(e, "Error creating kernel mixin");
-            throw;
-        }
-    }
-
     private async Task ProcessUserChatMessageAsync(
-        IKernelMixin kernelMixin,
         ChatContext chatContext,
         UserChatMessage userChatMessage,
         CancellationToken cancellationToken)
@@ -157,74 +128,89 @@ public class ChatService(
 
         activity?.SetTag("attachments", JsonSerializer.Serialize(attachmentTagValues));
 
-        if (validVisualElements.Count <= 0) return;
-
-        var analyzingContextMessage = new ActionChatMessage(
-            new AuthorRole("action"),
-            LucideIconKind.TextSearch,
-            LocaleKey.ActionChatMessage_Header_AnalyzingContext)
+        if (validVisualElements.Count > 0)
         {
-            IsBusy = true
-        };
+            var analyzingContextMessage = new ActionChatMessage(
+                new AuthorRole("action"),
+                LucideIconKind.TextSearch,
+                LocaleKey.ActionChatMessage_Header_AnalyzingContext)
+            {
+                IsBusy = true
+            };
 
-        try
-        {
-            chatContext.Add(analyzingContextMessage);
+            try
+            {
+                chatContext.Add(analyzingContextMessage);
 
-            var approximateTokenLimit = Math.Min(settings.Internal.VisualTreeTokenLimit, kernelMixin.ContextWindow / 2);
-            var xmlBuilder = new VisualElementXmlBuilder(validVisualElements, approximateTokenLimit, chatContext.VisualElements.Count + 1);
-            var renderedVisualTreePrompt = await Task.Run(
-                () =>
-                {
-                    // ReSharper disable once ExplicitCallerInfoArgument
-                    using var builderActivity = _activitySource.StartActivity("BuildVisualTreeXml");
-
-                    var xml = xmlBuilder.BuildXml(cancellationToken);
-                    var builtVisualElements = xmlBuilder.BuiltVisualElements;
-                    builderActivity?.SetTag("xml.length", xml.Length);
-                    builderActivity?.SetTag("xml.length_limit", approximateTokenLimit);
-                    builderActivity?.SetTag("xml.built_visual_elements.count", builtVisualElements.Count);
-
-                    string focusedElementIdString;
-                    if (builtVisualElements.FirstOrDefault(kv => ReferenceEquals(kv.Value, validVisualElements[0])) is
-                        { Key: var focusedElementId, Value: not null })
+                var maxTokens = settings.Model.SelectedModelDefinition?.MaxTokens.ActualValue ?? 64000;
+                var approximateTokenLimit = Math.Min(settings.Internal.VisualTreeTokenLimit, maxTokens / 2);
+                var xmlBuilder = new VisualElementXmlBuilder(validVisualElements, approximateTokenLimit, chatContext.VisualElements.Count + 1);
+                var renderedVisualTreePrompt = await Task.Run(
+                    () =>
                     {
-                        focusedElementIdString = focusedElementId.ToString();
-                    }
-                    else
-                    {
-                        focusedElementIdString = "null";
-                    }
+                        // ReSharper disable once ExplicitCallerInfoArgument
+                        using var builderActivity = _activitySource.StartActivity("BuildVisualTreeXml");
 
-                    // Adds the visual elements to the chat context for future reference.
-                    chatContext.VisualElements.AddRange(builtVisualElements);
+                        var xml = xmlBuilder.BuildXml(cancellationToken);
+                        var builtVisualElements = xmlBuilder.BuiltVisualElements;
+                        builderActivity?.SetTag("xml.length", xml.Length);
+                        builderActivity?.SetTag("xml.length_limit", approximateTokenLimit);
+                        builderActivity?.SetTag("xml.built_visual_elements.count", builtVisualElements.Count);
 
-                    // Then deactivate all the references, making them weak references.
-                    foreach (var reference in userChatMessage
-                                 .Attachments
-                                 .AsValueEnumerable()
-                                 .OfType<ChatVisualElementAttachment>()
-                                 .Select(a => a.Element)
-                                 .OfType<ResilientReference<IVisualElement>>())
-                    {
-                        reference.IsActive = false;
-                    }
-
-                    return Prompts.RenderPrompt(
-                        Prompts.VisualTreePrompt,
-                        new Dictionary<string, Func<string>>
+                        string focusedElementIdString;
+                        if (builtVisualElements.FirstOrDefault(kv => ReferenceEquals(kv.Value, validVisualElements[0])) is
+                            { Key: var focusedElementId, Value: not null })
                         {
-                            { "VisualTree", () => xml },
-                            { "FocusedElementId", () => focusedElementIdString },
-                        });
-                },
-                cancellationToken);
-            userChatMessage.UserPrompt = renderedVisualTreePrompt + "\n\n" + userChatMessage.UserPrompt;
+                            focusedElementIdString = focusedElementId.ToString();
+                        }
+                        else
+                        {
+                            focusedElementIdString = "null";
+                        }
+
+                        // Adds the visual elements to the chat context for future reference.
+                        chatContext.VisualElements.AddRange(builtVisualElements);
+
+                        // Then deactivate all the references, making them weak references.
+                        foreach (var reference in userChatMessage
+                                     .Attachments
+                                     .AsValueEnumerable()
+                                     .OfType<ChatVisualElementAttachment>()
+                                     .Select(a => a.Element)
+                                     .OfType<ResilientReference<IVisualElement>>())
+                        {
+                            reference.IsActive = false;
+                        }
+
+                        return Prompts.RenderPrompt(
+                            Prompts.VisualTreePrompt,
+                            new Dictionary<string, Func<string>>
+                            {
+                                { "VisualTree", () => xml },
+                                { "FocusedElementId", () => focusedElementIdString },
+                            });
+                    },
+                    cancellationToken);
+                userChatMessage.UserPrompt = renderedVisualTreePrompt + "\n\n" + userChatMessage.UserPrompt;
+            }
+            catch (Exception e)
+            {
+                e = HandledChatException.Parse(e);
+                activity?.SetStatus(ActivityStatusCode.Error, e.Message.Trim());
+                analyzingContextMessage.ErrorMessageKey = e.GetFriendlyMessage();
+                logger.LogError(e, "Error analyzing visual tree");
+            }
+            finally
+            {
+                analyzingContextMessage.FinishedAt = DateTimeOffset.UtcNow;
+                analyzingContextMessage.IsBusy = false;
+            }
         }
-        finally
+
+        // Append tool use prompt if enabled.
+        if (settings.Internal.IsToolCallEnabled)
         {
-            analyzingContextMessage.FinishedAt = DateTimeOffset.UtcNow;
-            analyzingContextMessage.IsBusy = false;
+            userChatMessage.UserPrompt += Prompts.TryUseToolUserPrompt;
         }
 
         static long GetFileSize(string filePath)
@@ -238,6 +224,27 @@ public class ChatService(
             {
                 return 0;
             }
+        }
+    }
+
+    private IKernelMixin CreateKernelMixin()
+    {
+        using var activity = _activitySource.StartActivity();
+
+        try
+        {
+            var kernelMixin = kernelMixinFactory.GetOrCreate(settings.Model);
+            activity?.SetTag("llm.provider.id", settings.Model.SelectedModelProviderId ?? "unknown");
+            activity?.SetTag("llm.model.id", settings.Model.SelectedModelDefinitionId ?? "unknown");
+            activity?.SetTag("llm.model.actual_id", settings.Model.SelectedModelDefinition?.ModelId.ActualValue ?? "unknown");
+            activity?.SetTag("llm.model.max_embedding", settings.Model.SelectedModelDefinition?.MaxTokens.ToString() ?? "unknown");
+            return kernelMixin;
+        }
+        catch (Exception e)
+        {
+            // This method may throw if the model settings are invalid.
+            activity?.SetStatus(ActivityStatusCode.Error, e.Message.Trim());
+            throw;
         }
     }
 
@@ -273,7 +280,6 @@ public class ChatService(
     }
 
     private async Task GenerateAsync(
-        IKernelMixin kernelMixin,
         ChatContext chatContext,
         AssistantChatMessage assistantChatMessage,
         CancellationToken cancellationToken)
@@ -285,12 +291,14 @@ public class ChatService(
         {
             cancellationToken.ThrowIfCancellationRequested();
 
+            var kernelMixin = CreateKernelMixin();
             var kernel = BuildKernel(kernelMixin, chatContext);
             var chatHistory = new ChatHistory();
             foreach (var chatMessage in chatContext
                          .Select(n => n.Message)
                          .Where(m => !ReferenceEquals(m, assistantChatMessage)) // exclude the current assistant message
-                         .Where(m => m.Role.Label is "system" or "assistant" or "user" or "tool"))
+                         .Where(m => m.Role.Label is "system" or "assistant" or "user" or "tool")
+                         .ToList()) // make a snapshot, otherwise async may cause thread deadlock
             {
                 await foreach (var chatMessageContent in CreateChatMessageContentsAsync(chatMessage))
                 {
@@ -448,6 +456,12 @@ public class ChatService(
                         functionCallContentBuilder.Append(streamingContent);
                     }
 
+                    // Mark the reasoning as finished if we have any reasoning output.
+                    if (chatSpan.ReasoningOutput is not null && chatSpan.ReasoningFinishedAt is null)
+                    {
+                        chatSpan.ReasoningFinishedAt = DateTimeOffset.UtcNow;
+                    }
+
                     if (assistantContentBuilder.Length > 0) chatHistory.AddAssistantMessage(assistantContentBuilder.ToString());
 
                     functionCallContents = functionCallContentBuilder.Build();
@@ -560,7 +574,7 @@ public class ChatService(
         }
         catch (Exception e)
         {
-            e = ChatRequestException.Parse(e);
+            e = HandledChatException.Parse(e);
             activity?.SetStatus(ActivityStatusCode.Error, e.Message.Trim());
             assistantChatMessage.ErrorMessageKey = e.GetFriendlyMessage();
             logger.LogError(e, "Error generating chat response");
@@ -735,7 +749,7 @@ public class ChatService(
         }
         catch (Exception e)
         {
-            e = ChatRequestException.Parse(e);
+            e = HandledChatException.Parse(e);
             activity?.SetStatus(ActivityStatusCode.Error, e.Message);
             logger.LogError(e, "Failed to generate chat title");
         }

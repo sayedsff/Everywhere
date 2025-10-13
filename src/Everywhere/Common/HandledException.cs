@@ -42,7 +42,7 @@ public class HandledException : Exception
 /// <summary>
 /// Defines the types of errors that can occur during a request to an AI kernel or service.
 /// </summary>
-public enum KernelRequestExceptionType
+public enum HandledChatExceptionType
 {
     /// <summary>
     /// An unknown error occurred.
@@ -114,18 +114,18 @@ public enum KernelRequestExceptionType
 /// Represents errors that occur during requests to LLM providers.
 /// This class normalizes various provider-specific exceptions into a unified format.
 /// </summary>
-public class ChatRequestException : HandledException
+public class HandledChatException : HandledException
 {
     /// <summary>
     /// Gets a value indicating whether the error is a general, non-technical error.
-    /// It is considered general unless the type is <see cref="KernelRequestExceptionType.Unknown"/>.
+    /// It is considered general unless the type is <see cref="HandledChatExceptionType.Unknown"/>.
     /// </summary>
-    public override bool IsExpected => ExceptionType != KernelRequestExceptionType.Unknown;
+    public override bool IsExpected => ExceptionType != HandledChatExceptionType.Unknown;
 
     /// <summary>
     /// Gets the categorized type of the exception.
     /// </summary>
-    public KernelRequestExceptionType ExceptionType { get; }
+    public HandledChatExceptionType ExceptionType { get; }
 
     /// <summary>
     /// Gets the HTTP status code of the response, if available.
@@ -143,9 +143,9 @@ public class ChatRequestException : HandledException
     public string? ModelId { get; init; }
 
     [SetsRequiredMembers]
-    public ChatRequestException(
+    public HandledChatException(
         Exception originalException,
-        KernelRequestExceptionType type,
+        HandledChatExceptionType type,
         DynamicResourceKey? customFriendlyMessageKey = null
     ) : base(originalException)
     {
@@ -153,31 +153,33 @@ public class ChatRequestException : HandledException
         FriendlyMessageKey = customFriendlyMessageKey ?? new DynamicResourceKey(
             type switch
             {
-                KernelRequestExceptionType.InvalidConfiguration => LocaleKey.KernelRequestException_InvalidConfiguration,
-                KernelRequestExceptionType.InvalidApiKey => LocaleKey.KernelRequestException_InvalidApiKey,
-                KernelRequestExceptionType.QuotaExceeded => LocaleKey.KernelRequestException_QuotaExceeded,
-                KernelRequestExceptionType.RateLimit => LocaleKey.KernelRequestException_RateLimit,
-                KernelRequestExceptionType.EndpointNotReachable => LocaleKey.KernelRequestException_EndpointNotReachable,
-                KernelRequestExceptionType.InvalidEndpoint => LocaleKey.KernelRequestException_InvalidEndpoint,
-                KernelRequestExceptionType.EmptyResponse => LocaleKey.KernelRequestException_EmptyResponse,
-                KernelRequestExceptionType.FeatureNotSupport => LocaleKey.KernelRequestException_FeatureNotSupport,
-                KernelRequestExceptionType.Timeout => LocaleKey.KernelRequestException_Timeout,
-                KernelRequestExceptionType.NetworkError => LocaleKey.KernelRequestException_NetworkError,
-                KernelRequestExceptionType.ServiceUnavailable => LocaleKey.KernelRequestException_ServiceUnavailable,
-                KernelRequestExceptionType.OperationCancelled => LocaleKey.KernelRequestException_OperationCancelled,
-                _ => LocaleKey.KernelRequestException_Unknown,
+                HandledChatExceptionType.InvalidConfiguration => LocaleKey.HandledChatException_InvalidConfiguration,
+                HandledChatExceptionType.InvalidApiKey => LocaleKey.HandledChatException_InvalidApiKey,
+                HandledChatExceptionType.QuotaExceeded => LocaleKey.HandledChatException_QuotaExceeded,
+                HandledChatExceptionType.RateLimit => LocaleKey.HandledChatException_RateLimit,
+                HandledChatExceptionType.EndpointNotReachable => LocaleKey.HandledChatException_EndpointNotReachable,
+                HandledChatExceptionType.InvalidEndpoint => LocaleKey.HandledChatException_InvalidEndpoint,
+                HandledChatExceptionType.EmptyResponse => LocaleKey.HandledChatException_EmptyResponse,
+                HandledChatExceptionType.FeatureNotSupport => LocaleKey.HandledChatException_FeatureNotSupport,
+                HandledChatExceptionType.Timeout => LocaleKey.HandledChatException_Timeout,
+                HandledChatExceptionType.NetworkError => LocaleKey.HandledChatException_NetworkError,
+                HandledChatExceptionType.ServiceUnavailable => LocaleKey.HandledChatException_ServiceUnavailable,
+                HandledChatExceptionType.OperationCancelled => LocaleKey.HandledChatException_OperationCancelled,
+                _ => LocaleKey.HandledChatException_Unknown,
             });
     }
 
     /// <summary>
-    /// Parses a generic <see cref="Exception"/> into a <see cref="ChatRequestException"/>.
+    /// Parses a generic <see cref="Exception"/> into a <see cref="HandledChatException"/>.
     /// </summary>
     /// <param name="exception">The exception to parse.</param>
     /// <param name="modelProviderId">The ID of the model provider.</param>
     /// <param name="modelId">The ID of the model.</param>
-    /// <returns>A new instance of <see cref="ChatRequestException"/>.</returns>
-    public static ChatRequestException Parse(Exception exception, string? modelProviderId = null, string? modelId = null)
+    /// <returns>A new instance of <see cref="HandledChatException"/>.</returns>
+    public static HandledChatException Parse(Exception exception, string? modelProviderId = null, string? modelId = null)
     {
+        if (exception is HandledChatException chatRequestException) return chatRequestException;
+
         var context = new ExceptionParsingContext(exception);
         new ParserChain<ClientResultExceptionParser,
             ParserChain<GoogleApiExceptionParser,
@@ -187,9 +189,9 @@ public class ChatRequestException : HandledException
                             GeneralExceptionParser>>>>>().TryParse(ref context);
         new HttpStatusCodeParser().TryParse(ref context);
 
-        return new ChatRequestException(
+        return new HandledChatException(
             originalException: exception,
-            type: context.ExceptionType ?? KernelRequestExceptionType.Unknown)
+            type: context.ExceptionType ?? HandledChatExceptionType.Unknown)
         {
             StatusCode = context.StatusCode,
             ModelProviderId = modelProviderId,
@@ -235,7 +237,7 @@ internal readonly struct ParserChain<T1, T2> : IExceptionParser
 internal ref struct ExceptionParsingContext(Exception exception)
 {
     public Exception Exception { get; } = exception;
-    public KernelRequestExceptionType? ExceptionType { get; set; }
+    public HandledChatExceptionType? ExceptionType { get; set; }
     public HttpStatusCode? StatusCode { get; set; }
 }
 
@@ -255,7 +257,7 @@ internal struct ClientResultExceptionParser : IExceptionParser
 
         if (clientResult.Status == 0)
         {
-            context.ExceptionType = KernelRequestExceptionType.EmptyResponse;
+            context.ExceptionType = HandledChatExceptionType.EmptyResponse;
         }
         else
         {
@@ -280,20 +282,20 @@ internal struct GoogleApiExceptionParser : IExceptionParser
             message.Contains("credential", StringComparison.OrdinalIgnoreCase) ||
             message.Contains("permission denied", StringComparison.OrdinalIgnoreCase))
         {
-            context.ExceptionType = KernelRequestExceptionType.InvalidApiKey;
+            context.ExceptionType = HandledChatExceptionType.InvalidApiKey;
         }
         else if (message.Contains("quota", StringComparison.OrdinalIgnoreCase))
         {
-            context.ExceptionType = KernelRequestExceptionType.QuotaExceeded;
+            context.ExceptionType = HandledChatExceptionType.QuotaExceeded;
         }
         else if (message.Contains("rate limit", StringComparison.OrdinalIgnoreCase))
         {
-            context.ExceptionType = KernelRequestExceptionType.RateLimit;
+            context.ExceptionType = HandledChatExceptionType.RateLimit;
         }
         else if (message.Contains("not found", StringComparison.OrdinalIgnoreCase) ||
                  message.Contains("invalid model", StringComparison.OrdinalIgnoreCase))
         {
-            context.ExceptionType = KernelRequestExceptionType.InvalidConfiguration;
+            context.ExceptionType = HandledChatExceptionType.InvalidConfiguration;
         }
         return true;
     }
@@ -316,9 +318,9 @@ internal readonly struct HttpRequestExceptionParser : IExceptionParser
         {
             context.ExceptionType = httpRequest.InnerException switch
             {
-                TimeoutException or TaskCanceledException { InnerException: TimeoutException } => KernelRequestExceptionType.Timeout,
-                SocketException => KernelRequestExceptionType.NetworkError,
-                _ => KernelRequestExceptionType.EndpointNotReachable
+                TimeoutException or TaskCanceledException { InnerException: TimeoutException } => HandledChatExceptionType.Timeout,
+                SocketException => HandledChatExceptionType.NetworkError,
+                _ => HandledChatExceptionType.EndpointNotReachable
             };
         }
         return true;
@@ -338,11 +340,11 @@ internal readonly struct OllamaExceptionParser : IExceptionParser
         if (message.Contains("model", StringComparison.OrdinalIgnoreCase) &&
             message.Contains("not found", StringComparison.OrdinalIgnoreCase))
         {
-            context.ExceptionType = KernelRequestExceptionType.InvalidConfiguration;
+            context.ExceptionType = HandledChatExceptionType.InvalidConfiguration;
         }
         else
         {
-            context.ExceptionType = KernelRequestExceptionType.Unknown;
+            context.ExceptionType = HandledChatExceptionType.Unknown;
         }
         return true;
     }
@@ -367,11 +369,11 @@ internal readonly struct GeneralExceptionParser : IExceptionParser
     {
         context.ExceptionType = context.Exception switch
         {
-            ModelDoesNotSupportToolsException => KernelRequestExceptionType.FeatureNotSupport,
-            AuthenticationException => KernelRequestExceptionType.InvalidApiKey,
-            UriFormatException => KernelRequestExceptionType.InvalidEndpoint,
-            OperationCanceledException => KernelRequestExceptionType.OperationCancelled,
-            HttpIOException => KernelRequestExceptionType.NetworkError,
+            ModelDoesNotSupportToolsException => HandledChatExceptionType.FeatureNotSupport,
+            AuthenticationException => HandledChatExceptionType.InvalidApiKey,
+            UriFormatException => HandledChatExceptionType.InvalidEndpoint,
+            OperationCanceledException => HandledChatExceptionType.OperationCancelled,
+            HttpIOException => HandledChatExceptionType.NetworkError,
             _ => null
         };
         return context.ExceptionType.HasValue;
@@ -391,45 +393,45 @@ internal readonly struct HttpStatusCodeParser : IExceptionParser
         context.ExceptionType = context.StatusCode switch
         {
             // 3xx Redirection
-            HttpStatusCode.MultipleChoices => KernelRequestExceptionType.NetworkError,
-            HttpStatusCode.MovedPermanently => KernelRequestExceptionType.NetworkError, // 301
-            HttpStatusCode.Found => KernelRequestExceptionType.NetworkError, // 302
-            HttpStatusCode.SeeOther => KernelRequestExceptionType.NetworkError, // 303
-            HttpStatusCode.NotModified => KernelRequestExceptionType.NetworkError, // 304
-            HttpStatusCode.UseProxy => KernelRequestExceptionType.NetworkError, // 305
-            HttpStatusCode.TemporaryRedirect => KernelRequestExceptionType.NetworkError, // 307
-            HttpStatusCode.PermanentRedirect => KernelRequestExceptionType.NetworkError, // 308
+            HttpStatusCode.MultipleChoices => HandledChatExceptionType.NetworkError,
+            HttpStatusCode.MovedPermanently => HandledChatExceptionType.NetworkError, // 301
+            HttpStatusCode.Found => HandledChatExceptionType.NetworkError, // 302
+            HttpStatusCode.SeeOther => HandledChatExceptionType.NetworkError, // 303
+            HttpStatusCode.NotModified => HandledChatExceptionType.NetworkError, // 304
+            HttpStatusCode.UseProxy => HandledChatExceptionType.NetworkError, // 305
+            HttpStatusCode.TemporaryRedirect => HandledChatExceptionType.NetworkError, // 307
+            HttpStatusCode.PermanentRedirect => HandledChatExceptionType.NetworkError, // 308
 
             // 4xx Client Errors
-            HttpStatusCode.BadRequest => ParseException(message, KernelRequestExceptionType.InvalidConfiguration), // 400
-            HttpStatusCode.Unauthorized => ParseException(message, KernelRequestExceptionType.InvalidApiKey), // 401
-            HttpStatusCode.PaymentRequired => KernelRequestExceptionType.QuotaExceeded, // 402
-            HttpStatusCode.Forbidden => ParseException(message, KernelRequestExceptionType.InvalidApiKey), // 403
-            HttpStatusCode.NotFound => ParseException(message, KernelRequestExceptionType.InvalidConfiguration), // 404
-            HttpStatusCode.MethodNotAllowed => ParseException(message, KernelRequestExceptionType.InvalidConfiguration), // 405
-            HttpStatusCode.NotAcceptable => ParseException(message, KernelRequestExceptionType.InvalidConfiguration), // 406
-            HttpStatusCode.RequestTimeout => KernelRequestExceptionType.Timeout, // 408
-            HttpStatusCode.Conflict => ParseException(message, KernelRequestExceptionType.InvalidConfiguration), // 409
-            HttpStatusCode.Gone => KernelRequestExceptionType.InvalidConfiguration, // 410
-            HttpStatusCode.LengthRequired => KernelRequestExceptionType.InvalidConfiguration, // 411
-            HttpStatusCode.RequestEntityTooLarge => KernelRequestExceptionType.InvalidConfiguration, // 413
-            HttpStatusCode.RequestUriTooLong => KernelRequestExceptionType.InvalidEndpoint, // 414
-            HttpStatusCode.UnsupportedMediaType => KernelRequestExceptionType.InvalidConfiguration, // 415
-            HttpStatusCode.UnprocessableEntity => KernelRequestExceptionType.InvalidConfiguration, // 422
-            HttpStatusCode.TooManyRequests => KernelRequestExceptionType.RateLimit, // 429
+            HttpStatusCode.BadRequest => ParseException(message, HandledChatExceptionType.InvalidConfiguration), // 400
+            HttpStatusCode.Unauthorized => ParseException(message, HandledChatExceptionType.InvalidApiKey), // 401
+            HttpStatusCode.PaymentRequired => HandledChatExceptionType.QuotaExceeded, // 402
+            HttpStatusCode.Forbidden => ParseException(message, HandledChatExceptionType.InvalidApiKey), // 403
+            HttpStatusCode.NotFound => ParseException(message, HandledChatExceptionType.InvalidConfiguration), // 404
+            HttpStatusCode.MethodNotAllowed => ParseException(message, HandledChatExceptionType.InvalidConfiguration), // 405
+            HttpStatusCode.NotAcceptable => ParseException(message, HandledChatExceptionType.InvalidConfiguration), // 406
+            HttpStatusCode.RequestTimeout => HandledChatExceptionType.Timeout, // 408
+            HttpStatusCode.Conflict => ParseException(message, HandledChatExceptionType.InvalidConfiguration), // 409
+            HttpStatusCode.Gone => HandledChatExceptionType.InvalidConfiguration, // 410
+            HttpStatusCode.LengthRequired => HandledChatExceptionType.InvalidConfiguration, // 411
+            HttpStatusCode.RequestEntityTooLarge => HandledChatExceptionType.InvalidConfiguration, // 413
+            HttpStatusCode.RequestUriTooLong => HandledChatExceptionType.InvalidEndpoint, // 414
+            HttpStatusCode.UnsupportedMediaType => HandledChatExceptionType.InvalidConfiguration, // 415
+            HttpStatusCode.UnprocessableEntity => HandledChatExceptionType.InvalidConfiguration, // 422
+            HttpStatusCode.TooManyRequests => HandledChatExceptionType.RateLimit, // 429
 
             // 5xx Server Errors
-            HttpStatusCode.InternalServerError => ParseException(message, KernelRequestExceptionType.ServiceUnavailable), // 500
-            HttpStatusCode.NotImplemented => ParseException(message, KernelRequestExceptionType.FeatureNotSupport), // 501
-            HttpStatusCode.BadGateway => ParseException(message, KernelRequestExceptionType.ServiceUnavailable), // 502
-            HttpStatusCode.ServiceUnavailable => ParseException(message, KernelRequestExceptionType.ServiceUnavailable), // 503
-            HttpStatusCode.GatewayTimeout => KernelRequestExceptionType.Timeout, // 504
+            HttpStatusCode.InternalServerError => ParseException(message, HandledChatExceptionType.ServiceUnavailable), // 500
+            HttpStatusCode.NotImplemented => ParseException(message, HandledChatExceptionType.FeatureNotSupport), // 501
+            HttpStatusCode.BadGateway => ParseException(message, HandledChatExceptionType.ServiceUnavailable), // 502
+            HttpStatusCode.ServiceUnavailable => ParseException(message, HandledChatExceptionType.ServiceUnavailable), // 503
+            HttpStatusCode.GatewayTimeout => HandledChatExceptionType.Timeout, // 504
             _ => null
         };
         return context.ExceptionType.HasValue;
     }
 
-    private static KernelRequestExceptionType ParseException(string message, KernelRequestExceptionType fallback)
+    private static HandledChatExceptionType ParseException(string message, HandledChatExceptionType fallback)
     {
         if (string.IsNullOrWhiteSpace(message))
         {
@@ -442,7 +444,7 @@ internal readonly struct HttpStatusCodeParser : IExceptionParser
             message.Contains("usage", StringComparison.OrdinalIgnoreCase) ||
             message.Contains("organization", StringComparison.OrdinalIgnoreCase))
         {
-            return KernelRequestExceptionType.QuotaExceeded;
+            return HandledChatExceptionType.QuotaExceeded;
         }
 
         if (message.Contains("key", StringComparison.OrdinalIgnoreCase) ||
@@ -451,7 +453,7 @@ internal readonly struct HttpStatusCodeParser : IExceptionParser
             message.Contains("authentication", StringComparison.OrdinalIgnoreCase) ||
             message.Contains("permission", StringComparison.OrdinalIgnoreCase))
         {
-            return KernelRequestExceptionType.InvalidApiKey;
+            return HandledChatExceptionType.InvalidApiKey;
         }
 
         if (message.Contains("model", StringComparison.OrdinalIgnoreCase) ||
@@ -459,7 +461,7 @@ internal readonly struct HttpStatusCodeParser : IExceptionParser
             message.Contains("invalid", StringComparison.OrdinalIgnoreCase) ||
             message.Contains("parameter", StringComparison.OrdinalIgnoreCase))
         {
-            return KernelRequestExceptionType.InvalidConfiguration;
+            return HandledChatExceptionType.InvalidConfiguration;
         }
 
         // Default for 403 Forbidden if no specific keywords are found

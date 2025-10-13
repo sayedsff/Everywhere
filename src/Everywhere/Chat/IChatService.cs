@@ -2,7 +2,7 @@
 
 public interface IChatService
 {
-    Task SendMessageAsync(UserChatMessage userMessage, CancellationToken cancellationToken);
+    Task SendMessageAsync(UserChatMessage message, CancellationToken cancellationToken);
 
     Task RetryAsync(ChatMessageNode node, CancellationToken cancellationToken);
 

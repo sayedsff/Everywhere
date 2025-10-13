@@ -838,40 +838,40 @@
     <data name="ChatWindow_ChatStatisticsTextBlock_TotalTokenCountRun" xml:space="preserve">
         <value>总计</value>
     </data>
-    <data name="KernelRequestException_Unknown" xml:space="preserve">
+    <data name="HandledChatException_Unknown" xml:space="preserve">
         <value>未知错误。</value>
     </data>
-    <data name="KernelRequestException_InvalidConfiguration" xml:space="preserve">
+    <data name="HandledChatException_InvalidConfiguration" xml:space="preserve">
         <value>模型配置不正确。模型提供商或 ID 可能缺失或无效。</value>
     </data>
-    <data name="KernelRequestException_QuotaExceeded" xml:space="preserve">
+    <data name="HandledChatException_QuotaExceeded" xml:space="preserve">
         <value>超出 API 使用配额，或者没有访问当前模型的权限。</value>
     </data>
-    <data name="KernelRequestException_RateLimit" xml:space="preserve">
+    <data name="HandledChatException_RateLimit" xml:space="preserve">
         <value>请求频率过高，请稍后重试。</value>
     </data>
-    <data name="KernelRequestException_EndpointNotReachable" xml:space="preserve">
+    <data name="HandledChatException_EndpointNotReachable" xml:space="preserve">
         <value>无法连接到服务端点，请检查您的网络连接。</value>
     </data>
-    <data name="KernelRequestException_InvalidEndpoint" xml:space="preserve">
+    <data name="HandledChatException_InvalidEndpoint" xml:space="preserve">
         <value>提供的服务端点无效。</value>
     </data>
-    <data name="KernelRequestException_EmptyResponse" xml:space="preserve">
+    <data name="HandledChatException_EmptyResponse" xml:space="preserve">
         <value>服务提供商返回了空响应，这可能表示存在网络或服务问题。</value>
     </data>
-    <data name="KernelRequestException_FeatureNotSupport" xml:space="preserve">
+    <data name="HandledChatException_FeatureNotSupport" xml:space="preserve">
         <value>所选模型不支持所请求的功能。</value>
     </data>
-    <data name="KernelRequestException_Timeout" xml:space="preserve">
+    <data name="HandledChatException_Timeout" xml:space="preserve">
         <value>请求服务超时，请重试。</value>
     </data>
-    <data name="KernelRequestException_NetworkError" xml:space="preserve">
+    <data name="HandledChatException_NetworkError" xml:space="preserve">
         <value>发生网络错误，请检查网络/服务提供商地区不支持。</value>
     </data>
-    <data name="KernelRequestException_ServiceUnavailable" xml:space="preserve">
+    <data name="HandledChatException_ServiceUnavailable" xml:space="preserve">
         <value>服务当前不可用，请稍后重试。</value>
     </data>
-    <data name="KernelRequestException_InvalidApiKey" xml:space="preserve">
+    <data name="HandledChatException_InvalidApiKey" xml:space="preserve">
         <value>API 密钥缺失或无效。</value>
     </data>
     <data name="KernelMixinFactory_NoModelDefinition" xml:space="preserve">
@@ -898,7 +898,7 @@
     <data name="Settings_ChatWindow_AllowRunInBackground_Description" xml:space="preserve">
         <value>开启后，关闭聊天窗口不会终止当前的任务。</value>
     </data>
-    <data name="KernelRequestException_OperationCancelled" xml:space="preserve">
+    <data name="HandledChatException_OperationCancelled" xml:space="preserve">
         <value>操作已取消。</value>
     </data>
     <data name="ChatPluginPage_SelectToViewDetails" xml:space="preserve">

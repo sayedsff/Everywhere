@@ -160,7 +160,7 @@ public partial class WelcomeViewModel : BusyViewModelBase
         }
         catch (Exception ex)
         {
-            ex = ChatRequestException.Parse(ex);
+            ex = HandledChatException.Parse(ex);
             _logger.LogError(
                 ex,
                 "Failed to validate API key for provider {ProviderId} and model {ModelId}",

@@ -1,8 +1,6 @@
 ﻿using System.ClientModel;
 using System.Reflection;
-using System.Security.Authentication;
 using System.Text.Json;
-using Everywhere.Common;
 using Everywhere.Configuration;
 using Microsoft.Extensions.AI;
 using Microsoft.SemanticKernel;
@@ -24,7 +22,7 @@ public sealed class OpenAIKernelMixin(ModelSettings settings, ModelProvider prov
     public override IChatCompletionService ChatCompletionService { get; } = new OptimizedOpenAIApiClient(
         new ChatClient(
             definition.ModelId,
-            new ApiKeyCredential(apiKey ?? throw new ChatRequestException(new AuthenticationException(), KernelRequestExceptionType.InvalidApiKey)),
+            new ApiKeyCredential(apiKey.IsNullOrWhiteSpace() ? "NO_API_KEY" : apiKey), // some models don't need API key (e.g. LM Studio)
             new OpenAIClientOptions
             {
                 Endpoint = new Uri(provider.Endpoint, UriKind.Absolute)

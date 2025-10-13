@@ -214,8 +214,6 @@ public partial class ChatWindowViewModel : BusyViewModelBase
 
             if (formats.Contains(DataFormats.Files))
             {
-                return; // TODO: 0.3.0
-
                 var files = await Clipboard.GetDataAsync(DataFormats.Files);
                 if (files is IEnumerable enumerable)
                 {
