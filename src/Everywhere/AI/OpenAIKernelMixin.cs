@@ -1,4 +1,5 @@
 ﻿using System.ClientModel;
+using System.ClientModel.Primitives;
 using System.Reflection;
 using System.Text.Json;
 using Everywhere.Configuration;
@@ -8,6 +9,7 @@ using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using OpenAI;
 using OpenAI.Chat;
+using BinaryContent = System.ClientModel.BinaryContent;
 using ChatMessage = Microsoft.Extensions.AI.ChatMessage;
 using TextContent = Microsoft.Extensions.AI.TextContent;
 
@@ -20,7 +22,7 @@ public sealed class OpenAIKernelMixin(ModelSettings settings, ModelProvider prov
     : KernelMixinBase(settings, provider, definition)
 {
     public override IChatCompletionService ChatCompletionService { get; } = new OptimizedOpenAIApiClient(
-        new ChatClient(
+        new OptimizedChatClient(
             definition.ModelId,
             new ApiKeyCredential(apiKey.IsNullOrWhiteSpace() ? "NO_API_KEY" : apiKey), // some models don't need API key (e.g. LM Studio)
             new OpenAIClientOptions
@@ -57,6 +59,36 @@ public sealed class OpenAIKernelMixin(ModelSettings settings, ModelProvider prov
         };
     }
 
+    /// <summary>
+    /// optimized wrapper around OpenAI's ChatClient to set custom User-Agent header.
+    /// </summary>
+    /// <remarks>
+    /// Layered upon layer, are you an onion?
+    /// </remarks>
+    private sealed class OptimizedChatClient(string modelId, ApiKeyCredential credential, OpenAIClientOptions options)
+        : ChatClient(modelId, credential, options)
+    {
+        public override Task<ClientResult> CompleteChatAsync(BinaryContent content, RequestOptions? options = null)
+        {
+            options?.SetHeader(
+                "UserAgent",
+                $"Everywhere/{typeof(OpenAIKernelMixin).Assembly.GetName().Version?.ToString() ?? "1.0.0"} " +
+#if IsWindows
+                "(Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
+#elif IsOSX
+                "(Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
+#else
+                "(X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
+#endif
+            );
+
+            return base.CompleteChatAsync(content, options);
+        }
+    }
+
+    /// <summary>
+    /// optimized wrapper around OpenAI's IChatClient to extract reasoning content from internal properties.
+    /// </summary>
     private sealed class OptimizedOpenAIApiClient(IChatClient client, ModelDefinition definition) : IChatClient
     {
         private static readonly PropertyInfo? ChoicesProperty =
