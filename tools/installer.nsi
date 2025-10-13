@@ -145,6 +145,11 @@ SectionEnd
 ; Installer Functions
 
 Function .onInit
+  ; Read the installation directory from the registry if it exists
+  ReadRegStr $0 HKCU "Software\${APP_NAME}" "InstallDir"
+  StrCmp $0 "" 0 +2
+    StrCpy $INSTDIR $0
+
   ; Set the language
   !insertmacro MUI_LANGDLL_DISPLAY
 FunctionEnd
