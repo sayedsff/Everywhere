@@ -1,3 +1,19 @@
+## [v0.3.10](https://github.com/DearVa/Everywhere/releases/tag/v0.3.10) - 2025-10-14
+
+✨ Improvements
+Introduced a new, modern installer that remembers the previous installation location during updates
+
+🐛 Bug Fixes
+Fixed an issue where an error was thrown if the OpenAI API key was empty (which is allowed for services like LM Studio)
+Fixed a bug that prevented pasting images as attachments in some cases
+Fixed a bug that caused the application to freeze when sending messages with images
+Fixed an issue causing an HTTP 400 error during function calls
+Fixed an issue where requests could be blocked by Cloudflare from some third-party model providers
+
+**Full Changelog**: https://github.com/DearVa/Everywhere/compare/v0.3.9...v0.3.10
+
+
+
 ## [v0.3.9](https://github.com/DearVa/Everywhere/releases/tag/v0.3.9) - 2025-10-13
 
 🚀 Features
