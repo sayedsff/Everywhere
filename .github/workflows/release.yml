@@ -71,11 +71,19 @@ jobs:
       run: |
         dotnet publish src/Everywhere.Windows/Everywhere.Windows.csproj -c Release --self-contained true -p:AssemblyVersion=$env:VERSION -p:FileVersion=$env:VERSION -o ./publish --no-restore
 
+    - name: Install Inno Setup
+      shell: pwsh
+      run: |
+        choco install innosetup
+
     - name: Compile .ISS to .EXE Installer
-      uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
-      with:
-        path: tools/installer.iss
-        options: /O+
+      shell: pwsh
+      run: |
+        & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "tools/installer.iss" /O+
+        if ($LASTEXITCODE -ne 0) {
+          Write-Error "Inno Setup compilation failed with exit code $LASTEXITCODE"
+          exit $LASTEXITCODE
+        }
 
     - name: Create release zip
       shell: pwsh
