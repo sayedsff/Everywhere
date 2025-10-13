@@ -27,18 +27,6 @@ jobs:
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
 
-    - name: Install NSIS
-      run: |
-        iwr -useb get.scoop.sh -outfile 'install.ps1'
-        .\install.ps1 -RunAsAdmin
-        scoop update
-        scoop bucket add extras
-        scoop install nsis
-        echo "$env:USERPROFILE\scoop\shims" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-
-    - name: Print NSIS version
-      run: makensis -VERSION
-
     - name: Get version from tag
       id: get_version
       shell: pwsh
@@ -83,12 +71,11 @@ jobs:
       run: |
         dotnet publish src/Everywhere.Windows/Everywhere.Windows.csproj -c Release --self-contained true -p:AssemblyVersion=$env:VERSION -p:FileVersion=$env:VERSION -o ./publish --no-restore
 
-    - name: Build NSIS installer
-      shell: pwsh
-      run: |
-        makensis "/DVERSION=${{env.VERSION}}" "tools/installer.nsi"
-        $exePath = "Everywhere-Windows-x64-Setup-v${{env.VERSION}}.exe"
-        echo "EXE_PATH=./${exePath}" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+    - name: Compile .ISS to .EXE Installer
+      uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
+      with:
+        path: tools/installer.iss
+        options: /O+
 
     - name: Create release zip
       shell: pwsh

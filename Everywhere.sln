@@ -66,7 +66,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{30A74410-E803-4C56-BE95-C8E1BE690C7A}"
 	ProjectSection(SolutionItems) = preProject
 		tools\build_vcproj.ps1 = tools\build_vcproj.ps1
-		tools\installer.nsi = tools\installer.nsi
+		tools\installer.iss = tools\installer.iss
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Everywhere.Watchdog", "src\Everywhere.Watchdog\Everywhere.Watchdog.csproj", "{2BACDFDD-0944-41E3-94C2-6B7B6626C845}"
