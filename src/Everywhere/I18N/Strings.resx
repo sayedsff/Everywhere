@@ -686,6 +686,12 @@
     <data name="NativeChatPlugin_FileSystem_Description" xml:space="preserve">
         <value>Provides the ability to access files, such as enumerating, creating, deleting, renaming, reading, or writing.</value>
     </data>
+    <data name="NativeChatPlugin_WindowsSystemApi_Header" xml:space="preserve">
+        <value>Windows System API</value>
+    </data>
+    <data name="NativeChatPlugin_WindowsSystemApi_Description" xml:space="preserve">
+        <value>Provides GUI interaction and system control capabilities that are difficult to achieve via terminal, including notifications, message boxes, window management, clipboard operations, mouse/keyboard control, wallpaper settings, brightness adjustment, and power management.</value>
+    </data>
     <data name="FriendlyExceptionMessage_InvalidOperation" xml:space="preserve">
         <value>Invalid operation.</value>
     </data>

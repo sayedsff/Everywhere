@@ -671,7 +671,13 @@
         <value>文件系统</value>
     </data>
     <data name="NativeChatPlugin_FileSystem_Description" xml:space="preserve">
-        <value>提供访问系统文件的能力，如枚举、创建、删除、重命名、读取或写入文件等。</value>
+        <value>提供访问系统文件的能力,如枚举、创建、删除、重命名、读取或写入文件等。</value>
+    </data>
+    <data name="NativeChatPlugin_WindowsSystemApi_Header" xml:space="preserve">
+        <value>Windows 系统 API</value>
+    </data>
+    <data name="NativeChatPlugin_WindowsSystemApi_Description" xml:space="preserve">
+        <value>提供终端难以实现的 GUI 交互和系统控制功能，包括通知、消息框、窗口管理、剪贴板操作、鼠标键盘控制、壁纸设置、亮度调节和电源管理等。</value>
     </data>
     <data name="FriendlyExceptionMessage_InvalidOperation" xml:space="preserve">
         <value>无效的操作。</value>
