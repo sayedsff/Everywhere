@@ -1,14 +1,14 @@
 ## [v0.3.10](https://github.com/DearVa/Everywhere/releases/tag/v0.3.10) - 2025-10-14
 
 ✨ Improvements
-Introduced a new, modern installer that remembers the previous installation location during updates
+- Introduced a new, modern installer that remembers the previous installation location during updates
 
 🐛 Bug Fixes
-Fixed an issue where an error was thrown if the OpenAI API key was empty (which is allowed for services like LM Studio)
-Fixed a bug that prevented pasting images as attachments in some cases
-Fixed a bug that caused the application to freeze when sending messages with images
-Fixed an issue causing an HTTP 400 error during function calls
-Fixed an issue where requests could be blocked by Cloudflare from some third-party model providers
+- Fixed an issue where an error was thrown if the OpenAI API key was empty (which is allowed for services like LM Studio)
+- Fixed a bug that prevented pasting images as attachments in some cases
+- Fixed a bug that caused the application to freeze when sending messages with images
+- Fixed an issue causing an HTTP 400 error during function calls
+- Fixed an issue where requests could be blocked by Cloudflare from some third-party model providers
 
 **Full Changelog**: https://github.com/DearVa/Everywhere/compare/v0.3.9...v0.3.10
 
@@ -17,16 +17,16 @@ Fixed an issue where requests could be blocked by Cloudflare from some third-par
 ## [v0.3.9](https://github.com/DearVa/Everywhere/releases/tag/v0.3.9) - 2025-10-13
 
 🚀 Features
-Provider icons in settings are now loaded as local resources for faster display
-Added deep-thought output support for Ollama, SiliconFlow, and some OpenAI-compatible models; fixed SiliconFlow and similar models not outputting results
-Added option to show chat plugin permissions in settings
+- Provider icons in settings are now loaded as local resources for faster display
+- Added deep-thought output support for Ollama, SiliconFlow, and some OpenAI-compatible models; fixed SiliconFlow and similar models not outputting results
+- Added option to show chat plugin permissions in settings
 
 ✨ Improvements
-Enhanced error handling and user-friendly messages
+- Enhanced error handling and user-friendly messages
 
 🐛 Bug Fixes
-Fixed dialog covering the title bar, making the window undraggable or unresponsive
-Fixed some prompt tasks (e.g. translation) may use the wrong target language
+- Fixed dialog covering the title bar, making the window undraggable or unresponsive
+- Fixed some prompt tasks (e.g. translation) may use the wrong target language
 
 **Full Changelog**: https://github.com/DearVa/Everywhere/compare/v0.3.8...v0.3.9
 

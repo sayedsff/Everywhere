@@ -48,6 +48,7 @@
     <PackageVersion Include="Microsoft.SemanticKernel.Plugins.Web" Version="$(SemanticKernelVersion)-alpha" />
     <PackageVersion Include="ModelContextProtocol" Version="0.3.0-preview.3" />
     <PackageVersion Include="PuppeteerSharp" Version="20.2.2" />
+    <PackageVersion Include="Tavily" Version="1.0.0" />
     <!-- Avalonia packages -->
     <PackageVersion Include="Avalonia" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Skia" Version="$(AvaloniaVersion)" />
@@ -86,10 +87,10 @@
     <PackageVersion Include="NUnit.Analyzers" Version="4.5.0" />
     <PackageVersion Include="NUnit3TestAdapter" Version="5.1.0" />
     <!-- ShadUI packages -->
-    <PackageVersion Include="Avalonia.AvaloniaEdit" Version="11.3.0"/>
-    <PackageVersion Include="AvaloniaEdit.TextMate" Version="11.3.0"/>
-    <PackageVersion Include="Jab" Version="0.11.0"/>
-    <PackageVersion Include="LiveChartsCore.SkiaSharpView.Avalonia" Version="2.0.0-rc5.4"/>
-    <PackageVersion Include="TextMateSharp.Grammars" Version="1.0.69"/>
+    <PackageVersion Include="Avalonia.AvaloniaEdit" Version="11.3.0" />
+    <PackageVersion Include="AvaloniaEdit.TextMate" Version="11.3.0" />
+    <PackageVersion Include="Jab" Version="0.11.0" />
+    <PackageVersion Include="LiveChartsCore.SkiaSharpView.Avalonia" Version="2.0.0-rc5.4" />
+    <PackageVersion Include="TextMateSharp.Grammars" Version="1.0.69" />
   </ItemGroup>
 </Project>
