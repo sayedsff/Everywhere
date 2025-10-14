@@ -600,15 +600,21 @@ public class ChatService(
                 }
                 case AssistantChatMessage assistant:
                 {
-                    foreach (var span in assistant.Spans)
+                    // ReSharper disable once ForCanBeConvertedToForeach
+                    // foreach would create an enumerator object, which will cause thread lock issues.
+                    for (var spanIndex = 0; spanIndex < assistant.Spans.Count; spanIndex++)
                     {
+                        var span = assistant.Spans[spanIndex];
                         if (span.MarkdownBuilder.Length > 0)
                         {
                             yield return new ChatMessageContent(chatMessage.Role, span.MarkdownBuilder.ToString());
                         }
 
-                        foreach (var functionCallChatMessage in span.FunctionCalls)
+                        // ReSharper disable once ForCanBeConvertedToForeach
+                        // foreach would create an enumerator object, which will cause thread lock issues.
+                        for (var callIndex = 0; callIndex < span.FunctionCalls.Count; callIndex++)
                         {
+                            var functionCallChatMessage = span.FunctionCalls[callIndex];
                             await foreach (var actionChatMessageContent in CreateChatMessageContentsAsync(functionCallChatMessage))
                             {
                                 yield return actionChatMessageContent;
@@ -630,8 +636,11 @@ public class ChatService(
                     functionCallMessage.Items.AddRange(functionCall.Calls);
                     yield return functionCallMessage;
 
-                    foreach (var result in functionCall.Results)
+                    // ReSharper disable once ForCanBeConvertedToForeach
+                    // foreach would create an enumerator object, which will cause thread lock issues.
+                    for (var resultIndex = 0; resultIndex < functionCall.Results.Count; resultIndex++)
                     {
+                        var result = functionCall.Results[resultIndex];
                         yield return result.ToChatMessage();
                     }
 
@@ -661,7 +670,9 @@ public class ChatService(
 
         async ValueTask AddAttachmentsToChatMessageContentAsync(IEnumerable<ChatAttachment> attachments, ChatMessageContent content)
         {
-            foreach (var attachment in attachments.Take(10)) // Limit to 10 attachments
+            // Limit to 10 attachments
+            // snapshot the attachments to avoid thread issues.
+            foreach (var attachment in attachments.Take(10).ToList())
             {
                 switch (attachment)
                 {
