@@ -733,6 +733,11 @@ public class SettingsInitializer : IAsyncInitializer
                 },
                 new WebSearchEngineProvider
                 {
+                    Id = "tavily",
+                    EndPoint = "https://api.tavily.com/search"
+                },
+                new WebSearchEngineProvider
+                {
                     Id = "bing",
                     EndPoint = "https://api.bing.microsoft.com/v7.0/search?q"
                 },

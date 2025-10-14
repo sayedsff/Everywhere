@@ -19,6 +19,7 @@ using Microsoft.SemanticKernel.Plugins.Web.Bing;
 using Microsoft.SemanticKernel.Plugins.Web.Brave;
 using Microsoft.SemanticKernel.Plugins.Web.Google;
 using PuppeteerSharp;
+using Tavily;
 using ZLinq;
 
 namespace Everywhere.Chat.Plugins;
@@ -29,7 +30,7 @@ public partial class WebSearchEnginePlugin : BuiltInChatPlugin
 
     public override IReadOnlyList<SettingsItem>? SettingsItems { get; }
 
-    private readonly WebSearchEngineSettings _settings;
+    private readonly WebSearchEngineSettings _webSearchEngineSettings;
     private readonly IRuntimeConstantProvider _runtimeConstantProvider;
     private readonly IWatchdogManager _watchdogManager;
     private readonly ILoggerFactory _loggerFactory;
@@ -48,7 +49,7 @@ public partial class WebSearchEnginePlugin : BuiltInChatPlugin
         IWatchdogManager watchdogManager,
         ILoggerFactory loggerFactory) : base("WebSearchEngine")
     {
-        _settings = settings.Plugin.WebSearchEngine;
+        _webSearchEngineSettings = settings.Plugin.WebSearchEngine;
         _runtimeConstantProvider = runtimeConstantProvider;
         _watchdogManager = watchdogManager;
         _loggerFactory = loggerFactory;
@@ -91,9 +92,9 @@ public partial class WebSearchEnginePlugin : BuiltInChatPlugin
                 WebSnapshotAsync,
                 ChatFunctionPermissions.NetworkAccess));
 
-        SettingsItems = SettingsItemFactory.CreateForObject(_settings, "Plugin_WebSearchEngine");
+        SettingsItems = SettingsItemFactory.CreateForObject(_webSearchEngineSettings, "Plugin_WebSearchEngine");
 
-        new ObjectObserver(HandleSettingsChanged).Observe(_settings);
+        new ObjectObserver(HandleSettingsChanged).Observe(_webSearchEngineSettings);
     }
 
     private void HandleSettingsChanged(in ObjectObserverChangedEventArgs e)
@@ -109,7 +110,7 @@ public partial class WebSearchEnginePlugin : BuiltInChatPlugin
 
         _logger.LogDebug("Ensuring web search engine connector is initialized.");
 
-        if (_settings.SelectedWebSearchEngineProvider is not { } provider)
+        if (_webSearchEngineSettings.SelectedWebSearchEngineProvider is not { } provider)
         {
             throw new InvalidOperationException("Web search engine provider is not selected.");
         }
@@ -135,6 +136,7 @@ public partial class WebSearchEnginePlugin : BuiltInChatPlugin
                 },
                 provider.SearchEngineId ?? throw new InvalidOperationException("Search Engine ID is not set."),
                 _loggerFactory),
+            "tavily" => new TavilyConnector(provider.ApiKey, uri, _loggerFactory),
             "bing" => new BingConnector(provider.ApiKey, uri, _loggerFactory),
             "brave" => new BraveConnector(provider.ApiKey, uri, _loggerFactory),
             "bocha" => new BoChaConnector(provider.ApiKey, uri, _loggerFactory),
@@ -293,6 +295,55 @@ public partial class WebSearchEnginePlugin : BuiltInChatPlugin
         }
     }
 
+    private class TavilyConnector(string apiKey, Uri? uri, ILoggerFactory? loggerFactory) : IWebSearchEngineConnector
+    {
+        private readonly TavilyClient _tavilyClient = new(baseUri: uri);
+        private readonly ILogger _logger = loggerFactory?.CreateLogger(typeof(TavilyConnector)) ?? NullLogger.Instance;
+
+        public async Task<IEnumerable<T>> SearchAsync<T>(string query, int count = 1, int offset = 0, CancellationToken cancellationToken = default)
+        {
+            if (count is <= 0 or >= 50)
+            {
+                throw new ArgumentOutOfRangeException(nameof(count), count, $"{nameof(count)} value must be greater than 0 and less than 50.");
+            }
+
+            _logger.LogDebug("Sending request");
+
+            var response = await _tavilyClient.SearchAsync(apiKey: apiKey, query, maxResults: count, cancellationToken: cancellationToken);
+
+            _logger.LogDebug("Response received");
+
+            List<T>? returnValues;
+            if (typeof(T) == typeof(string))
+            {
+                returnValues = response.Results
+                    .AsValueEnumerable()
+                    .Take(count)
+                    .Select(x => x.Content)
+                    .ToList() as List<T>;
+            }
+            else if (typeof(T) == typeof(WebPage))
+            {
+                returnValues = response.Results
+                    .AsValueEnumerable()
+                    .Take(count)
+                    .Select(x => new WebPage
+                    {
+                        Name = x.Title,
+                        Url = x.Url,
+                        Snippet = x.Content
+                    })
+                    .ToList() as List<T>;
+            }
+            else
+            {
+                throw new NotSupportedException($"Type {typeof(T)} is not supported.");
+            }
+
+            return returnValues ?? [];
+        }
+    }
+
     private partial class BoChaConnector : IWebSearchEngineConnector
     {
         private readonly ILogger _logger;
@@ -306,7 +357,7 @@ public partial class WebSearchEnginePlugin : BuiltInChatPlugin
         /// <param name="apiKey">The API key to authenticate the connector.</param>
         /// <param name="uri">The URI of the Bing Search instance. Defaults to "https://api.bing.microsoft.com/v7.0/search?q".</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory"/> to use for logging. If null, no logging will be performed.</param>
-        public BoChaConnector(string apiKey, Uri? uri = null, ILoggerFactory? loggerFactory = null)
+        public BoChaConnector(string apiKey, Uri? uri, ILoggerFactory? loggerFactory)
         {
             _logger = loggerFactory?.CreateLogger(typeof(BoChaConnector)) ?? NullLogger.Instance;
             _httpClient = new HttpClient();
