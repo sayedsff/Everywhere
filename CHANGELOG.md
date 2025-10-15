@@ -1,10 +1,10 @@
 ## [v0.3.11](https://github.com/DearVa/Everywhere/releases/tag/v0.3.11) - 2025-10-16
 
-🚀 Features
+✨ Features
 - 🎉 Added custom assistants! You can now create multiple assistants with different icons, names, and prompts, and switch between them freely during a chat
 - Added support for the Tavily web search engine
 
-✨ Improvements
+🚀 Improvements
 - Optimized exception handling
 
 **Full Changelog**: https://github.com/DearVa/Everywhere/compare/v0.3.10...v0.3.11
@@ -13,7 +13,7 @@
 
 ## [v0.3.10](https://github.com/DearVa/Everywhere/releases/tag/v0.3.10) - 2025-10-14
 
-✨ Improvements
+🚀 Improvements
 - Introduced a new, modern installer that remembers the previous installation location during updates
 
 🐛 Bug Fixes
@@ -29,12 +29,12 @@
 
 ## [v0.3.9](https://github.com/DearVa/Everywhere/releases/tag/v0.3.9) - 2025-10-13
 
-🚀 Features
+✨ Features
 - Provider icons in settings are now loaded as local resources for faster display
 - Added deep-thought output support for Ollama, SiliconFlow, and some OpenAI-compatible models; fixed SiliconFlow and similar models not outputting results
 - Added option to show chat plugin permissions in settings
 
-✨ Improvements
+🚀 Improvements
 - Enhanced error handling and user-friendly messages
 
 🐛 Bug Fixes
@@ -47,13 +47,13 @@
 
 ## [v0.3.8](https://github.com/DearVa/Everywhere/releases/tag/v0.3.8) - 2025-10-11
 
-🚀 Features
+✨ Features
 - Software updates can now be cancelled by dismissing the toast notification
 - Added more keyboard shortcuts: `Ctrl+N` for a new chat, `Ctrl+T` to for tools switch
 - Added a visual tree length limit setting to save tokens
 - Added a notification when an update is available
 
-✨ Improvements
+🚀 Improvements
 - Optimized the button layout in the chat window
 - Added more friendly error messages for a better user experience
 
