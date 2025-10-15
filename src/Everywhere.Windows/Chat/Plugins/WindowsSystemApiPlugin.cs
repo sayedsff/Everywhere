@@ -118,7 +118,7 @@ public class WindowsSystemApiPlugin : BuiltInChatPlugin
                         return $"System volume set to {value}%.";
 
                     case SystemSettingNumberTarget.Brightness:
-                        RunPowerShellOrThrow($"$brightness = {value}\n(Get-WmiObject -Namespace root/WMI -Class WmiMonitorBrightnessMethods).WmiSetBrightness(1, $brightness)");
+                        RunPowerShellOrThrow("(Get-WmiObject -Namespace root/WMI -Class WmiMonitorBrightnessMethods).WmiSetBrightness(1, $args[0])", value);
                         return value == 0 ? "Display brightness set to minimum." : $"Display brightness set to {value}%";
 
                     default:
@@ -236,7 +236,6 @@ public class WindowsSystemApiPlugin : BuiltInChatPlugin
                         {
                             throw new ArgumentException("Text must be provided for TypeText actions.");
                         }
-
                         SendKeys.SendWait(text);
                         return $"Typed {text.Length} characters.";
 
@@ -292,12 +291,12 @@ public class WindowsSystemApiPlugin : BuiltInChatPlugin
         _ => throw new ArgumentOutOfRangeException(nameof(shortcut), shortcut, "Shortcut not supported.")
     };
 
-    private static void RunPowerShellOrThrow(string script)
+    private static void RunPowerShellOrThrow(string script, params object[] args)
     {
         var psi = new ProcessStartInfo
         {
             FileName = "powershell.exe",
-            Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{script}\"",
+            Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{script}\" {string.Join(" ", args)}",
             UseShellExecute = false,
             CreateNoWindow = true,
             RedirectStandardError = true
