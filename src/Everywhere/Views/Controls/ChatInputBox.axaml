@@ -234,8 +234,9 @@
               <MenuItem
                 Classes="Outline Rounded" Width="30"
                 Height="30" Margin="0,0,4,0"
-                shadui:MenuItemAssist.PopupPlacement="Top" shadui:MenuItemAssist.PopupVerticalOffset="-4"
-                Focusable="False" Grid.IsSharedSizeScope="True"
+                shadui:MenuItemAssist.PopupMaxHeight="400" shadui:MenuItemAssist.PopupPlacement="Top"
+                shadui:MenuItemAssist.PopupVerticalOffset="-4" Focusable="False"
+                Grid.IsSharedSizeScope="True"
                 ItemsSource="{TemplateBinding CustomAssistants, Mode=OneWay}"
                 SelectedItem="{TemplateBinding SelectedCustomAssistant, Mode=OneWay}"
                 ToolTip.Tip="{I18N {x:Static LocaleKey.ChatInputBox_CustomAssistantsMenuItem_ToolTip}}">
@@ -278,8 +279,8 @@
                       <ControlTemplate
                         x:DataType="ai:CustomAssistant" TargetType="MenuItem">
                         <DockPanel
-                          Height="36" Background="Transparent"
-                          LastChildFill="True">
+                          Height="36" Margin="0,0,6,0"
+                          Background="Transparent" LastChildFill="True">
                           <Classes.Selected>
                             <MultiBinding Converter="{x:Static vc:CommonConverters.AllEquals}">
                               <Binding Path="."/>

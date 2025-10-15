@@ -11,6 +11,7 @@ using CommunityToolkit.Mvvm.Input;
 using Everywhere.Common;
 using Everywhere.Configuration;
 using Everywhere.ValueConverters;
+using Lucide.Avalonia;
 using Microsoft.Extensions.Logging;
 using ShadUI;
 
@@ -99,6 +100,12 @@ public class SoftwareUpdateControl : StackPanel
             },
             new Button
             {
+                [ButtonAssist.IconProperty] = new LucideIcon
+                {
+                    Kind = LucideIconKind.RefreshCcw,
+                    Size = 18,
+                    Margin = new Thickness(0, 0, 6, 0)
+                },
                 [!ButtonAssist.ShowProgressProperty] = new Binding
                 {
                     Path = "Command.IsRunning",

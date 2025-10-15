@@ -23,11 +23,12 @@
     <ListBox
       Grid.Row="1" Grid.Column="0"
       ItemsSource="{Binding CustomAssistants}"
+      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
       SelectedItem="{Binding SelectedCustomAssistant, Mode=TwoWay}">
       <ListBox.DataTemplates>
         <DataTemplate DataType="ai:CustomAssistant">
           <DockPanel
-            HorizontalSpacing="8" LastChildFill="True">
+            HorizontalSpacing="12" LastChildFill="True">
             <v:IconPresenter
               DockPanel.Dock="Left" Width="40"
               Height="40" CornerRadius="20"
@@ -35,11 +36,9 @@
               Icon="{Binding Icon}"
               IconSize="24"/>
 
-            <StackPanel
-              VerticalAlignment="Center" Orientation="Vertical"
-              Spacing="4">
+            <StackPanel VerticalAlignment="Center">
               <TextBlock
-                Classes="p"
+                FontSize="15"
                 Text="{Binding Name, FallbackValue={x:Null}}"
                 TextTrimming="CharacterEllipsis"
                 ToolTip.Tip="{Binding $self.Text}"/>
@@ -49,7 +48,7 @@
                 IsVisible="{Binding Description, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                 MaxLines="2"
                 Text="{Binding Description}"
-                TextTrimming="CharacterEllipsis" TextWrapping="Wrap"
+                TextTrimming="CharacterEllipsis"
                 ToolTip.Tip="{Binding $self.Text}"/>
             </StackPanel>
           </DockPanel>
