@@ -1,4 +1,5 @@
-﻿using System.Security;
+﻿using System.Linq;
+using System.Security;
 using System.Text;
 using System.Text.RegularExpressions;
 using Everywhere.Interop;
@@ -13,7 +14,12 @@ namespace Everywhere.Chat;
 /// </summary>
 /// <param name="coreElements"></param>
 /// <param name="approximateTokenLimit"></param>
-public partial class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreElements, int approximateTokenLimit, int startingId)
+/// <param name="detailLevel"></param>
+public partial class VisualElementXmlBuilder(
+    IReadOnlyList<IVisualElement> coreElements,
+    int approximateTokenLimit,
+    int startingId,
+    VisualTreeDetailLevel detailLevel)
 {
     private enum QueueOrigin
     {
@@ -32,6 +38,12 @@ public partial class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreE
 
         public List<XmlVisualElement> Children { get; } = [];
 
+        public bool ShouldRender { get; set; } = true;
+
+        public bool HasInformativeContent { get; set; }
+
+        public int InformativeChildCount { get; set; }
+
         public virtual bool Equals(XmlVisualElement? other) => Element.Id == other?.Element.Id;
 
         public override int GetHashCode() => Element.Id.GetHashCode();
@@ -42,8 +54,42 @@ public partial class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreE
     /// </summary>
     public Dictionary<int, IVisualElement> BuiltVisualElements { get; } = new();
 
+    private readonly VisualTreeDetailLevel _detailLevel = detailLevel;
+    private readonly HashSet<string> _coreElementIds = coreElements
+        .Select(e => e.Id)
+        .Where(id => !string.IsNullOrEmpty(id))
+        .ToHashSet(StringComparer.Ordinal);
+
     private readonly HashSet<XmlVisualElement> _rootElements = [];
     private StringBuilder? _visualTreeXmlBuilder;
+    private bool _detailLevelApplied;
+
+    private static readonly HashSet<VisualElementType> InteractiveElementTypes = new()
+    {
+        VisualElementType.Button,
+        VisualElementType.Hyperlink,
+        VisualElementType.CheckBox,
+        VisualElementType.RadioButton,
+        VisualElementType.ComboBox,
+        VisualElementType.ListView,
+        VisualElementType.ListViewItem,
+        VisualElementType.TreeView,
+        VisualElementType.TreeViewItem,
+        VisualElementType.DataGrid,
+        VisualElementType.DataGridItem,
+        VisualElementType.TabControl,
+        VisualElementType.TabItem,
+        VisualElementType.Menu,
+        VisualElementType.MenuItem,
+        VisualElementType.Slider,
+        VisualElementType.ScrollBar,
+        VisualElementType.ProgressBar,
+        VisualElementType.TextEdit,
+        VisualElementType.Table,
+        VisualElementType.TableRow
+    };
+
+    private const VisualElementStates InteractiveStates = VisualElementStates.Focused | VisualElementStates.Selected;
 
     public string BuildXml(CancellationToken cancellationToken)
     {
@@ -152,6 +198,8 @@ public partial class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreE
             _rootElements.Add(current);
         }
 
+        ApplyDetailLevel();
+
         _visualTreeXmlBuilder = new StringBuilder();
         foreach (var rootElement in _rootElements) InternalBuildXml(rootElement, 0);
         _visualTreeXmlBuilder.TrimEnd();
@@ -168,6 +216,15 @@ public partial class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreE
 
         void InternalBuildXml(XmlVisualElement xmlElement, int indentLevel)
         {
+            if (!xmlElement.ShouldRender)
+            {
+                foreach (var child in xmlElement.Children)
+                {
+                    InternalBuildXml(child, indentLevel);
+                }
+                return;
+            }
+
             var indent = new string(' ', indentLevel * 2);
             var element = xmlElement.Element;
             var elementType = element.Type;
@@ -185,7 +242,8 @@ public partial class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreE
                 VisualElementType.Panel or
                 VisualElementType.TopLevel or
                 VisualElementType.Screen;
-            if (isContainer)
+            var includeBounds = isContainer && _detailLevel != VisualTreeDetailLevel.Minimal;
+            if (includeBounds)
             {
                 // for containers, include the element's size
                 var bounds = element.BoundingRectangle;
@@ -208,7 +266,23 @@ public partial class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreE
 
             if (xmlElement.Children.Count == 0 && xmlElement.Contents.Count == 0)
             {
-                if (isContainer && element.BoundingRectangle is { Width: > 64, Height: > 64 })
+                bool shouldWarn = false;
+                if (includeBounds)
+                {
+                    switch (_detailLevel)
+                    {
+                        case VisualTreeDetailLevel.Detailed:
+                            shouldWarn = element.BoundingRectangle is { Width: > 64, Height: > 64 };
+                            break;
+                        case VisualTreeDetailLevel.Compact:
+                            shouldWarn = element.BoundingRectangle is { Width: > 256, Height: > 256 };
+                            break;
+                        case VisualTreeDetailLevel.Minimal:
+                            shouldWarn = false;
+                            break;
+                    }
+                }
+                if (shouldWarn)
                 {
                     _visualTreeXmlBuilder.Append(" warning=\"XML content may be inaccessible!\"");
                 }
@@ -239,6 +313,84 @@ public partial class VisualElementXmlBuilder(IReadOnlyList<IVisualElement> coreE
         }
 
         return _visualTreeXmlBuilder.ToString();
+    }
+
+    private void ApplyDetailLevel()
+    {
+        if (_detailLevelApplied || _detailLevel == VisualTreeDetailLevel.Detailed) return;
+
+        foreach (var rootElement in _rootElements)
+        {
+            MarkRenderFlags(rootElement);
+        }
+
+        _detailLevelApplied = true;
+    }
+
+    private bool MarkRenderFlags(XmlVisualElement element)
+    {
+        var informativeChildCount = 0;
+        foreach (var child in element.Children)
+        {
+            if (MarkRenderFlags(child)) informativeChildCount++;
+        }
+
+        var hasTextContent = element.Contents.Any(static line => !string.IsNullOrWhiteSpace(line));
+        var hasDescription = !string.IsNullOrWhiteSpace(element.Description);
+        var interactive = IsInteractiveElement(element.Element);
+        var elementId = element.Element.Id;
+        var isCoreElement = elementId is { Length: > 0 } && _coreElementIds.Contains(elementId);
+
+        var hasSelfInformativeContent = hasTextContent || hasDescription || interactive || isCoreElement;
+        var hasInformativeDescendant = informativeChildCount > 0;
+
+        var shouldRender = hasSelfInformativeContent;
+        if (!shouldRender)
+        {
+            shouldRender = _detailLevel switch
+            {
+                VisualTreeDetailLevel.Compact => ShouldKeepContainerForCompact(element, informativeChildCount),
+                VisualTreeDetailLevel.Minimal => ShouldKeepContainerForMinimal(element, informativeChildCount),
+                _ => hasInformativeDescendant
+            };
+        }
+
+        element.ShouldRender = shouldRender;
+        element.InformativeChildCount = informativeChildCount;
+        element.HasInformativeContent = hasSelfInformativeContent || hasInformativeDescendant;
+
+        return element.HasInformativeContent;
+    }
+
+    private static bool ShouldKeepContainerForCompact(XmlVisualElement element, int informativeChildCount)
+    {
+        if (element.Parent is null) return informativeChildCount > 0;
+
+        var type = element.Element.Type;
+        return type switch
+        {
+            VisualElementType.Screen or VisualElementType.TopLevel => informativeChildCount > 1,
+            VisualElementType.Document => informativeChildCount > 0,
+            VisualElementType.Panel => informativeChildCount > 1,
+            _ => false
+        };
+    }
+
+    private static bool ShouldKeepContainerForMinimal(XmlVisualElement element, int informativeChildCount)
+    {
+        if (element.Parent is null)
+        {
+            return informativeChildCount > 0;
+        }
+
+        return false;
+    }
+
+    private static bool IsInteractiveElement(IVisualElement element)
+    {
+        if (InteractiveElementTypes.Contains(element.Type)) return true;
+
+        return (element.States & InteractiveStates) != 0;
     }
 
     // The token-to-word ratio for English/Latin-based text.

@@ -500,11 +500,26 @@
     <data name="ChatWindowPinMode_PinOnInput" xml:space="preserve">
         <value>Pin on input</value>
     </data>
+    <data name="VisualTreeDetailLevel_Detailed" xml:space="preserve">
+        <value>Detailed</value>
+    </data>
+    <data name="VisualTreeDetailLevel_Compact" xml:space="preserve">
+        <value>Compact</value>
+    </data>
+    <data name="VisualTreeDetailLevel_Minimal" xml:space="preserve">
+        <value>Minimal</value>
+    </data>
     <data name="Settings_ChatWindow_WindowPinMode_Header" xml:space="preserve">
         <value>Window Pin Mode</value>
     </data>
     <data name="Settings_ChatWindow_WindowPinMode_Description" xml:space="preserve">
         <value>Specifies the pin mode for the chat window when it is opened. When the window is not fixed, it will be hidden automatically when it loses focus.</value>
+    </data>
+    <data name="Settings_ChatWindow_VisualTreeDetailLevel_Header" xml:space="preserve">
+        <value>Visual tree detail level</value>
+    </data>
+    <data name="Settings_ChatWindow_VisualTreeDetailLevel_Description" xml:space="preserve">
+        <value>Choose how much information is captured from the UI tree when attaching elements.</value>
     </data>
     <data name="FriendlyExceptionMessage_ClientResult" xml:space="preserve">
         <value>Client error.</value>
@@ -943,6 +958,9 @@ My intelligence comes from powerful Large language models (LLMs), which are prov
     </data>
     <data name="ChatWindow_ChatInputBox_SettingsMenuItems_VisualTreeTokenLimit" xml:space="preserve">
         <value>Visual tree length limit</value>
+    </data>
+    <data name="ChatWindow_ChatInputBox_SettingsMenuItems_VisualTreeDetailLevel" xml:space="preserve">
+        <value>Visual tree detail</value>
     </data>
     <data name="SoftwareUpdater_UpdateAvailable_Toast_Message" xml:space="preserve">
         <value>Update available.</value>

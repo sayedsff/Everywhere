@@ -1,0 +1,234 @@
+<TopLevel id="1" x="-9" y="-9" width="1938" height="1038" description="豆包 - 搜索 和另外 1 个页面 - 个人 - Microsoft Edge">
+    <TopLevel id="2" x="0" y="0" width="1920" height="1020" warning="XML content may be inaccessible!"/>
+    <TopLevel id="3" x="0" y="0" width="1920" height="1020" warning="XML content may be inaccessible!"/>
+    <TopLevel id="4" x="0" y="0" width="1920" height="1020" description="豆包 - 搜索 - Microsoft Edge">
+        <TopLevel id="5" x="0" y="0" width="1920" height="1020">
+            <TopLevel id="6" x="0" y="0" width="1920" height="1020">
+                <!-- 窗口控制按钮区域 -->
+                <TopLevel id="7" x="1747" y="0" width="173" height="43">
+                    <Button id="8" description="最小化"/>
+                    <Button id="9" description="还原"/>
+                    <Button id="10" description="关闭"/>
+                </TopLevel>
+                
+                <TopLevel id="11" x="0" y="0" width="1920" height="1020">
+                    <!-- 顶部导航区域（标签页+应用栏+收藏夹栏） -->
+                    <TopLevel id="12" x="0" y="0" width="1920" height="128">
+                        <!-- 标签页栏 -->
+                        <TabControl id="13" description="标签页栏">
+                            <Button id="14" description="Tab 操作菜单"/>
+                            <TopLevel id="15" x="45" y="0" width="382" height="44">
+                                <TopLevel id="16" x="45" y="0" width="382" height="44">
+                                    <TabItem id="17" description="chatgpt.com - 已固定 - 网络错误"/>
+                                    <TabItem id="18" description="豆包 - 搜索">
+                                        <Button id="19" description="关闭标签页"/>
+                                    </TabItem>
+                                    <TopLevel id="20" x="0" y="0" width="0" height="0">
+                                        <TopLevel id="21" x="0" y="0" width="0" height="0">
+                                            <TopLevel id="22" x="0" y="0" width="0" height="0"/>
+                                        </TopLevel>
+                                        <TopLevel id="23" x="0" y="0" width="0" height="0"/>
+                                    </TopLevel>
+                                </TopLevel>
+                                <TopLevel id="24" x="45" y="0" width="382" height="44"/>
+                            </TopLevel>
+                            <Button id="25" description="新建标签页"/>
+                            <TopLevel id="26" x="466" y="0" width="1282" height="44"/>
+                        </TabControl>
+                        
+                        <!-- 应用栏（返回/刷新/地址栏等） -->
+                        <Panel id="27" x="0" y="42" width="1920" height="50" description="应用栏">
+                            <TopLevel id="28" x="0" y="42" width="1920" height="50">
+                                <Button id="29" description="返回"/>
+                                <Button id="30" description="刷新"/>
+                                
+                                <!-- 地址和搜索栏区域 -->
+                                <Panel id="31" x="100" y="47" width="1529" height="40">
+                                    <Button id="32" description="查看站点信息"/>
+                                    <TextEdit id="33" description="地址和搜索栏" 
+                                              content="https://www.bing.com/search?q=豆包&amp;qs=n&amp;form=QBRE&amp;sp=-1&amp;lq=0&amp;pq=dou%27b&amp;sc=12-5&amp;sk=&amp;cvid=DB2A5EB04FDA4C728DC2817AD56189F8">
+                                        https://www.bing.com/search?q=豆包&amp;qs=n&amp;form=QBRE&amp;sp=-1&amp;lq=0&amp;pq=dou%27b&amp;sc=12-5&amp;sk=&amp;cvid=DB2A5EB04FDA4C728DC2817AD56189F8
+                                    </TextEdit>
+                                    
+                                    <!-- 收藏按钮 -->
+                                    <TopLevel id="34" x="1590" y="50" width="30" height="35">
+                                        <Button id="35" description="将此页面添加到收藏夹(Ctrl+D)"/>
+                                    </TopLevel>
+                                </Panel>
+                                
+                                <!-- 扩展/收藏夹/设置等按钮 -->
+                                <TopLevel id="36" x="1638" y="42" width="47" height="50">
+                                    <Button id="37" description="扩展"/>
+                                    <TopLevel id="38" x="1683" y="57" width="2" height="20"/>
+                                </TopLevel>
+                                <TopLevel id="39" x="1690" y="42" width="40" height="50">
+                                    <Button id="40" description="收藏夹"/>
+                                </TopLevel>
+                                <Button id="41" description="在 Internet Explorer 模式下的重新加载选项卡"/>
+                                <Button id="42" description="个人 个人资料"/>
+                                <Button id="43" description="设置及其他 (Alt+F)"/>
+                                <Button id="44" description="侧栏"/>
+                            </TopLevel>
+                        </Panel>
+                        
+                        <!-- 收藏夹栏 -->
+                        <Panel id="45" x="0" y="92" width="1920" height="35" description="收藏夹栏">
+                            <Panel id="46" x="7" y="95" width="35" height="30" description="保存的选项卡组">
+                                <Button id="47" description="标签页组"/>
+                            </Panel>
+                            <Unknown id="48" description="分隔符"/>
+                            <Button id="49" description="哔哩哔哩 (゜-゜)つロ 干杯~-bilibili"/>
+                            <Button id="50" description="宽带测速"/>
+                            <Button id="51" description="波特律动 串口助手"/>
+                            <Button id="52" description="QQ 开放平台"/>
+                            <Button id="53" description="rating"/>
+                            <Button id="54" description="Steam Trading Site Tracker | Steam 挂刀行情站"/>
+                            <Button id="55" description="Instances | Hostwinds"/>
+                            <Button id="56" description="myfreemp3音乐官网-mp3歌曲免费下载-myfreemp3在线音乐免费下载官网-歌曲下载-myfreemp3 app官网下载"/>
+                            <Button id="57" description="登录 | Learning-Chat 后台管理"/>
+                            <Button id="58" description="SG90 - Micro Servo 9g - Tower Pro | 3D CAD Model Library | GrabCAD"/>
+                            <Button id="59" description="包含隐藏的收藏夹的菜单"/>
+                        </Panel>
+                    </TopLevel>
+                    
+                    <!-- 页面主体内容区域 -->
+                    <TopLevel id="60" x="0" y="127" width="1920" height="893">
+                        <TopLevel id="61" x="0" y="127" width="1920" height="893">
+                            <TopLevel id="62" x="0" y="127" width="1920" height="893">
+                                <TopLevel id="63" x="0" y="127" width="1920" height="893">
+                                    <TopLevel id="64" x="0" y="127" width="1920" height="893">
+                                        <TopLevel id="65" x="0" y="127" width="1920" height="893">
+                                            <TopLevel id="66" x="0" y="127" width="1920" height="893">
+                                                <!-- 搜索结果文档主体 -->
+                                                <Document id="67" x="5" y="130" width="1910" height="885" description="豆包 - 搜索" 
+                                                          content="https://www.bing.com/search?q=%E8%B1%86%E5%8C%85&amp;qs=n&amp;form=QBRE&amp;sp=-1&amp;lq=0&amp;pq=dou%27b&amp;sc=12-5&amp;sk=&amp;cvid=DB2A5EB04FDA4C728DC2817AD56189F8">
+                                                    https://www.bing.com/search?q=%E8%B1%86%E5%8C%85&amp;qs=n&amp;form=QBRE&amp;sp=-1&amp;lq=0&amp;pq=dou%27b&amp;sc=12-5&amp;sk=&amp;cvid=DB2A5EB04FDA4C728DC2817AD56189F8
+                                                    
+                                                    <Panel id="68" x="5" y="130" width="1891" height="6483">
+                                                        <!-- 搜索页头部（国内版/国际版切换+搜索框） -->
+                                                        <Panel id="69" x="5" y="130" width="1891" height="182">
+                                                            <Button id="70" description="跳至内容"/>
+                                                            <Panel id="71" x="230" y="152" width="84" height="32" description="国内版">
+                                                                <Label id="72" content="国内版">国内版</Label>
+                                                            </Panel>
+                                                            <Panel id="73" x="318" y="152" width="85" height="32" description="国际版">
+                                                                <Label id="74" content="国际版">国际版</Label>
+                                                            </Panel>
+                                                            <Hyperlink id="75" description="返回到必应搜索" content="https://www.bing.com/?FORM=Z9FD1">
+                                                                https://www.bing.com/?FORM=Z9FD1
+                                                                <Label id="76" content="返回到必应搜索">
+                                                                    返回到必应搜索
+                                                                    <Image id="77"/>
+                                                                </Label>
+                                                            </Hyperlink>
+                                                            
+                                                            <!-- 搜索输入框 -->
+                                                            <Panel id="78" x="205" y="188" width="813" height="61">
+                                                                <Hyperlink id="79" description="“搜索”按钮" content="javascript:void(0)">
+                                                                    javascript:void(0)
+                                                                    <Button id="80" description="搜索"/>
+                                                                </Hyperlink>
+                                                                <TextEdit id="81" content="在此处输入你的搜索 — 输入时会显示搜索建议">
+                                                                    在此处输入你的搜索 — 输入时会显示搜索建议
+                                                                </TextEdit>
+                                                            </Panel>
+                                                            
+                                                            <!-- 账户奖励区域 -->
+                                                            <Panel id="82" x="1589" y="188" width="267" height="64" description="帐户奖励和偏好设置">
+                                                                <Button id="83" description="Microsoft Rewards"/>
+                                                            </Panel>
+                                                            <Panel id="84" x="205" y="262" width="1691" height="49" description="主菜单"/>
+                                                        </Panel>
+                                                        
+                                                        <!-- 搜索结果列表区域 -->
+                                                        <Panel id="85" x="155" y="323" width="1575" height="6205" description="搜索结果">
+                                                            <ListView id="86">
+                                                                <!-- 搜索结果1：豆包AI网页版（广告） -->
+                                                                <ListViewItem id="87" description="豆包AI网页版https://www.doubao.com豆包_您的工作学习AI助手! - 立即点击豆包了解凭借强大的算法，它能将你的想法转化为生动的图像，助你在视觉表达上脱颖而出. 豆包是你的得力助手！它能根据你的需求，生成精准、实用的内容，让你的项目顺利推进。广告亮点: 豆包AI搜索 · 豆包AI助手 · 豆包AI问答 · 豆包AI生图 · 豆包AI翻译豆包图像生成强大丰富的丰富能力一语成画，生成绘本、小说插图等豆包AI搜索实时资讯丰富信源，整合搜索豆包AI写作助手生成电子邮件、博客文章等轻松高效完成文案工作豆包AI翻译一键精准翻译，打破语言壁垒多种语言，准确翻译豆包解题答疑传图识题 专业解答校考职考，精准解析豆包语音通话语音查询资料不打断手上工作在 doubao.com 上查看更多信息">
+                                                                    <ListView id="88">
+                                                                        <ListViewItem id="89" description="豆包AI网页版https://www.doubao.com豆包_您的工作学习AI助手! - 立即点击豆包了解凭借强大的算法，它能将你的想法转化为生动的图像，助你在视觉表达上脱颖而出. 豆包是你的得力助手！它能根据你的需求，生成精准、实用的内容，让你的项目顺利推进。广告亮点: 豆包AI搜索 · 豆包AI助手 · 豆包AI问答 · 豆包AI生图 · 豆包AI翻译豆包图像生成强大丰富的丰富能力一语成画，生成绘本、小说插图等豆包AI搜索实时资讯丰富信源，整合搜索豆包AI写作助手生成电子邮件、博客文章等轻松高效完成文案工作豆包AI翻译一键精准翻译，打破语言壁垒多种语言，准确翻译豆包解题答疑传图识题 专业解答校考职考，精准解析豆包语音通话语音查询资料不打断手上工作在 doubao.com 上查看更多信息">
+                                                                            <Panel id="90" x="230" y="335" width="760" height="58">
+                                                                                <Label id="91" content="豆包AI网页版">豆包AI网页版</Label>
+                                                                            </Panel>
+                                                                            <Label id="92" content="SERP,5526">SERP,5526</Label>
+                                                                        </ListViewItem>
+                                                                    </ListView>
+                                                                </ListViewItem>
+                                                                
+                                                                <!-- 搜索结果2：豆包AI智能伙伴（广告） -->
+                                                                <ListViewItem id="93" description="广告豆包AI智能伙伴高效助手www.doubao.com豆包AI支持多语言交互与跨领域知识查询.网页直达,快速解决学习、工作难题,点击立即获取专属助手立即开始 ">
+                                                                    <ListView id="94">
+                                                                        <ListViewItem id="95" description="广告豆包AI智能伙伴高效助手www.doubao.com豆包AI支持多语言交互与跨领域知识查询.网页直达,快速解决学习、工作难题,点击立即获取专属助手立即开始 ">
+                                                                            <ListView id="96"/>
+                                                                        </ListViewItem>
+                                                                    </ListView>
+                                                                </ListViewItem>
+                                                                
+                                                                <!-- 搜索结果3：豆包（字节跳动官方） -->
+                                                                <ListViewItem id="97" description="所有图像doubao.comhttps://www.doubao.com豆包 - 字节跳动旗下 AI 智能助手豆包是你的 AI 聊天智能对话问答助手，写作文案翻译编程全能工具。 豆包为你答疑解惑，提供灵感，辅助创作，也可以和你畅聊任何你感兴趣的话题。开发者首次发布操作系统语言所有图像所有图像豆包网页版 - 豆包AI网页版官网入口豆包是字节跳动推出的AI智能助手，支持文本创作、代码编程、多模态交互等核心功能。 豆包网页版无需下载即可使用，提供文档解析、智能修图、学习辅导等场景化服务。https://doubao.zube.cn反馈">
+                                                                    <Panel id="98" x="200" y="980" width="1530" height="571">
+                                                                        <ListView id="99" description="请使用箭头键进行导航"/>
+                                                                    </Panel>
+                                                                    <Panel id="100" x="1641" y="1558" width="84" height="28"/>
+                                                                </ListViewItem>
+                                                            </ListView>
+                                                            
+                                                            <ListView id="101">
+                                                                <!-- 搜索结果4：豆包手游模拟器（广告） -->
+                                                                <ListViewItem id="102" description="ldmnq.comhttps://www.ldmnq.com电脑玩《豆包》手游电脑版 - 选雷电安卓模拟器电脑手机双端互通,电脑玩豆包AI超清大屏,稳定快速,支持多开,脚本录制,. 同步操作,效率加倍,默认智能按键,键位精准,操作简单,支持手柄,带来不一样的手游体验。广告ai1foo.comhttps://www.ai1foo.com › 边界AIChat › 一站式智能平台chat5.0全新技术 - Chat-5.0全新升级体验豆包、-提供全面企业解决方案。能为企业打造定制化 AI 客服. 提升客户服务效率与质量；分析海量数据，洞察市场趋势；优化文案创作，生成吸引人的营销文案广告">
+                                                                    <ListView id="103">
+                                                                        <ListViewItem id="104" description="ldmnq.comhttps://www.ldmnq.com电脑玩《豆包》手游电脑版 - 选雷电安卓模拟器电脑手机双端互通,电脑玩豆包AI超清大屏,稳定快速,支持多开,脚本录制,. 同步操作,效率加倍,默认智能按键,键位精准,操作简单,支持手柄,带来不一样的手游体验。广告">
+                                                                            <Panel id="105" x="230" y="1634" width="760" height="58"/>
+                                                                        </ListViewItem>
+                                                                        <ListViewItem id="106" description="ai1foo.comhttps://www.ai1foo.com › 边界AIChat › 一站式智能平台chat5.0全新技术 - Chat-5.0全新升级体验豆包、-提供全面企业解决方案。能为企业打造定制化 AI 客服. 提升客户服务效率与质量；分析海量数据，洞察市场趋势；优化文案创作，生成吸引人的营销文案广告"/>
+                                                                    </ListView>
+                                                                </ListViewItem>
+                                                                
+                                                                <!-- 搜索结果5：豆包图片 -->
+                                                                <ListViewItem id="107" description="豆包 的图片豆包智能体：让学生和“你”对话豆包上线“深入研究”功能，支持免费体验 - AIHub工具导航豆包怎么切换语言-豆包app设置语言教程介绍 - Iefans豆包AI-豆包AI官网:字节跳动AI聊天机器人-半给电商豆包插件-字节跳动推出的浏览器AI助手 - AIHub | AI导航chatbot和豆包 - 抖音怎么用豆包智能翻译英文文献？豆包翻译功能使用教学 献？豆包翻译功能使用教…- 软件大巴下载站豆包Windows版下载-你的桌面 AI 助手_助力每日工作学习-2025AI 助手_助力每日工作学习-20…官方最新版豆包智能体：让学生和“你”对话已滚动 0%查看全部">
+                                                                    <Label id="108" content="豆包 的图片">
+                                                                        豆包 的图片
+                                                                        <Hyperlink id="109" description="豆包 的图片" content="https://www.bing.com/images/search?q=%e8%b1%86%e5%8c%85&amp;qpvt=%e8%b1%86%e5%8c%85&amp;FORM=IGRE">
+                                                                            https://www.bing.com/images/search?q=%e8%b1%86%e5%8c%85&amp;qpvt=%e8%b1%86%e5%8c%85&amp;FORM=IGRE
+                                                                        </Hyperlink>
+                                                                    </Label>
+                                                                    <Panel id="110" x="205" y="2064" width="810" height="470" description="图像轮播" warning="XML content may be inaccessible!"/>
+                                                                </ListViewItem>
+                                                                
+                                                                <!-- 搜索结果6：豆包网页版官网入口 -->
+                                                                <ListViewItem id="111" description="zube.cnhttps://doubao.zube.cn豆包网页版 - 豆包AI网页版官网入口2025年9月10日·豆包是字节跳动推出的AI智能助手，支持文本创作、代码编程、多模态交互等核心功能。 豆包网页版无需下载即可使用，提供文档解析、智 …">
+                                                                    <Panel id="112" x="230" y="2640" width="760" height="58"/>
+                                                                </ListViewItem>
+                                                                
+                                                                <!-- 搜索结果7：豆包视频 -->
+                                                                <ListViewItem id="113" description="豆包 的视频7:44东北豆包制作全过程，吃个特色美食需要三天，尝过以后才觉得真值sohu · 美食街3359408822022年12月4日3:30东北正宗粘豆包传统做法，香甜软糯。一个豆包可以两种吃法sohu · 天天吃美食2023年6月24日豆包三大实用功能教学，豆包写文案、编程、智能搜索功能使用方法bilibili · AI吧教学日记已浏览 8813 次 · 2024年7月25日"/>
+                                                                
+                                                                <!-- 搜索结果8：腾讯应用宝（未完整显示） -->
+                                                                <ListViewItem id="114" description="腾讯应用宝https://sj.q..."/>
+                                                            </ListView>
+                                                            
+                                                            <!-- 更多结果区域 -->
+                                                            <Panel id="115" x="1015" y="1609" width="690" height="4795" description="更多结果">
+                                                                <ListView id="116"/>
+                                                            </Panel>
+                                                        </Panel>
+                                                        
+                                                        <!-- 页脚区域 -->
+                                                        <Panel id="117" x="5" y="6552" width="1891" height="61" description="页脚"/>
+                                                    </Panel>
+                                                </Document>
+                                            </TopLevel>
+                                        </TopLevel>
+                                    </TopLevel>
+                                </TopLevel>
+                                <TextEdit id="118"/>
+                            </TopLevel>
+                        </TopLevel>
+                    </TopLevel>
+                </TopLevel>
+            </TopLevel>
+            <TopLevel id="119" x="0" y="0" width="1920" height="1020" warning="XML content may be inaccessible!"/>
+        </TopLevel>
+        <Panel id="120" x="0" y="0" width="0" height="0" description="建议可用"/>
+    </TopLevel>
+</TopLevel>
