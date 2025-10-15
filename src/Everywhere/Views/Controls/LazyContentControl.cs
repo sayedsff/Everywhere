@@ -46,6 +46,22 @@ public class LazyContentControl : ContentControl
         set => SetValue(IsActiveProperty, value);
     }
 
+    /// <summary>
+    /// Identifies the <see cref="ContentDataContext"/> property.
+    /// </summary>
+    public static readonly StyledProperty<object?> ContentDataContextProperty =
+        AvaloniaProperty.Register<LazyContentControl, object?>(nameof(ContentDataContext));
+
+    /// <summary>
+    /// Gets or sets the data context for the content of this control.
+    /// If not set, the control's own DataContext is used.
+    /// </summary>
+    public object? ContentDataContext
+    {
+        get => GetValue(ContentDataContextProperty);
+        set => SetValue(ContentDataContextProperty, value);
+    }
+
     [Content]
     public IAvaloniaList<IControlTemplate> ItemTemplates { get; }
 
@@ -56,6 +72,7 @@ public class LazyContentControl : ContentControl
     {
         ItemIndexProperty.Changed.AddClassHandler<LazyContentControl>(HandleItemIndexChanged);
         IsActiveProperty.Changed.AddClassHandler<LazyContentControl>(HandleIsActiveChanged);
+        ContentDataContextProperty.Changed.AddClassHandler<LazyContentControl>(HandleContentDataContextChanged);
     }
 
     private static void HandleItemIndexChanged(LazyContentControl sender, AvaloniaPropertyChangedEventArgs args)
@@ -84,6 +101,12 @@ public class LazyContentControl : ContentControl
             true => 1,
             _ => -1,
         });
+    }
+
+    private static void HandleContentDataContextChanged(LazyContentControl sender, AvaloniaPropertyChangedEventArgs args)
+    {
+        // If the content is already loaded, update its DataContext
+        if (sender.Content is Control control) control.DataContext = args.NewValue ?? sender.DataContext;
     }
 
     /// <summary>
@@ -138,7 +161,9 @@ public class LazyContentControl : ContentControl
         var index = ItemIndex;
         if (index >= 0 && index < ItemTemplates.Count)
         {
-            Content = ItemTemplates[index].Build(this)?.Result;
+            var control = ItemTemplates[index].Build(this)?.Result;
+            control?.DataContext = ContentDataContext ?? DataContext;
+            Content = control;
         }
         else
         {

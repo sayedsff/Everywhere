@@ -1,0 +1,69 @@
+﻿<ResourceDictionary
+  xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:common="clr-namespace:Everywhere.Common" xmlns:v="using:Everywhere.Views"
+  xmlns:vc="clr-namespace:Everywhere.ValueConverters">
+  <Design.PreviewWith>
+    <v:IconPresenter/>
+  </Design.PreviewWith>
+
+  <ControlTheme
+    x:Key="{x:Type v:IconPresenter}"
+    TargetType="v:IconPresenter">
+    <Setter Property="CornerRadius" Value="{DynamicResource FullCornerRadius}"/>
+    <Setter Property="Background" Value="{DynamicResource PrimaryColor}"/>
+    <Setter Property="Foreground" Value="{DynamicResource ForegroundColor}"/>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border CornerRadius="{TemplateBinding CornerRadius}">
+          <Border.Background>
+            <MultiBinding Converter="{x:Static vc:CommonConverters.DefaultMultiValue}">
+              <MultiBinding Converter="{x:Static vc:CommonConverters.FirstNonNull}">
+                <Binding
+                  FallbackValue="{x:Null}"
+                  Path="Icon.BackgroundColor"
+                  RelativeSource="{RelativeSource TemplatedParent}"/>
+                <TemplateBinding Property="Background"/>
+              </MultiBinding>
+            </MultiBinding>
+          </Border.Background>
+
+          <v:LazyContentControl
+            ContentDataContext="{TemplateBinding Icon}"
+            ItemIndex="{Binding Icon.Type, RelativeSource={RelativeSource TemplatedParent}, FallbackValue=-1}">
+            <ControlTemplate x:DataType="common:ColoredIcon">
+              <LucideIcon
+                HorizontalAlignment="Center" VerticalAlignment="Center"
+                Kind="{Binding Kind}"
+                Size="{Binding $parent[v:IconPresenter].IconSize}">
+                <LucideIcon.Foreground>
+                  <MultiBinding Converter="{x:Static vc:CommonConverters.DefaultMultiValue}">
+                    <MultiBinding Converter="{x:Static vc:CommonConverters.FirstNonNull}">
+                      <Binding Path="ForegroundColor"/>
+                      <Binding Path="$parent[v:IconPresenter].Foreground"/>
+                    </MultiBinding>
+                  </MultiBinding>
+                </LucideIcon.Foreground>
+              </LucideIcon>
+            </ControlTemplate>
+
+            <ControlTemplate x:DataType="common:ColoredIcon">
+              <TextBlock
+                HorizontalAlignment="Center" VerticalAlignment="Center"
+                FontSize="{Binding $parent[v:IconPresenter].FontSize}"
+                Text="{Binding Text}">
+                <TextBlock.Foreground>
+                  <MultiBinding Converter="{x:Static vc:CommonConverters.DefaultMultiValue}">
+                    <MultiBinding Converter="{x:Static vc:CommonConverters.FirstNonNull}">
+                      <Binding Path="ForegroundColor"/>
+                      <Binding Path="$parent[v:IconPresenter].Foreground"/>
+                    </MultiBinding>
+                  </MultiBinding>
+                </TextBlock.Foreground>
+              </TextBlock>
+            </ControlTemplate>
+          </v:LazyContentControl>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

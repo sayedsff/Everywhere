@@ -54,9 +54,12 @@ public partial class CustomAssistantPageViewModel(IKernelMixinFactory kernelMixi
         var newAssistant = new CustomAssistant
         {
             Name = LocaleKey.CustomAssistant_Name_Default.I18N(),
-            Icon = new ColoredLucideIcon(
-                LucideIconKind.Bot,
+            Icon = new ColoredIcon(
+                ColoredIconType.Lucide,
                 background: RandomAssistantIconBackgrounds[Random.Shared.Next(RandomAssistantIconBackgrounds.Length)])
+            {
+                Kind = LucideIconKind.Bot
+            }
         };
         settings.Model.CustomAssistants.Add(newAssistant);
         SelectedCustomAssistant = newAssistant;

@@ -97,22 +97,23 @@
                   </DataTemplate>
 
                   <DataTemplate DataType="c:SettingsCustomizableItem">
-                    <StackPanel Orientation="Horizontal">
-                      <ContentControl
-                        x:Name="PART_SettingsItemContentControl" HorizontalAlignment="Left"
-                        HorizontalContentAlignment="Left"
-                        Content="{Binding CustomValueItem}"/>
-
+                    <DockPanel
+                      HorizontalSpacing="8" LastChildFill="True">
                       <Button
-                        Classes="Ghost" Width="36"
-                        Margin="8,0,0,0" Padding="0"
+                        Classes="Ghost" DockPanel.Dock="Right"
+                        Width="36" Padding="0"
                         Command="{Binding ResetCommand}"
                         ToolTip.Tip="{I18N {x:Static LocaleKey.SettingsPage_RestoreDefault_Button_ToolTip}}">
                         <LucideIcon
                           Width="18" Height="18"
                           Kind="RotateCcw" Size="18"/>
                       </Button>
-                    </StackPanel>
+
+                      <ContentControl
+                        x:Name="PART_SettingsItemContentControl" HorizontalAlignment="Left"
+                        HorizontalContentAlignment="Left"
+                        Content="{Binding CustomValueItem}"/>
+                    </DockPanel>
                   </DataTemplate>
 
                   <DataTemplate DataType="c:SettingsSelectionItem">
@@ -131,11 +132,10 @@
                     </ComboBox>
                   </DataTemplate>
 
-                  <DataTemplate DataType="c:SettingsKeyboardHotkeyItem">
-                    <v:KeyboardHotkeyInputBox
-                      MinWidth="160" MinHeight="32"
-                      HorizontalAlignment="Left"
-                      Hotkey="{Binding Value, Mode=TwoWay}"/>
+                  <DataTemplate DataType="c:SettingsTypedItem">
+                    <ContentControl
+                      Content="{Binding}"
+                      ContentTemplate="{Binding DataTemplate}"/>
                   </DataTemplate>
 
                   <DataTemplate DataType="c:SettingsControlItem">

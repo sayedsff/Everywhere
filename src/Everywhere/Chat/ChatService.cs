@@ -215,10 +215,10 @@ public class ChatService(
         }
 
         // Append tool use prompt if enabled.
-        if (settings.Internal.IsToolCallEnabled)
-        {
-            userChatMessage.UserPrompt += Prompts.TryUseToolUserPrompt;
-        }
+        // if (settings.Internal.IsToolCallEnabled)
+        // {
+        //     userChatMessage.UserPrompt += Prompts.TryUseToolUserPrompt;
+        // }
 
         static long GetFileSize(string filePath)
         {
@@ -301,7 +301,10 @@ public class ChatService(
 
             var kernelMixin = CreateKernelMixin(customAssistant);
             var kernel = BuildKernel(kernelMixin, chatContext, customAssistant);
+
             var chatHistory = new ChatHistory();
+            chatContext.SystemPrompt = customAssistant.SystemPrompt.ActualValue;
+
             foreach (var chatMessage in chatContext
                          .Select(n => n.Message)
                          .Where(m => !ReferenceEquals(m, assistantChatMessage)) // exclude the current assistant message

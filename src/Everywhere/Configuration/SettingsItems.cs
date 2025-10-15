@@ -4,7 +4,6 @@ using Avalonia.Controls.Templates;
 using Avalonia.Data;
 using Avalonia.Data.Converters;
 using Avalonia.Media;
-using Everywhere.Interop;
 using ZLinq;
 
 namespace Everywhere.Configuration;
@@ -59,7 +58,7 @@ public class SettingsItems : AvaloniaList<SettingsItem>
         PropertyInfo itemPropertyInfo,
         MemberInfo? attributeOwner = null)
     {
-        SettingsItem? result = null;
+        SettingsItem? result;
 
         attributeOwner ??= itemPropertyInfo;
         var name = $"{ownerName}_{itemPropertyInfo.Name}";
@@ -94,7 +93,7 @@ public class SettingsItems : AvaloniaList<SettingsItem>
                                 .ToArray();
                         }
 
-                        var keyPrefix = $"SettingsSelectionItem_{ownerName}{bindingPath.Replace('.', '_')}_{itemPropertyInfo.Name}";
+                        var keyPrefix = $"{nameof(SettingsSelectionItem)}_{ownerName}{bindingPath.Replace('.', '_')}_{itemPropertyInfo.Name}";
                         return enumerable
                             .AsValueEnumerable()
                             .Select(k => new SettingsSelectionItem.Item(new DynamicResourceKey($"{keyPrefix}_{k}"), k, contentTemplate))
@@ -179,10 +178,6 @@ public class SettingsItems : AvaloniaList<SettingsItem>
                 };
             }
         }
-        else if (itemPropertyInfo.PropertyType == typeof(KeyboardHotkey))
-        {
-            result = new SettingsKeyboardHotkeyItem(name);
-        }
         else if (itemPropertyInfo.PropertyType.IsEnum)
         {
             result = SettingsSelectionItem.FromEnum(itemPropertyInfo.PropertyType, name);
@@ -195,6 +190,10 @@ public class SettingsItems : AvaloniaList<SettingsItem>
             var control = settingsControl.CreateControl();
             control.DataContext = target;
             result = new SettingsControlItem(name, control);
+        }
+        else
+        {
+            result = SettingsTypedItem.TryCreate(itemPropertyInfo.PropertyType, name);
         }
 
         if (result is null) return null;

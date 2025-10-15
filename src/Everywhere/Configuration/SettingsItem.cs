@@ -272,7 +272,31 @@ public class SettingsCustomizableItem(string name, SettingsItem customValueItem)
     }
 }
 
-public class SettingsKeyboardHotkeyItem(string name) : SettingsItem(name);
+public abstract class SettingsTypedItem(string name, IDataTemplate? dataTemplate) : SettingsItem(name)
+{
+    public IDataTemplate? DataTemplate => dataTemplate;
+
+    public static SettingsTypedItem? TryCreate(Type propertyType, string name)
+    {
+        if (Application.Current?.Resources.TryGetResource(propertyType, null, out var resource) is not true ||
+            resource is not IDataTemplate dataTemplate)
+        {
+            return null;
+        }
+
+        var typedItem = typeof(SettingsTypedItem<>).MakeGenericType(propertyType);
+        var constructor = typedItem.GetConstructor([typeof(string), typeof(IDataTemplate)]);
+        return (SettingsTypedItem?)constructor?.Invoke([name, dataTemplate]);
+    }
+}
+
+/// <summary>
+/// A settings item that holds a value of a specific type.
+/// TType is used for DataTemplate selection.
+/// </summary>
+/// <param name="name"></param>
+/// <typeparam name="TType"></typeparam>
+public class SettingsTypedItem<TType>(string name, IDataTemplate? dataTemplate) : SettingsTypedItem(name, dataTemplate);
 
 public class SettingsControlItem(string name, Control control) : SettingsItem(name)
 {

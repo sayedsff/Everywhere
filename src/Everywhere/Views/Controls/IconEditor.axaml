@@ -1,0 +1,69 @@
+﻿<ResourceDictionary
+  xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:common="clr-namespace:Everywhere.Common" xmlns:v="using:Everywhere.Views">
+  <Design.PreviewWith>
+    <v:IconEditor/>
+  </Design.PreviewWith>
+
+  <ControlTheme
+    x:Key="{x:Type v:IconEditor}"
+    TargetType="v:IconEditor">
+    <Setter Property="Template">
+      <ControlTemplate TargetType="v:IconEditor">
+        <TabControl>
+          <TabItem Header="{I18N {x:Static LocaleKey.IconEditor_IconTabItem_Header}}">
+            <TabControl x:Name="PART_IconTypeTabControl">
+              <TabItem
+                Header="Lucide"
+                Tag="{x:Static common:ColoredIconType.Lucide}">
+                <ListBox
+                  ItemsSource="{x:Static v:IconEditor.AvailableKinds}"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                  SelectedItem="{Binding Icon.Kind, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}, FallbackValue={x:Null}}">
+                  <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                      <WrapPanel
+                        ItemSpacing="3" LineSpacing="3"/>
+                    </ItemsPanelTemplate>
+                  </ListBox.ItemsPanel>
+                  <ListBox.ItemTemplate>
+                    <DataTemplate DataType="LucideIconKind">
+                      <LucideIcon Kind="{Binding}"/>
+                    </DataTemplate>
+                  </ListBox.ItemTemplate>
+                </ListBox>
+              </TabItem>
+
+              <TabItem
+                Header="Emoji"
+                Tag="{x:Static common:ColoredIconType.Text}">
+                <ListBox
+                  ItemsSource="{x:Static v:IconEditor.AvailableEmojis}"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                  SelectedItem="{Binding Icon.Text, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}, FallbackValue={x:Null}}">
+                  <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                      <WrapPanel
+                        ItemSpacing="3" LineSpacing="3"/>
+                    </ItemsPanelTemplate>
+                  </ListBox.ItemsPanel>
+                  <ListBox.ItemTemplate>
+                    <DataTemplate DataType="LucideIconKind">
+                      <TextBlock Text="{Binding}"/>
+                    </DataTemplate>
+                  </ListBox.ItemTemplate>
+                </ListBox>
+              </TabItem>
+            </TabControl>
+          </TabItem>
+          <TabItem Header="{I18N {x:Static LocaleKey.IconEditor_BackgroundTabItem_Header}}">
+            <ColorView Color="{Binding Icon.BackgroundColor, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay, FallbackValue=Black}"/>
+          </TabItem>
+          <TabItem Header="{I18N {x:Static LocaleKey.IconEditor_ForegroundTabItem_Header}}">
+            <ColorView Color="{Binding Icon.ForegroundColor, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay, FallbackValue=White}"/>
+          </TabItem>
+        </TabControl>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

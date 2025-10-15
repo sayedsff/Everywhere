@@ -1026,7 +1026,22 @@
     <data name="CustomAssistantPageViewModel_CheckConnectivity_FailedToast_Title" xml:space="preserve">
         <value>测试失败</value>
     </data>
-    <data name="ChatInputBox_CustomAssistantsMenuItem_Header" xml:space="preserve">
+    <data name="ChatInputBox_CustomAssistantsMenuItem_ToolTip" xml:space="preserve">
         <value>选择助手</value>
+    </data>
+    <data name="Settings_CustomAssistant_Icon_Header" xml:space="preserve">
+        <value>图标</value>
+    </data>
+    <data name="Settings_CustomAssistant_Icon_Description" xml:space="preserve">
+        <value>点击自定义助手图标。</value>
+    </data>
+    <data name="IconEditor_BackgroundTabItem_Header" xml:space="preserve">
+        <value>背景色</value>
+    </data>
+    <data name="IconEditor_ForegroundTabItem_Header" xml:space="preserve">
+        <value>前景色</value>
+    </data>
+    <data name="IconEditor_IconTabItem_Header" xml:space="preserve">
+        <value>图标</value>
     </data>
 </root>

@@ -30,6 +30,13 @@ public partial class ChatContext : ObservableObject, IReadOnlyList<ChatMessageNo
     [IgnoreMember]
     public int Count => _branchNodes.Count;
 
+    [IgnoreMember]
+    public string SystemPrompt
+    {
+        get => _rootNode.Message.To<SystemChatMessage>().SystemPrompt;
+        set => _rootNode.Message.To<SystemChatMessage>().SystemPrompt = value;
+    }
+
     /// <summary>
     /// VisualElement.Id: VisualElement.
     /// VisualElement is dynamically created and not serialized, so we keep a map here to track them.

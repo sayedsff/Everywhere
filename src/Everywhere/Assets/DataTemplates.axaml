@@ -1,7 +1,9 @@
 ﻿<ResourceDictionary
   xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-  xmlns:ai="clr-namespace:Everywhere.AI" xmlns:md="clr-namespace:LiveMarkdown.Avalonia;assembly=LiveMarkdown.Avalonia"
-  xmlns:plugins="clr-namespace:Everywhere.Chat.Plugins">
+  xmlns:ai="clr-namespace:Everywhere.AI" xmlns:c="clr-namespace:Everywhere.Configuration"
+  xmlns:common="clr-namespace:Everywhere.Common" xmlns:interop="clr-namespace:Everywhere.Interop"
+  xmlns:md="clr-namespace:LiveMarkdown.Avalonia;assembly=LiveMarkdown.Avalonia" xmlns:plugins="clr-namespace:Everywhere.Chat.Plugins"
+  xmlns:v="clr-namespace:Everywhere.Views">
   <DataTemplate
     x:Key="{x:Type ai:ModelProviderTemplate}"
     x:DataType="ai:ModelProviderTemplate">
@@ -22,6 +24,41 @@
     x:Key="{x:Type ai:ModelDefinitionTemplate}"
     x:DataType="ai:ModelDefinitionTemplate">
     <TextBlock Text="{Binding DisplayName, FallbackValue={x:Null}}"/>
+  </DataTemplate>
+
+  <DataTemplate x:Key="{x:Type interop:KeyboardHotkey}">
+    <DataTemplate.DataType>
+      <x:Type
+        x:TypeArguments="interop:KeyboardHotkey" TypeName="c:SettingsTypedItem"/>
+    </DataTemplate.DataType>
+    <v:KeyboardHotkeyInputBox
+      MinWidth="160" MinHeight="32"
+      HorizontalAlignment="Left"
+      Hotkey="{Binding Value, Mode=TwoWay}"/>
+  </DataTemplate>
+
+  <DataTemplate x:Key="{x:Type common:ColoredIcon}">
+    <DataTemplate.DataType>
+      <x:Type
+        x:TypeArguments="common:ColoredIcon" TypeName="c:SettingsTypedItem"/>
+    </DataTemplate.DataType>
+
+    <Button
+      HorizontalAlignment="Left" CornerRadius="20">
+      <v:IconPresenter
+        Width="40" Height="40"
+        FontSize="24"
+        Icon="{Binding Value}"
+        IconSize="24"/>
+
+      <Button.Flyout>
+        <Flyout>
+          <v:IconEditor
+            Width="360" Height="500"
+            Icon="{Binding Value, Mode=TwoWay}"/>
+        </Flyout>
+      </Button.Flyout>
+    </Button>
   </DataTemplate>
 
   <DataTemplate

@@ -19,12 +19,11 @@ public partial class CustomAssistant : ObservableObject
     public Guid Id { get; set; } = Guid.CreateVersion7();
 
     [ObservableProperty]
-    [SettingsStringItem(MaxLength = 32)]
-    public required partial string Name { get; set; }
+    public partial ColoredIcon? Icon { get; set; }
 
     [ObservableProperty]
-    [HiddenSettingsItem]
-    public partial ColoredLucideIcon Icon { get; set; } = new(LucideIconKind.Bot);
+    [SettingsStringItem(MaxLength = 32)]
+    public required partial string Name { get; set; }
 
     [ObservableProperty]
     [SettingsStringItem(IsMultiline = true, MaxLength = 4096, Height = 80)]
@@ -32,7 +31,7 @@ public partial class CustomAssistant : ObservableObject
 
     [ObservableProperty]
     [SettingsStringItem(IsMultiline = true, MaxLength = 40960)]
-    public partial string? SystemPrompt { get; set; } = Prompts.DefaultSystemPrompt;
+    public partial Customizable<string> SystemPrompt { get; set; } = Prompts.DefaultSystemPrompt;
 
     [JsonIgnore]
     [HiddenSettingsItem]

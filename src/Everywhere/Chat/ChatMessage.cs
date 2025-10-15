@@ -41,9 +41,10 @@ public partial class SystemChatMessage(string systemPrompt) : ChatMessage
     public override AuthorRole Role => AuthorRole.System;
 
     [Key(0)]
-    public string SystemPrompt => systemPrompt;
+    [ObservableProperty]
+    public partial string SystemPrompt { get; set; } = systemPrompt;
 
-    public override string ToString() => systemPrompt;
+    public override string ToString() => SystemPrompt;
 }
 
 [MessagePackObject(OnlyIncludeKeyedMembers = true, AllowPrivate = true)]

@@ -234,16 +234,16 @@
               <MenuItem
                 Classes="Outline Rounded" Width="30"
                 Height="30" Margin="0,0,4,0"
-                shadui:MenuItemAssist.Label="{I18N {x:Static LocaleKey.ChatInputBox_CustomAssistantsMenuItem_Header}}"
                 shadui:MenuItemAssist.PopupPlacement="Top" shadui:MenuItemAssist.PopupVerticalOffset="-4"
-                Focusable="False"
+                Focusable="False" Grid.IsSharedSizeScope="True"
                 ItemsSource="{TemplateBinding CustomAssistants, Mode=OneWay}"
                 SelectedItem="{TemplateBinding SelectedCustomAssistant, Mode=OneWay}"
-                ToolTip.Tip="{I18N {x:Static LocaleKey.ChatInputBox_AddAttachmentMenuItem_ToolTip}}">
+                ToolTip.Tip="{I18N {x:Static LocaleKey.ChatInputBox_CustomAssistantsMenuItem_ToolTip}}">
 
                 <MenuItem.Header>
-                  <v:ColoredLucideIconPresenter
+                  <v:IconPresenter
                     Width="30" Height="30"
+                    FontSize="16"
                     Icon="{Binding SelectedCustomAssistant.Icon, RelativeSource={RelativeSource TemplatedParent}, FallbackValue={x:Null}}"
                     IconSize="16"/>
                 </MenuItem.Header>
@@ -254,12 +254,20 @@
                       <Setter Property="Background" Value="{DynamicResource CardBackgroundColor}"/>
                     </Style>
 
-                    <Style Selector="^/template/ DockPanel.Highlight">
+                    <Style Selector="^/template/ DockPanel.Selected">
                       <Style Selector="^ Border#SelectedBorder">
                         <Setter Property="Background" Value="{DynamicResource PrimaryColor}"/>
                       </Style>
                       <Style Selector="^ Border#ContainerBorder">
                         <Setter Property="Background" Value="{DynamicResource SecondaryCardBackgroundColor}"/>
+                      </Style>
+                    </Style>
+
+                    <Style Selector="^/template/ shadui|Badge">
+                      <Setter Property="Height" Value="18"/>
+                      <Setter Property="CornerRadius" Value="4"/>
+                      <Style Selector="^ LucideIcon">
+                        <Setter Property="Size" Value="12"/>
                       </Style>
                     </Style>
 
@@ -270,14 +278,14 @@
                       <ControlTemplate
                         x:DataType="ai:CustomAssistant" TargetType="MenuItem">
                         <DockPanel
-                          Height="28" Background="Transparent"
+                          Height="36" Background="Transparent"
                           LastChildFill="True">
-                          <Classes.Highlight>
+                          <Classes.Selected>
                             <MultiBinding Converter="{x:Static vc:CommonConverters.AllEquals}">
                               <Binding Path="."/>
                               <Binding Path="$parent[v:ChatInputBox].SelectedCustomAssistant"/>
                             </MultiBinding>
-                          </Classes.Highlight>
+                          </Classes.Selected>
 
                           <Border
                             x:Name="SelectedBorder" DockPanel.Dock="Left"
@@ -290,19 +298,58 @@
                             Padding="4,2"
                             Background="{TemplateBinding Background}"
                             CornerRadius="4">
-                            <StackPanel
-                              Orientation="Horizontal" Spacing="4">
-                              <v:ColoredLucideIconPresenter
-                                Width="20" Height="20"
-                                VerticalAlignment="Center"
+                            <Grid ColumnSpacing="4">
+                              <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition
+                                  Width="Auto" SharedSizeGroup="Badges"/>
+                              </Grid.ColumnDefinitions>
+
+                              <v:IconPresenter
+                                Grid.Column="0" Width="20"
+                                Height="20" VerticalAlignment="Center"
+                                FontSize="14"
                                 Icon="{Binding Icon}"
-                                IconSize="16"/>
+                                IconSize="14"/>
                               <TextBlock
-                                VerticalAlignment="Center"
+                                Grid.Column="1" VerticalAlignment="Center"
                                 Text="{Binding Name}"
                                 TextTrimming="CharacterEllipsis"
                                 ToolTip.Tip="{Binding Description}"/>
-                            </StackPanel>
+
+                              <StackPanel
+                                Grid.Column="2" Margin="16,0,0,0"
+                                HorizontalAlignment="Right" Orientation="Horizontal"
+                                Spacing="2">
+                                <shadui:Badge
+                                  Background="Chocolate"
+                                  IsVisible="{Binding IsImageInputSupported.ActualValue}"
+                                  ToolTip.Tip="{I18N {x:Static LocaleKey.Settings_CustomAssistant_IsImageInputSupported_Header}}">
+                                  <LucideIcon Kind="Eye"/>
+                                </shadui:Badge>
+                                <shadui:Badge
+                                  Background="CadetBlue"
+                                  IsVisible="{Binding IsFunctionCallingSupported.ActualValue}"
+                                  ToolTip.Tip="{I18N {x:Static LocaleKey.Settings_CustomAssistant_IsFunctionCallingSupported_Header}}">
+                                  <LucideIcon Kind="Hammer"/>
+                                </shadui:Badge>
+                                <shadui:Badge
+                                  Background="ForestGreen"
+                                  IsVisible="{Binding IsDeepThinkingSupported.ActualValue}"
+                                  ToolTip.Tip="{I18N {x:Static LocaleKey.Settings_CustomAssistant_IsDeepThinkingSupported_Header}}">
+                                  <LucideIcon Kind="Brain"/>
+                                </shadui:Badge>
+                                <shadui:Badge
+                                  Background="MediumSlateBlue"
+                                  IsVisible="{Binding MaxTokens.ActualValue}"
+                                  ToolTip.Tip="{I18N {x:Static LocaleKey.Settings_CustomAssistant_MaxTokens_Header}}">
+                                  <TextBlock
+                                    FontSize="12"
+                                    Text="{Binding MaxTokens.ActualValue, Converter={x:Static vc:TokenCountHumanizationConverter.Shared}}"/>
+                                </shadui:Badge>
+                              </StackPanel>
+                            </Grid>
                           </Border>
                         </DockPanel>
                       </ControlTemplate>
