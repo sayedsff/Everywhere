@@ -195,7 +195,7 @@ public class ChatService(
             }
             catch (Exception e)
             {
-                e = HandledChatException.Parse(e);
+                e = HandledChatException.Handle(e);
                 activity?.SetStatus(ActivityStatusCode.Error, e.Message.Trim());
                 analyzingContextMessage.ErrorMessageKey = e.GetFriendlyMessage();
                 logger.LogError(e, "Error analyzing visual tree");
@@ -528,13 +528,13 @@ public class ChatService(
                         }
                         catch (Exception ex)
                         {
-                            // TODO: ChatFunctionCallException
+                            ex = HandledSystemException.Handle(ex);
                             functionCallActivity?.SetStatus(ActivityStatusCode.Error, ex.Message);
 
                             resultContent = new FunctionResultContent(functionCallContent, $"Error: {ex.Message}");
                             functionCallChatMessage.ErrorMessageKey = ex.GetFriendlyMessage();
 
-                            logger.LogInformation(ex, "Error invoking function '{FunctionName}'", functionCallContent.FunctionName);
+                            logger.LogError(ex, "Error invoking function '{FunctionName}'", functionCallContent.FunctionName);
                         }
 
                         functionCallChatMessage.Results.Add(resultContent);
@@ -578,7 +578,7 @@ public class ChatService(
         }
         catch (Exception e)
         {
-            e = HandledChatException.Parse(e);
+            e = HandledChatException.Handle(e);
             activity?.SetStatus(ActivityStatusCode.Error, e.Message.Trim());
             assistantChatMessage.ErrorMessageKey = e.GetFriendlyMessage();
             logger.LogError(e, "Error generating chat response");
@@ -764,7 +764,7 @@ public class ChatService(
         }
         catch (Exception e)
         {
-            e = HandledChatException.Parse(e);
+            e = HandledChatException.Handle(e);
             activity?.SetStatus(ActivityStatusCode.Error, e.Message);
             logger.LogError(e, "Failed to generate chat title");
         }

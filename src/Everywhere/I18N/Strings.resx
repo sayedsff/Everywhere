@@ -56,7 +56,7 @@
         <value>Light</value>
     </data>
     <data name="SettingsCategory_ChatWindow_Header" xml:space="preserve">
-        <value>Chat Window Settings</value>
+        <value>Chat Settings</value>
     </data>
     <data name="Settings_ChatWindow_Hotkey_Header" xml:space="preserve">
         <value>Hotkey</value>
@@ -67,35 +67,17 @@
     <data name="SettingsCategory_Model_Header" xml:space="preserve">
         <value>AI Settings</value>
     </data>
-    <data name="Settings_Model_ModelName_Header" xml:space="preserve">
-        <value>Model Name</value>
-    </data>
-    <data name="Settings_Model_ModelName_Description" xml:space="preserve">
-        <value>Specify the name of the model the assistant will use.</value>
-    </data>
-    <data name="Settings_Model_Temperature_Header" xml:space="preserve">
+    <data name="Settings_CustomAssistant_Temperature_Header" xml:space="preserve">
         <value>Creativity (temperature)</value>
     </data>
-    <data name="Settings_Model_Temperature_Description" xml:space="preserve">
+    <data name="Settings_CustomAssistant_Temperature_Description" xml:space="preserve">
         <value>Higher values yield more imaginative, creative responses; lower values produce more precise, conservative outputs; note that temperatures above 1.0 may cause garbled output in some models.</value>
     </data>
-    <data name="Settings_Model_TopP_Header" xml:space="preserve">
+    <data name="Settings_CustomAssistant_TopP_Header" xml:space="preserve">
         <value>Thought Openness (top_p)</value>
     </data>
-    <data name="Settings_Model_TopP_Description" xml:space="preserve">
+    <data name="Settings_CustomAssistant_TopP_Description" xml:space="preserve">
         <value>Higher values allow a wider range of possible responses; lower values favor the most probable answers; it’s not recommended to modify this alongside the temperature. This setting is only effective for some models. If you encounter an error, try restoring the default value.</value>
-    </data>
-    <data name="Settings_Model_IsToolCallSupported_Header" xml:space="preserve">
-        <value>Enable Tool Calling</value>
-    </data>
-    <data name="Settings_Model_IsToolCallSupported_Description" xml:space="preserve">
-        <value>When enabled, for tool-capable large models (e.g., DeepSeek-V3, GPT-4o), the assistant will invoke external tools at appropriate times to extend its capabilities; if the model doesn’t support tool calls, enabling this may cause failures.</value>
-    </data>
-    <data name="Settings_Model_IsWebSearchSupported_Header" xml:space="preserve">
-        <value>Enable Web Search</value>
-    </data>
-    <data name="Settings_Model_IsWebSearchSupported_Description" xml:space="preserve">
-        <value>When enabled, for tool-capable large models (e.g., DeepSeek-V3, GPT-4o), the assistant will perform web searches and integrate results before generating responses; if the model doesn’t support tool calls, enabling this may cause failures.</value>
     </data>
     <data name="Settings_Plugin_WebSearchEngine_SelectedWebSearchEngineProvider_Description" xml:space="preserve">
         <value>Select the service provider for web search engines.</value>
@@ -111,12 +93,6 @@
     </data>
     <data name="SettingsSelectionItem_Model_WebSearchProvider_bocha" xml:space="preserve">
         <value>Bocha</value>
-    </data>
-    <data name="Settings_Model_WebSearchApiKey_Header" xml:space="preserve">
-        <value>Web Search Service API Key</value>
-    </data>
-    <data name="Settings_Model_WebSearchApiKey_Description" xml:space="preserve">
-        <value>Specify the API access key for the web search service, obtainable from the provider’s API portal.</value>
     </data>
     <data name="Settings_Plugin_WebSearchEngine_SelectedWebSearchEngineProvider_EndPoint_Header" xml:space="preserve">
         <value>API Url</value>
@@ -509,73 +485,61 @@
     <data name="FriendlyExceptionMessage_ClientResult" xml:space="preserve">
         <value>Client error.</value>
     </data>
-    <data name="Settings_Model_PresencePenalty_Header" xml:space="preserve">
+    <data name="Settings_CustomAssistant_PresencePenalty_Header" xml:space="preserve">
         <value>Expression Divergence (presence_penalty)</value>
     </data>
-    <data name="Settings_Model_PresencePenalty_Description" xml:space="preserve">
+    <data name="Settings_CustomAssistant_PresencePenalty_Description" xml:space="preserve">
         <value>The higher the value, the more inclined to use different expressions and avoid concept repetition; the lower the value, the more inclined to use repeated concepts or narratives, resulting in more consistent expression. This setting is only effective for some models. If you encounter an error, try restoring the default value.</value>
     </data>
-    <data name="Settings_Model_FrequencyPenalty_Header" xml:space="preserve">
+    <data name="Settings_CustomAssistant_FrequencyPenalty_Header" xml:space="preserve">
         <value>Vocabulary Richness (frequency_penalty)</value>
     </data>
-    <data name="Settings_Model_FrequencyPenalty_Description" xml:space="preserve">
+    <data name="Settings_CustomAssistant_FrequencyPenalty_Description" xml:space="preserve">
         <value>The higher the value, the more diverse and rich the vocabulary; the lower the value, the simpler and more straightforward the language. This setting is only effective for some models. If you encounter an error, try restoring the default value.</value>
     </data>
-    <data name="Settings_Model_SelectedModelProvider_Description" xml:space="preserve">
-        <value>Select the large language model service provider.</value>
-    </data>
-    <data name="Settings_Model_SelectedModelProvider_Header" xml:space="preserve">
-        <value>Model Provider</value>
-    </data>
-    <data name="Settings_Model_SelectedModelDefinition_Description" xml:space="preserve">
-        <value>Select the large language model (LLM) provided by model provider.</value>
-    </data>
-    <data name="Settings_Model_SelectedModelDefinition_Header" xml:space="preserve">
-        <value>Model</value>
-    </data>
-    <data name="Settings_Model_SelectedModelProvider_Endpoint_Header" xml:space="preserve">
+    <data name="Settings_CustomAssistant_Endpoint_Header" xml:space="preserve">
         <value>API Url</value>
     </data>
-    <data name="Settings_Model_SelectedModelProvider_Endpoint_Description" xml:space="preserve">
+    <data name="Settings_CustomAssistant_Endpoint_Description" xml:space="preserve">
         <value>Leaving this to default if you don't know what to do. Must starts with "http(s)://".</value>
     </data>
-    <data name="Settings_Model_SelectedModelProvider_ApiKey_Header" xml:space="preserve">
+    <data name="Settings_CustomAssistant_ApiKey_Header" xml:space="preserve">
         <value>API Key</value>
     </data>
-    <data name="Settings_Model_SelectedModelProvider_ApiKey_Description" xml:space="preserve">
+    <data name="Settings_CustomAssistant_ApiKey_Description" xml:space="preserve">
         <value>In case of online models, you need to get from the corresponding official, please refer to the guide for details.</value>
     </data>
-    <data name="Settings_Model_SelectedModelDefinition_IsImageInputSupported_Header" xml:space="preserve">
+    <data name="Settings_CustomAssistant_IsImageInputSupported_Header" xml:space="preserve">
         <value>Support Image Input</value>
     </data>
-    <data name="Settings_Model_SelectedModelDefinition_IsImageInputSupported_Description" xml:space="preserve">
+    <data name="Settings_CustomAssistant_IsImageInputSupported_Description" xml:space="preserve">
         <value>You can upload images in chat context. If you're not sure what you're doing, keep the default value. If the model doesn’t support image inputs, enabling this may cause failures.</value>
     </data>
-    <data name="Settings_Model_SelectedModelDefinition_IsFunctionCallingSupported_Header" xml:space="preserve">
+    <data name="Settings_CustomAssistant_IsFunctionCallingSupported_Header" xml:space="preserve">
         <value>Support Tools Usage</value>
     </data>
-    <data name="Settings_Model_SelectedModelDefinition_IsFunctionCallingSupported_Description" xml:space="preserve">
+    <data name="Settings_CustomAssistant_IsFunctionCallingSupported_Description" xml:space="preserve">
         <value>Model can use tools you configured in chat context. If you're not sure what you're doing, keep the default value. If the model doesn’t support function calling, enabling this may cause failures.</value>
     </data>
-    <data name="Settings_Model_SelectedModelDefinition_IsDeepThinkingSupported_Description" xml:space="preserve">
+    <data name="Settings_CustomAssistant_IsDeepThinkingSupported_Description" xml:space="preserve">
         <value>Model can think before replies. If you're not sure what you're doing, keep the default value. If the model doesn’t support deep thinking, enabling this may cause failures.</value>
     </data>
-    <data name="Settings_Model_SelectedModelDefinition_IsDeepThinkingSupported_Header" xml:space="preserve">
+    <data name="Settings_CustomAssistant_IsDeepThinkingSupported_Header" xml:space="preserve">
         <value>Support Deep Thinking</value>
     </data>
-    <data name="Settings_Model_SelectedModelDefinition_MaxTokens_Description" xml:space="preserve">
+    <data name="Settings_CustomAssistant_MaxTokens_Description" xml:space="preserve">
         <value>The maximum context length of single chat. If you're not sure what you're doing, keep the default value. Setting this larger than the default value may cause failures.</value>
     </data>
-    <data name="Settings_Model_SelectedModelDefinition_MaxTokens_Header" xml:space="preserve">
+    <data name="Settings_CustomAssistant_MaxTokens_Header" xml:space="preserve">
         <value>Maximum Context Length (max_tokens)</value>
     </data>
     <data name="SettingsPage_RestoreDefault_Button_ToolTip" xml:space="preserve">
         <value>Restore Default</value>
     </data>
-    <data name="Settings_Model_SelectedModelProvider_Schema_Header" xml:space="preserve">
+    <data name="Settings_CustomAssistant_Schema_Header" xml:space="preserve">
         <value>API Schema</value>
     </data>
-    <data name="Settings_Model_SelectedModelProvider_Schema_Description" xml:space="preserve">
+    <data name="Settings_CustomAssistant_Schema_Description" xml:space="preserve">
         <value>Select API schema. Leaving this to default if you dont't know what to do.</value>
     </data>
     <data name="Settings_Common_IsStartupEnabled_Header" xml:space="preserve">
@@ -641,10 +605,10 @@
     <data name="Settings_Common_SoftwareUpdate_Toast_DownloadingUpdate" xml:space="preserve">
         <value>Downloading update...</value>
     </data>
-    <data name="Settings_Model_SelectedModelDefinition_ModelId_Header" xml:space="preserve">
+    <data name="Settings_CustomAssistant_ModelId_Header" xml:space="preserve">
         <value>Model ID</value>
     </data>
-    <data name="Settings_Model_SelectedModelDefinition_ModelId_Description" xml:space="preserve">
+    <data name="Settings_CustomAssistant_ModelId_Description" xml:space="preserve">
         <value>Model identifier used for API calls, such as gpt-4o. If you are unsure what this is, keep the default value.</value>
     </data>
     <data name="ChatPluginPage_Title" xml:space="preserve">
@@ -893,14 +857,8 @@ My intelligence comes from powerful Large language models (LLMs), which are prov
     <data name="HandledChatException_Unknown" xml:space="preserve">
         <value>An unknown error occurred.</value>
     </data>
-    <data name="KernelMixinFactory_NoModelDefinition" xml:space="preserve">
-        <value>No model definition found with the selected ID.</value>
-    </data>
     <data name="KernelMixinFactory_UnsupportedModelProviderSchema" xml:space="preserve">
         <value>Unsupported model provider API schema.</value>
-    </data>
-    <data name="KernelMixinFactory_NoModelProvider" xml:space="preserve">
-        <value>No model provider found with the selected ID.</value>
     </data>
     <data name="ChatWindowViewModel_QuickActions_Solve" xml:space="preserve">
         <value>Solve</value>
@@ -970,5 +928,111 @@ My intelligence comes from powerful Large language models (LLMs), which are prov
     </data>
     <data name="HandledChatException_ContextLengthExceeded" xml:space="preserve">
         <value>Context length exceeded.</value>
+    </data>
+    <data name="CustomAssistant_Name_Default" xml:space="preserve">
+        <value>Default Assistant</value>
+    </data>
+    <data name="CustomAssistantPage_Title" xml:space="preserve">
+        <value>AI Assistant</value>
+    </data>
+    <data name="CustomAssistantPage_CreateNewCustomAssistantButton_Content" xml:space="preserve">
+        <value>Create</value>
+    </data>
+    <data name="Settings_CustomAssistant_Name_Header" xml:space="preserve">
+        <value>Name</value>
+    </data>
+    <data name="Settings_CustomAssistant_Name_Description" xml:space="preserve">
+        <value>Specify the name of the assistant, used solely for display and differentiation purposes.</value>
+    </data>
+    <data name="Settings_CustomAssistant_Description_Header" xml:space="preserve">
+        <value>Description</value>
+    </data>
+    <data name="Settings_CustomAssistant_Description_Description" xml:space="preserve">
+        <value>Specify the description of the assistant, used solely for display and differentiation purposes.</value>
+    </data>
+    <data name="Settings_CustomAssistant_SystemPrompt_Description" xml:space="preserve">
+        <value>The system prompt is sent to the model by default at the start of the conversation. A well-crafted prompt includes an introduction, task description, and contextual information.
+Placeholders can be used within the prompt, enclosed in {}, and will be replaced with corresponding content before being sent to the model.</value>
+    </data>
+    <data name="Settings_CustomAssistant_SystemPrompt_Header" xml:space="preserve">
+        <value>System Prompt</value>
+    </data>
+    <data name="CustomAssistantPage_DeleteCustomAssistantButton_Content" xml:space="preserve">
+        <value>Delete</value>
+    </data>
+    <data name="Common_Warning" xml:space="preserve">
+        <value>Warning</value>
+    </data>
+    <data name="CustomAssistantPageViewModel_DeleteCustomAssistant_Dialog_Message" xml:space="preserve">
+        <value>Are you sure you want to delete the "{0}"?</value>
+    </data>
+    <data name="Common_Yes" xml:space="preserve">
+        <value>Yes</value>
+    </data>
+    <data name="Common_No" xml:space="preserve">
+        <value>No</value>
+    </data>
+    <data name="Settings_CustomAssistant_ModelProviderTemplate_Header" xml:space="preserve">
+        <value>Model Provider Template</value>
+    </data>
+    <data name="Settings_CustomAssistant_ModelDefinitionTemplate_Header" xml:space="preserve">
+        <value>Model Definition Template</value>
+    </data>
+    <data name="Settings_CustomAssistant_ModelDefinitionTemplate_Description" xml:space="preserve">
+        <value>Select a template to automatically set default values for options such as model ID, image input support, tool usage support, and more. Click the Reset button to revert to undefined settings.</value>
+    </data>
+    <data name="Settings_CustomAssistant_ModelProviderTemplate_Description" xml:space="preserve">
+        <value>Select a template to automatically set default values for options such as the API call address and API mode. Click the Reset button to revert to undefined settings.</value>
+    </data>
+    <data name="HandledSystemException_IOException" xml:space="preserve">
+        <value>A general I/O error occurred. This might be due to a problem with reading or writing a file.</value>
+    </data>
+    <data name="HandledSystemException_UnauthorizedAccess" xml:space="preserve">
+        <value>Access to a required resource was denied. Please check file permissions or run the application as an administrator.</value>
+    </data>
+    <data name="HandledSystemException_PathTooLong" xml:space="preserve">
+        <value>The specified file or directory path is too long. Please try using a shorter path.</value>
+    </data>
+    <data name="HandledSystemException_OperationCancelled" xml:space="preserve">
+        <value>The operation was cancelled.</value>
+    </data>
+    <data name="HandledSystemException_Timeout" xml:space="preserve">
+        <value>The operation timed out. Please check your system performance and try again.</value>
+    </data>
+    <data name="HandledSystemException_FileNotFound" xml:space="preserve">
+        <value>The specified file could not be found. Please ensure the file exists and the path is correct.</value>
+    </data>
+    <data name="HandledSystemException_DirectoryNotFound" xml:space="preserve">
+        <value>The specified directory could not be found. Please ensure the directory exists and the path is correct.</value>
+    </data>
+    <data name="HandledSystemException_NotSupported" xml:space="preserve">
+        <value>The requested operation is not supported on your system.</value>
+    </data>
+    <data name="HandledSystemException_Security" xml:space="preserve">
+        <value>A security error occurred. The application may not have the necessary permissions.</value>
+    </data>
+    <data name="HandledSystemException_COMException" xml:space="preserve">
+        <value>A system component (COM) error occurred. This may indicate an issue with the OS or a dependency.</value>
+    </data>
+    <data name="HandledSystemException_Win32Exception" xml:space="preserve">
+        <value>A Windows system error occurred. Please check the application logs for more details.</value>
+    </data>
+    <data name="HandledSystemException_Socket" xml:space="preserve">
+        <value>A network socket error occurred. Please check your network connection and firewall settings.</value>
+    </data>
+    <data name="HandledSystemException_OutOfMemory" xml:space="preserve">
+        <value>The application ran out of memory. Please close other programs and try again.</value>
+    </data>
+    <data name="HandledSystemException_DriveNotFound" xml:space="preserve">
+        <value>The specified drive could not be found. Please ensure the drive is connected and accessible.</value>
+    </data>
+    <data name="HandledSystemException_EndOfStream" xml:space="preserve">
+        <value>An unexpected end of a data stream was reached. This might indicate a corrupted file or network issue.</value>
+    </data>
+    <data name="HandledSystemException_InvalidData" xml:space="preserve">
+        <value>The data being processed is invalid or corrupted. Please check the source file or data.</value>
+    </data>
+    <data name="HandledSystemException_Unknown" xml:space="preserve">
+        <value>An unexpected system error occurred. Please try again or check the application logs.</value>
     </data>
 </root>

@@ -1,6 +1,7 @@
 ﻿using System.Security.Cryptography;
 using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Everywhere.Common;
 using Everywhere.Interop;
 using Everywhere.Storage;
 using Everywhere.Utilities;
@@ -123,12 +124,14 @@ public partial class ChatFileAttachment(
 
         try
         {
+            if (!File.Exists(FilePath)) return null;
             await using var stream = File.OpenRead(FilePath);
             var bitmap = Bitmap.DecodeToWidth(stream, maxWidth);
             return await ResizeImageOnDemandAsync(bitmap, maxWidth, maxHeight);
         }
         catch (Exception ex)
         {
+            ex = HandledSystemException.Handle(ex);
             Log.Logger.ForContext<ChatFileAttachment>().Error(ex, "Failed to load image from file: {FilePath}", FilePath);
             return null;
         }

@@ -45,7 +45,7 @@ public class EmptyDynamicResourceKey : DynamicResourceKeyBase
 public partial class DynamicResourceKey(object key) : DynamicResourceKeyBase
 {
     [Key(0)]
-    protected object Key { get; } = key;
+    public object Key { get; } = key;
 
     protected IObservable<object?> GetObservable() =>
         Application.Current?.Resources.GetResourceObservable(Key, NotFoundConverter) ?? EmptyDynamicResourceKey.Instance;
@@ -234,4 +234,6 @@ public class DynamicResourceKeyAttribute(string key) : Attribute
 public static class DynamicResourceKeyExtension
 {
     public static string I18N(this string key) => DynamicResourceKey.Resolve(key);
+
+    public static string I18N(this string key, params DynamicResourceKeyBase[] args) => new FormattedDynamicResourceKey(key, args).ToString();
 }

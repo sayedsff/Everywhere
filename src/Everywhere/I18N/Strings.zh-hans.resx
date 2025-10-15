@@ -53,35 +53,17 @@
     <data name="SettingsCategory_Model_Header" xml:space="preserve">
         <value>AI 设置</value>
     </data>
-    <data name="Settings_Model_ModelName_Header" xml:space="preserve">
-        <value>模型名称</value>
-    </data>
-    <data name="Settings_Model_ModelName_Description" xml:space="preserve">
-        <value>指定助手调用的模型名称。</value>
-    </data>
-    <data name="Settings_Model_Temperature_Header" xml:space="preserve">
+    <data name="Settings_CustomAssistant_Temperature_Header" xml:space="preserve">
         <value>创意活跃度 (temperature)</value>
     </data>
-    <data name="Settings_Model_Temperature_Description" xml:space="preserve">
+    <data name="Settings_CustomAssistant_Temperature_Description" xml:space="preserve">
         <value>数值越高，回答越具创造力和想象力；数值越低，则越趋严谨；部分模型数值超过 1.0 可能导致输出乱码。</value>
     </data>
-    <data name="Settings_Model_TopP_Header" xml:space="preserve">
+    <data name="Settings_CustomAssistant_TopP_Header" xml:space="preserve">
         <value>思维开放度 (top_p)</value>
     </data>
-    <data name="Settings_Model_TopP_Description" xml:space="preserve">
+    <data name="Settings_CustomAssistant_TopP_Description" xml:space="preserve">
         <value>数值越高，模型会接受更多潜在回答；数值越低，则更倾向于最可能的回答；不建议与创意活跃度同时调整。该设置仅对部分模型有效，如果遇到错误，请尝试还原默认值。</value>
-    </data>
-    <data name="Settings_Model_IsToolCallSupported_Header" xml:space="preserve">
-        <value>开启工具调用</value>
-    </data>
-    <data name="Settings_Model_IsToolCallSupported_Description" xml:space="preserve">
-        <value>开启后，在支持工具调用的大模型 (如 DeepSeek-V3、GPT-4o) 中，助手会在合适时机调用外部工具以扩展能力；若模型不支持此功能，则可能导致调用失败。</value>
-    </data>
-    <data name="Settings_Model_IsWebSearchSupported_Header" xml:space="preserve">
-        <value>开启网络搜索</value>
-    </data>
-    <data name="Settings_Model_IsWebSearchSupported_Description" xml:space="preserve">
-        <value>开启后，在支持工具调用的大模型 (如 DeepSeek-V3、GPT-4o) 中，助手会先进行网络搜索并整合结果后再生成回复；若模型不支持此功能，则可能导致调用失败。</value>
     </data>
     <data name="Settings_Plugin_WebSearchEngine_SelectedWebSearchEngineProvider_Description" xml:space="preserve">
         <value>选择用于网络搜索引擎的服务提供商。</value>
@@ -97,12 +79,6 @@
     </data>
     <data name="SettingsSelectionItem_Model_WebSearchProvider_bocha" xml:space="preserve">
         <value>博查</value>
-    </data>
-    <data name="Settings_Model_WebSearchApiKey_Header" xml:space="preserve">
-        <value>网络搜索服务 API Key</value>
-    </data>
-    <data name="Settings_Model_WebSearchApiKey_Description" xml:space="preserve">
-        <value>指定网络搜索服务的 API 访问密钥，可在对应服务提供商的 API 控制台获取。</value>
     </data>
     <data name="Settings_Plugin_WebSearchEngine_SelectedWebSearchEngineProvider_EndPoint_Header" xml:space="preserve">
         <value>API 调用地址</value>
@@ -496,73 +472,61 @@
     <data name="FriendlyExceptionMessage_ClientResult" xml:space="preserve">
         <value>客户端错误。</value>
     </data>
-    <data name="Settings_Model_PresencePenalty_Description" xml:space="preserve">
+    <data name="Settings_CustomAssistant_PresencePenalty_Description" xml:space="preserve">
         <value>值越大，越倾向不同的表达方式，避免概念重复；值越小，越倾向使用重复的概念或叙述，表达更具一致性。该设置仅对部分模型有效，如果遇到错误，请尝试还原默认值。</value>
     </data>
-    <data name="Settings_Model_PresencePenalty_Header" xml:space="preserve">
+    <data name="Settings_CustomAssistant_PresencePenalty_Header" xml:space="preserve">
         <value>表述发散度 (presence_penalty)</value>
     </data>
-    <data name="Settings_Model_FrequencyPenalty_Header" xml:space="preserve">
+    <data name="Settings_CustomAssistant_FrequencyPenalty_Header" xml:space="preserve">
         <value>词汇丰富度 (frequency_penalty)</value>
     </data>
-    <data name="Settings_Model_FrequencyPenalty_Description" xml:space="preserve">
+    <data name="Settings_CustomAssistant_FrequencyPenalty_Description" xml:space="preserve">
         <value>值越大，用词越丰富多样；值越低，用词更朴实简单。该设置仅对部分模型有效，如果遇到错误，请尝试还原默认值。</value>
     </data>
-    <data name="Settings_Model_SelectedModelProvider_Header" xml:space="preserve">
-        <value>模型提供商</value>
-    </data>
-    <data name="Settings_Model_SelectedModelProvider_Description" xml:space="preserve">
-        <value>选择大语言模型 (LLM) 服务提供商。</value>
-    </data>
-    <data name="Settings_Model_SelectedModelDefinition_Header" xml:space="preserve">
-        <value>模型</value>
-    </data>
-    <data name="Settings_Model_SelectedModelDefinition_Description" xml:space="preserve">
-        <value>选择模型提供商的大语言模型 (LLM)。</value>
-    </data>
-    <data name="Settings_Model_SelectedModelProvider_Endpoint_Header" xml:space="preserve">
+    <data name="Settings_CustomAssistant_Endpoint_Header" xml:space="preserve">
         <value>API 调用地址</value>
     </data>
-    <data name="Settings_Model_SelectedModelProvider_Endpoint_Description" xml:space="preserve">
+    <data name="Settings_CustomAssistant_Endpoint_Description" xml:space="preserve">
         <value>如果你不确定这是什么，请保持默认值。必须以“http(s)://”开头。</value>
     </data>
-    <data name="Settings_Model_SelectedModelProvider_ApiKey_Header" xml:space="preserve">
+    <data name="Settings_CustomAssistant_ApiKey_Header" xml:space="preserve">
         <value>API 密钥</value>
     </data>
-    <data name="Settings_Model_SelectedModelProvider_ApiKey_Description" xml:space="preserve">
+    <data name="Settings_CustomAssistant_ApiKey_Description" xml:space="preserve">
         <value>如果是在线模型，需要从对应的官方获取，详情请参考指南。</value>
     </data>
-    <data name="Settings_Model_SelectedModelDefinition_IsImageInputSupported_Header" xml:space="preserve">
+    <data name="Settings_CustomAssistant_IsImageInputSupported_Header" xml:space="preserve">
         <value>支持图像输入</value>
     </data>
-    <data name="Settings_Model_SelectedModelDefinition_IsImageInputSupported_Description" xml:space="preserve">
+    <data name="Settings_CustomAssistant_IsImageInputSupported_Description" xml:space="preserve">
         <value>你可以在聊天上下文中上传图像。如果你不确定这是什么，请保持默认值。如果模型不支持，开启此选项可能会导致调用失败。</value>
     </data>
-    <data name="Settings_Model_SelectedModelDefinition_IsFunctionCallingSupported_Header" xml:space="preserve">
+    <data name="Settings_CustomAssistant_IsFunctionCallingSupported_Header" xml:space="preserve">
         <value>支持使用工具</value>
     </data>
-    <data name="Settings_Model_SelectedModelDefinition_IsFunctionCallingSupported_Description" xml:space="preserve">
+    <data name="Settings_CustomAssistant_IsFunctionCallingSupported_Description" xml:space="preserve">
         <value>模型会在聊天上下文中使用你配置的工具。如果你不确定这是什么，请保持默认值。如果模型不支持，开启此选项可能会导致调用失败。</value>
     </data>
-    <data name="Settings_Model_SelectedModelDefinition_IsDeepThinkingSupported_Header" xml:space="preserve">
+    <data name="Settings_CustomAssistant_IsDeepThinkingSupported_Header" xml:space="preserve">
         <value>支持深度思考</value>
     </data>
-    <data name="Settings_Model_SelectedModelDefinition_IsDeepThinkingSupported_Description" xml:space="preserve">
+    <data name="Settings_CustomAssistant_IsDeepThinkingSupported_Description" xml:space="preserve">
         <value>模型会先思考再回答。如果你不确定这是什么，请保持默认值。如果模型不支持，开启此选项可能会导致调用失败。</value>
     </data>
-    <data name="Settings_Model_SelectedModelDefinition_MaxTokens_Description" xml:space="preserve">
+    <data name="Settings_CustomAssistant_MaxTokens_Description" xml:space="preserve">
         <value>单个对话的最大上下文长度。如果你不确定在做什么，请保持默认值。设为大于默认值可能导致调用失败。</value>
     </data>
-    <data name="Settings_Model_SelectedModelDefinition_MaxTokens_Header" xml:space="preserve">
+    <data name="Settings_CustomAssistant_MaxTokens_Header" xml:space="preserve">
         <value>最大上下文长度 (max_tokens)</value>
     </data>
     <data name="SettingsPage_RestoreDefault_Button_ToolTip" xml:space="preserve">
         <value>恢复默认</value>
     </data>
-    <data name="Settings_Model_SelectedModelProvider_Schema_Header" xml:space="preserve">
+    <data name="Settings_CustomAssistant_Schema_Header" xml:space="preserve">
         <value>API 模式</value>
     </data>
-    <data name="Settings_Model_SelectedModelProvider_Schema_Description" xml:space="preserve">
+    <data name="Settings_CustomAssistant_Schema_Description" xml:space="preserve">
         <value>选择 API 的模式。如果你不确定这是什么，请保持默认值。</value>
     </data>
     <data name="Settings_Common_IsStartupEnabled_Header" xml:space="preserve">
@@ -628,10 +592,10 @@
     <data name="Settings_Common_SoftwareUpdate_Toast_DownloadingUpdate" xml:space="preserve">
         <value>下载更新中...</value>
     </data>
-    <data name="Settings_Model_SelectedModelDefinition_ModelId_Header" xml:space="preserve">
+    <data name="Settings_CustomAssistant_ModelId_Header" xml:space="preserve">
         <value>模型 ID</value>
     </data>
-    <data name="Settings_Model_SelectedModelDefinition_ModelId_Description" xml:space="preserve">
+    <data name="Settings_CustomAssistant_ModelId_Description" xml:space="preserve">
         <value>用于 API 调用的模型标识，例如 gpt-4o。如果你不确定这是什么，请保持默认值。</value>
     </data>
     <data name="ChatPluginPage_Title" xml:space="preserve">
@@ -874,12 +838,6 @@
     <data name="HandledChatException_InvalidApiKey" xml:space="preserve">
         <value>API 密钥缺失或无效。</value>
     </data>
-    <data name="KernelMixinFactory_NoModelDefinition" xml:space="preserve">
-        <value>未找到具有所选 ID 的模型定义。</value>
-    </data>
-    <data name="KernelMixinFactory_NoModelProvider" xml:space="preserve">
-        <value>未找到具有所选 ID 的模型提供商。</value>
-    </data>
     <data name="KernelMixinFactory_UnsupportedModelProviderSchema" xml:space="preserve">
         <value>不支持的模型提供商 API 协议。</value>
     </data>
@@ -951,5 +909,112 @@
     </data>
     <data name="HandledChatException_ContextLengthExceeded" xml:space="preserve">
         <value>上下文长度超出限制。</value>
+    </data>
+    <data name="CustomAssistant_Name_Default" xml:space="preserve">
+        <value>默认助手</value>
+    </data>
+    <data name="CustomAssistantPage_Title" xml:space="preserve">
+        <value>AI 助手</value>
+    </data>
+    <data name="CustomAssistantPage_CreateNewCustomAssistantButton_Content" xml:space="preserve">
+        <value>创建</value>
+    </data>
+    <data name="Settings_CustomAssistant_SystemPrompt_Header" xml:space="preserve">
+        <value>系统提示词</value>
+    </data>
+    <data name="Settings_CustomAssistant_SystemPrompt_Description" xml:space="preserve">
+        <value>系统提示词会在对话的开始默认发送给模型，一个好的提示词包括介绍、任务、上下文描述等。
+提示词中可以使用占位符，包含在 {} 中，在发送给模型前会被替换成对应的内容。</value>
+    </data>
+    <data name="Settings_CustomAssistant_Name_Header" xml:space="preserve">
+        <value>名称</value>
+    </data>
+    <data name="Settings_CustomAssistant_Name_Description" xml:space="preserve">
+        <value>指定助手的名称，仅用于显示和区分。</value>
+    </data>
+    <data name="Settings_CustomAssistant_Description_Header" xml:space="preserve">
+        <value>描述</value>
+    </data>
+    <data name="Settings_CustomAssistant_Description_Description" xml:space="preserve">
+        <value>指定助手的描述，仅用于显示和区分。</value>
+    </data>
+    <data name="CustomAssistantPage_DeleteCustomAssistantButton_Content" xml:space="preserve">
+        <value>删除</value>
+    </data>
+    <data name="Common_Warning" xml:space="preserve">
+        <value>警告</value>
+    </data>
+    <data name="CustomAssistantPageViewModel_DeleteCustomAssistant_Dialog_Message" xml:space="preserve">
+        <value>你确定要删除当前助手吗？
+“{0}”将会永久消失！（真的很久！）</value>
+    </data>
+    <data name="Common_Yes" xml:space="preserve">
+        <value>是</value>
+    </data>
+    <data name="Common_No" xml:space="preserve">
+        <value>否</value>
+    </data>
+    <data name="Settings_CustomAssistant_ModelProviderTemplate_Header" xml:space="preserve">
+        <value>模型提供商模板</value>
+    </data>
+    <data name="Settings_CustomAssistant_ModelDefinitionTemplate_Header" xml:space="preserve">
+        <value>模型定义模板</value>
+    </data>
+    <data name="Settings_CustomAssistant_ModelProviderTemplate_Description" xml:space="preserve">
+        <value>选择一个模板，这会自动设置 API 调用地址、API 模式等选项的默认值。点击重置按钮还原到无定义。</value>
+    </data>
+    <data name="Settings_CustomAssistant_ModelDefinitionTemplate_Description" xml:space="preserve">
+        <value>选择一个模板，这会自动设置模型 ID、支持图像输入、支持使用工具等等选项的默认值。点击重置按钮还原到无定义。</value>
+    </data>
+    <data name="HandledSystemException_Unknown" xml:space="preserve">
+        <value>发生意外的系统错误。请重试或检查应用程序日志。</value>
+    </data>
+    <data name="HandledSystemException_IOException" xml:space="preserve">
+        <value>发生通用 I/O 错误。可能是读写文件时出现问题。</value>
+    </data>
+    <data name="HandledSystemException_UnauthorizedAccess" xml:space="preserve">
+        <value>访问所需资源被拒绝。请检查文件权限或以管理员身份运行应用程序。</value>
+    </data>
+    <data name="HandledSystemException_PathTooLong" xml:space="preserve">
+        <value>指定的文件或目录路径过长。请尝试使用更短的路径。</value>
+    </data>
+    <data name="HandledSystemException_OperationCancelled" xml:space="preserve">
+        <value>操作已取消。</value>
+    </data>
+    <data name="HandledSystemException_Timeout" xml:space="preserve">
+        <value>操作超时。请检查您的系统性能，然后重试。</value>
+    </data>
+    <data name="HandledSystemException_FileNotFound" xml:space="preserve">
+        <value>找不到指定的文件。请确保文件存在且路径正确。</value>
+    </data>
+    <data name="HandledSystemException_DirectoryNotFound" xml:space="preserve">
+        <value>找不到指定的目录。请确保目录存在且路径正确。</value>
+    </data>
+    <data name="HandledSystemException_NotSupported" xml:space="preserve">
+        <value>您的系统不支持所请求的操作。</value>
+    </data>
+    <data name="HandledSystemException_Security" xml:space="preserve">
+        <value>发生安全错误。应用程序可能没有必要的权限。</value>
+    </data>
+    <data name="HandledSystemException_COMException" xml:space="preserve">
+        <value>发生系统组件 (COM) 错误。这可能表示操作系统或依赖项存在问题。</value>
+    </data>
+    <data name="HandledSystemException_Win32Exception" xml:space="preserve">
+        <value>发生 Windows 系统错误。请检查应用程序日志以获取更多详细信息。</value>
+    </data>
+    <data name="HandledSystemException_Socket" xml:space="preserve">
+        <value>发生网络套接字错误。请检查您的网络连接和防火墙设置。</value>
+    </data>
+    <data name="HandledSystemException_OutOfMemory" xml:space="preserve">
+        <value>应用程序内存不足。请关闭其他程序后重试。</value>
+    </data>
+    <data name="HandledSystemException_DriveNotFound" xml:space="preserve">
+        <value>找不到指定的驱动器。请确保驱动器已连接且可访问。</value>
+    </data>
+    <data name="HandledSystemException_EndOfStream" xml:space="preserve">
+        <value>意外到达数据流的末尾。这可能表示文件损坏或网络问题。</value>
+    </data>
+    <data name="HandledSystemException_InvalidData" xml:space="preserve">
+        <value>正在处理的数据无效或已损坏。请检查源文件或数据。</value>
     </data>
 </root>
