@@ -1,3 +1,16 @@
+## [v0.3.11](https://github.com/DearVa/Everywhere/releases/tag/v0.3.11) - 2025-10-16
+
+🚀 Features
+- 🎉 Added custom assistants! You can now create multiple assistants with different icons, names, and prompts, and switch between them freely during a chat
+- Added support for the Tavily web search engine
+
+✨ Improvements
+- Optimized exception handling
+
+**Full Changelog**: https://github.com/DearVa/Everywhere/compare/v0.3.10...v0.3.11
+
+
+
 ## [v0.3.10](https://github.com/DearVa/Everywhere/releases/tag/v0.3.10) - 2025-10-14
 
 ✨ Improvements
