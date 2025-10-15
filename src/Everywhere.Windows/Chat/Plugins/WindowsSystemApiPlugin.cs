@@ -331,6 +331,9 @@ public class WindowsSystemApiPlugin : BuiltInChatPlugin
 
     private static class AudioControl
     {
+    // IID_IAudioEndpointVolume: Interface ID for IAudioEndpointVolume (Windows Core Audio API)
+    // Source: https://learn.microsoft.com/en-us/windows/win32/api/endpointvolume/nn-endpointvolume-iaudioendpointvolume
+    // Value: 5CDF2C82-841E-4546-9722-0CF74078229A
     private static readonly Guid AudioEndpointVolumeGuid = new("5CDF2C82-841E-4546-9722-0CF74078229A");
         private static readonly Guid AudioDeviceEnumeratorClassId = new("BCDE0395-E52F-467C-8E3D-C4579291692E");
         private const int CLSCTX_ALL = 23;
