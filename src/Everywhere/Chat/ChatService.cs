@@ -881,13 +881,13 @@ public class ChatService(
                 // 如果只有一个文本项，简化格式
                 if (contentItems.Count == 1 && contentItems[0] is { } firstItem)
                 {
-                    var itemDict = firstItem as dynamic;
-                    if (itemDict?.type == "text")
+                    // Use pattern matching to avoid dynamic
+                    if (firstItem is { type: "text", text: var text })
                     {
                         messages.Add(new
                         {
                             role = msg.Role.Label,
-                            content = itemDict.text
+                            content = text
                         });
                         continue;
                     }
