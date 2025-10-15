@@ -227,7 +227,7 @@ public partial class ChatWindowViewModel : BusyViewModelBase
                     }
                 }
             }
-            else if (Settings.Model.SelectedModelDefinition?.IsImageInputSupported.ActualValue is true)
+            else if (Settings.Model.SelectedCustomAssistant?.IsImageInputSupported.ActualValue is true)
             {
                 if (await _nativeHelper.GetClipboardBitmapAsync() is not { } bitmap) return;
 
@@ -318,7 +318,7 @@ public partial class ChatWindowViewModel : BusyViewModelBase
                 return; // TODO: 0.3.0
             }
 
-            if (Settings.Model.SelectedModelDefinition?.IsImageInputSupported.ActualValue is not true)
+            if (Settings.Model.SelectedCustomAssistant?.IsImageInputSupported.ActualValue is not true)
             {
                 return;
             }

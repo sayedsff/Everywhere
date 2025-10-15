@@ -47,17 +47,17 @@ public partial class Win32VisualElementContext : IVisualElementContext
         _nativeHelper = nativeHelper;
         _logger = logger;
 
-        Automation.RegisterFocusChangedEvent(element =>
-        {
-            if (KeyboardFocusedElementChanged is not { } handler) return;
-            if (element == null)
-            {
-                handler(null);
-                return;
-            }
-
-            handler(new AutomationVisualElementImpl(this, element, true));
-        });
+        // Automation.RegisterFocusChangedEvent(element =>
+        // {
+        //     if (KeyboardFocusedElementChanged is not { } handler) return;
+        //     if (element == null)
+        //     {
+        //         handler(null);
+        //         return;
+        //     }
+//
+        //     handler(new AutomationVisualElementImpl(this, element, true));
+        // });
     }
 
 

@@ -126,8 +126,7 @@
         Stretch="Uniform"/>
       <LucideIcon
         Grid.Row="0" Grid.RowSpan="3"
-        Grid.Column="0" Width="128"
-        Height="128" Margin="0,0,16,0"
+        Grid.Column="0" Margin="0,0,16,0"
         IsVisible="{Binding SelectedPlugin.BeautifulIcon, FallbackValue=false, Converter={x:Static ObjectConverters.IsNull}}"
         Kind="{Binding SelectedPlugin.Icon, FallbackValue=Hammer}"
         Size="128"/>

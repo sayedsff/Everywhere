@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Everywhere.AI;
 using Everywhere.Configuration;
 using Everywhere.Utilities;
 using Lucide.Avalonia;
@@ -79,7 +80,7 @@ public class ChatPluginManager : IChatPluginManager
         throw new NotImplementedException();
     }
 
-    public IChatPluginScope CreateScope(ChatContext chatContext)
+    public IChatPluginScope CreateScope(ChatContext chatContext, CustomAssistant customAssistant)
     {
         return new Scope(
             _builtInPlugins
@@ -87,7 +88,7 @@ public class ChatPluginManager : IChatPluginManager
                 .Cast<ChatPlugin>()
                 .Concat(_mcpPlugins)
                 .Where(p => p.IsEnabled)
-                .Select(p => new ChatPluginSnapshot(p, chatContext))
+                .Select(p => new ChatPluginSnapshot(p, chatContext, customAssistant))
                 .ToList());
     }
 
@@ -100,11 +101,15 @@ public class ChatPluginManager : IChatPluginManager
 
         private readonly ChatPlugin _originalChatPlugin;
 
-        public ChatPluginSnapshot(ChatPlugin originalChatPlugin, ChatContext chatContext) : base(originalChatPlugin.Name)
+        public ChatPluginSnapshot(
+            ChatPlugin originalChatPlugin,
+            ChatContext chatContext,
+            CustomAssistant customAssistant
+        ) : base(originalChatPlugin.Name)
         {
             _originalChatPlugin = originalChatPlugin;
             AllowedPermissions = originalChatPlugin.AllowedPermissions.ActualValue;
-            _functions.AddRange(originalChatPlugin.SnapshotFunctions(chatContext));
+            _functions.AddRange(originalChatPlugin.SnapshotFunctions(chatContext, customAssistant));
         }
     }
 

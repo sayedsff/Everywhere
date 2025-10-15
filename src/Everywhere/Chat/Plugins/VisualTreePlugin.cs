@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using Everywhere.AI;
 using Everywhere.Configuration;
 using Everywhere.Database;
 using Everywhere.Interop;
@@ -36,12 +37,13 @@ public class VisualTreePlugin : BuiltInChatPlugin
     /// When LLM does not support image input or image feature is disabled, and there is no visual element in the chat context, hide this plugin.
     /// </summary>
     /// <param name="chatContext"></param>
+    /// <param name="customAssistant"></param>
     /// <returns></returns>
-    public override IEnumerable<ChatFunction> SnapshotFunctions(ChatContext chatContext) =>
-        _settings.Model.SelectedModelDefinition?.IsImageInputSupported.ActualValue is not true ||
+    public override IEnumerable<ChatFunction> SnapshotFunctions(ChatContext chatContext, CustomAssistant customAssistant) =>
+        customAssistant.IsImageInputSupported.ActualValue is not true ||
         chatContext.VisualElements.Count == 0 ?
             [] :
-            base.SnapshotFunctions(chatContext);
+            base.SnapshotFunctions(chatContext, customAssistant);
 
     [KernelFunction("capture_visual_element_by_id")]
     [Description("Captures a screenshot of the specified visual element by Id. Use when XML content is inaccessible or element is image-like.")]

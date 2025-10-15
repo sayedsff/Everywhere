@@ -141,7 +141,7 @@ public partial class ChatContextManager : ObservableObject, IChatContextManager,
         if (IsEmptyContext(_current)) return;
 
         var renderedSystemPrompt = Prompts.RenderPrompt(
-            Prompts.DefaultSystemPrompt,
+            _settings.Model.SelectedCustomAssistant?.SystemPrompt ?? Prompts.DefaultSystemPrompt,
             new Dictionary<string, Func<string>>
             {
                 { "OS", () => Environment.OSVersion.ToString() },

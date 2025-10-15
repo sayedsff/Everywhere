@@ -8,6 +8,7 @@ using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
 using Avalonia.Media;
 using CommunityToolkit.Mvvm.Input;
+using Everywhere.AI;
 using Everywhere.Chat;
 using Everywhere.Utilities;
 
@@ -32,13 +33,19 @@ public partial class ChatInputBox : TextBox
     public static readonly StyledProperty<int> MaxChatAttachmentCountProperty =
         AvaloniaProperty.Register<ChatInputBox, int>(nameof(MaxChatAttachmentCount));
 
-    public static readonly DirectProperty<ChatInputBox, AvaloniaList<MenuItem>> AddChatAttachmentMenuItemsProperty =
-        AvaloniaProperty.RegisterDirect<ChatInputBox, AvaloniaList<MenuItem>>(
+    public static readonly StyledProperty<IEnumerable<CustomAssistant>?> CustomAssistantsProperty =
+        AvaloniaProperty.Register<ChatInputBox, IEnumerable<CustomAssistant>?>(nameof(CustomAssistants));
+
+    public static readonly StyledProperty<CustomAssistant?> SelectedCustomAssistantProperty =
+        AvaloniaProperty.Register<ChatInputBox, CustomAssistant?>(nameof(SelectedCustomAssistant));
+
+    public static readonly DirectProperty<ChatInputBox, IEnumerable?> AddChatAttachmentMenuItemsProperty =
+        AvaloniaProperty.RegisterDirect<ChatInputBox, IEnumerable?>(
             nameof(AddChatAttachmentMenuItems),
             o => o.AddChatAttachmentMenuItems);
 
-    public static readonly DirectProperty<ChatInputBox, AvaloniaList<MenuItem>> SettingsMenuItemsProperty =
-        AvaloniaProperty.RegisterDirect<ChatInputBox, AvaloniaList<MenuItem>>(
+    public static readonly DirectProperty<ChatInputBox, IEnumerable?> SettingsMenuItemsProperty =
+        AvaloniaProperty.RegisterDirect<ChatInputBox, IEnumerable?>(
             nameof(SettingsMenuItems),
             o => o.SettingsMenuItems);
 
@@ -93,17 +100,29 @@ public partial class ChatInputBox : TextBox
         set => SetValue(MaxChatAttachmentCountProperty, value);
     }
 
-    public AvaloniaList<MenuItem> AddChatAttachmentMenuItems
+    public CustomAssistant? SelectedCustomAssistant
+    {
+        get => GetValue(SelectedCustomAssistantProperty);
+        set => SetValue(SelectedCustomAssistantProperty, value);
+    }
+
+    public IEnumerable<CustomAssistant>? CustomAssistants
+    {
+        get => GetValue(CustomAssistantsProperty);
+        set => SetValue(CustomAssistantsProperty, value);
+    }
+
+    public IEnumerable? AddChatAttachmentMenuItems
     {
         get;
         set => SetAndRaise(AddChatAttachmentMenuItemsProperty, ref field, value);
-    } = [];
+    } = new AvaloniaList<MenuItem>();
 
-    public AvaloniaList<MenuItem> SettingsMenuItems
+    public IEnumerable? SettingsMenuItems
     {
         get;
         set => SetAndRaise(SettingsMenuItemsProperty, ref field, value);
-    } = [];
+    } = new AvaloniaList<MenuItem>();
 
     public bool IsImageSupported
     {
@@ -255,6 +274,12 @@ public partial class ChatInputBox : TextBox
         }
 
         base.OnPointerPressed(e);
+    }
+
+    [RelayCommand]
+    private void SetSelectedCustomAssistant(MenuItem? sender)
+    {
+        SelectedCustomAssistant = sender?.DataContext as CustomAssistant;
     }
 
     [RelayCommand]

@@ -5,8 +5,6 @@ using Everywhere.AI;
 using Everywhere.Common;
 using Everywhere.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.ChatCompletion;
 using ShadUI;
 using ZLinq;
 
@@ -32,13 +30,13 @@ public partial class WelcomeViewModel : BusyViewModelBase
         Telemetry = 4
     }
 
-    public record ModelProviderWrapper(ModelProvider Provider)
+    public record ModelProviderWrapper(ModelProviderTemplate ProviderTemplate)
     {
-        public DynamicResourceKeyBase DescriptionKey => new DynamicResourceKey($"WelcomeView_ModelProviderWrapper_{Provider.Id}_Description");
+        public DynamicResourceKeyBase DescriptionKey => new DynamicResourceKey($"WelcomeView_ModelProviderWrapper_{ProviderTemplate.Id}_Description");
 
-        public Uri OfficialWebsiteUri => new(Provider.OfficialWebsiteUrl?.DefaultValue ?? "https://everywhere.sylinko.com", UriKind.Absolute);
+        public Uri OfficialWebsiteUri => new(ProviderTemplate.OfficialWebsiteUrl ?? "https://everywhere.sylinko.com", UriKind.Absolute);
 
-        public Uri ApiKeyHelpUri => new($"https://everywhere.sylinko.com/model-provider/{Provider.Id}", UriKind.Absolute);
+        public Uri ApiKeyHelpUri => new($"https://everywhere.sylinko.com/model-provider/{ProviderTemplate.Id}", UriKind.Absolute);
     }
 
     [ObservableProperty]
@@ -53,7 +51,7 @@ public partial class WelcomeViewModel : BusyViewModelBase
         {
             if (!SetProperty(ref field, value)) return;
 
-            ModelDefinitions = field?.Provider.ModelDefinitions
+            ModelDefinitions = field?.ProviderTemplate.ModelDefinitions
                     .AsValueEnumerable()
                     .Where(m => m.Id != "custom")
                     .ToList()
@@ -66,10 +64,10 @@ public partial class WelcomeViewModel : BusyViewModelBase
     }
 
     [ObservableProperty]
-    public partial IReadOnlyList<ModelDefinition> ModelDefinitions { get; private set; } = [];
+    public partial IReadOnlyList<ModelDefinitionTemplate> ModelDefinitions { get; private set; } = [];
 
     [ObservableProperty]
-    public partial ModelDefinition? SelectedModelDefinition { get; set; }
+    public partial ModelDefinitionTemplate? SelectedModelDefinition { get; set; }
 
     public string? ApiKey
     {
@@ -103,9 +101,9 @@ public partial class WelcomeViewModel : BusyViewModelBase
         Settings = settings;
         _logger = logger;
 
-        ModelProviders = settings.Model.ModelProviders
+        ModelProviders = ModelProviderTemplate.SupportedTemplates
             .AsValueEnumerable()
-            .Where(m => m.Id is "openai" or "anthropic" or "google" or "deepseek" or "moonshot" or "openrouter" or "siliconflow")
+            .Where(m => m.Id is not "ollama")
             .Select(m => new ModelProviderWrapper(m))
             .ToList();
     }
@@ -133,45 +131,41 @@ public partial class WelcomeViewModel : BusyViewModelBase
         if (!CanValidateApiKey) return;
 
         IsApiKeyValid = false;
+        var customAssistant = new CustomAssistant
+        {
+            Name = LocaleKey.CustomAssistant_Name_Default.I18N(),
+            ApiKey = ApiKey,
+            ModelProviderTemplateId = SelectedModelProvider.ProviderTemplate.Id,
+            ModelDefinitionTemplateId = SelectedModelDefinition.Id
+        };
 
         try
         {
-            var modelSettings = new ModelSettings
-            {
-                ModelProviders = { SelectedModelProvider.Provider },
-                SelectedModelProvider = SelectedModelProvider.Provider,
-                SelectedModelDefinition = SelectedModelDefinition
-            };
-            var kernelMixin = _kernelMixinFactory.GetOrCreate(modelSettings, ApiKey);
-            await kernelMixin.ChatCompletionService.GetChatMessageContentAsync(
-                [
-                    new ChatMessageContent(AuthorRole.System, "You're a helpful assistant."),
-                    new ChatMessageContent(AuthorRole.User, Prompts.TestPrompt)
-                ],
-                cancellationToken: cancellationToken);
-
-            IsApiKeyValid = true;
-            ApiKeyValidated?.Invoke();
-
-            // Apply settings
-            Settings.Model.SelectedModelProvider = SelectedModelProvider.Provider;
-            Settings.Model.SelectedModelProvider.ApiKey = ApiKey;
-            Settings.Model.SelectedModelDefinition = SelectedModelDefinition;
+            var kernelMixin = _kernelMixinFactory.GetOrCreate(customAssistant);
+            await kernelMixin.CheckConnectivityAsync(cancellationToken);
         }
         catch (Exception ex)
         {
-            ex = HandledChatException.Parse(ex);
+            ex = HandledChatException.Handle(ex);
             _logger.LogError(
                 ex,
                 "Failed to validate API key for provider {ProviderId} and model {ModelId}",
-                SelectedModelProvider.Provider.Id,
+                SelectedModelProvider.ProviderTemplate.Id,
                 SelectedModelDefinition.Id);
             ToastManager
                 .CreateToast(LocaleKey.WelcomeViewModel_ValidateApiKey_FailedToast_Title.I18N())
                 .WithContent(ex.GetFriendlyMessage().ToTextBlock())
                 .DismissOnClick()
                 .ShowError();
+            return;
         }
+
+        IsApiKeyValid = true;
+        ApiKeyValidated?.Invoke();
+
+        // Apply settings
+        Settings.Model.CustomAssistants.Add(customAssistant);
+        Settings.Model.SelectedCustomAssistant = customAssistant;
     });
 
     [RelayCommand(CanExecute = nameof(IsApiKeyValid))]

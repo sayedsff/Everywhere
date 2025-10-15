@@ -3,24 +3,24 @@
   xmlns:ai="clr-namespace:Everywhere.AI" xmlns:md="clr-namespace:LiveMarkdown.Avalonia;assembly=LiveMarkdown.Avalonia"
   xmlns:plugins="clr-namespace:Everywhere.Chat.Plugins">
   <DataTemplate
-    x:Key="{x:Type ai:ModelProvider}"
-    x:DataType="ai:ModelProvider">
+    x:Key="{x:Type ai:ModelProviderTemplate}"
+    x:DataType="ai:ModelProviderTemplate">
     <StackPanel
       Margin="4" Orientation="Horizontal"
       Spacing="8">
       <Image
         Width="20" Height="20"
-        md:AsyncImageLoader.Source="{Binding IconUrl.ActualValue, FallbackValue={x:Null}}"/>
+        md:AsyncImageLoader.Source="{Binding IconUrl, FallbackValue={x:Null}}"/>
 
       <TextBlock
         VerticalAlignment="Center"
-        Text="{Binding DisplayName.ActualValue, FallbackValue={x:Null}}"/>
+        Text="{Binding DisplayName, FallbackValue={x:Null}}"/>
     </StackPanel>
   </DataTemplate>
 
   <DataTemplate
-    x:Key="{x:Type ai:ModelDefinition}"
-    x:DataType="ai:ModelDefinition">
+    x:Key="{x:Type ai:ModelDefinitionTemplate}"
+    x:DataType="ai:ModelDefinitionTemplate">
     <TextBlock Text="{Binding DisplayName, FallbackValue={x:Null}}"/>
   </DataTemplate>
 

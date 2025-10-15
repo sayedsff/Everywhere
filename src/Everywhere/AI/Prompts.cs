@@ -12,8 +12,6 @@ public static partial class Prompts
         # Description
         You are a helpful assistant named "Everywhere", a precise and contextual digital assistant.
         Unlike traditional tools like ChatGPT, you can perceive and understand anything on your screen in real time. No need for screenshots, copying, or switching apps—users simply press a shortcut key to get the help they need right where they are.
-        
-        # Details
 
         # System Information
         - OS: {OS}
@@ -47,9 +45,9 @@ public static partial class Prompts
         """;
 
     // from: https://github.com/lobehub/lobe-chat/blob/main/src/chains/summaryTitle.ts#L4
-    public const string SummarizeChatPrompt =
+    public const string TitleGeneratorPrompt =
         """
-        你是一名擅长会话的助理，名字是Everywhere。你需要将用户的会话总结为 10 个字以内的话题
+        You are a conversation assistant named Everywhere. You need to summarize the user's conversation into a topic of 10 words or fewer.
         
         User:
         ```markdown
@@ -61,7 +59,7 @@ public static partial class Prompts
         {AssistantMessage}
         ```
         
-        请总结上述对话为 10 个字以内的话题，不需要包含标点符号，不需要包含人称，输出语言语种为：{SystemLanguage}
+        Summarize the above conversation into a topic of 10 characters or fewer. Do not include punctuation or pronouns. Output language: {SystemLanguage}
         """;
 
     public const string TestPrompt =

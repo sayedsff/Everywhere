@@ -14,6 +14,7 @@
         <ResourceInclude Source="avares://Everywhere/Assets/Resources.axaml"/>
         <ResourceInclude Source="avares://Everywhere/Views/Controls/ChatInputBox.axaml"/>
         <ResourceInclude Source="avares://Everywhere/Views/Controls/ChatActionBubble.axaml"/>
+        <ResourceInclude Source="avares://Everywhere/Views/Controls/ColoredLucideIconPresenter.axaml"/>
         <ResourceInclude Source="avares://Everywhere/Views/Controls/SettingsItemsControl.axaml"/>
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>

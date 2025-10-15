@@ -397,7 +397,7 @@ public partial class ChatWindow : ReactiveWindow<ChatWindowViewModel>
                 ViewModel.ChatContextManager.CreateNewCommand.Execute(null);
                 break;
             case { Key: Key.T, KeyModifiers: KeyModifiers.Control } when
-                _settings.Model.SelectedModelDefinition?.IsFunctionCallingSupported.ActualValue is true:
+                _settings.Model.SelectedCustomAssistant?.IsFunctionCallingSupported.ActualValue is true:
                 _settings.Internal.IsToolCallEnabled = !_settings.Internal.IsToolCallEnabled;
                 break;
         }

@@ -58,7 +58,7 @@ public partial class MainViewModel(IServiceProvider serviceProvider, Settings se
     {
         var version = Assembly.GetExecutingAssembly().GetName().Version;
         if (!Version.TryParse(settings.Internal.PreviousLaunchVersion, out var previousLaunchVersion)) previousLaunchVersion = null;
-        if (previousLaunchVersion is null || previousLaunchVersion < new Version(0, 3, 0)) // 0.3.0 is the first version with OOBE
+        if (settings.Model.CustomAssistants.Count == 0)
         {
             DialogManager
                 .CreateDialog(ServiceLocator.Resolve<WelcomeView>())

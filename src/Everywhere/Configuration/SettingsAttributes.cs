@@ -27,6 +27,7 @@ public class SettingsStringItemAttribute : Attribute
     public int MaxLength { get; set; } = int.MaxValue;
     public bool IsMultiline { get; set; }
     public bool IsPassword { get; set; }
+    public double Height { get; set; } = double.NaN;
 }
 
 [AttributeUsage(AttributeTargets.Property)]

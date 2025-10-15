@@ -92,7 +92,7 @@ public partial class WebSearchEnginePlugin : BuiltInChatPlugin
                 WebSnapshotAsync,
                 ChatFunctionPermissions.NetworkAccess));
 
-        SettingsItems = SettingsItemFactory.CreateForObject(_webSearchEngineSettings, "Plugin_WebSearchEngine");
+        SettingsItems = Configuration.SettingsItems.CreateForObject(_webSearchEngineSettings, "Plugin_WebSearchEngine");
 
         new ObjectObserver(HandleSettingsChanged).Observe(_webSearchEngineSettings);
     }

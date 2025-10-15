@@ -1,7 +1,7 @@
 ﻿using Avalonia.Controls;
 using Everywhere.Common;
 using Everywhere.Interop;
-using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace Everywhere.Views;
 
@@ -55,9 +55,10 @@ public class OverlayWindow : Window
                 }
             }
         }
+        catch (TimeoutException) { }
         catch (Exception ex)
         {
-            ServiceLocator.Resolve<ILogger<OverlayWindow>>().LogError(ex, "Failed to update OverlayWindow for visual element.");
+            Log.Logger.ForContext<OverlayWindow>().Error(ex, "Failed to update OverlayWindow for visual element.");
         }
     }
 }

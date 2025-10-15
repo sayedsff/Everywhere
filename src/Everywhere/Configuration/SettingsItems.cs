@@ -1,7 +1,9 @@
 ﻿using System.Reflection;
+using Avalonia.Collections;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
 using Avalonia.Data.Converters;
+using Avalonia.Media;
 using Everywhere.Interop;
 using ZLinq;
 
@@ -10,16 +12,23 @@ namespace Everywhere.Configuration;
 /// <summary>
 /// Factory class for creating settings items based on the properties of a target object.
 /// </summary>
-public static class SettingsItemFactory
+public class SettingsItems : AvaloniaList<SettingsItem>
 {
     /// <summary>
-    /// Creates settings items for the specified settings category.
+    /// The owner object for which the settings items are created.
+    /// </summary>
+    /// TODO: Support setting owner and changing settings dynamically.
+    public object Owner { get; }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SettingsItems"/> class for the specified settings category.
     /// </summary>
     /// <param name="category"></param>
-    /// <returns></returns>
-    public static SettingsItem[] CreateForCategory(SettingsCategory category)
+    public SettingsItems(SettingsCategory category) : this(category, CreateItems(category, string.Empty, category.Header, category.GetType())) { }
+
+    private SettingsItems(object owner, IEnumerable<SettingsItem> collection) : base(collection)
     {
-        return CreateItems(category, string.Empty, category.Header, category.GetType());
+        Owner = owner;
     }
 
     /// <summary>
@@ -28,21 +37,19 @@ public static class SettingsItemFactory
     /// <param name="target"></param>
     /// <param name="groupName"></param>
     /// <returns></returns>
-    public static SettingsItem[] CreateForObject(object target, string groupName)
+    public static SettingsItems CreateForObject<T>(T target, string groupName) where T : class
     {
-        return CreateItems(target, string.Empty, groupName, target.GetType());
+        return new SettingsItems(target, CreateItems(target, string.Empty, groupName, typeof(T)));
     }
 
-    private static SettingsItem[] CreateItems(object target, string bindingPath, string groupName, Type ownerType)
+    private static IEnumerable<SettingsItem> CreateItems(object target, string bindingPath, string groupName, Type ownerType)
     {
         return ownerType
             .GetProperties(BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public)
-            .AsValueEnumerable()
             .Where(p => p is { CanRead: true })
             .Where(p => p.GetCustomAttribute<HiddenSettingsItemAttribute>() is null)
             .Select(p => CreateItem(target, bindingPath, groupName, p))
-            .OfType<SettingsItem>()
-            .ToArray();
+            .OfType<SettingsItem>();
     }
 
     private static SettingsItem? CreateItem(
@@ -117,7 +124,9 @@ public static class SettingsItemFactory
                 Watermark = attribute?.Watermark,
                 MaxLength = attribute?.MaxLength ?? int.MaxValue,
                 IsMultiline = attribute?.IsMultiline ?? false,
-                PasswordChar = (attribute?.IsPassword ?? false) ? '*' : '\0'
+                TextWrapping = attribute?.IsMultiline is true ? TextWrapping.Wrap : TextWrapping.NoWrap,
+                PasswordChar = (attribute?.IsPassword ?? false) ? '*' : '\0',
+                Height = attribute?.Height ?? double.NaN
             };
         }
         else if (itemPropertyInfo.PropertyType == typeof(int))

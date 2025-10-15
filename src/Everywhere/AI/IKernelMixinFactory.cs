@@ -1,5 +1,3 @@
-using Everywhere.Configuration;
-
 namespace Everywhere.AI;
 
 /// <summary>
@@ -7,5 +5,5 @@ namespace Everywhere.AI;
 /// </summary>
 public interface IKernelMixinFactory
 {
-    IKernelMixin GetOrCreate(ModelSettings modelSettings, string? apiKeyOverride = null);
+    IKernelMixin GetOrCreate(CustomAssistant customAssistant, string? apiKeyOverride = null);
 }

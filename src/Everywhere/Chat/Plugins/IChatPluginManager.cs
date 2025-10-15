@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Everywhere.AI;
 using ObservableCollections;
 
 namespace Everywhere.Chat.Plugins;
@@ -25,7 +26,7 @@ public interface IChatPluginManager
     /// This method should be lightweight and fast, as it is called frequently.
     /// </summary>
     /// <returns></returns>
-    IChatPluginScope CreateScope(ChatContext chatContext);
+    IChatPluginScope CreateScope(ChatContext chatContext, CustomAssistant customAssistant);
 }
 
 /// <summary>

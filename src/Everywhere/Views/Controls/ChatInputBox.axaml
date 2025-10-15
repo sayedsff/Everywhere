@@ -1,7 +1,8 @@
 ﻿<ResourceDictionary
   xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-  xmlns:be="clr-namespace:Everywhere.Behaviors" xmlns:chat="clr-namespace:Everywhere.Chat"
-  xmlns:shadui="clr-namespace:ShadUI;assembly=ShadUI" xmlns:v="clr-namespace:Everywhere.Views">
+  xmlns:ai="clr-namespace:Everywhere.AI" xmlns:be="clr-namespace:Everywhere.Behaviors"
+  xmlns:chat="clr-namespace:Everywhere.Chat" xmlns:shadui="clr-namespace:ShadUI;assembly=ShadUI"
+  xmlns:v="clr-namespace:Everywhere.Views" xmlns:vc="clr-namespace:Everywhere.ValueConverters">
 
   <ControlTheme
     x:Key="{x:Type v:ChatInputBox}"
@@ -232,7 +233,87 @@
             <Menu Focusable="False">
               <MenuItem
                 Classes="Outline Rounded" Width="30"
-                Height="30" shadui:MenuItemAssist.PopupPlacement="TopEdgeAlignedLeft"
+                Height="30" Margin="0,0,4,0"
+                shadui:MenuItemAssist.Label="{I18N {x:Static LocaleKey.ChatInputBox_CustomAssistantsMenuItem_Header}}"
+                shadui:MenuItemAssist.PopupPlacement="Top" shadui:MenuItemAssist.PopupVerticalOffset="-4"
+                Focusable="False"
+                ItemsSource="{TemplateBinding CustomAssistants, Mode=OneWay}"
+                SelectedItem="{TemplateBinding SelectedCustomAssistant, Mode=OneWay}"
+                ToolTip.Tip="{I18N {x:Static LocaleKey.ChatInputBox_AddAttachmentMenuItem_ToolTip}}">
+
+                <MenuItem.Header>
+                  <v:ColoredLucideIconPresenter
+                    Width="30" Height="30"
+                    Icon="{Binding SelectedCustomAssistant.Icon, RelativeSource={RelativeSource TemplatedParent}, FallbackValue={x:Null}}"
+                    IconSize="16"/>
+                </MenuItem.Header>
+
+                <MenuItem.ItemContainerTheme>
+                  <ControlTheme TargetType="MenuItem">
+                    <Style Selector="^:pointerover">
+                      <Setter Property="Background" Value="{DynamicResource CardBackgroundColor}"/>
+                    </Style>
+
+                    <Style Selector="^/template/ DockPanel.Highlight">
+                      <Style Selector="^ Border#SelectedBorder">
+                        <Setter Property="Background" Value="{DynamicResource PrimaryColor}"/>
+                      </Style>
+                      <Style Selector="^ Border#ContainerBorder">
+                        <Setter Property="Background" Value="{DynamicResource SecondaryCardBackgroundColor}"/>
+                      </Style>
+                    </Style>
+
+                    <Setter Property="Focusable" Value="False"/>
+                    <Setter Property="Command" Value="{Binding $parent[v:ChatInputBox].SetSelectedCustomAssistantCommand}"/>
+                    <Setter Property="CommandParameter" Value="{Binding RelativeSource={RelativeSource Self}}"/>
+                    <Setter Property="Template">
+                      <ControlTemplate
+                        x:DataType="ai:CustomAssistant" TargetType="MenuItem">
+                        <DockPanel
+                          Height="28" Background="Transparent"
+                          LastChildFill="True">
+                          <Classes.Highlight>
+                            <MultiBinding Converter="{x:Static vc:CommonConverters.AllEquals}">
+                              <Binding Path="."/>
+                              <Binding Path="$parent[v:ChatInputBox].SelectedCustomAssistant"/>
+                            </MultiBinding>
+                          </Classes.Highlight>
+
+                          <Border
+                            x:Name="SelectedBorder" DockPanel.Dock="Left"
+                            Width="4" Margin="4,2,2,2"
+                            CornerRadius="2">
+                          </Border>
+
+                          <Border
+                            x:Name="ContainerBorder" Margin="0,2,4,2"
+                            Padding="4,2"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="4">
+                            <StackPanel
+                              Orientation="Horizontal" Spacing="4">
+                              <v:ColoredLucideIconPresenter
+                                Width="20" Height="20"
+                                VerticalAlignment="Center"
+                                Icon="{Binding Icon}"
+                                IconSize="16"/>
+                              <TextBlock
+                                VerticalAlignment="Center"
+                                Text="{Binding Name}"
+                                TextTrimming="CharacterEllipsis"
+                                ToolTip.Tip="{Binding Description}"/>
+                            </StackPanel>
+                          </Border>
+                        </DockPanel>
+                      </ControlTemplate>
+                    </Setter>
+                  </ControlTheme>
+                </MenuItem.ItemContainerTheme>
+              </MenuItem>
+
+              <MenuItem
+                Classes="Outline Rounded" Width="30"
+                Height="30" shadui:MenuItemAssist.PopupPlacement="Top"
                 shadui:MenuItemAssist.PopupVerticalOffset="-4"
                 ItemsSource="{TemplateBinding AddChatAttachmentMenuItems}"
                 ToolTip.Tip="{I18N {x:Static LocaleKey.ChatInputBox_AddAttachmentMenuItem_ToolTip}}">

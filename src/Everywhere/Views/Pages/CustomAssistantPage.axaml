@@ -1,0 +1,98 @@
+﻿<UserControl
+  x:Class="Everywhere.Views.Pages.CustomAssistantPage" xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ai="clr-namespace:Everywhere.AI"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI" xmlns:v="clr-namespace:Everywhere.Views"
+  xmlns:vc="clr-namespace:Everywhere.ValueConverters" xmlns:vm="clr-namespace:Everywhere.ViewModels"
+  d:DesignHeight="450" d:DesignWidth="800"
+  x:DataType="vm:CustomAssistantPageViewModel" mc:Ignorable="d">
+  <Grid
+    Margin="32,24" ColumnDefinitions="*,1,4*"
+    RowDefinitions="Auto,*" RowSpacing="8">
+
+    <Button
+      Classes="Primary" Grid.Row="0"
+      Grid.Column="0" HorizontalAlignment="Left"
+      Command="{Binding CreateNewCustomAssistantCommand}"
+      Content="{I18N {x:Static LocaleKey.CustomAssistantPage_CreateNewCustomAssistantButton_Content}}">
+      <shadui:ButtonAssist.Icon>
+        <LucideIcon Kind="Plus"/>
+      </shadui:ButtonAssist.Icon>
+    </Button>
+
+    <ListBox
+      Grid.Row="1" Grid.Column="0"
+      ItemsSource="{Binding CustomAssistants}"
+      SelectedItem="{Binding SelectedCustomAssistant, Mode=TwoWay}">
+      <ListBox.DataTemplates>
+        <DataTemplate DataType="ai:CustomAssistant">
+          <DockPanel
+            HorizontalSpacing="8" LastChildFill="True">
+            <v:ColoredLucideIconPresenter
+              DockPanel.Dock="Left" Width="40"
+              Height="40" CornerRadius="20"
+              Icon="{Binding Icon}"
+              IconSize="32"/>
+
+            <StackPanel
+              VerticalAlignment="Center" Orientation="Vertical"
+              Spacing="4">
+              <TextBlock
+                Classes="p"
+                Text="{Binding Name, FallbackValue={x:Null}}"
+                TextTrimming="CharacterEllipsis"
+                ToolTip.Tip="{Binding $self.Text}"/>
+
+              <TextBlock
+                Classes="Muted"
+                IsVisible="{Binding Description, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                MaxLines="2"
+                Text="{Binding Description}"
+                TextTrimming="CharacterEllipsis" TextWrapping="Wrap"
+                ToolTip.Tip="{Binding $self.Text}"/>
+            </StackPanel>
+          </DockPanel>
+        </DataTemplate>
+      </ListBox.DataTemplates>
+    </ListBox>
+
+    <GridSplitter
+      Grid.Row="0" Grid.RowSpan="2"
+      Grid.Column="1" Margin="4,0"
+      VerticalAlignment="Stretch" Background="Transparent"/>
+
+    <StackPanel
+      Grid.Row="0" Grid.Column="2"
+      HorizontalAlignment="Right" Orientation="Horizontal"
+      Spacing="8">
+      <Button
+        Classes="Primary" Height="34"
+        VerticalAlignment="Center"
+        shadui:ButtonAssist.ShowProgress="{Binding CheckConnectivityCommand.IsRunning}"
+        Command="{Binding CheckConnectivityCommand}"
+        Content="{I18N {x:Static LocaleKey.CustomAssistantPage_CheckConnectivityButton_Content}}"
+        IsVisible="{Binding SelectedCustomAssistant, Converter={x:Static ObjectConverters.IsNotNull}}">
+        <shadui:ButtonAssist.Icon>
+          <LucideIcon Kind="Unplug"/>
+        </shadui:ButtonAssist.Icon>
+      </Button>
+      <Button
+        Classes="Destructive" VerticalAlignment="Center"
+        Command="{Binding DeleteCustomAssistantCommand}"
+        Content="{I18N {x:Static LocaleKey.CustomAssistantPage_DeleteCustomAssistantButton_Content}}"
+        IsVisible="{Binding SelectedCustomAssistant, Converter={x:Static ObjectConverters.IsNotNull}}">
+        <shadui:ButtonAssist.Icon>
+          <LucideIcon Kind="Trash2"/>
+        </shadui:ButtonAssist.Icon>
+      </Button>
+    </StackPanel>
+
+    <ScrollViewer
+      Grid.Row="1" Grid.Column="2"
+      HorizontalScrollBarVisibility="Disabled">
+      <v:SettingsItemsControl
+        Margin="0,0,12,0"
+        ItemsSource="{Binding SelectedCustomAssistant.SettingsItems, FallbackValue={x:Null}}"/>
+    </ScrollViewer>
+  </Grid>
+</UserControl>

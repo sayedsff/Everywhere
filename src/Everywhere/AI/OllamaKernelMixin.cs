@@ -1,5 +1,4 @@
 ﻿using System.Text.RegularExpressions;
-using Everywhere.Configuration;
 using Microsoft.Extensions.AI;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
@@ -19,8 +18,8 @@ public sealed partial class OllamaKernelMixin : KernelMixinBase
     public override PromptExecutionSettings GetPromptExecutionSettings(FunctionChoiceBehavior? functionChoiceBehavior = null) =>
         new OllamaPromptExecutionSettings
         {
-            Temperature = (float)_settings.Temperature,
-            TopP = (float)_settings.TopP,
+            Temperature = (float)_customAssistant.Temperature,
+            TopP = (float)_customAssistant.TopP,
             FunctionChoiceBehavior = functionChoiceBehavior
         };
 
@@ -29,10 +28,10 @@ public sealed partial class OllamaKernelMixin : KernelMixinBase
     /// <summary>
     /// Initializes a new instance of the <see cref="OllamaKernelMixin"/> class.
     /// </summary>
-    public OllamaKernelMixin(ModelSettings settings, ModelProvider provider, ModelDefinition definition) : base(settings, provider, definition)
+    public OllamaKernelMixin(CustomAssistant customAssistant) : base(customAssistant)
     {
-        _client = new OllamaApiClient(provider.Endpoint, definition.ModelId);
-        ChatCompletionService = new OptimizedOllamaApiClient(_client, definition).AsChatCompletionService();
+        _client = new OllamaApiClient(customAssistant.Endpoint, customAssistant.ModelId);
+        ChatCompletionService = new OptimizedOllamaApiClient(_client, this).AsChatCompletionService();
     }
 
     public override void Dispose()
@@ -40,7 +39,7 @@ public sealed partial class OllamaKernelMixin : KernelMixinBase
         _client.Dispose();
     }
 
-    private sealed partial class OptimizedOllamaApiClient(OllamaApiClient client, ModelDefinition definition) : IChatClient
+    private sealed partial class OptimizedOllamaApiClient(OllamaApiClient client, OllamaKernelMixin owner) : IChatClient
     {
         private IChatClient ChatClient => client;
 
@@ -50,7 +49,7 @@ public sealed partial class OllamaKernelMixin : KernelMixinBase
             CancellationToken cancellationToken = default)
         {
             var response = await ChatClient.GetResponseAsync(messages, options, cancellationToken);
-            if (!definition.IsDeepThinkingSupported.ActualValue) return response;
+            if (!owner.IsDeepThinkingSupported) return response;
 
             // handle reasoning in non-streaming mode, only actual response
             // use regex to extract parts <think>[reasoning]</think>[response]
@@ -74,7 +73,7 @@ public sealed partial class OllamaKernelMixin : KernelMixinBase
             ChatOptions? options = null,
             [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
-            if (!definition.IsDeepThinkingSupported.ActualValue)
+            if (!owner.IsDeepThinkingSupported)
             {
                 await foreach (var update in ChatClient.GetStreamingResponseAsync(messages, options, cancellationToken))
                 {

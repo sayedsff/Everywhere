@@ -1035,4 +1035,16 @@ Placeholders can be used within the prompt, enclosed in {}, and will be replaced
     <data name="HandledSystemException_Unknown" xml:space="preserve">
         <value>An unexpected system error occurred. Please try again or check the application logs.</value>
     </data>
+    <data name="CustomAssistantPage_CheckConnectivityButton_Content" xml:space="preserve">
+        <value>Check Connectivity</value>
+    </data>
+    <data name="CustomAssistantPageViewModel_CheckConnectivity_SuccessToast_Title" xml:space="preserve">
+        <value>Check Success</value>
+    </data>
+    <data name="CustomAssistantPageViewModel_CheckConnectivity_FailedToast_Title" xml:space="preserve">
+        <value>Check Failed</value>
+    </data>
+    <data name="ChatInputBox_CustomAssistantsMenuItem_Header" xml:space="preserve">
+        <value>Select Assistant</value>
+    </data>
 </root>

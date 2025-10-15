@@ -1,7 +1,7 @@
 ﻿<ResourceDictionary
   xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-  xmlns:at="clr-namespace:Everywhere.AttachedProperties" xmlns:configuration="clr-namespace:Everywhere.Configuration"
-  xmlns:v="using:Everywhere.Views">
+  xmlns:at="clr-namespace:Everywhere.AttachedProperties" xmlns:c="clr-namespace:Everywhere.Configuration"
+  xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI" xmlns:v="using:Everywhere.Views">
   <Design.PreviewWith>
     <v:SettingsItemsControl/>
   </Design.PreviewWith>
@@ -27,7 +27,7 @@
     </Setter>
 
     <Setter Property="ItemTemplate">
-      <DataTemplate DataType="configuration:SettingsItem">
+      <DataTemplate DataType="c:SettingsItem">
         <Expander
           Background="Transparent"
           BorderBrush="{Binding $parent[v:SettingsItemsControl].BorderBrush}"
@@ -41,25 +41,27 @@
             <Style Selector="ContentControl#PART_SettingsItemContentControl">
               <Setter Property="at:DataTemplatesAttach.DataTemplates">
                 <DataTemplates>
-                  <DataTemplate DataType="configuration:SettingsBooleanItem">
+                  <DataTemplate DataType="c:SettingsBooleanItem">
                     <ToggleSwitch
                       Margin="0,0,4,0"
                       IsChecked="{Binding Value, Mode=TwoWay}"
                       IsThreeState="{Binding IsNullable}"/>
                   </DataTemplate>
 
-                  <DataTemplate DataType="configuration:SettingsStringItem">
+                  <DataTemplate DataType="c:SettingsStringItem">
                     <TextBox
                       MinWidth="320" MinHeight="32"
                       HorizontalAlignment="Left"
+                      shadui:ControlAssist.Height="{Binding Height}"
                       AcceptsReturn="{Binding IsMultiline}"
                       MaxLength="{Binding MaxLength}"
                       PasswordChar="{Binding PasswordChar}"
                       Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      TextWrapping="{Binding TextWrapping}"
                       Watermark="{Binding Watermark}"/>
                   </DataTemplate>
 
-                  <DataTemplate DataType="configuration:SettingsIntegerItem">
+                  <DataTemplate DataType="c:SettingsIntegerItem">
                     <StackPanel
                       HorizontalAlignment="Left" Orientation="Horizontal"
                       Spacing="8">
@@ -76,7 +78,7 @@
                     </StackPanel>
                   </DataTemplate>
 
-                  <DataTemplate DataType="configuration:SettingsDoubleItem">
+                  <DataTemplate DataType="c:SettingsDoubleItem">
                     <StackPanel
                       HorizontalAlignment="Left" Orientation="Horizontal"
                       Spacing="8">
@@ -94,7 +96,7 @@
                     </StackPanel>
                   </DataTemplate>
 
-                  <DataTemplate DataType="configuration:SettingsCustomizableItem">
+                  <DataTemplate DataType="c:SettingsCustomizableItem">
                     <StackPanel Orientation="Horizontal">
                       <ContentControl
                         x:Name="PART_SettingsItemContentControl" HorizontalAlignment="Left"
@@ -113,14 +115,14 @@
                     </StackPanel>
                   </DataTemplate>
 
-                  <DataTemplate DataType="configuration:SettingsSelectionItem">
+                  <DataTemplate DataType="c:SettingsSelectionItem">
                     <ComboBox
                       MinWidth="320" MinHeight="32"
                       HorizontalAlignment="Left"
                       ItemsSource="{Binding ItemsSource}"
                       SelectedItem="{Binding SelectedItem, Mode=TwoWay}">
                       <ComboBox.ItemTemplate>
-                        <DataTemplate DataType="configuration:SettingsSelectionItem+Item">
+                        <DataTemplate DataType="c:SettingsSelectionItem+Item">
                           <ContentControl
                             Content="{Binding Key^}"
                             ContentTemplate="{Binding ContentTemplate}"/>
@@ -129,14 +131,14 @@
                     </ComboBox>
                   </DataTemplate>
 
-                  <DataTemplate DataType="configuration:SettingsKeyboardHotkeyItem">
+                  <DataTemplate DataType="c:SettingsKeyboardHotkeyItem">
                     <v:KeyboardHotkeyInputBox
                       MinWidth="160" MinHeight="32"
                       HorizontalAlignment="Left"
                       Hotkey="{Binding Value, Mode=TwoWay}"/>
                   </DataTemplate>
 
-                  <DataTemplate DataType="configuration:SettingsControlItem">
+                  <DataTemplate DataType="c:SettingsControlItem">
                     <ContentControl Content="{Binding Control}"/>
                   </DataTemplate>
                 </DataTemplates>

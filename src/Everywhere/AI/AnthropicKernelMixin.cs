@@ -1,5 +1,4 @@
 ﻿using Anthropic.SDK;
-using Everywhere.Configuration;
 using Microsoft.Extensions.AI;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
@@ -18,10 +17,10 @@ public sealed class AnthropicKernelMixin : KernelMixinBase
         ModelId = ModelId,
         ExtensionData = new Dictionary<string, object>
         {
-            { "temperature", _settings.Temperature },
-            { "top_p", _settings.TopP },
-            { "presence_penalty", _settings.PresencePenalty },
-            { "frequency_penalty", _settings.FrequencyPenalty },
+            { "temperature", _customAssistant.Temperature },
+            { "top_p", _customAssistant.TopP },
+            { "presence_penalty", _customAssistant.PresencePenalty },
+            { "frequency_penalty", _customAssistant.FrequencyPenalty },
         },
         FunctionChoiceBehavior = functionChoiceBehavior
     };
@@ -31,12 +30,11 @@ public sealed class AnthropicKernelMixin : KernelMixinBase
     /// <summary>
     /// Initializes a new instance of the <see cref="AnthropicKernelMixin"/> class.
     /// </summary>
-    public AnthropicKernelMixin(ModelSettings settings, ModelProvider provider, ModelDefinition definition, string? apiKey)
-        : base(settings, provider, definition)
+    public AnthropicKernelMixin(CustomAssistant customAssistant) : base(customAssistant)
     {
-        _chatClient = new AnthropicClient(new APIAuthentication(apiKey))
+        _chatClient = new AnthropicClient(new APIAuthentication(customAssistant.ApiKey))
         {
-            ApiUrlFormat = provider.Endpoint + "/{0}/{1}"
+            ApiUrlFormat = customAssistant.Endpoint + "/{0}/{1}"
         }.Messages;
         ChatCompletionService = _chatClient.AsChatCompletionService();
     }

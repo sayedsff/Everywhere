@@ -12,6 +12,7 @@ using Everywhere.Initialization;
 using Everywhere.Interop;
 using Everywhere.ViewModels;
 using Everywhere.Views;
+using Everywhere.Views.Configuration;
 using Everywhere.Views.Pages;
 using Everywhere.Windows.Chat.Plugins;
 using Everywhere.Windows.Configuration;
@@ -48,45 +49,9 @@ public static class Program
 
                 #endregion
 
-                #region Avalonia Basic
-
-                .AddDialogManagerAndToastManager()
-                .AddTransient<IClipboard>(_ =>
-                    Application.Current.As<App>()?.TopLevel.Clipboard ??
-                    throw new InvalidOperationException("Clipboard is not available."))
-                .AddTransient<IStorageProvider>(_ =>
-                    Application.Current.As<App>()?.TopLevel.StorageProvider ??
-                    throw new InvalidOperationException("StorageProvider is not available."))
-                .AddTransient<ILauncher>(_ =>
-                    Application.Current.As<App>()?.TopLevel.Launcher ??
-                    throw new InvalidOperationException("Launcher is not available."))
-
-                #endregion
-
-                #region View & ViewModel
-
-                .AddSingleton<VisualTreeDebugger>()
-                .AddSingleton<ChatWindowViewModel>()
-                .AddSingleton<ChatWindow>()
-                .AddTransient<IMainViewPageFactory, SettingsCategoryPageFactory>()
-                .AddSingleton<ChatPluginPageViewModel>()
-                .AddSingleton<IMainViewPage, ChatPluginPage>()
-                .AddSingleton<AboutPageViewModel>()
-                .AddSingleton<IMainViewPage, AboutPage>()
-                .AddTransient<WelcomeViewModel>()
-                .AddTransient<WelcomeView>()
-                .AddTransient<ChangeLogViewModel>()
-                .AddTransient<ChangeLogView>()
-                .AddSingleton<MainViewModel>()
-                .AddSingleton<MainView>()
-
-                #endregion
-
-                #region Database
-
+                .AddAvaloniaBasicServices()
+                .AddViewsAndViewModels()
                 .AddDatabaseAndStorage()
-
-                #endregion
 
                 #region Chat Plugins
 

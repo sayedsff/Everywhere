@@ -39,22 +39,28 @@ public class ChatService(
 
     public async Task SendMessageAsync(UserChatMessage message, CancellationToken cancellationToken)
     {
+        var customAssistant = settings.Model.SelectedCustomAssistant;
+        if (customAssistant is null) return;
+
         using var activity = _activitySource.StartActivity();
 
         var chatContext = chatContextManager.Current;
         activity?.SetTag("chat.context.id", chatContext.Metadata.Id);
         chatContext.Add(message);
 
-        await ProcessUserChatMessageAsync(chatContext, message, cancellationToken);
+        await ProcessUserChatMessageAsync(chatContext, customAssistant, message, cancellationToken);
 
         var assistantChatMessage = new AssistantChatMessage { IsBusy = true };
         chatContext.Add(assistantChatMessage);
 
-        await GenerateAsync(chatContext, assistantChatMessage, cancellationToken);
+        await GenerateAsync(chatContext, customAssistant, assistantChatMessage, cancellationToken);
     }
 
     public async Task RetryAsync(ChatMessageNode node, CancellationToken cancellationToken)
     {
+        var customAssistant = settings.Model.SelectedCustomAssistant;
+        if (customAssistant is null) return;
+
         using var activity = _activitySource.StartActivity();
         activity?.SetTag("chat.context.id", node.Context.Metadata.Id);
 
@@ -66,7 +72,7 @@ public class ChatService(
         var assistantChatMessage = new AssistantChatMessage { IsBusy = true };
         node.Context.CreateBranchOn(node, assistantChatMessage);
 
-        await GenerateAsync(node.Context, assistantChatMessage, cancellationToken);
+        await GenerateAsync(node.Context, customAssistant, assistantChatMessage, cancellationToken);
     }
 
     public Task EditAsync(ChatMessageNode node, CancellationToken cancellationToken)
@@ -76,6 +82,7 @@ public class ChatService(
 
     private async Task ProcessUserChatMessageAsync(
         ChatContext chatContext,
+        CustomAssistant customAssistant,
         UserChatMessage userChatMessage,
         CancellationToken cancellationToken)
     {
@@ -142,7 +149,7 @@ public class ChatService(
             {
                 chatContext.Add(analyzingContextMessage);
 
-                var maxTokens = settings.Model.SelectedModelDefinition?.MaxTokens.ActualValue ?? 64000;
+                var maxTokens = customAssistant.MaxTokens.ActualValue;
                 var approximateTokenLimit = Math.Min(settings.Internal.VisualTreeTokenLimit, maxTokens / 2);
                 var xmlBuilder = new VisualElementXmlBuilder(validVisualElements, approximateTokenLimit, chatContext.VisualElements.Count + 1);
                 var renderedVisualTreePrompt = await Task.Run(
@@ -227,17 +234,17 @@ public class ChatService(
         }
     }
 
-    private IKernelMixin CreateKernelMixin()
+    private IKernelMixin CreateKernelMixin(CustomAssistant customAssistant)
     {
         using var activity = _activitySource.StartActivity();
 
         try
         {
-            var kernelMixin = kernelMixinFactory.GetOrCreate(settings.Model);
-            activity?.SetTag("llm.provider.id", settings.Model.SelectedModelProviderId ?? "unknown");
-            activity?.SetTag("llm.model.id", settings.Model.SelectedModelDefinitionId ?? "unknown");
-            activity?.SetTag("llm.model.actual_id", settings.Model.SelectedModelDefinition?.ModelId.ActualValue ?? "unknown");
-            activity?.SetTag("llm.model.max_embedding", settings.Model.SelectedModelDefinition?.MaxTokens.ToString() ?? "unknown");
+            var kernelMixin = kernelMixinFactory.GetOrCreate(customAssistant);
+            activity?.SetTag("llm.provider.id", customAssistant.ModelProviderTemplateId);
+            activity?.SetTag("llm.model.id", customAssistant.ModelDefinitionTemplateId);
+            activity?.SetTag("llm.model.actual_id", customAssistant.ModelId.ActualValue);
+            activity?.SetTag("llm.model.max_embedding", customAssistant.MaxTokens.ActualValue);
             return kernelMixin;
         }
         catch (Exception e)
@@ -255,7 +262,7 @@ public class ChatService(
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
     /// <exception cref="NotSupportedException"></exception>
-    private Kernel BuildKernel(IKernelMixin kernelMixin, ChatContext chatContext)
+    private Kernel BuildKernel(IKernelMixin kernelMixin, ChatContext chatContext, CustomAssistant customAssistant)
     {
         using var activity = _activitySource.StartActivity();
 
@@ -266,7 +273,7 @@ public class ChatService(
 
         if (kernelMixin.IsFunctionCallingSupported && settings.Internal.IsToolCallEnabled)
         {
-            var chatPluginScope = chatPluginManager.CreateScope(chatContext);
+            var chatPluginScope = chatPluginManager.CreateScope(chatContext, customAssistant);
             builder.Services.AddSingleton(chatPluginScope);
             activity?.SetTag("plugins.count", chatPluginScope.Plugins.AsValueEnumerable().Count());
 
@@ -281,6 +288,7 @@ public class ChatService(
 
     private async Task GenerateAsync(
         ChatContext chatContext,
+        CustomAssistant customAssistant,
         AssistantChatMessage assistantChatMessage,
         CancellationToken cancellationToken)
     {
@@ -291,8 +299,8 @@ public class ChatService(
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var kernelMixin = CreateKernelMixin();
-            var kernel = BuildKernel(kernelMixin, chatContext);
+            var kernelMixin = CreateKernelMixin(customAssistant);
+            var kernel = BuildKernel(kernelMixin, chatContext, customAssistant);
             var chatHistory = new ChatHistory();
             foreach (var chatMessage in chatContext
                          .Select(n => n.Message)
@@ -330,10 +338,10 @@ public class ChatService(
                 using (var llmStreamActivity = _activitySource.StartActivity("ChatCompletionService.GetStreamingChatMessageContents"))
                 {
                     llmStreamActivity?.SetTag("chat.context.id", chatContext.Metadata.Id);
-                    llmStreamActivity?.SetTag("llm.provider.id", settings.Model.SelectedModelProviderId ?? "unknown");
-                    llmStreamActivity?.SetTag("llm.model.id", settings.Model.SelectedModelDefinitionId ?? "unknown");
-                    llmStreamActivity?.SetTag("llm.model.actual_id", settings.Model.SelectedModelDefinition?.ModelId.ActualValue ?? "unknown");
-                    llmStreamActivity?.SetTag("llm.model.max_embedding", settings.Model.SelectedModelDefinition?.MaxTokens?.ToString() ?? "unknown");
+                    llmStreamActivity?.SetTag("llm.provider.id", customAssistant.ModelProviderTemplateId);
+                    llmStreamActivity?.SetTag("llm.model.id", customAssistant.ModelDefinitionTemplateId);
+                    llmStreamActivity?.SetTag("llm.model.actual_id", customAssistant.ModelId.ActualValue);
+                    llmStreamActivity?.SetTag("llm.model.max_embedding", customAssistant.MaxTokens.ActualValue);
 
                     await foreach (var streamingContent in kernelMixin.ChatCompletionService.GetStreamingChatMessageContentsAsync(
                                        // They absolutely must modify this ChatHistory internally.
@@ -748,7 +756,7 @@ public class ChatService(
                 new ChatMessageContent(
                     AuthorRole.System,
                     Prompts.RenderPrompt(
-                        Prompts.SummarizeChatPrompt,
+                        Prompts.TitleGeneratorPrompt,
                         new Dictionary<string, Func<string>>
                         {
                             { "UserMessage", () => userMessage.SafeSubstring(0, 2048) },

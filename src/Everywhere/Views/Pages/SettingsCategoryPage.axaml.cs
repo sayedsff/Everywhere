@@ -17,14 +17,14 @@ public partial class SettingsCategoryPage : UserControl, IMainViewPage
 
     public LucideIconKind Icon { get; }
 
-    public SettingsItem[] Items { get; }
+    public SettingsItems Items { get; }
 
     public SettingsCategoryPage(int index, SettingsCategory settingsCategory)
     {
         Index = index;
         Title = new DynamicResourceKey($"SettingsCategory_{settingsCategory.Header}_Header");
         Icon = settingsCategory.Icon;
-        Items = SettingsItemFactory.CreateForCategory(settingsCategory);
+        Items = new SettingsItems(settingsCategory);
 
         InitializeComponent();
     }

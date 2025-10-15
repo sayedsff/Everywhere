@@ -2,7 +2,6 @@
 using System.ClientModel.Primitives;
 using System.Reflection;
 using System.Text.Json;
-using Everywhere.Configuration;
 using Microsoft.Extensions.AI;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
@@ -18,27 +17,32 @@ namespace Everywhere.AI;
 /// <summary>
 /// An implementation of <see cref="IKernelMixin"/> for OpenAI models.
 /// </summary>
-public sealed class OpenAIKernelMixin(ModelSettings settings, ModelProvider provider, ModelDefinition definition, string? apiKey)
-    : KernelMixinBase(settings, provider, definition)
+public sealed class OpenAIKernelMixin : KernelMixinBase
 {
-    public override IChatCompletionService ChatCompletionService { get; } = new OptimizedOpenAIApiClient(
-        new OptimizedChatClient(
-            definition.ModelId,
-            new ApiKeyCredential(apiKey.IsNullOrWhiteSpace() ? "NO_API_KEY" : apiKey), // some models don't need API key (e.g. LM Studio)
-            new OpenAIClientOptions
-            {
-                Endpoint = new Uri(provider.Endpoint, UriKind.Absolute)
-            }
-        ).AsIChatClient(),
-        definition
-    ).AsChatCompletionService();
+    public override IChatCompletionService ChatCompletionService { get; }
+
+    public OpenAIKernelMixin(CustomAssistant customAssistant) : base(customAssistant)
+    {
+        ChatCompletionService = new OptimizedOpenAIApiClient(
+            new OptimizedChatClient(
+                customAssistant.ModelId,
+                // some models don't need API key (e.g. LM Studio)
+                new ApiKeyCredential(customAssistant.ApiKey.IsNullOrWhiteSpace() ? "NO_API_KEY" : customAssistant.ApiKey),
+                new OpenAIClientOptions
+                {
+                    Endpoint = new Uri(customAssistant.Endpoint, UriKind.Absolute)
+                }
+            ).AsIChatClient(),
+            this
+        ).AsChatCompletionService();
+    }
 
     public override PromptExecutionSettings? GetPromptExecutionSettings(FunctionChoiceBehavior? functionChoiceBehavior = null)
     {
-        double? temperature = _settings.Temperature.IsCustomValueSet ? _settings.Temperature.ActualValue : null;
-        double? topP = _settings.TopP.IsCustomValueSet ? _settings.TopP.ActualValue : null;
-        double? presencePenalty = _settings.PresencePenalty.IsCustomValueSet ? _settings.PresencePenalty.ActualValue : null;
-        double? frequencyPenalty = _settings.FrequencyPenalty.IsCustomValueSet ? _settings.FrequencyPenalty.ActualValue : null;
+        double? temperature = _customAssistant.Temperature.IsCustomValueSet ? _customAssistant.Temperature.ActualValue : null;
+        double? topP = _customAssistant.TopP.IsCustomValueSet ? _customAssistant.TopP.ActualValue : null;
+        double? presencePenalty = _customAssistant.PresencePenalty.IsCustomValueSet ? _customAssistant.PresencePenalty.ActualValue : null;
+        double? frequencyPenalty = _customAssistant.FrequencyPenalty.IsCustomValueSet ? _customAssistant.FrequencyPenalty.ActualValue : null;
 
         if (temperature is null &&
             topP is null &&
@@ -89,7 +93,7 @@ public sealed class OpenAIKernelMixin(ModelSettings settings, ModelProvider prov
     /// <summary>
     /// optimized wrapper around OpenAI's IChatClient to extract reasoning content from internal properties.
     /// </summary>
-    private sealed class OptimizedOpenAIApiClient(IChatClient client, ModelDefinition definition) : IChatClient
+    private sealed class OptimizedOpenAIApiClient(IChatClient client, OpenAIKernelMixin owner) : IChatClient
     {
         private static readonly PropertyInfo? ChoicesProperty =
             typeof(StreamingChatCompletionUpdate).GetProperty("Choices", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -111,7 +115,8 @@ public sealed class OpenAIKernelMixin(ModelSettings settings, ModelProvider prov
             ChatOptions? options = null,
             [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
-            var isDeepThinkingSupported = definition.IsDeepThinkingSupported.ActualValue;
+            // cache the value to avoid property changes during enumeration
+            var isDeepThinkingSupported = owner.IsDeepThinkingSupported;
             await foreach (var update in client.GetStreamingResponseAsync(messages, options, cancellationToken))
             {
                 // Why you keep reasoning in the fucking internal properties, OpenAI???

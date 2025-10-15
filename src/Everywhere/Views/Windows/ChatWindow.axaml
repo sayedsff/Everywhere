@@ -737,12 +737,14 @@
           CaretIndex="{x:Static sys:Int32.MaxValue}"
           ChatAttachmentItemsSource="{Binding ChatAttachments}"
           Command="{Binding SendMessageCommand}"
+          CustomAssistants="{Binding Settings.Model.CustomAssistants}"
           Focusable="True" IsImageEnabled="False"
           IsImageSupported="False"
           IsSendButtonEnabled="{Binding !IsBusy}"
           IsToolCallEnabled="{Binding Settings.Internal.IsToolCallEnabled, Mode=TwoWay}"
-          IsToolCallSupported="{Binding Settings.Model.SelectedModelDefinition.IsFunctionCallingSupported, FallbackValue=false}"
+          IsToolCallSupported="{Binding Settings.Model.SelectedCustomAssistant.IsFunctionCallingSupported, FallbackValue=false}"
           MaxChatAttachmentCount="{Binding Settings.Internal.MaxChatAttachmentCount}"
+          SelectedCustomAssistant="{Binding Settings.Model.SelectedCustomAssistant, Mode=TwoWay}"
           Text="{Binding Settings.Internal.ChatInputBoxText, Mode=TwoWay}"
           TextWrapping="Wrap">
           <v:ChatInputBox.AddChatAttachmentMenuItems>
@@ -817,7 +819,7 @@
                     MinWidth="200" VerticalAlignment="Center">
                     <Interaction.Behaviors>
                       <be:LogarithmicSliderBehavior
-                        Maximum="{Binding Settings.Model.SelectedModelDefinition.MaxTokens.ActualValue, FallbackValue=8192, Converter={x:Static vc:DoubleConverters.Multiply}, ConverterParameter=0.5}"
+                        Maximum="{Binding Settings.Model.SelectedCustomAssistant.MaxTokens.ActualValue, FallbackValue=8192, Converter={x:Static vc:DoubleConverters.Multiply}, ConverterParameter=0.5}"
                         Minimum="512"
                         Value="{Binding Settings.Internal.VisualTreeTokenLimit, Mode=TwoWay}"/>
                     </Interaction.Behaviors>

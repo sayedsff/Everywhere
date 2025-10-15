@@ -146,7 +146,7 @@
           <ComboBox
             Margin="-10,-6" Background="Transparent"
             BorderThickness="0"
-            ItemTemplate="{StaticResource {x:Type ai:ModelDefinition}}"
+            ItemTemplate="{StaticResource {x:Type ai:ModelDefinitionTemplate}}"
             ItemsSource="{Binding ModelDefinitions}"
             SelectedItem="{Binding SelectedModelDefinition}"/>
           <TextBlock
@@ -217,13 +217,13 @@
                   <Border CornerRadius="8">
                     <Image
                       Width="36" Height="36"
-                      md:AsyncImageLoader.Source="{Binding Provider.IconUrl.ActualValue, FallbackValue={x:Null}}"/>
+                      md:AsyncImageLoader.Source="{Binding ProviderTemplate.IconUrl, FallbackValue={x:Null}}"/>
                   </Border>
 
                   <TextBlock
                     Classes="Large" Margin="8,0,0,0"
                     VerticalAlignment="Center"
-                    Text="{Binding Provider.DisplayName.ActualValue, FallbackValue={x:Null}}"/>
+                    Text="{Binding ProviderTemplate.DisplayName, FallbackValue={x:Null}}"/>
                 </StackPanel>
               </DataTemplate>
             </ListBox.ItemTemplate>
