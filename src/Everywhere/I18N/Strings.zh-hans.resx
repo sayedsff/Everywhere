@@ -677,7 +677,7 @@
         <value>Windows 系统 API</value>
     </data>
     <data name="NativeChatPlugin_WindowsSystemApi_Description" xml:space="preserve">
-        <value>提供终端难以实现的 GUI 交互和系统控制功能，包括通知、消息框、窗口管理、剪贴板操作、鼠标键盘控制、壁纸设置、亮度调节和电源管理等。</value>
+        <value>提供一组精简的 Windows 控制能力，包括 Control Panel 快捷入口、系统设置的数值与开关调整、适配 computer-use 的鼠标键盘操作。</value>
     </data>
     <data name="FriendlyExceptionMessage_InvalidOperation" xml:space="preserve">
         <value>无效的操作。</value>

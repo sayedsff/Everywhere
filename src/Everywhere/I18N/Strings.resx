@@ -690,7 +690,7 @@
         <value>Windows System API</value>
     </data>
     <data name="NativeChatPlugin_WindowsSystemApi_Description" xml:space="preserve">
-        <value>Provides GUI interaction and system control capabilities that are difficult to achieve via terminal, including notifications, message boxes, window management, clipboard operations, mouse/keyboard control, wallpaper settings, brightness adjustment, and power management.</value>
+        <value>Provides a compact Windows control surface for assistants, including Control Panel shortcuts, numeric and boolean system setting updates, and computer-use compatible mouse and keyboard actions.</value>
     </data>
     <data name="FriendlyExceptionMessage_InvalidOperation" xml:space="preserve">
         <value>Invalid operation.</value>
