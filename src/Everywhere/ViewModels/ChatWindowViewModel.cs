@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -205,19 +206,19 @@ public partial class ChatWindowViewModel : BusyViewModelBase
         {
             if (_chatAttachments.Count >= Settings.Internal.MaxChatAttachmentCount) return;
 
-            var formats = await Clipboard.GetFormatsAsync();
-            if (formats.Length == 0)
+            var formats = await Clipboard.GetDataFormatsAsync();
+            if (formats.Count == 0)
             {
                 _logger.LogWarning("Clipboard is empty.");
                 return;
             }
 
-            if (formats.Contains(DataFormats.Files))
+            if (formats.Contains(DataFormat.File))
             {
-                var files = await Clipboard.GetDataAsync(DataFormats.Files);
-                if (files is IEnumerable enumerable)
+                var files = await Clipboard.TryGetFilesAsync();
+                if (files != null)
                 {
-                    foreach (var storageItem in enumerable.OfType<IStorageItem>())
+                    foreach (var storageItem in files)
                     {
                         var uri = storageItem.Path;
                         if (!uri.IsFile) break;
