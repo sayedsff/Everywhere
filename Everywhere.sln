@@ -78,6 +78,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WritableJsonConfiguration.T
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShadUI.Demo", "3rd\shad-ui\src\ShadUI.Demo\ShadUI.Demo.csproj", "{BFCCE248-E8A1-4690-A4A0-B42DB06B7B88}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "issue_templates", "issue_templates", "{5FCC5684-9471-46B6-9FE2-431880831A05}"
+	ProjectSection(SolutionItems) = preProject
+		.github\ISSUE_TEMPLATE\bug-report.yml = .github\ISSUE_TEMPLATE\bug-report.yml
+		.github\ISSUE_TEMPLATE\bug-report-zh.yml = .github\ISSUE_TEMPLATE\bug-report-zh.yml
+		.github\ISSUE_TEMPLATE\feature-request.yml = .github\ISSUE_TEMPLATE\feature-request.yml
+		.github\ISSUE_TEMPLATE\feature-request-zh.yml = .github\ISSUE_TEMPLATE\feature-request-zh.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -364,6 +372,7 @@ Global
 		{2F651C37-C3A7-41FF-8A36-0A7DB0DED09D} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{6B85590F-763A-472E-84B9-091D6F68D28D} = {9933B251-881A-4638-8995-EB7CC5370002}
 		{BFCCE248-E8A1-4690-A4A0-B42DB06B7B88} = {53D93485-1520-4753-81CE-DA1CFF334372}
+		{5FCC5684-9471-46B6-9FE2-431880831A05} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {83CB65B8-011F-4ED7-BCD3-A6CFA935EF7E}

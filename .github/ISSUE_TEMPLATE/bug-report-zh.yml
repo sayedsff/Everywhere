@@ -33,6 +33,22 @@ body:
       placeholder: 例如 Windows 11 22631
     validations:
       required: true
+  - type: input
+    id: model-provider
+    attributes:
+      label: 模型提供商
+      description: 您使用的大语言模型提供商
+      placeholder: E.g. OpenAI, Google
+    validations:
+      required: false
+  - type: input
+    id: model-name
+    attributes:
+      label: 模型名称
+      description: 具体的模型名称
+      placeholder: E.g. GPT-4, Gemini 2.5 Pro
+    validations:
+      required: false
   - type: textarea
     id: expected
     attributes:
