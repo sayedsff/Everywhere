@@ -671,7 +671,7 @@
         <value>文件系统</value>
     </data>
     <data name="NativeChatPlugin_FileSystem_Description" xml:space="preserve">
-        <value>提供访问系统文件的能力,如枚举、创建、删除、重命名、读取或写入文件等。</value>
+        <value>提供访问系统文件的能力, 如枚举、创建、删除、重命名、读取或写入文件等。</value>
     </data>
     <data name="NativeChatPlugin_WindowsSystemApi_Header" xml:space="preserve">
         <value>Windows 系统 API</value>
