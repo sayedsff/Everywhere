@@ -26,7 +26,7 @@ public class WindowsSystemApiPlugin : BuiltInChatPlugin
     {
         _logger = logger;
 
-        _functions.Add(new AnonymousChatFunction(UseControlPanelAsync, ChatFunctionPermissions.ProcessAccess));
+        _functions.Add(new AnonymousChatFunction(OpenControlPanelAsync, ChatFunctionPermissions.ProcessAccess));
         _functions.Add(new AnonymousChatFunction(MouseActionAsync, ChatFunctionPermissions.ScreenAccess));
         _functions.Add(new AnonymousChatFunction(KeyboardActionAsync, ChatFunctionPermissions.ScreenAccess));
     }
@@ -46,9 +46,9 @@ public class WindowsSystemApiPlugin : BuiltInChatPlugin
         { ControlPanelItem.DateTime, "timedate.cpl" }
     };
 
-    [KernelFunction("use_control_panel")]
+    [KernelFunction("open_control_panel")]
     [Description("Launches Control Panel tasks the same way the control.exe command does. Useful for opening specific Windows settings panes.")]
-    private Task<string> UseControlPanelAsync(
+    private Task<string> OpenControlPanelAsync(
         [Description("The Control Panel item to open. Matches control.exe canonical names.")] ControlPanelItem item,
         [Description("Optional override for the control.exe argument when you already know the exact command.")]
         string? argument = null)
@@ -162,7 +162,7 @@ public class WindowsSystemApiPlugin : BuiltInChatPlugin
         });
     }
 
-    [KernelFunction("computer_keyboard_action")]
+    [KernelFunction("keyboard_action")]
     [Description("Simulates keyboard input compatible with the computer-use tool schema (type text or send common shortcuts).")]
     private Task<string> KeyboardActionAsync(
         [Description("Keyboard action type.")] KeyboardActionKind action,
