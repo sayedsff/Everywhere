@@ -378,14 +378,9 @@ public partial class ChatWindow : ReactiveWindow<ChatWindowViewModel>
     {
         if (!e.Pointer.IsPrimary) return;
 
+        // BeginResizeDrag implementation requires CanResize to be true, so we temporarily set it to true, then set it back
         CanResize = true;
         BeginResizeDrag(WindowEdge.SouthEast, e);
-    }
-
-    protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
-    {
-        base.OnPointerCaptureLost(e);
-
         CanResize = false;
     }
 
