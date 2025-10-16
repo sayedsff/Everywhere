@@ -27,8 +27,8 @@
             CornerRadius="{TemplateBinding CornerRadius}">
             <Border.Styles>
               <Style Selector="ToggleButton:checked /template/ Border#RootBorder">
-                <Setter Property="Background" Value="{DynamicResource PrimaryColor50}"/>
-                <Setter Property="BorderBrush" Value="{DynamicResource PrimaryColor50}"/>
+                <Setter Property="Background" Value="{DynamicResource SecondaryColor}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource SecondaryColor}"/>
               </Style>
             </Border.Styles>
 
@@ -100,7 +100,7 @@
 
           <Border
             Margin="0,4"
-            BorderBrush="{DynamicResource PrimaryColor}"
+            BorderBrush="{DynamicResource ErrorColor60}"
             BorderThickness="3,0,0,0" CornerRadius="3">
             <Border.IsVisible>
               <MultiBinding Converter="{x:Static BoolConverters.And}">

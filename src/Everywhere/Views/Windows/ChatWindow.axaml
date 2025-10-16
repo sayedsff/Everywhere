@@ -679,12 +679,13 @@
                       ElapsedSeconds="{Binding ElapsedSeconds}"
                       Header="{Binding HeaderKey^, FallbackValue={x:Null}}"
                       Icon="{Binding Icon}"
-                      IsBusy="{Binding IsBusy}">
+                      IsBusy="{Binding IsBusy}"
+                      IsError="{Binding ErrorMessageKey, Converter={x:Static ObjectConverters.IsNotNull}}">
                       <v:ChatActionBubble.ErrorContent>
                         <SelectableTextBlock
                           Classes="Muted" Margin="6,4"
                           FontSize="13"
-                          Text="{Binding ErrorMessageKey}"/>
+                          Text="{Binding ErrorMessageKey^, FallbackValue={x:Null}}"/>
                       </v:ChatActionBubble.ErrorContent>
                     </v:ChatActionBubble>
                   </DataTemplate>
@@ -694,12 +695,13 @@
                       ElapsedSeconds="{Binding ElapsedSeconds}"
                       Header="{Binding HeaderKey^, FallbackValue={x:Null}}"
                       Icon="{Binding Icon}"
-                      IsBusy="{Binding IsBusy}">
+                      IsBusy="{Binding IsBusy}"
+                      IsError="{Binding ErrorMessageKey, Converter={x:Static ObjectConverters.IsNotNull}}">
                       <v:ChatActionBubble.ErrorContent>
                         <SelectableTextBlock
                           Classes="Muted" Margin="6,4"
                           FontSize="13"
-                          Text="{Binding ErrorMessageKey}"/>
+                          Text="{Binding ErrorMessageKey^, FallbackValue={x:Null}}"/>
                       </v:ChatActionBubble.ErrorContent>
                     </v:ChatActionBubble>
                   </DataTemplate>
