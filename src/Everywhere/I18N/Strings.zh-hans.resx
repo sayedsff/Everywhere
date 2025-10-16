@@ -484,13 +484,13 @@
     <data name="ChatWindowPinMode_AlwaysUnpinned" xml:space="preserve">
         <value>总是不固定</value>
     </data>
-    <data name="VisualTreeDetailLevel_Detailed" xml:space="preserve">
+    <data name="VisualTreeXmlDetailLevel_Detailed" xml:space="preserve">
         <value>详细</value>
     </data>
-    <data name="VisualTreeDetailLevel_Compact" xml:space="preserve">
+    <data name="VisualTreeXmlDetailLevel_Compact" xml:space="preserve">
         <value>精简</value>
     </data>
-    <data name="VisualTreeDetailLevel_Minimal" xml:space="preserve">
+    <data name="VisualTreeXmlDetailLevel_Minimal" xml:space="preserve">
         <value>极简</value>
     </data>
     <data name="ChatWindowPinMode_PinOnInput" xml:space="preserve">
@@ -938,10 +938,10 @@
         <value>设置</value>
     </data>
     <data name="ChatWindow_ChatInputBox_SettingsMenuItems_VisualTreeTokenLimit" xml:space="preserve">
-        <value>视觉树长度限制</value>
+        <value>视觉树长度限制:</value>
     </data>
     <data name="ChatWindow_ChatInputBox_SettingsMenuItems_VisualTreeDetailLevel" xml:space="preserve">
-        <value>视觉树详细程度</value>
+        <value>视觉树详细程度:</value>
     </data>
     <data name="SoftwareUpdater_UpdateAvailable_Toast_Message" xml:space="preserve">
         <value>有新版本可用。</value>

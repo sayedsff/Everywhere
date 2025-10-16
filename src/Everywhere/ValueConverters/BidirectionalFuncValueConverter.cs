@@ -28,7 +28,7 @@ public class BidirectionalFuncValueConverter<TInput, TOutput>(Func<TInput, objec
             return convertBack(output, parameter);
         }
 
-        if (System.Convert.ChangeType(value, targetType) is TOutput converted)
+        if (System.Convert.ChangeType(value, typeof(TOutput)) is TOutput converted)
         {
             return convertBack(converted, parameter);
         }

@@ -54,22 +54,6 @@ public partial class ChatWindowViewModel : BusyViewModelBase
     [ObservableProperty]
     public partial IReadOnlyList<DynamicNamedCommand>? QuickActions { get; private set; }
 
-    [ObservableProperty]
-    public partial int VisualTreeDetailLevelIndex { get; set; }
-
-    partial void OnVisualTreeDetailLevelIndexChanged(int value)
-    {
-        Settings.ChatWindow.VisualTreeDetailLevel = (VisualTreeDetailLevel)value;
-    }
-
-    public string VisualTreeDetailLevelDisplay => Settings.ChatWindow.VisualTreeDetailLevel switch
-    {
-        VisualTreeDetailLevel.Detailed => "详细",
-        VisualTreeDetailLevel.Compact => "精简",
-        VisualTreeDetailLevel.Minimal => "极简",
-        _ => "未知"
-    };
-
     public IChatContextManager ChatContextManager { get; }
 
     private readonly IChatService _chatService;
@@ -106,16 +90,6 @@ public partial class ChatWindowViewModel : BusyViewModelBase
         _logger = logger;
 
         InitializeCommands();
-
-        VisualTreeDetailLevelIndex = (int)Settings.ChatWindow.VisualTreeDetailLevel;
-        Settings.ChatWindow.PropertyChanged += (s, e) =>
-        {
-            if (e.PropertyName == nameof(ChatWindowSettings.VisualTreeDetailLevel))
-            {
-                VisualTreeDetailLevelIndex = (int)Settings.ChatWindow.VisualTreeDetailLevel;
-                OnPropertyChanged(nameof(VisualTreeDetailLevelDisplay));
-            }
-        };
     }
 
     private void InitializeCommands()

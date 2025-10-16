@@ -1,13 +1,22 @@
-﻿using System.Linq;
-using System.Security;
+﻿using System.Security;
 using System.Text;
 using System.Text.RegularExpressions;
 using Everywhere.Interop;
 using ZLinq;
-#if DEBUG
-#endif
 
 namespace Everywhere.Chat;
+
+public enum VisualTreeXmlDetailLevel
+{
+    [DynamicResourceKey(LocaleKey.VisualTreeXmlDetailLevel_Minimal)]
+    Minimal,
+
+    [DynamicResourceKey(LocaleKey.VisualTreeXmlDetailLevel_Compact)]
+    Compact,
+
+    [DynamicResourceKey(LocaleKey.VisualTreeXmlDetailLevel_Detailed)]
+    Detailed,
+}
 
 /// <summary>
 ///     This class builds an XML representation of the core elements, which is limited by the soft token limit and finally used by a LLM.
@@ -15,11 +24,11 @@ namespace Everywhere.Chat;
 /// <param name="coreElements"></param>
 /// <param name="approximateTokenLimit"></param>
 /// <param name="detailLevel"></param>
-public partial class VisualElementXmlBuilder(
+public partial class VisualTreeXmlBuilder(
     IReadOnlyList<IVisualElement> coreElements,
     int approximateTokenLimit,
     int startingId,
-    VisualTreeDetailLevel detailLevel)
+    VisualTreeXmlDetailLevel detailLevel)
 {
     private enum QueueOrigin
     {
@@ -54,7 +63,6 @@ public partial class VisualElementXmlBuilder(
     /// </summary>
     public Dictionary<int, IVisualElement> BuiltVisualElements { get; } = new();
 
-    private readonly VisualTreeDetailLevel _detailLevel = detailLevel;
     private readonly HashSet<string> _coreElementIds = coreElements
         .Select(e => e.Id)
         .Where(id => !string.IsNullOrEmpty(id))
@@ -242,7 +250,7 @@ public partial class VisualElementXmlBuilder(
                 VisualElementType.Panel or
                 VisualElementType.TopLevel or
                 VisualElementType.Screen;
-            var includeBounds = isContainer && _detailLevel != VisualTreeDetailLevel.Minimal;
+            var includeBounds = isContainer && detailLevel != VisualTreeXmlDetailLevel.Minimal;
             if (includeBounds)
             {
                 // for containers, include the element's size
@@ -269,15 +277,15 @@ public partial class VisualElementXmlBuilder(
                 bool shouldWarn = false;
                 if (includeBounds)
                 {
-                    switch (_detailLevel)
+                    switch (detailLevel)
                     {
-                        case VisualTreeDetailLevel.Detailed:
+                        case VisualTreeXmlDetailLevel.Detailed:
                             shouldWarn = element.BoundingRectangle is { Width: > 64, Height: > 64 };
                             break;
-                        case VisualTreeDetailLevel.Compact:
+                        case VisualTreeXmlDetailLevel.Compact:
                             shouldWarn = element.BoundingRectangle is { Width: > 256, Height: > 256 };
                             break;
-                        case VisualTreeDetailLevel.Minimal:
+                        case VisualTreeXmlDetailLevel.Minimal:
                             shouldWarn = false;
                             break;
                     }
@@ -317,7 +325,7 @@ public partial class VisualElementXmlBuilder(
 
     private void ApplyDetailLevel()
     {
-        if (_detailLevelApplied || _detailLevel == VisualTreeDetailLevel.Detailed) return;
+        if (_detailLevelApplied || detailLevel == VisualTreeXmlDetailLevel.Detailed) return;
 
         foreach (var rootElement in _rootElements)
         {
@@ -347,10 +355,10 @@ public partial class VisualElementXmlBuilder(
         var shouldRender = hasSelfInformativeContent;
         if (!shouldRender)
         {
-            shouldRender = _detailLevel switch
+            shouldRender = detailLevel switch
             {
-                VisualTreeDetailLevel.Compact => ShouldKeepContainerForCompact(element, informativeChildCount),
-                VisualTreeDetailLevel.Minimal => ShouldKeepContainerForMinimal(element, informativeChildCount),
+                VisualTreeXmlDetailLevel.Compact => ShouldKeepContainerForCompact(element, informativeChildCount),
+                VisualTreeXmlDetailLevel.Minimal => ShouldKeepContainerForMinimal(element, informativeChildCount),
                 _ => hasInformativeDescendant
             };
         }
