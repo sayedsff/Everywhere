@@ -1062,4 +1062,19 @@ Placeholders can be used within the prompt, enclosed in {}, and will be replaced
     <data name="IconEditor_IconTabItem_Header" xml:space="preserve">
         <value>Icon</value>
     </data>
+    <data name="HandledSystemException_InvalidOperation" xml:space="preserve">
+        <value>The operaction is invalid. Please ensure the configuration is correct.</value>
+    </data>
+    <data name="HandledSystemException_InvalidArgument" xml:space="preserve">
+        <value>The argument is invalid. Please ensure the configuration is correct.</value>
+    </data>
+    <data name="HandledSystemException_InvalidFormat" xml:space="preserve">
+        <value>The format is invalid. Please ensure the configuration is correct.</value>
+    </data>
+    <data name="HandledSystemException_ArgumentNull" xml:space="preserve">
+        <value>The argument is empty. Please ensure the configuration is correct.</value>
+    </data>
+    <data name="HandledSystemException_ArgumentOutOfRange" xml:space="preserve">
+        <value>The argument is out of valid range. Please ensure the configuration is correct.</value>
+    </data>
 </root>

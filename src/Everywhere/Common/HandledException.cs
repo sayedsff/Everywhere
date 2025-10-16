@@ -27,12 +27,28 @@ public class HandledException : Exception
     /// </summary>
     public virtual bool IsExpected { get; }
 
+    public override string Message
+    {
+        get
+        {
+            var exception = InnerException;
+            var message = exception?.Message;
+            while (message.IsNullOrEmpty() && exception?.InnerException is not null)
+            {
+                exception = exception.InnerException;
+                message = exception?.Message;
+            }
+
+            return message ?? LocaleKey.Common_Unknown.I18N();
+        }
+    }
+
     [SetsRequiredMembers]
     public HandledException(
         Exception originalException,
         DynamicResourceKey friendlyMessageKey,
         bool isExpected = true
-    ) : base(originalException.Message, originalException)
+    ) : base(null, originalException)
     {
         FriendlyMessageKey = friendlyMessageKey;
         IsExpected = isExpected;
@@ -133,6 +149,31 @@ public enum HandledSystemExceptionType
     /// The data is invalid or in an unexpected format.
     /// </summary>
     InvalidData,
+
+    /// <summary>
+    /// The operation is not valid due to the current state of the object.
+    /// </summary>
+    InvalidOperation,
+
+    /// <summary>
+    /// The argument provided to a method is not valid.
+    /// </summary>
+    InvalidArgument,
+
+    /// <summary>
+    /// The format of an argument is not valid.
+    /// </summary>
+    InvalidFormat,
+
+    /// <summary>
+    /// A null argument was passed to a method that does not accept it.
+    /// </summary>
+    ArgumentNull,
+
+    /// <summary>
+    /// An argument is outside the range of valid values.
+    /// </summary>
+    ArgumentOutOfRange,
 }
 
 /// <summary>
@@ -187,6 +228,11 @@ public class HandledSystemException : HandledException
                 HandledSystemExceptionType.DriveNotFound => LocaleKey.HandledSystemException_DriveNotFound,
                 HandledSystemExceptionType.EndOfStream => LocaleKey.HandledSystemException_EndOfStream,
                 HandledSystemExceptionType.InvalidData => LocaleKey.HandledSystemException_InvalidData,
+                HandledSystemExceptionType.InvalidOperation => LocaleKey.HandledSystemException_InvalidOperation,
+                HandledSystemExceptionType.InvalidArgument => LocaleKey.HandledSystemException_InvalidArgument,
+                HandledSystemExceptionType.InvalidFormat => LocaleKey.HandledSystemException_InvalidFormat,
+                HandledSystemExceptionType.ArgumentNull => LocaleKey.HandledSystemException_ArgumentNull,
+                HandledSystemExceptionType.ArgumentOutOfRange => LocaleKey.HandledSystemException_ArgumentOutOfRange,
                 _ => LocaleKey.HandledSystemException_Unknown,
             }),
         isExpected: false)
@@ -299,6 +345,21 @@ public class HandledSystemException : HandledException
                 case IOException io:
                     context.ExceptionType = HandledSystemExceptionType.IOException;
                     context.ErrorCode ??= io.HResult;
+                    break;
+                case InvalidOperationException:
+                    context.ExceptionType = HandledSystemExceptionType.InvalidOperation;
+                    break;
+                case ArgumentNullException:
+                    context.ExceptionType = HandledSystemExceptionType.ArgumentNull;
+                    break;
+                case ArgumentOutOfRangeException:
+                    context.ExceptionType = HandledSystemExceptionType.ArgumentOutOfRange;
+                    break;
+                case FormatException:
+                    context.ExceptionType = HandledSystemExceptionType.InvalidFormat;
+                    break;
+                case ArgumentException:
+                    context.ExceptionType = HandledSystemExceptionType.InvalidArgument;
                     break;
                 default:
                     return false;
