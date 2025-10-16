@@ -460,6 +460,15 @@
     <data name="ChatWindowPinMode_AlwaysUnpinned" xml:space="preserve">
         <value>总是不固定</value>
     </data>
+    <data name="VisualTreeXmlDetailLevel_Detailed" xml:space="preserve">
+        <value>详细</value>
+    </data>
+    <data name="VisualTreeXmlDetailLevel_Compact" xml:space="preserve">
+        <value>精简</value>
+    </data>
+    <data name="VisualTreeXmlDetailLevel_Minimal" xml:space="preserve">
+        <value>极简</value>
+    </data>
     <data name="ChatWindowPinMode_PinOnInput" xml:space="preserve">
         <value>输入时固定</value>
     </data>
@@ -468,6 +477,12 @@
     </data>
     <data name="Settings_ChatWindow_WindowPinMode_Description" xml:space="preserve">
         <value>指定聊天窗口打开时的固定模式，当窗口没有固定时，失去焦点会自动隐藏。</value>
+    </data>
+    <data name="Settings_ChatWindow_VisualTreeDetailLevel_Header" xml:space="preserve">
+        <value>视觉树详细程度</value>
+    </data>
+    <data name="Settings_ChatWindow_VisualTreeDetailLevel_Description" xml:space="preserve">
+        <value>控制附加界面元素时采集的界面信息量。</value>
     </data>
     <data name="FriendlyExceptionMessage_ClientResult" xml:space="preserve">
         <value>客户端错误。</value>
@@ -635,7 +650,13 @@
         <value>文件系统</value>
     </data>
     <data name="NativeChatPlugin_FileSystem_Description" xml:space="preserve">
-        <value>提供访问系统文件的能力，如枚举、创建、删除、重命名、读取或写入文件等。</value>
+        <value>提供访问系统文件的能力, 如枚举、创建、删除、重命名、读取或写入文件等。</value>
+    </data>
+    <data name="NativeChatPlugin_WindowsSystemApi_Header" xml:space="preserve">
+        <value>Windows 系统 API</value>
+    </data>
+    <data name="NativeChatPlugin_WindowsSystemApi_Description" xml:space="preserve">
+        <value>提供一组精简的 Windows 控制能力，包括 Control Panel 快捷入口、系统设置的数值与开关调整、适配 computer-use 的鼠标键盘操作。</value>
     </data>
     <data name="FriendlyExceptionMessage_InvalidOperation" xml:space="preserve">
         <value>无效的操作。</value>
@@ -875,7 +896,10 @@
         <value>设置</value>
     </data>
     <data name="ChatWindow_ChatInputBox_SettingsMenuItems_VisualTreeTokenLimit" xml:space="preserve">
-        <value>视觉树长度限制</value>
+        <value>视觉树长度限制:</value>
+    </data>
+    <data name="ChatWindow_ChatInputBox_SettingsMenuItems_VisualTreeDetailLevel" xml:space="preserve">
+        <value>视觉树详细程度:</value>
     </data>
     <data name="SoftwareUpdater_UpdateAvailable_Toast_Message" xml:space="preserve">
         <value>有新版本可用。</value>
@@ -909,6 +933,9 @@
     </data>
     <data name="HandledChatException_ContextLengthExceeded" xml:space="preserve">
         <value>上下文长度超出限制。</value>
+    </data>
+    <data name="ChatFunctionPermissions_ProcessAccess" xml:space="preserve">
+        <value>访问进程</value>
     </data>
     <data name="CustomAssistant_Name_Default" xml:space="preserve">
         <value>默认助手</value>

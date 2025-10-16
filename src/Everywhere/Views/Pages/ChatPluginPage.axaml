@@ -63,8 +63,13 @@
         <DataTemplate DataType="p:ChatFunctionPermissions">
           <shadui:Badge
             Background="{Binding Converter={x:Static vc:ChatFunctionPermissionsConverters.ToBrush}}"
-            Content="{Binding Converter={x:Static vc:DynamicResourceKeyConverter.Shared}}"
-            Opacity="0.7"/>
+            Opacity="0.7">
+            <TextBlock>
+              <TextBlock.Text>
+                <I18N Key="{Binding Converter={x:Static vc:DynamicResourceKeyConverter.Shared}}"/>
+              </TextBlock.Text>
+            </TextBlock>
+          </shadui:Badge>
         </DataTemplate>
       </Setter>
     </Style>

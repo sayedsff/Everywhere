@@ -476,11 +476,26 @@
     <data name="ChatWindowPinMode_PinOnInput" xml:space="preserve">
         <value>Pin on input</value>
     </data>
+    <data name="VisualTreeXmlDetailLevel_Detailed" xml:space="preserve">
+        <value>Detailed</value>
+    </data>
+    <data name="VisualTreeXmlDetailLevel_Compact" xml:space="preserve">
+        <value>Compact</value>
+    </data>
+    <data name="VisualTreeXmlDetailLevel_Minimal" xml:space="preserve">
+        <value>Minimal</value>
+    </data>
     <data name="Settings_ChatWindow_WindowPinMode_Header" xml:space="preserve">
         <value>Window Pin Mode</value>
     </data>
     <data name="Settings_ChatWindow_WindowPinMode_Description" xml:space="preserve">
         <value>Specifies the pin mode for the chat window when it is opened. When the window is not fixed, it will be hidden automatically when it loses focus.</value>
+    </data>
+    <data name="Settings_ChatWindow_VisualTreeDetailLevel_Header" xml:space="preserve">
+        <value>Visual tree detail level</value>
+    </data>
+    <data name="Settings_ChatWindow_VisualTreeDetailLevel_Description" xml:space="preserve">
+        <value>Choose how much information is captured from the UI tree when attaching elements.</value>
     </data>
     <data name="FriendlyExceptionMessage_ClientResult" xml:space="preserve">
         <value>Client error.</value>
@@ -649,6 +664,12 @@
     </data>
     <data name="NativeChatPlugin_FileSystem_Description" xml:space="preserve">
         <value>Provides the ability to access files, such as enumerating, creating, deleting, renaming, reading, or writing.</value>
+    </data>
+    <data name="NativeChatPlugin_WindowsSystemApi_Header" xml:space="preserve">
+        <value>Windows System API</value>
+    </data>
+    <data name="NativeChatPlugin_WindowsSystemApi_Description" xml:space="preserve">
+        <value>Provides a compact Windows control surface for assistants, including Control Panel shortcuts, numeric and boolean system setting updates, and computer-use compatible mouse and keyboard actions.</value>
     </data>
     <data name="FriendlyExceptionMessage_InvalidOperation" xml:space="preserve">
         <value>Invalid operation.</value>
@@ -894,7 +915,10 @@ My intelligence comes from powerful Large language models (LLMs), which are prov
         <value>Settings</value>
     </data>
     <data name="ChatWindow_ChatInputBox_SettingsMenuItems_VisualTreeTokenLimit" xml:space="preserve">
-        <value>Visual tree length limit</value>
+        <value>Visual tree length limit:</value>
+    </data>
+    <data name="ChatWindow_ChatInputBox_SettingsMenuItems_VisualTreeDetailLevel" xml:space="preserve">
+        <value>Visual tree detail level:</value>
     </data>
     <data name="SoftwareUpdater_UpdateAvailable_Toast_Message" xml:space="preserve">
         <value>Update available.</value>
@@ -928,6 +952,9 @@ My intelligence comes from powerful Large language models (LLMs), which are prov
     </data>
     <data name="HandledChatException_ContextLengthExceeded" xml:space="preserve">
         <value>Context length exceeded.</value>
+    </data>
+    <data name="ChatFunctionPermissions_ProcessAccess" xml:space="preserve">
+        <value>Access process</value>
     </data>
     <data name="CustomAssistant_Name_Default" xml:space="preserve">
         <value>Default Assistant</value>

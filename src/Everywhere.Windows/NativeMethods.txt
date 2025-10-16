@@ -29,6 +29,7 @@ GetCursorPos
 SetCapture
 ReleaseCapture
 SendInput
+SetCursorPos
 BlockInput
 SetWindowsHookEx
 CallNextHookEx

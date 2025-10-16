@@ -26,6 +26,21 @@ public class NumberConverters<T> where T : struct, INumber<T>
         convert: static (x, p) => x > ChangeType(p),
         convertBack: static (_, _) => throw new NotSupportedException()
     );
+
+    public static IValueConverter FromEnum { get; } = new FromEnumConverter();
+
+    private sealed class FromEnumConverter : IValueConverter
+    {
+        public object Convert(object? value, Type targetType, object? parameter, System.Globalization.CultureInfo culture)
+        {
+            return value is null ? default : ChangeType(value);
+        }
+
+        public object ConvertBack(object? value, Type targetType, object? parameter, System.Globalization.CultureInfo culture)
+        {
+            return value is null ? 0 : Enum.ToObject(targetType, System.Convert.ChangeType(value, TypeCode.Int64));
+        }
+    }
 }
 
 public class Int32Converters : NumberConverters<int>;

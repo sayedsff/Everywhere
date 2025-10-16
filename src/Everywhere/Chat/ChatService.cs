@@ -151,7 +151,11 @@ public class ChatService(
 
                 var maxTokens = customAssistant.MaxTokens.ActualValue;
                 var approximateTokenLimit = Math.Min(settings.Internal.VisualTreeTokenLimit, maxTokens / 2);
-                var xmlBuilder = new VisualElementXmlBuilder(validVisualElements, approximateTokenLimit, chatContext.VisualElements.Count + 1);
+                var xmlBuilder = new VisualTreeXmlBuilder(
+                    validVisualElements,
+                    approximateTokenLimit,
+                    chatContext.VisualElements.Count + 1,
+                    settings.ChatWindow.VisualTreeXmlDetailLevel);
                 var renderedVisualTreePrompt = await Task.Run(
                     () =>
                     {

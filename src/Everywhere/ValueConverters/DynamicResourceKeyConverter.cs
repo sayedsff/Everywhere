@@ -1,7 +1,5 @@
 ﻿using System.Globalization;
 using System.Reflection;
-using Avalonia.Controls;
-using Avalonia.Data;
 using Avalonia.Data.Converters;
 
 namespace Everywhere.ValueConverters;
@@ -31,17 +29,7 @@ public class DynamicResourceKeyConverter : IValueConverter
             attribute = type.GetCustomAttributes<DynamicResourceKeyAttribute>(true).FirstOrDefault();
         }
 
-        if (attribute is null) return null;
-
-        var dynamicResourceKey = new DynamicResourceKey(attribute.Key);
-        return new TextBlock
-        {
-            [!TextBlock.TextProperty] = new Binding
-            {
-                Path = $"{nameof(DynamicResourceKeyBase.Self)}^",
-                Source = dynamicResourceKey
-            }
-        };
+        return attribute is null ? null : new DynamicResourceKey(attribute.Key);
     }
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

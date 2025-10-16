@@ -54,12 +54,15 @@ public enum ChatFunctionPermissions
     [DynamicResourceKey(LocaleKey.ChatFunctionPermissions_FileAccess)]
     FileAccess = FileRead | 1 << 6, // 32 | 64 = 96
 
+    [DynamicResourceKey(LocaleKey.ChatFunctionPermissions_ProcessAccess)]
+    ProcessAccess = 1 << 7, // 128
+
     /// <summary>
     /// Allows executing local shell commands. This is a high-risk permission
     /// that can potentially perform any system-level action.
     /// </summary>
     [DynamicResourceKey(LocaleKey.ChatFunctionPermissions_ShellExecute)]
-    ShellExecute = ScreenAccess | NetworkAccess | ClipboardAccess | FileAccess | 1 << 7,
+    ShellExecute = ScreenAccess | NetworkAccess | ClipboardAccess | FileAccess | ProcessAccess | 1 << 8,
 
     AllAccess = ~0
 }
