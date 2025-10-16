@@ -82,11 +82,6 @@ public class SettingsInitializer : IAsyncInitializer
                 },
                 new WebSearchEngineProvider
                 {
-                    Id = "bing",
-                    EndPoint = "https://api.bing.microsoft.com/v7.0/search?q"
-                },
-                new WebSearchEngineProvider
-                {
                     Id = "brave",
                     EndPoint = "https://api.search.brave.com/res/v1/web/search?q"
                 },

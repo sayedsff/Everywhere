@@ -137,7 +137,6 @@ public partial class WebSearchEnginePlugin : BuiltInChatPlugin
                 provider.SearchEngineId ?? throw new InvalidOperationException("Search Engine ID is not set."),
                 _loggerFactory),
             "tavily" => new TavilyConnector(provider.ApiKey, uri, _loggerFactory),
-            "bing" => new BingConnector(provider.ApiKey, uri, _loggerFactory),
             "brave" => new BraveConnector(provider.ApiKey, uri, _loggerFactory),
             "bocha" => new BoChaConnector(provider.ApiKey, uri, _loggerFactory),
             _ => throw new NotSupportedException($"Web search engine provider '{provider.Id}' is not supported.")
