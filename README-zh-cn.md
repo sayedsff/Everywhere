@@ -223,6 +223,10 @@
 
 第三方许可证：参见 [ThirdPartyNotices.txt](ThirdPartyNotices.txt)。
 
+## 🤩 鸣谢
+
+本项目的代码签名证书（Code Signing Certificate）由 [Certum中国](https://www.certumcodesign.cn/) 赞助提供，[Certum中国](https://www.certumcodesign.cn/) 持续为开源社区贡献一份力量。
+
 ## 📈 星标历史
 
 <a href="https://www.star-history.com/#DearVa/Everywhere&Date">

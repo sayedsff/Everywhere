@@ -224,6 +224,10 @@ Distributed under the Apache 2.0 License. See [LICENSE](LICENSE) for more inform
 
 Third-Party Licenses: See [ThirdPartyNotices.txt](ThirdPartyNotices.txt) for details.
 
+## 🤩 Special Thanks
+
+The Code Signing Certificate for this project is sponsored by [Certum China](https://www.certumcodesign.cn/), which continues to contribute to the open-source community.
+
 ## 📈 Star History
 
 <a href="https://www.star-history.com/#DearVa/Everywhere&Date">
