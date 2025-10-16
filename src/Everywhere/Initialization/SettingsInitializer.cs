@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Everywhere.Chat.Plugins;
@@ -94,6 +94,11 @@ public class SettingsInitializer : IAsyncInitializer
                 {
                     Id = "bocha",
                     EndPoint = "https://api.bochaai.com/v1/web-search"
+                },
+                new WebSearchEngineProvider
+                {
+                    Id = "jina",
+                    EndPoint = "https://s.jina.ai/?q"
                 },
             ],
             webSearchEngineSettings.WebSearchEngineProviders);
