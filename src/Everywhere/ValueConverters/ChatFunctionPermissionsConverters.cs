@@ -31,6 +31,7 @@ public static class ChatFunctionPermissionsConverters
             else if (permissions.HasFlag(ChatFunctionPermissions.ScreenRead)) permissionList.Add(ChatFunctionPermissions.ScreenRead);
             if (permissions.HasFlag(ChatFunctionPermissions.FileAccess)) permissionList.Add(ChatFunctionPermissions.FileAccess);
             else if (permissions.HasFlag(ChatFunctionPermissions.FileRead)) permissionList.Add(ChatFunctionPermissions.FileRead);
+            if (permissions.HasFlag(ChatFunctionPermissions.ProcessAccess)) permissionList.Add(ChatFunctionPermissions.ProcessAccess);
             if (permissions.HasFlag(ChatFunctionPermissions.ShellExecute)) permissionList.Add(ChatFunctionPermissions.ShellExecute);
             return permissionList;
         }
@@ -47,7 +48,7 @@ public static class ChatFunctionPermissionsConverters
         {
             if (value is not ChatFunctionPermissions permissions) return null;
 
-            // Define brushs for different permission levels
+            // Define brushes for different permission levels
             var brushNone = Brushes.Gray;
             var brushLow = Brushes.Green;
             var brushMedium = Brushes.DarkOrange;
@@ -55,7 +56,7 @@ public static class ChatFunctionPermissionsConverters
 
             if (permissions == ChatFunctionPermissions.None)
                 return brushNone;
-            if (permissions.HasFlag(ChatFunctionPermissions.ShellExecute))
+            if (permissions.HasFlag(ChatFunctionPermissions.ProcessAccess) || permissions.HasFlag(ChatFunctionPermissions.ShellExecute))
                 return brushHigh;
             if (permissions.HasFlag(ChatFunctionPermissions.FileAccess) || permissions.HasFlag(ChatFunctionPermissions.ClipboardAccess) ||
                 permissions.HasFlag(ChatFunctionPermissions.ScreenAccess))

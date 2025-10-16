@@ -976,4 +976,7 @@
     <data name="HandledChatException_ContextLengthExceeded" xml:space="preserve">
         <value>上下文长度超出限制。</value>
     </data>
+    <data name="ChatFunctionPermissions_ProcessAccess" xml:space="preserve">
+        <value>访问进程</value>
+    </data>
 </root>
