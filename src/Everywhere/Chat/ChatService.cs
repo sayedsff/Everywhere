@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using Anthropic.SDK.Messaging;
 using Avalonia.Threading;
 using Everywhere.AI;
@@ -339,11 +338,6 @@ public class ChatService(
                     llmStreamActivity?.SetTag("llm.model.id", settings.Model.SelectedModelDefinitionId ?? "unknown");
                     llmStreamActivity?.SetTag("llm.model.actual_id", settings.Model.SelectedModelDefinition?.ModelId.ActualValue ?? "unknown");
                     llmStreamActivity?.SetTag("llm.model.max_embedding", settings.Model.SelectedModelDefinition?.MaxTokens?.ToString() ?? "unknown");
-
-#if DEBUG
-                    // 在开发模式下保存发送给AI的原始消息
-                    await SaveChatHistoryToJsonAsync(chatContext.Metadata.Id.ToString(), chatHistory, cancellationToken);
-#endif
 
                     await foreach (var streamingContent in kernelMixin.ChatCompletionService.GetStreamingChatMessageContentsAsync(
                                        // They absolutely must modify this ChatHistory internally.
@@ -779,156 +773,4 @@ public class ChatService(
             logger.LogError(e, "Failed to generate chat title");
         }
     }
-
-#if DEBUG
-    /// <summary>
-    /// 在开发模式下保存发送给AI的原始消息到JSON文件
-    /// </summary>
-    private async Task SaveChatHistoryToJsonAsync(string chatContextId, ChatHistory chatHistory, CancellationToken cancellationToken)
-    {
-        try
-        {
-            var dataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Everywhere", "DebugChatHistory");
-            Directory.CreateDirectory(dataPath);
-
-            var filePath = Path.Combine(dataPath, $"{chatContextId}.json");
-
-            // 将ChatHistory转换为类似OpenAI API格式的消息数组
-            var messages = new List<object>();
-            
-            foreach (var msg in chatHistory)
-            {
-                // 如果消息没有Items或Items为空，使用Content
-                if (msg.Items == null || msg.Items.Count == 0)
-                {
-                    if (!string.IsNullOrEmpty(msg.Content))
-                    {
-                        messages.Add(new
-                        {
-                            role = msg.Role.Label,
-                            content = msg.Content
-                        });
-                    }
-                    continue;
-                }
-
-                // 处理包含多个Items的消息
-                var contentItems = new List<object>();
-                
-                foreach (var item in msg.Items)
-                {
-                    switch (item)
-                    {
-                        case TextContent textContent:
-                            contentItems.Add(new
-                            {
-                                type = "text",
-                                text = textContent.Text
-                            });
-                            break;
-                            
-                        case ImageContent imageContent:
-                            contentItems.Add(new
-                            {
-                                type = "image_url",
-                                image_url = new
-                                {
-                                    url = $"data:{imageContent.MimeType};base64,[{imageContent.Data?.Length ?? 0} bytes]"
-                                }
-                            });
-                            break;
-                            
-                        case FunctionCallContent functionCall:
-                        {
-                            // 提取实际的参数
-                            var argumentsDict = new Dictionary<string, object?>();
-                            if (functionCall.Arguments != null)
-                            {
-                                foreach (var kvp in functionCall.Arguments)
-                                {
-                                    argumentsDict[kvp.Key] = kvp.Value;
-                                }
-                            }
-                            
-                            contentItems.Add(new
-                            {
-                                type = "function_call",
-                                id = functionCall.Id,
-                                function = new
-                                {
-                                    name = functionCall.FunctionName,
-                                    arguments = JsonSerializer.Serialize(argumentsDict)
-                                }
-                            });
-                            break;
-                        }
-                            
-                        case FunctionResultContent functionResult:
-                            contentItems.Add(new
-                            {
-                                type = "tool_result",
-                                tool_call_id = functionResult.CallId,
-                                content = functionResult.Result?.ToString()
-                            });
-                            break;
-                            
-                        case AudioContent audioContent:
-                            contentItems.Add(new
-                            {
-                                type = "audio",
-                                data_length = audioContent.Data?.Length ?? 0
-                            });
-                            break;
-                    }
-                }
-
-                // 如果只有一个文本项，简化格式
-                if (contentItems.Count == 1 && contentItems[0] is { } firstItem)
-                {
-                    // Use pattern matching to avoid dynamic
-                    if (firstItem is { type: "text", text: var text })
-                    {
-                        messages.Add(new
-                        {
-                            role = msg.Role.Label,
-                            content = text
-                        });
-                        continue;
-                    }
-                }
-
-                // 多项或非文本内容
-                messages.Add(new
-                {
-                    role = msg.Role.Label,
-                    content = contentItems
-                });
-            }
-
-            var jsonOptions = new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-            };
-
-            var json = JsonSerializer.Serialize(new
-            {
-                context_id = chatContextId,
-                timestamp = DateTimeOffset.UtcNow,
-                message_count = messages.Count,
-                messages = messages
-            }, jsonOptions);
-
-            await File.WriteAllTextAsync(filePath, json, cancellationToken);
-
-            logger.LogDebug("Saved chat history to {FilePath}", filePath);
-        }
-        catch (Exception ex)
-        {
-            // 保存失败不应该影响正常流程
-            logger.LogWarning(ex, "Failed to save chat history to JSON");
-        }
-    }
-#endif
 }
