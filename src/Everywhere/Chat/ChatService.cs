@@ -770,7 +770,7 @@ public class ChatService(
             var chatMessageContent = await chatCompletionService.GetChatMessageContentAsync(
                 chatHistory,
                 cancellationToken: cancellationToken);
-            metadata.Topic = chatMessageContent.Content;
+            metadata.Topic = chatMessageContent.Content?.Trim().Trim('.', '!', '?', '。', '！', '？').SafeSubstring(0, 50);
             activity?.SetTag("topic.length", metadata.Topic?.Length ?? 0);
         }
         catch (Exception e)

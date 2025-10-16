@@ -184,7 +184,7 @@ public class HandledSystemException : HandledException
     /// <summary>
     /// System-level errors are treated as unexpected by default.
     /// </summary>
-    public override bool IsExpected => false;
+    public override bool IsExpected => ExceptionType != HandledSystemExceptionType.Unknown;
 
     /// <summary>
     /// Gets the categorized type of the system exception.
