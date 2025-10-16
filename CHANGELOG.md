@@ -1,3 +1,20 @@
+## [v0.3.12](https://github.com/DearVa/Everywhere/releases/tag/v0.3.12) - 2025-10-16
+
+### 🚀 Improvements
+- Removed the obsolete Bing web search engine
+- Optimized error handling
+
+### 🐛 Bug Fixes
+- Fixed an issue where the chat window could not be resized
+- Fixed an issue where the Tavily search engine could not be invoked
+- Fixed an issue where the chat action bubble did not display error messages
+- Fixed an issue where variables in the system prompt were not rendered
+- Fixed an issue where the chat topic summary was sometimes empty (Note: This is not fully resolved, as some models may still produce empty results)
+
+**Full Changelog**: https://github.com/DearVa/Everywhere/compare/v0.3.11...v0.3.12
+
+
+
 ## [v0.3.11](https://github.com/DearVa/Everywhere/releases/tag/v0.3.11) - 2025-10-16
 
 ### ⚠️ Breaking Changes ⚠️
