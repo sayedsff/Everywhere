@@ -12,6 +12,8 @@ public interface IChatContextManager : INotifyPropertyChanged
 
     IReadOnlyList<ChatContextHistory> History { get; }
 
+    IReadOnlyDictionary<string, Func<string>> SystemPromptVariables { get; }
+
     IRelayCommand CreateNewCommand { get; }
 
     IRelayCommand<ChatContext> RenameCommand { get; }

@@ -303,7 +303,7 @@ public class ChatService(
             var kernel = BuildKernel(kernelMixin, chatContext, customAssistant);
 
             var chatHistory = new ChatHistory();
-            chatContext.SystemPrompt = customAssistant.SystemPrompt.ActualValue;
+            chatContext.SystemPrompt = Prompts.RenderPrompt(customAssistant.SystemPrompt.ActualValue, chatContextManager.SystemPromptVariables);
 
             foreach (var chatMessage in chatContext
                          .Select(n => n.Message)
