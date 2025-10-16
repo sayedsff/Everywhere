@@ -78,7 +78,7 @@ public class SettingsInitializer : IAsyncInitializer
                 new WebSearchEngineProvider
                 {
                     Id = "tavily",
-                    EndPoint = "https://api.tavily.com/search"
+                    EndPoint = "https://api.tavily.com"
                 },
                 new WebSearchEngineProvider
                 {
