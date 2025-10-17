@@ -166,12 +166,11 @@ public static class EnumerableExtension
         double? last = null;
         foreach (var value in source)
         {
-            if (last == null) last = value;
-            else
+            if (last != null)
             {
                 yield return value - last.Value;
-                last = value;
             }
+            last = value;
         }
     }
     

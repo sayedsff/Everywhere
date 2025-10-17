@@ -4,10 +4,10 @@ public static class ReflectionExtension
 {
     public static IEnumerable<Type> EnumerateBaseTypes(this Type type)
     {
-        var currentType = type;
-        while (currentType.BaseType != null)
+        var currentType = type.BaseType;
+        while (currentType != null)
         {
-            yield return currentType.BaseType;
+            yield return currentType;
             currentType = currentType.BaseType;
         }
     }
