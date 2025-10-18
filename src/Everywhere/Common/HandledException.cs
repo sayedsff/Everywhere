@@ -182,11 +182,6 @@ public enum HandledSystemExceptionType
 public class HandledSystemException : HandledException
 {
     /// <summary>
-    /// System-level errors are treated as unexpected by default.
-    /// </summary>
-    public override bool IsExpected => ExceptionType != HandledSystemExceptionType.Unknown;
-
-    /// <summary>
     /// Gets the categorized type of the system exception.
     /// </summary>
     public HandledSystemExceptionType ExceptionType { get; }
@@ -204,7 +199,8 @@ public class HandledSystemException : HandledException
     public HandledSystemException(
         Exception originalException,
         HandledSystemExceptionType type,
-        DynamicResourceKey? customFriendlyMessageKey = null
+        DynamicResourceKey? customFriendlyMessageKey = null,
+        bool isExpected = true
     ) : base(
         originalException,
         customFriendlyMessageKey ?? new DynamicResourceKey(
@@ -235,7 +231,7 @@ public class HandledSystemException : HandledException
                 HandledSystemExceptionType.ArgumentOutOfRange => LocaleKey.HandledSystemException_ArgumentOutOfRange,
                 _ => LocaleKey.HandledSystemException_Unknown,
             }),
-        isExpected: false)
+        isExpected)
     {
         ExceptionType = type;
     }
@@ -243,7 +239,7 @@ public class HandledSystemException : HandledException
     /// <summary>
     /// Parses a generic Exception into a <see cref="HandledSystemException"/> or <see cref="AggregateException"/>.
     /// </summary>
-    public static Exception Handle(Exception exception)
+    public static Exception Handle(Exception exception, bool? isExpectedOverride = null)
     {
         if (exception is HandledSystemException systemEx) return systemEx;
         switch (exception)
@@ -251,7 +247,7 @@ public class HandledSystemException : HandledException
             case HandledSystemException handledSystemException:
                 return handledSystemException;
             case AggregateException aggregateException:
-                return new AggregateException(aggregateException.Segregate().Select(Handle));
+                return new AggregateException(aggregateException.Segregate().Select(e => Handle(e, isExpectedOverride)));
         }
 
         var context = new ExceptionParsingContext(exception);
@@ -269,7 +265,8 @@ public class HandledSystemException : HandledException
 
         return new HandledSystemException(
             originalException: exception,
-            type: context.ExceptionType ?? HandledSystemExceptionType.Unknown)
+            type: context.ExceptionType ?? HandledSystemExceptionType.Unknown,
+            isExpected: isExpectedOverride ?? context.ExceptionType is null or HandledSystemExceptionType.Unknown)
         {
             ErrorCode = context.ErrorCode
         };

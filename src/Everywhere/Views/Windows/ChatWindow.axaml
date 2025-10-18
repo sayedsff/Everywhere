@@ -1,4 +1,4 @@
-﻿<v:ReactiveWindow
+﻿<v:ReactiveShadWindow
   x:Class="Everywhere.Views.ChatWindow" xmlns="https://github.com/avaloniaui"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:at="clr-namespace:Everywhere.AttachedProperties"
   xmlns:be="clr-namespace:Everywhere.Behaviors" xmlns:chat="clr-namespace:Everywhere.Chat"
@@ -872,4 +872,4 @@
       </Viewbox>
     </Border>
   </Grid>
-</v:ReactiveWindow>
+</v:ReactiveShadWindow>

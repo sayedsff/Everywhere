@@ -318,7 +318,24 @@ public partial class ChatWindow : ReactiveWindow<ChatWindowViewModel>
         {
             ShowInTaskbar = true; // temporarily show in taskbar to avoid window blink in the bottom left corner
             WindowState = WindowState.Minimized;
-            Show();
+
+            try
+            {
+                Show();
+            }
+#if DEBUG
+            catch (Exception ex)
+            {
+                ex.Debug();
+#else
+            catch
+            {
+#endif
+
+                // sometimes this will fail, god knows why
+                IsOpened = false;
+            }
+
             WindowState = WindowState.Normal;
 
             Topmost = false;

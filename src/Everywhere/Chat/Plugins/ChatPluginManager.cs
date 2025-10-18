@@ -94,8 +94,8 @@ public class ChatPluginManager : IChatPluginManager
 
     private class ChatPluginSnapshot : ChatPlugin
     {
-        public override DynamicResourceKey HeaderKey => _originalChatPlugin.HeaderKey;
-        public override DynamicResourceKey DescriptionKey => _originalChatPlugin.DescriptionKey;
+        public override DynamicResourceKeyBase HeaderKey => _originalChatPlugin.HeaderKey;
+        public override DynamicResourceKeyBase DescriptionKey => _originalChatPlugin.DescriptionKey;
         public override LucideIconKind? Icon => _originalChatPlugin.Icon;
         public override string? BeautifulIcon => _originalChatPlugin.BeautifulIcon;
 

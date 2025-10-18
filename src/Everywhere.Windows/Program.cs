@@ -56,10 +56,11 @@ public static class Program
                 #region Chat Plugins
 
                 .AddTransient<BuiltInChatPlugin, VisualTreePlugin>()
-                .AddTransient<BuiltInChatPlugin, WebSearchEnginePlugin>()
+                .AddTransient<BuiltInChatPlugin, WebBrowserPlugin>()
                 .AddTransient<BuiltInChatPlugin, FileSystemPlugin>()
                 .AddTransient<BuiltInChatPlugin, PowerShellPlugin>()
                 .AddTransient<BuiltInChatPlugin, WindowsSystemApiPlugin>()
+                .AddTransient<BuiltInChatPlugin, EverythingPlugin>()
 
                 #endregion
 

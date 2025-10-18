@@ -11,13 +11,15 @@ namespace Everywhere.Chat.Plugins;
 
 public class VisualTreePlugin : BuiltInChatPlugin
 {
+    public override DynamicResourceKeyBase HeaderKey { get; } = new DynamicResourceKey(LocaleKey.NativeChatPlugin_VisualTree_Header);
+    public override DynamicResourceKeyBase DescriptionKey { get; } = new DynamicResourceKey(LocaleKey.NativeChatPlugin_VisualTree_Description);
     public override LucideIconKind? Icon => LucideIconKind.Component;
 
     private readonly IBlobStorage _blobStorage;
     private readonly IVisualElementContext _visualElementContext;
     private readonly Settings _settings;
 
-    public VisualTreePlugin(IBlobStorage blobStorage, IVisualElementContext visualElementContext, Settings settings) : base("VisualTree")
+    public VisualTreePlugin(IBlobStorage blobStorage, IVisualElementContext visualElementContext, Settings settings) : base("visual_tree")
     {
         _blobStorage = blobStorage;
         _visualElementContext = visualElementContext;

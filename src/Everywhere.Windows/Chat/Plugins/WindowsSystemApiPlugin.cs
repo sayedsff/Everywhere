@@ -18,11 +18,14 @@ namespace Everywhere.Windows.Chat.Plugins;
 /// </summary>
 public class WindowsSystemApiPlugin : BuiltInChatPlugin
 {
+    public override DynamicResourceKeyBase HeaderKey { get; } = new DirectResourceKey(LocaleKey.NativeChatPlugin_WindowsSystemApi_Header);
+    public override DynamicResourceKeyBase DescriptionKey { get; } = new DirectResourceKey(LocaleKey.NativeChatPlugin_WindowsSystemApi_Description);
     public override LucideIconKind? Icon => LucideIconKind.Monitor;
+    public override string BeautifulIcon => "avares://Everywhere.Windows/Assets/Icons/Windows11.svg";
 
     private readonly ILogger<WindowsSystemApiPlugin> _logger;
 
-    public WindowsSystemApiPlugin(ILogger<WindowsSystemApiPlugin> logger) : base("WindowsSystemApi")
+    public WindowsSystemApiPlugin(ILogger<WindowsSystemApiPlugin> logger) : base("windows_system_api")
     {
         _logger = logger;
 

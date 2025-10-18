@@ -543,7 +543,7 @@ public class ChatService(
                         }
                         catch (Exception ex)
                         {
-                            ex = HandledSystemException.Handle(ex);
+                            ex = HandledSystemException.Handle(ex, true); // treat all as expected
                             functionCallActivity?.SetStatus(ActivityStatusCode.Error, ex.Message);
 
                             resultContent = new FunctionResultContent(functionCallContent, $"Error: {ex.Message}");

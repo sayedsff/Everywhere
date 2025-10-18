@@ -647,11 +647,11 @@
     <data name="Settings_Plugin_WebSearchEngine_SelectedWebSearchEngineProvider_SearchEngineId_Description" xml:space="preserve">
         <value>(Google only) Provides a programmable search engine ID. For details, refer to the guide.</value>
     </data>
-    <data name="NativeChatPlugin_WebSearchEngine_Header" xml:space="preserve">
-        <value>Web Search</value>
+    <data name="NativeChatPlugin_WebBrowser_Header" xml:space="preserve">
+        <value>Web Browser</value>
     </data>
-    <data name="NativeChatPlugin_WebSearchEngine_Description" xml:space="preserve">
-        <value>Provides the ability to search the web before answering, can reduce large language model hallucinations and provide the latest information. Note: Using the web_search tool requires configuring a search engine API key (which is different from the LLM API key). If you do not intend to configure an API key, you can uncheck the web_search tool and use only the web_snapshot tool.</value>
+    <data name="NativeChatPlugin_WebBrowser_Description" xml:space="preserve">
+        <value>Providing web browsing capabilities, including search engine and webpage access functions, can reduce model hallucinations and deliver up-to-date information. Note: Using the web_search tool requires configuring a search engine API key (different from the model API key). If you do not intend to configure an API key, you may uncheck the web_search tool and use only the web_snapshot tool.</value>
     </data>
     <data name="NativeChatPlugin_Shell_Header" xml:space="preserve">
         <value>Terminal</value>
@@ -1103,5 +1103,11 @@ Placeholders can be used within the prompt, enclosed in {}, and will be replaced
     </data>
     <data name="HandledSystemException_ArgumentOutOfRange" xml:space="preserve">
         <value>The argument is out of valid range. Please ensure the configuration is correct.</value>
+    </data>
+    <data name="NativeChatPlugin_Everything_Header" xml:space="preserve">
+        <value>Everything</value>
+    </data>
+    <data name="NativeChatPlugin_Everything_Description" xml:space="preserve">
+        <value>Use Everything (a high-performance local file search engine) to search for files on your computer.</value>
     </data>
 </root>

@@ -277,9 +277,19 @@ public partial class FunctionCallChatMessage : ChatMessage, IChatMessageWithAtta
     [ObservableProperty]
     public partial LucideIconKind Icon { get; set; }
 
+    /// <summary>
+    /// Obsolete: Use HeaderKey instead.
+    /// </summary>
     [Key(2)]
+    private DynamicResourceKey? ObsoleteHeaderKey
+    {
+        get => null; // for forward compatibility
+        set => HeaderKey = value;
+    }
+
+    [Key(9)]
     [ObservableProperty]
-    public partial DynamicResourceKey? HeaderKey { get; set; }
+    public partial DynamicResourceKeyBase? HeaderKey { get; set; }
 
     [Key(3)]
     public string? Content { get; set; }
@@ -301,7 +311,6 @@ public partial class FunctionCallChatMessage : ChatMessage, IChatMessageWithAtta
 
     [Key(8)]
     [ObservableProperty]
-
     [NotifyPropertyChangedFor(nameof(ElapsedSeconds))]
     public partial DateTimeOffset FinishedAt { get; set; } = DateTimeOffset.UtcNow;
 
@@ -318,7 +327,7 @@ public partial class FunctionCallChatMessage : ChatMessage, IChatMessageWithAtta
     [SerializationConstructor]
     private FunctionCallChatMessage() { }
 
-    public FunctionCallChatMessage(LucideIconKind icon, DynamicResourceKey? headerKey)
+    public FunctionCallChatMessage(LucideIconKind icon, DynamicResourceKeyBase? headerKey)
     {
         Icon = icon;
         HeaderKey = headerKey;

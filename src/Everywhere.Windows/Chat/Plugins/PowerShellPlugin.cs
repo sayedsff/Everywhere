@@ -2,6 +2,7 @@
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 using Everywhere.Chat.Plugins;
+using Everywhere.I18N;
 using Lucide.Avalonia;
 using Microsoft.Extensions.Logging;
 using Microsoft.PowerShell;
@@ -11,11 +12,17 @@ namespace Everywhere.Windows.Chat.Plugins;
 
 public class PowerShellPlugin : BuiltInChatPlugin
 {
+    public override DynamicResourceKeyBase HeaderKey { get; } = new DynamicResourceKey(LocaleKey.NativeChatPlugin_Shell_Header);
+
+    public override DynamicResourceKeyBase DescriptionKey { get; } = new DynamicResourceKey(LocaleKey.NativeChatPlugin_Shell_Description);
+
     public override LucideIconKind? Icon => LucideIconKind.SquareTerminal;
+
+    public override string BeautifulIcon => "avares://Everywhere.Windows/Assets/Icons/PowerShell.svg";
 
     private readonly ILogger<PowerShellPlugin> _logger;
 
-    public PowerShellPlugin(ILogger<PowerShellPlugin> logger) : base("Shell")
+    public PowerShellPlugin(ILogger<PowerShellPlugin> logger) : base("powershell")
     {
         _logger = logger;
 

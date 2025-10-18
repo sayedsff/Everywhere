@@ -28,11 +28,13 @@ public class FileSystemPlugin : BuiltInChatPlugin
     private record ReadTextFileResult(string Content, bool IsBinary, bool IsEndOfFile);
 
 
+    public override DynamicResourceKeyBase HeaderKey { get; } = new DynamicResourceKey(LocaleKey.NativeChatPlugin_FileSystem_Header);
+    public override DynamicResourceKeyBase DescriptionKey { get; } = new DynamicResourceKey(LocaleKey.NativeChatPlugin_FileSystem_Description);
     public override LucideIconKind? Icon => LucideIconKind.FileBox;
 
     private readonly ILogger<FileSystemPlugin> _logger;
 
-    public FileSystemPlugin(ILogger<FileSystemPlugin> logger) : base("FileSystem")
+    public FileSystemPlugin(ILogger<FileSystemPlugin> logger) : base("file_system")
     {
         _logger = logger;
 

@@ -23,8 +23,10 @@ using ZLinq;
 
 namespace Everywhere.Chat.Plugins;
 
-public partial class WebSearchEnginePlugin : BuiltInChatPlugin
+public partial class WebBrowserPlugin : BuiltInChatPlugin
 {
+    public override DynamicResourceKeyBase HeaderKey { get; } = new DynamicResourceKey(LocaleKey.NativeChatPlugin_WebBrowser_Header);
+    public override DynamicResourceKeyBase DescriptionKey { get; } = new DynamicResourceKey(LocaleKey.NativeChatPlugin_WebBrowser_Description);
     public override LucideIconKind? Icon => LucideIconKind.Globe;
 
     public override IReadOnlyList<SettingsItem>? SettingsItems { get; }
@@ -33,8 +35,8 @@ public partial class WebSearchEnginePlugin : BuiltInChatPlugin
     private readonly IRuntimeConstantProvider _runtimeConstantProvider;
     private readonly IWatchdogManager _watchdogManager;
     private readonly ILoggerFactory _loggerFactory;
-    private readonly ILogger<WebSearchEnginePlugin> _logger;
-    private readonly DebounceExecutor<WebSearchEnginePlugin> _browserDisposer;
+    private readonly ILogger<WebBrowserPlugin> _logger;
+    private readonly DebounceExecutor<WebBrowserPlugin> _browserDisposer;
     private readonly JsonSerializerOptions _jsonSerializerOptions = new() { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
     private readonly SemaphoreSlim _browserLock = new(1, 1);
 
@@ -42,18 +44,18 @@ public partial class WebSearchEnginePlugin : BuiltInChatPlugin
     private IBrowser? _browser;
     private Process? _browserProcess;
 
-    public WebSearchEnginePlugin(
+    public WebBrowserPlugin(
         Settings settings,
         IRuntimeConstantProvider runtimeConstantProvider,
         IWatchdogManager watchdogManager,
-        ILoggerFactory loggerFactory) : base("WebSearchEngine")
+        ILoggerFactory loggerFactory) : base("web_browser")
     {
         _webSearchEngineSettings = settings.Plugin.WebSearchEngine;
         _runtimeConstantProvider = runtimeConstantProvider;
         _watchdogManager = watchdogManager;
         _loggerFactory = loggerFactory;
-        _logger = loggerFactory.CreateLogger<WebSearchEnginePlugin>();
-        _browserDisposer = new DebounceExecutor<WebSearchEnginePlugin>(
+        _logger = loggerFactory.CreateLogger<WebBrowserPlugin>();
+        _browserDisposer = new DebounceExecutor<WebBrowserPlugin>(
             () => this,
             static that =>
             {
@@ -170,6 +172,84 @@ public partial class WebSearchEnginePlugin : BuiltInChatPlugin
         return JsonSerializer.Serialize(results, _jsonSerializerOptions);
     }
 
+    private async ValueTask<IBrowser> EnsureBrowserAsync(CancellationToken cancellationToken)
+    {
+        if (_browser is not null) return _browser;
+
+        _logger.LogDebug("Ensuring Puppeteer browser is initialized.");
+
+        try
+        {
+            if (_browserProcess is { HasExited: false })
+            {
+                // Kill existing browser process if any
+                var processId = _browserProcess.Id;
+                _browserProcess.Kill();
+                _browserProcess = null;
+                await _watchdogManager.UnregisterProcessAsync(processId);
+            }
+
+            var cachePath = _runtimeConstantProvider.EnsureWritableDataFolderPath("cache/plugins/puppeteer");
+            var browserFetcher = new BrowserFetcher
+            {
+                CacheDir = cachePath,
+                Browser = SupportedBrowser.Chromium
+            };
+            const string buildId = "1499281";
+            var executablePath = browserFetcher.GetExecutablePath(buildId);
+            if (!File.Exists(executablePath))
+            {
+                _logger.LogDebug("Downloading Puppeteer browser to cache directory: {CachePath}", cachePath);
+                browserFetcher.BaseUrl =
+                    await TestUrlConnectionAsync("https://storage.googleapis.com/chromium-browser-snapshots") ??
+                    await TestUrlConnectionAsync("https://cdn.npmmirror.com/binaries/chromium-browser-snapshots") ??
+                    throw new HttpRequestException("Failed to connect to Puppeteer browser download URL.");
+                await browserFetcher.DownloadAsync(buildId);
+            }
+
+            _logger.LogDebug("Using Puppeteer browser executable at: {ExecutablePath}", executablePath);
+            var launcher = new Launcher(_loggerFactory);
+            _browser = await launcher.LaunchAsync(
+                new LaunchOptions
+                {
+                    ExecutablePath = executablePath,
+                    Browser = SupportedBrowser.Chromium,
+                    Headless = true
+                });
+
+            _browserProcess = launcher.Process.Process;
+            await _watchdogManager.RegisterProcessAsync(_browserProcess.Id);
+
+            return _browser;
+        }
+        catch (Exception e)
+        {
+            throw new InvalidOperationException("Failed to download or launch Puppeteer browser.", e);
+        }
+
+        async ValueTask<string?> TestUrlConnectionAsync(string testUrl)
+        {
+            using var client = new HttpClient();
+            client.Timeout = TimeSpan.FromSeconds(10); // Set a reasonable timeout for the test connection
+            try
+            {
+                using var response = await client.GetAsync(testUrl, cancellationToken);
+                if (response.IsSuccessStatusCode)
+                {
+                    return testUrl;
+                }
+
+                _logger.LogWarning("Failed to connect to URL: {Url}, Status Code: {StatusCode}", testUrl, response.StatusCode);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to connect to URL: {Url}", testUrl);
+                return null;
+            }
+        }
+    }
+
     [KernelFunction("web_snapshot")]
     [Description("Snapshot accessibility of a web page via Puppeteer, returning a json of the page content and metadata.")]
     private async Task<string> WebSnapshotAsync([Description("Web page URL to snapshot")] string url, CancellationToken cancellationToken = default)
@@ -181,55 +261,9 @@ public partial class WebSearchEnginePlugin : BuiltInChatPlugin
 
         try
         {
-            if (_browser is null)
-            {
-                try
-                {
-                    if (_browserProcess is { HasExited: false })
-                    {
-                        // Kill existing browser process if any
-                        _browserProcess.Kill();
-                        _browserProcess = null;
-                    }
+            var browser = await EnsureBrowserAsync(cancellationToken);
+            await using var page = await browser.NewPageAsync();
 
-                    var cachePath = _runtimeConstantProvider.EnsureWritableDataFolderPath("cache/plugins/puppeteer");
-                    var browserFetcher = new BrowserFetcher
-                    {
-                        CacheDir = cachePath,
-                        Browser = SupportedBrowser.Chromium
-                    };
-                    const string buildId = "1499281";
-                    var executablePath = browserFetcher.GetExecutablePath(buildId);
-                    if (!File.Exists(executablePath))
-                    {
-                        _logger.LogDebug("Downloading Puppeteer browser to cache directory: {CachePath}", cachePath);
-                        browserFetcher.BaseUrl =
-                            await TestUrlConnectionAsync("https://storage.googleapis.com/chromium-browser-snapshots") ??
-                            await TestUrlConnectionAsync("https://cdn.npmmirror.com/binaries/chromium-browser-snapshots") ??
-                            throw new HttpRequestException("Failed to connect to Puppeteer browser download URL.");
-                        await browserFetcher.DownloadAsync(buildId);
-                    }
-
-                    _logger.LogDebug("Using Puppeteer browser executable at: {ExecutablePath}", executablePath);
-                    var launcher = new Launcher(_loggerFactory);
-                    _browser = await launcher.LaunchAsync(
-                        new LaunchOptions
-                        {
-                            ExecutablePath = executablePath,
-                            Browser = SupportedBrowser.Chromium,
-                            Headless = true
-                        });
-
-                    _browserProcess = launcher.Process.Process;
-                    await _watchdogManager.RegisterProcessAsync(_browserProcess.Id);
-                }
-                catch (Exception e)
-                {
-                    throw new InvalidOperationException("Failed to download or launch Puppeteer browser.", e);
-                }
-            }
-
-            await using var page = await _browser.NewPageAsync();
             try
             {
                 await page.SetUserAgentAsync(
@@ -268,28 +302,6 @@ public partial class WebSearchEnginePlugin : BuiltInChatPlugin
         {
             _browserDisposer.Trigger();
             _browserLock.Release();
-        }
-
-        async ValueTask<string?> TestUrlConnectionAsync(string testUrl)
-        {
-            using var client = new HttpClient();
-            client.Timeout = TimeSpan.FromSeconds(10); // Set a reasonable timeout for the test connection
-            try
-            {
-                using var response = await client.GetAsync(testUrl, cancellationToken);
-                if (response.IsSuccessStatusCode)
-                {
-                    return testUrl;
-                }
-
-                _logger.LogWarning("Failed to connect to URL: {Url}, Status Code: {StatusCode}", testUrl, response.StatusCode);
-                return null;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to connect to URL: {Url}", testUrl);
-                return null;
-            }
         }
     }
 

@@ -34,6 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\3rd\EverythingNetCore\EverythingNet\EverythingNet.csproj" />
     <ProjectReference Include="..\Everywhere\Everywhere.csproj"/>
   </ItemGroup>
 
