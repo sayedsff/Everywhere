@@ -213,7 +213,7 @@ public partial class ChatWindowSettings : SettingsCategory
     public partial ChatWindowPinMode WindowPinMode { get; set; }
 
     [ObservableProperty]
-    public partial VisualTreeXmlDetailLevel VisualTreeXmlDetailLevel { get; set; } = VisualTreeXmlDetailLevel.Detailed;
+    public partial VisualTreeDetailLevel VisualTreeDetailLevel { get; set; } = VisualTreeDetailLevel.Detailed;
 
     /// <summary>
     /// When enabled, automatically add focused element as attachment when opening chat window.

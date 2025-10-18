@@ -14,7 +14,8 @@
       Classes="Primary" Grid.Row="0"
       Grid.Column="0" HorizontalAlignment="Left"
       Command="{Binding CreateNewCustomAssistantCommand}"
-      Content="{I18N {x:Static LocaleKey.CustomAssistantPage_CreateNewCustomAssistantButton_Content}}">
+      Content="{I18N {x:Static LocaleKey.CustomAssistantPage_CreateNewCustomAssistantButton_Content}}"
+      ToolTip.Tip="{I18N {x:Static LocaleKey.CustomAssistantPage_CreateNewCustomAssistantButton_ToolTip}}">
       <shadui:ButtonAssist.Icon>
         <LucideIcon Kind="Plus"/>
       </shadui:ButtonAssist.Icon>
@@ -71,7 +72,8 @@
         shadui:ButtonAssist.ShowProgress="{Binding CheckConnectivityCommand.IsRunning}"
         Command="{Binding CheckConnectivityCommand}"
         Content="{I18N {x:Static LocaleKey.CustomAssistantPage_CheckConnectivityButton_Content}}"
-        IsVisible="{Binding SelectedCustomAssistant, Converter={x:Static ObjectConverters.IsNotNull}}">
+        IsVisible="{Binding SelectedCustomAssistant, Converter={x:Static ObjectConverters.IsNotNull}}"
+        ToolTip.Tip="{I18N {x:Static LocaleKey.CustomAssistantPage_CheckConnectivityButton_ToolTip}}">
         <shadui:ButtonAssist.Icon>
           <LucideIcon Kind="Unplug"/>
         </shadui:ButtonAssist.Icon>
@@ -80,7 +82,8 @@
         Classes="Destructive" VerticalAlignment="Center"
         Command="{Binding DeleteCustomAssistantCommand}"
         Content="{I18N {x:Static LocaleKey.CustomAssistantPage_DeleteCustomAssistantButton_Content}}"
-        IsVisible="{Binding SelectedCustomAssistant, Converter={x:Static ObjectConverters.IsNotNull}}">
+        IsVisible="{Binding SelectedCustomAssistant, Converter={x:Static ObjectConverters.IsNotNull}}"
+        ToolTip.Tip="{I18N {x:Static LocaleKey.CustomAssistantPage_DeleteCustomAssistantButton_ToolTip}}">
         <shadui:ButtonAssist.Icon>
           <LucideIcon Kind="Trash2"/>
         </shadui:ButtonAssist.Icon>

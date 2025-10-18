@@ -155,7 +155,7 @@ public class ChatService(
                     validVisualElements,
                     approximateTokenLimit,
                     chatContext.VisualElements.Count + 1,
-                    settings.ChatWindow.VisualTreeXmlDetailLevel);
+                    settings.ChatWindow.VisualTreeDetailLevel);
                 var renderedVisualTreePrompt = await Task.Run(
                     () =>
                     {

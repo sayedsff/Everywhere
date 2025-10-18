@@ -107,7 +107,7 @@
         <value>Ask Everywhere, or just chat</value>
     </data>
     <data name="ChatInputBox_AddAttachmentMenuItem_ToolTip" xml:space="preserve">
-        <value>Add attachments to the conversation</value>
+        <value>Add attachments to current session</value>
     </data>
     <data name="ChatInputBox_AddAttachmentMenuItem_Header" xml:space="preserve">
         <value>Add Attachment</value>
@@ -168,19 +168,19 @@
     </data>
     <data name="ChatWindow_ChatInputBox_AddAttachmentMenuItems_PickScreen"
         xml:space="preserve">
-        <value>Pick screen</value>
+        <value>Pick Screen</value>
     </data>
     <data name="ChatWindow_ChatInputBox_AddAttachmentMenuItems_PickWindow"
         xml:space="preserve">
-        <value>Pick window</value>
+        <value>Pick Window</value>
     </data>
     <data name="ChatWindow_ChatInputBox_AddAttachmentMenuItems_PickElement"
         xml:space="preserve">
-        <value>Pick element</value>
+        <value>Pick Element</value>
     </data>
-    <data name="ChatWindow_ChatInputBox_AddAttachmentMenuItems_ClipboardContent"
+    <data name="ChatWindow_ChatInputBox_AddAttachmentMenuItems_PasteFromClipboard"
         xml:space="preserve">
-        <value>Clipboard content</value>
+        <value>Paste from Clipboard</value>
     </data>
     <data name="ChatWindow_ChatInputBox_AddAttachmentMenuItems_AttachFile" xml:space="preserve">
         <value>Attach File</value>
@@ -201,7 +201,7 @@
         <value>Click to set a hotkey</value>
     </data>
     <data name="ChatContext_Metadata_Title_Default" xml:space="preserve">
-        <value>Unnamed session</value>
+        <value>Unnamed Session</value>
     </data>
     <data name="ChatAttachment_RemoveButton_ToolTip" xml:space="preserve">
         <value>Remove</value>
@@ -479,13 +479,13 @@
     <data name="ChatWindowPinMode_PinOnInput" xml:space="preserve">
         <value>Pin on input</value>
     </data>
-    <data name="VisualTreeXmlDetailLevel_Detailed" xml:space="preserve">
+    <data name="VisualTreeDetailLevel_Detailed" xml:space="preserve">
         <value>Detailed</value>
     </data>
-    <data name="VisualTreeXmlDetailLevel_Compact" xml:space="preserve">
+    <data name="VisualTreeDetailLevel_Compact" xml:space="preserve">
         <value>Compact</value>
     </data>
-    <data name="VisualTreeXmlDetailLevel_Minimal" xml:space="preserve">
+    <data name="VisualTreeDetailLevel_Minimal" xml:space="preserve">
         <value>Minimal</value>
     </data>
     <data name="Settings_ChatWindow_WindowPinMode_Header" xml:space="preserve">
@@ -495,7 +495,7 @@
         <value>Specifies the pin mode for the chat window when it is opened. When the window is not fixed, it will be hidden automatically when it loses focus.</value>
     </data>
     <data name="Settings_ChatWindow_VisualTreeDetailLevel_Header" xml:space="preserve">
-        <value>Visual tree detail level</value>
+        <value>Visual Tree Detail Level</value>
     </data>
     <data name="Settings_ChatWindow_VisualTreeDetailLevel_Description" xml:space="preserve">
         <value>Choose how much information is captured from the UI tree when attaching elements.</value>
@@ -525,7 +525,7 @@
         <value>API Key</value>
     </data>
     <data name="Settings_CustomAssistant_ApiKey_Description" xml:space="preserve">
-        <value>In case of online models, you need to get from the corresponding official, please refer to the guide for details.</value>
+        <value>For online models, you need to get from the corresponding official, please refer to the guide for details.</value>
     </data>
     <data name="Settings_CustomAssistant_IsImageInputSupported_Header" xml:space="preserve">
         <value>Support Image Input</value>
@@ -810,7 +810,7 @@ My intelligence comes from powerful Large language models (LLMs), which are prov
         <value>Authentication error.</value>
     </data>
     <data name="WelcomeView_TelemetryStep_Message1" xml:space="preserve">
-        <value>To help me improve, I need to enable “telemetry” to collect anonymous data. This data is used solely for analysis and does not contain or allow the inference of any personally identifiable information about you.</value>
+        <value>To help me improve, I need to enable “Telemetry” to collect anonymous data. This data is used solely for analysis and does not contain or allow the inference of any personally identifiable information about you.</value>
     </data>
     <data name="WelcomeView_TelemetryStep_Message2" xml:space="preserve">
         <value>You may choose to send only necessary data; this option will not affect core functionality.</value>
@@ -930,34 +930,34 @@ My intelligence comes from powerful Large language models (LLMs), which are prov
         <value>Deep thinking</value>
     </data>
     <data name="ChatFunctionPermissions_ScreenRead" xml:space="preserve">
-        <value>Read screen</value>
+        <value>Read Screen</value>
     </data>
     <data name="ChatFunctionPermissions_ScreenAccess" xml:space="preserve">
-        <value>Access screen</value>
+        <value>Access Screen</value>
     </data>
     <data name="ChatFunctionPermissions_NetworkAccess" xml:space="preserve">
-        <value>Access network</value>
+        <value>Access Network</value>
     </data>
     <data name="ChatFunctionPermissions_ClipboardRead" xml:space="preserve">
-        <value>Read clipboard</value>
+        <value>Read Clipboard</value>
     </data>
     <data name="ChatFunctionPermissions_ClipboardAccess" xml:space="preserve">
-        <value>Access clipboard</value>
+        <value>Access Clipboard</value>
     </data>
     <data name="ChatFunctionPermissions_FileRead" xml:space="preserve">
-        <value>Read file</value>
+        <value>Read File</value>
     </data>
     <data name="ChatFunctionPermissions_FileAccess" xml:space="preserve">
-        <value>Access file</value>
+        <value>Access File</value>
     </data>
     <data name="ChatFunctionPermissions_ShellExecute" xml:space="preserve">
-        <value>Execute shell script</value>
+        <value>Execute Shell Script</value>
     </data>
     <data name="HandledChatException_ContextLengthExceeded" xml:space="preserve">
         <value>Context length exceeded.</value>
     </data>
     <data name="ChatFunctionPermissions_ProcessAccess" xml:space="preserve">
-        <value>Access process</value>
+        <value>Access Process</value>
     </data>
     <data name="CustomAssistant_Name_Default" xml:space="preserve">
         <value>Default Assistant</value>
@@ -1021,28 +1021,28 @@ Placeholders can be used within the prompt, enclosed in {}, and will be replaced
         <value>Access to a required resource was denied. Please check file permissions or run the application as an administrator.</value>
     </data>
     <data name="HandledSystemException_PathTooLong" xml:space="preserve">
-        <value>The specified file or directory path is too long. Please try using a shorter path.</value>
+        <value>Specified file or directory path is too long. Please try using a shorter path.</value>
     </data>
     <data name="HandledSystemException_OperationCancelled" xml:space="preserve">
-        <value>The operation was cancelled.</value>
+        <value>Operation was cancelled.</value>
     </data>
     <data name="HandledSystemException_Timeout" xml:space="preserve">
-        <value>The operation timed out. Please check your system performance and try again.</value>
+        <value>Operation timed out. Please check your system performance and try again.</value>
     </data>
     <data name="HandledSystemException_FileNotFound" xml:space="preserve">
-        <value>The specified file could not be found. Please ensure the file exists and the path is correct.</value>
+        <value>Specified file not found. Please ensure the file exists and the path is correct.</value>
     </data>
     <data name="HandledSystemException_DirectoryNotFound" xml:space="preserve">
-        <value>The specified directory could not be found. Please ensure the directory exists and the path is correct.</value>
+        <value>Specified directory not found. Please ensure the directory exists and the path is correct.</value>
     </data>
     <data name="HandledSystemException_NotSupported" xml:space="preserve">
-        <value>The requested operation is not supported on your system.</value>
+        <value>Requested operation is not supported on your system.</value>
     </data>
     <data name="HandledSystemException_Security" xml:space="preserve">
         <value>A security error occurred. The application may not have the necessary permissions.</value>
     </data>
     <data name="HandledSystemException_COMException" xml:space="preserve">
-        <value>A system component (COM) error occurred. This may indicate an issue with the OS or a dependency.</value>
+        <value>System component (COM) error occurred. This may indicate an issue with the OS or a dependency.</value>
     </data>
     <data name="HandledSystemException_Win32Exception" xml:space="preserve">
         <value>A Windows system error occurred. Please check the application logs for more details.</value>
@@ -1051,16 +1051,16 @@ Placeholders can be used within the prompt, enclosed in {}, and will be replaced
         <value>A network socket error occurred. Please check your network connection and firewall settings.</value>
     </data>
     <data name="HandledSystemException_OutOfMemory" xml:space="preserve">
-        <value>The application ran out of memory. Please close other programs and try again.</value>
+        <value>Application ran out of memory. Please close other programs and try again.</value>
     </data>
     <data name="HandledSystemException_DriveNotFound" xml:space="preserve">
-        <value>The specified drive could not be found. Please ensure the drive is connected and accessible.</value>
+        <value>Specified drive not found. Please ensure the drive is connected and accessible.</value>
     </data>
     <data name="HandledSystemException_EndOfStream" xml:space="preserve">
         <value>An unexpected end of a data stream was reached. This might indicate a corrupted file or network issue.</value>
     </data>
     <data name="HandledSystemException_InvalidData" xml:space="preserve">
-        <value>The data being processed is invalid or corrupted. Please check the source file or data.</value>
+        <value>Data being processed is invalid or corrupted. Please check the source file or data.</value>
     </data>
     <data name="HandledSystemException_Unknown" xml:space="preserve">
         <value>An unexpected system error occurred. Please try again or check the application logs.</value>
@@ -1075,7 +1075,7 @@ Placeholders can be used within the prompt, enclosed in {}, and will be replaced
         <value>Check Failed</value>
     </data>
     <data name="ChatInputBox_CustomAssistantsMenuItem_ToolTip" xml:space="preserve">
-        <value>Select Assistant</value>
+        <value>Select the assistant</value>
     </data>
     <data name="Settings_CustomAssistant_Icon_Description" xml:space="preserve">
         <value>Click to customize assistant icon.</value>
@@ -1093,24 +1093,33 @@ Placeholders can be used within the prompt, enclosed in {}, and will be replaced
         <value>Icon</value>
     </data>
     <data name="HandledSystemException_InvalidOperation" xml:space="preserve">
-        <value>The operaction is invalid. Please ensure the configuration is correct.</value>
+        <value>Operation is invalid. Please ensure the configuration is correct.</value>
     </data>
     <data name="HandledSystemException_InvalidArgument" xml:space="preserve">
-        <value>The argument is invalid. Please ensure the configuration is correct.</value>
+        <value>Argument is invalid. Please ensure the configuration is correct.</value>
     </data>
     <data name="HandledSystemException_InvalidFormat" xml:space="preserve">
-        <value>The format is invalid. Please ensure the configuration is correct.</value>
+        <value>Format is invalid. Please ensure the configuration is correct.</value>
     </data>
     <data name="HandledSystemException_ArgumentNull" xml:space="preserve">
-        <value>The argument is empty. Please ensure the configuration is correct.</value>
+        <value>Argument is empty. Please ensure the configuration is correct.</value>
     </data>
     <data name="HandledSystemException_ArgumentOutOfRange" xml:space="preserve">
-        <value>The argument is out of valid range. Please ensure the configuration is correct.</value>
+        <value>Argument is out of valid range. Please ensure the configuration is correct.</value>
     </data>
     <data name="NativeChatPlugin_Everything_Header" xml:space="preserve">
         <value>Everything</value>
     </data>
     <data name="NativeChatPlugin_Everything_Description" xml:space="preserve">
         <value>Use Everything (a high-performance local file search engine) to search for files on your computer.</value>
+    </data>
+    <data name="CustomAssistantPage_CheckConnectivityButton_ToolTip" xml:space="preserve">
+        <value>Confirm the availability of the model service.</value>
+    </data>
+    <data name="CustomAssistantPage_CreateNewCustomAssistantButton_ToolTip" xml:space="preserve">
+        <value>Start a new configuration for an AI assistant.</value>
+    </data>
+    <data name="CustomAssistantPage_DeleteCustomAssistantButton_ToolTip" xml:space="preserve">
+        <value>Deletes the selected assistant permanently.</value>
     </data>
 </root>

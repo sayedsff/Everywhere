@@ -93,7 +93,7 @@
         <value>向 Everywhere 提问，或是随便聊聊</value>
     </data>
     <data name="ChatInputBox_AddAttachmentMenuItem_ToolTip" xml:space="preserve">
-        <value>添加附件到对话</value>
+        <value>添加附件到当前会话</value>
     </data>
     <data name="ChatInputBox_AddAttachmentMenuItem_Header" xml:space="preserve">
         <value>添加附件</value>
@@ -161,8 +161,8 @@
     <data name="ChatWindow_ChatInputBox_AddAttachmentMenuItems_PickElement" xml:space="preserve">
         <value>选择元素</value>
     </data>
-    <data name="ChatWindow_ChatInputBox_AddAttachmentMenuItems_ClipboardContent" xml:space="preserve">
-        <value>剪切板内容</value>
+    <data name="ChatWindow_ChatInputBox_AddAttachmentMenuItems_PasteFromClipboard" xml:space="preserve">
+        <value>从剪贴板复制</value>
     </data>
     <data name="ChatWindow_ChatInputBox_AddAttachmentMenuItems_AttachFile" xml:space="preserve">
         <value>附加文件</value>
@@ -463,13 +463,13 @@
     <data name="ChatWindowPinMode_AlwaysUnpinned" xml:space="preserve">
         <value>总是不固定</value>
     </data>
-    <data name="VisualTreeXmlDetailLevel_Detailed" xml:space="preserve">
+    <data name="VisualTreeDetailLevel_Detailed" xml:space="preserve">
         <value>详细</value>
     </data>
-    <data name="VisualTreeXmlDetailLevel_Compact" xml:space="preserve">
+    <data name="VisualTreeDetailLevel_Compact" xml:space="preserve">
         <value>精简</value>
     </data>
-    <data name="VisualTreeXmlDetailLevel_Minimal" xml:space="preserve">
+    <data name="VisualTreeDetailLevel_Minimal" xml:space="preserve">
         <value>极简</value>
     </data>
     <data name="ChatWindowPinMode_PinOnInput" xml:space="preserve">
@@ -1094,5 +1094,14 @@
     </data>
     <data name="NativeChatPlugin_Everything_Description" xml:space="preserve">
         <value>使用 Everything (一个高性能本地文件搜索引擎) 搜索计算机上的文件。</value>
+    </data>
+    <data name="CustomAssistantPage_CheckConnectivityButton_ToolTip" xml:space="preserve">
+        <value>确认模型服务的可用性。</value>
+    </data>
+    <data name="CustomAssistantPage_CreateNewCustomAssistantButton_ToolTip" xml:space="preserve">
+        <value>创建一个新的 AI 助手。</value>
+    </data>
+    <data name="CustomAssistantPage_DeleteCustomAssistantButton_ToolTip" xml:space="preserve">
+        <value>永久删除选中的 AI 助手。</value>
     </data>
 </root>

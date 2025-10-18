@@ -6,15 +6,15 @@ using ZLinq;
 
 namespace Everywhere.Chat;
 
-public enum VisualTreeXmlDetailLevel
+public enum VisualTreeDetailLevel
 {
-    [DynamicResourceKey(LocaleKey.VisualTreeXmlDetailLevel_Minimal)]
+    [DynamicResourceKey(LocaleKey.VisualTreeDetailLevel_Minimal)]
     Minimal,
 
-    [DynamicResourceKey(LocaleKey.VisualTreeXmlDetailLevel_Compact)]
+    [DynamicResourceKey(LocaleKey.VisualTreeDetailLevel_Compact)]
     Compact,
 
-    [DynamicResourceKey(LocaleKey.VisualTreeXmlDetailLevel_Detailed)]
+    [DynamicResourceKey(LocaleKey.VisualTreeDetailLevel_Detailed)]
     Detailed,
 }
 
@@ -28,7 +28,7 @@ public partial class VisualTreeXmlBuilder(
     IReadOnlyList<IVisualElement> coreElements,
     int approximateTokenLimit,
     int startingId,
-    VisualTreeXmlDetailLevel detailLevel)
+    VisualTreeDetailLevel detailLevel)
 {
     private enum QueueOrigin
     {
@@ -250,7 +250,7 @@ public partial class VisualTreeXmlBuilder(
                 VisualElementType.Panel or
                 VisualElementType.TopLevel or
                 VisualElementType.Screen;
-            var includeBounds = isContainer && detailLevel != VisualTreeXmlDetailLevel.Minimal;
+            var includeBounds = isContainer && detailLevel != VisualTreeDetailLevel.Minimal;
             if (includeBounds)
             {
                 // for containers, include the element's size
@@ -279,13 +279,13 @@ public partial class VisualTreeXmlBuilder(
                 {
                     switch (detailLevel)
                     {
-                        case VisualTreeXmlDetailLevel.Detailed:
+                        case VisualTreeDetailLevel.Detailed:
                             shouldWarn = element.BoundingRectangle is { Width: > 64, Height: > 64 };
                             break;
-                        case VisualTreeXmlDetailLevel.Compact:
+                        case VisualTreeDetailLevel.Compact:
                             shouldWarn = element.BoundingRectangle is { Width: > 256, Height: > 256 };
                             break;
-                        case VisualTreeXmlDetailLevel.Minimal:
+                        case VisualTreeDetailLevel.Minimal:
                             shouldWarn = false;
                             break;
                     }
@@ -325,7 +325,7 @@ public partial class VisualTreeXmlBuilder(
 
     private void ApplyDetailLevel()
     {
-        if (_detailLevelApplied || detailLevel == VisualTreeXmlDetailLevel.Detailed) return;
+        if (_detailLevelApplied || detailLevel == VisualTreeDetailLevel.Detailed) return;
 
         foreach (var rootElement in _rootElements)
         {
@@ -357,8 +357,8 @@ public partial class VisualTreeXmlBuilder(
         {
             shouldRender = detailLevel switch
             {
-                VisualTreeXmlDetailLevel.Compact => ShouldKeepContainerForCompact(element, informativeChildCount),
-                VisualTreeXmlDetailLevel.Minimal => ShouldKeepContainerForMinimal(element, informativeChildCount),
+                VisualTreeDetailLevel.Compact => ShouldKeepContainerForCompact(element, informativeChildCount),
+                VisualTreeDetailLevel.Minimal => ShouldKeepContainerForMinimal(element, informativeChildCount),
                 _ => hasInformativeDescendant
             };
         }
