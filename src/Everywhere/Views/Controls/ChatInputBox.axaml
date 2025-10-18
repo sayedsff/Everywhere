@@ -4,6 +4,10 @@
   xmlns:chat="clr-namespace:Everywhere.Chat" xmlns:shadui="clr-namespace:ShadUI;assembly=ShadUI"
   xmlns:v="clr-namespace:Everywhere.Views" xmlns:vc="clr-namespace:Everywhere.ValueConverters">
 
+  <I18N
+    x:Key="TestI"
+    Key="{x:Static LocaleKey.ChatInputBox_ContextFlyout_CutMenuItem_Header}"/>
+
   <ControlTheme
     x:Key="{x:Type v:ChatInputBox}"
     TargetType="v:ChatInputBox">
@@ -33,13 +37,35 @@
       <Setter Property="IsVisible" Value="False"/>
     </Style>
 
-    <Setter Property="Watermark" Value="{I18N {x:Static LocaleKey.ChatInputBox_Watermark}}"/>
     <Setter Property="FontSize" Value="14"/>
     <Setter Property="Padding" Value="6"/>
     <Setter Property="SelectionBrush" Value="{DynamicResource PrimaryColor}"/>
     <Setter Property="SelectionForegroundBrush" Value="{DynamicResource PrimaryForegroundColor}"/>
     <Setter Property="CaretBrush" Value="{DynamicResource ForegroundColor}"/>
     <Setter Property="MaxLines" Value="5"/>
+    <Setter Property="ContextFlyout">
+      <MenuFlyout Placement="Bottom">
+        <MenuItem
+          x:Name="TextBoxContextFlyoutCutItem"
+          Command="{Binding $parent[v:ChatInputBox].Cut}"
+          Cursor="Hand"
+          Header="{I18N ChatInputBox_ContextFlyout_CutMenuItem_Header}"
+          InputGesture="{x:Static v:ChatInputBox.CutGesture}"
+          IsEnabled="{Binding $parent[v:ChatInputBox].CanCut}"/>
+        <MenuItem
+          x:Name="TextBoxContextFlyoutCopyItem"
+          Command="{Binding $parent[v:ChatInputBox].Copy}"
+          Cursor="Hand" Header="Copy"
+          InputGesture="{x:Static v:ChatInputBox.CopyGesture}"
+          IsEnabled="{Binding $parent[v:ChatInputBox].CanCopy}"/>
+        <MenuItem
+          x:Name="TextBoxContextFlyoutPasteItem"
+          Command="{Binding $parent[v:ChatInputBox].Paste}"
+          Cursor="Hand" Header="Paste"
+          InputGesture="{x:Static v:ChatInputBox.PasteGesture}"
+          IsEnabled="{Binding $parent[v:ChatInputBox].CanPaste}"/>
+      </MenuFlyout>
+    </Setter>
     <Setter Property="Template">
       <ControlTemplate>
         <Grid
@@ -56,7 +82,7 @@
               <TextBlock
                 FontSize="{TemplateBinding FontSize}"
                 Opacity="0.5"
-                Text="{TemplateBinding Watermark}"
+                Text="{I18N {x:Static LocaleKey.ChatInputBox_Watermark}}"
                 TextAlignment="{TemplateBinding TextAlignment}"
                 TextWrapping="{TemplateBinding TextWrapping}">
                 <TextBlock.IsVisible>
@@ -291,8 +317,7 @@
                           <Border
                             x:Name="SelectedBorder" DockPanel.Dock="Left"
                             Width="4" Margin="4,2,2,2"
-                            CornerRadius="2">
-                          </Border>
+                            CornerRadius="2"/>
 
                           <Border
                             x:Name="ContainerBorder" Margin="0,2,4,2"
