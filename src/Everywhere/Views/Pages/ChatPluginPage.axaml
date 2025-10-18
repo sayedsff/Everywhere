@@ -83,14 +83,14 @@
     </UserControl.Styles>
 
     <Grid
-        Margin="32,24" ColumnDefinitions="*,1,4*"
+        Margin="32,0,32,24" ColumnDefinitions="*,1,4*"
         RowDefinitions="Auto,*">
         <TabControl
             Grid.Row="0" Grid.RowSpan="2"
             Grid.Column="0" ClipToBounds="False">
             <TabItem Header="{I18N {x:Static LocaleKey.ChatPluginPage_TabItem_BuiltIn_Header}}">
                 <ListBox
-                    Classes="PluginListBox" Margin="0,0,10,0"
+                    Classes="PluginListBox"
                     ItemsSource="{Binding Manager.BuiltInPlugins}"
                     SelectedItem="{Binding SelectedPlugin}"/>
             </TabItem>

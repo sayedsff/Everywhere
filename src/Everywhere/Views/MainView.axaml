@@ -38,13 +38,10 @@
 
     <DockPanel
       Grid.Column="1" LastChildFill="True">
-      <Border
-        DockPanel.Dock="Top"
-        BorderBrush="{DynamicResource BorderColor}"
-        BorderThickness="0,0,0,1">
+      <Border DockPanel.Dock="Top">
         <TextBlock
-          Classes="h4" Margin="16,8"
-          VerticalAlignment="Center"
+          Classes="h2" Margin="32,32,32,16"
+          VerticalAlignment="Center" ClipToBounds="False"
           Text="{Binding #Sidebar.((v:IMainViewPage)CurrentRoute).Title^, FallbackValue={x:Null}}"/>
       </Border>
 
