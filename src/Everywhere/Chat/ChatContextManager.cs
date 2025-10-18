@@ -83,7 +83,7 @@ public partial class ChatContextManager : ObservableObject, IChatContextManager,
             }).Select(g => new ChatContextHistory(
                 g.Key,
                 g.AsValueEnumerable().OrderByDescending(c => c.Metadata.DateModified).ToImmutableArray())
-            ).ToReadOnlyList();
+            ).OrderBy(g => g.Date).ToReadOnlyList();
         }
     }
 
