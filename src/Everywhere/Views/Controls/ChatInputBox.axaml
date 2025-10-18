@@ -49,19 +49,21 @@
           x:Name="TextBoxContextFlyoutCutItem"
           Command="{Binding $parent[v:ChatInputBox].Cut}"
           Cursor="Hand"
-          Header="{I18N ChatInputBox_ContextFlyout_CutMenuItem_Header}"
+          Header="{I18N {x:Static LocaleKey.ChatInputBox_ContextFlyout_CutMenuItem_Header}}"
           InputGesture="{x:Static v:ChatInputBox.CutGesture}"
           IsEnabled="{Binding $parent[v:ChatInputBox].CanCut}"/>
         <MenuItem
           x:Name="TextBoxContextFlyoutCopyItem"
           Command="{Binding $parent[v:ChatInputBox].Copy}"
-          Cursor="Hand" Header="Copy"
+          Cursor="Hand"
+          Header="{I18N {x:Static LocaleKey.ChatInputBox_ContextFlyout_CopyMenuItem_Header}}"
           InputGesture="{x:Static v:ChatInputBox.CopyGesture}"
           IsEnabled="{Binding $parent[v:ChatInputBox].CanCopy}"/>
         <MenuItem
           x:Name="TextBoxContextFlyoutPasteItem"
           Command="{Binding $parent[v:ChatInputBox].Paste}"
-          Cursor="Hand" Header="Paste"
+          Cursor="Hand"
+          Header="{I18N {x:Static LocaleKey.ChatInputBox_ContextFlyout_PasteMenuItem_Header}}"
           InputGesture="{x:Static v:ChatInputBox.PasteGesture}"
           IsEnabled="{Binding $parent[v:ChatInputBox].CanPaste}"/>
       </MenuFlyout>

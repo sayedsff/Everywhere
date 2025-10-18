@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Avalonia.Data;
 using Avalonia.Data.Converters;
@@ -31,8 +30,6 @@ public class I18NExtension : MarkupExtension
 
     public override object ProvideValue(IServiceProvider serviceProvider)
     {
-        if (Key is "ChatInputBox_ContextFlyout_CutMenuItem_Header") Debugger.Break();
-        
         var target = serviceProvider.GetService<IProvideValueTarget>();
 
         if (Key is IBinding binding)
