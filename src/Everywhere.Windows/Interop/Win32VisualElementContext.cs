@@ -42,14 +42,13 @@ public partial class Win32VisualElementContext : IVisualElementContext
 
     public IVisualElement? PointerOverElement => TryFrom(static () => PInvoke.GetCursorPos(out var point) ? Automation.FromPoint(point) : null);
 
-    private readonly INativeHelper nativeHelper;
-    private readonly ILogger<Win32VisualElementContext> logger;
+    private readonly INativeHelper _nativeHelper;
+    private readonly ILogger<Win32VisualElementContext> _logger;
 
     public Win32VisualElementContext(INativeHelper nativeHelper, ILogger<Win32VisualElementContext> logger)
     {
-    this.nativeHelper = nativeHelper;
-    this.logger = logger;
-
+        this._nativeHelper = nativeHelper;
+        this._logger = logger;        
         // Automation.RegisterFocusChangedEvent(element =>
         // {
         //     if (KeyboardFocusedElementChanged is not { } handler) return;
@@ -105,8 +104,8 @@ public partial class Win32VisualElementContext : IVisualElementContext
         }
 
         var windows = desktopLifetime.Windows.AsValueEnumerable().Where(w => w.IsVisible).ToList();
-        foreach (var window in windows) nativeHelper.HideWindowWithoutAnimation(window);
-        var result = await ElementPicker.PickAsync(this, nativeHelper, mode);
+        foreach (var window in windows) _nativeHelper.HideWindowWithoutAnimation(window);
+        var result = await ElementPicker.PickAsync(this, _nativeHelper, mode);
         foreach (var window in windows) window.IsVisible = true;
         return result;
     }
@@ -119,7 +118,7 @@ public partial class Win32VisualElementContext : IVisualElementContext
         }
         catch (Exception ex)
         {
-            logger.LogError(
+            _logger.LogError(
                 new HandledException(ex, new DirectResourceKey("Failed to get AutomationElement")),
                 "Failed to get AutomationElement");
         }

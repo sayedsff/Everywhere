@@ -17,70 +17,15 @@ public class VisualTreePlugin : BuiltInChatPlugin
 {
     public override LucideIconKind? Icon => LucideIconKind.Component;
 
-    private readonly IBlobStorage blobStorage;
-    private readonly IVisualElementContext visualElementContext;
-    private readonly Settings settings;
-    private static readonly JsonSerializerOptions ActionSerializerOptions = new()
-    {
-        AllowTrailingCommas = true,
-        PropertyNameCaseInsensitive = true,
-        ReadCommentHandling = JsonCommentHandling.Skip
-    };
-
-    private static readonly Dictionary<string, VirtualKey> ShortcutKeyAliases = new(StringComparer.OrdinalIgnoreCase)
-    {
-        ["enter"] = VirtualKey.Enter,
-        ["return"] = VirtualKey.Enter,
-        ["tab"] = VirtualKey.Tab,
-        ["escape"] = VirtualKey.Escape,
-        ["esc"] = VirtualKey.Escape,
-        ["space"] = VirtualKey.Space,
-        ["spacebar"] = VirtualKey.Space,
-        ["backspace"] = VirtualKey.Backspace,
-        ["delete"] = VirtualKey.Delete,
-        ["del"] = VirtualKey.Delete,
-        ["left"] = VirtualKey.Left,
-        ["right"] = VirtualKey.Right,
-        ["up"] = VirtualKey.Up,
-        ["down"] = VirtualKey.Down,
-        ["home"] = (VirtualKey)0x24,
-        ["end"] = (VirtualKey)0x23,
-        ["pageup"] = (VirtualKey)0x21,
-        ["pagedown"] = (VirtualKey)0x22,
-        ["f1"] = (VirtualKey)0x70,
-        ["f2"] = (VirtualKey)0x71,
-        ["f3"] = (VirtualKey)0x72,
-        ["f4"] = (VirtualKey)0x73,
-        ["f5"] = (VirtualKey)0x74,
-        ["f6"] = (VirtualKey)0x75,
-        ["f7"] = (VirtualKey)0x76,
-        ["f8"] = (VirtualKey)0x77,
-        ["f9"] = (VirtualKey)0x78,
-        ["f10"] = (VirtualKey)0x79,
-        ["f11"] = (VirtualKey)0x7A,
-        ["f12"] = (VirtualKey)0x7B
-    };
-
-    private static readonly Dictionary<string, VirtualKey> ShortcutModifierAliases = new(StringComparer.OrdinalIgnoreCase)
-    {
-        ["ctrl"] = VirtualKey.Control,
-        ["control"] = VirtualKey.Control,
-        ["shift"] = VirtualKey.Shift,
-        ["alt"] = VirtualKey.Alt,
-        ["option"] = VirtualKey.Alt,
-        ["win"] = VirtualKey.Windows,
-        ["windows"] = VirtualKey.Windows,
-        ["meta"] = VirtualKey.Windows,
-        ["cmd"] = VirtualKey.Windows,
-        ["command"] = VirtualKey.Windows
-    };
+    private readonly IBlobStorage _blobStorage;
+    private readonly IVisualElementContext _visualElementContext;
+    private readonly Settings _settings;
 
     public VisualTreePlugin(IBlobStorage blobStorage, IVisualElementContext visualElementContext, Settings settings) : base("VisualTree")
     {
-    this.blobStorage = blobStorage;
-    this.visualElementContext = visualElementContext;
-    this.settings = settings;
-
+        this._blobStorage = blobStorage;
+        this._visualElementContext = visualElementContext;
+        this._settings = settings;        
         _functions.Add(
             new AnonymousChatFunction(
                 CaptureVisualElementByIdAsync,
@@ -118,7 +63,7 @@ public class VisualTreePlugin : BuiltInChatPlugin
     [Description("Captures a screenshot of the entire screen. Use when no specific visual element is available.")]
     private Task<ChatFileAttachment> CaptureFullScreenAsync()
     {
-    var visualElement = visualElementContext.ElementFromPointer(PickElementMode.Screen);
+        var visualElement = _visualElementContext.ElementFromPointer(PickElementMode.Screen);
         if (visualElement is null)
         {
             throw new InvalidOperationException("No screen is available to capture.");
@@ -135,7 +80,7 @@ public class VisualTreePlugin : BuiltInChatPlugin
         using (var stream = new MemoryStream())
         {
             bitmap.Save(stream, 100);
-            blob = await blobStorage.StorageBlobAsync(stream, "image/png");
+            blob = await _blobStorage.StorageBlobAsync(stream, "image/png");
         }
 
         return new ChatFileAttachment(
@@ -146,28 +91,26 @@ public class VisualTreePlugin : BuiltInChatPlugin
     }
 
     [KernelFunction("execute_visual_action_queue")]
-    [Description("Executes a reliable UI automation action queue. Supports clicking elements, entering text, sending shortcuts (e.g., Ctrl+V), and waiting without simulating pointer input. Useful for automating stable interactions, even when the target window is minimized.")]
+    [Description("Executes a reliable UI automation action queue. Supports clicking elements, entering text, sending shortcuts (e.g., Ctrl+V), and waiting without simulating pointer input. Useful for automating stable interactions, even when the target window is minimized. Example: [{\"Type\":\"click\",\"ElementId\":1},{\"Type\":\"set_text\",\"ElementId\":2,\"Text\":\"hello\"},{\"Type\":\"send_shortcut\",\"ElementId\":3,\"Key\":\"VK_RETURN\",\"Modifiers\":[\"VK_CONTROL\"]},{\"Type\":\"wait\",\"DelayMs\":500}]")]
     private async Task<string> ExecuteVisualActionQueueAsync(
         [FromKernelServices] ChatContext chatContext,
-    [Description("JSON array describing the action queue. Example: [{\"type\":\"click\",\"element_id\":1},{\"type\":\"set_text\",\"element_id\":2,\"text\":\"hello\"},{\"type\":\"send_shortcut\",\"element_id\":2,\"shortcut\":\"ctrl+enter\"},{\"type\":\"wait\",\"delay_ms\":500}]")] string actionsJson,
+        [Description("Array of actions to execute in sequence")] VisualActionStep[] actions,
         CancellationToken cancellationToken = default)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(actionsJson);
-        var steps = DeserializeActions(actionsJson);
-        if (steps.Count == 0)
+        if (actions == null || actions.Length == 0)
         {
-            throw new ArgumentException("Action queue cannot be empty.", nameof(actionsJson));
+            throw new ArgumentException("Action queue cannot be empty.", nameof(actions));
         }
 
         var index = 0;
-        foreach (var step in steps)
+        foreach (var step in actions)
         {
             cancellationToken.ThrowIfCancellationRequested();
             index++;
 
             if (!TryParseActionType(step.Type, out var actionType))
             {
-                throw new ArgumentException($"Unsupported action type '{step.Type}' at position {index}.", nameof(actionsJson));
+                throw new ArgumentException($"Unsupported action type '{step.Type}' at position {index}.", nameof(actions));
             }
 
             try
@@ -176,20 +119,20 @@ public class VisualTreePlugin : BuiltInChatPlugin
                 {
                     case VisualActionType.Click:
                     {
-                        var element = ResolveVisualElement(chatContext, step.RequireElementId(), nameof(actionsJson));
+                        var element = ResolveVisualElement(chatContext, step.RequireElementId(), nameof(actions));
                         await element.InvokeAsync(cancellationToken).ConfigureAwait(false);
                         break;
                     }
                     case VisualActionType.SetText:
                     {
-                        var element = ResolveVisualElement(chatContext, step.RequireElementId(), nameof(actionsJson));
+                        var element = ResolveVisualElement(chatContext, step.RequireElementId(), nameof(actions));
                         await element.SetTextAsync(step.Text ?? string.Empty, cancellationToken).ConfigureAwait(false);
                         break;
                     }
                     case VisualActionType.SendShortcut:
                     {
-                        var element = ResolveVisualElement(chatContext, step.RequireElementId(), nameof(actionsJson));
-                        var shortcut = ResolveShortcut(step, nameof(actionsJson));
+                        var element = ResolveVisualElement(chatContext, step.RequireElementId(), nameof(actions));
+                        var shortcut = ResolveShortcut(step, nameof(actions));
                         await element.SendShortcutAsync(shortcut, cancellationToken).ConfigureAwait(false);
                         break;
                     }
@@ -198,7 +141,7 @@ public class VisualTreePlugin : BuiltInChatPlugin
                         var delay = step.ResolveDelayMilliseconds();
                         if (delay < 0)
                         {
-                            throw new ArgumentException($"Delay must be non-negative for wait actions (step {index}).", nameof(actionsJson));
+                            throw new ArgumentException($"Delay must be non-negative for wait actions (step {index}).", nameof(actions));
                         }
 
                         await Task.Delay(TimeSpan.FromMilliseconds(delay), cancellationToken).ConfigureAwait(false);
@@ -212,19 +155,7 @@ public class VisualTreePlugin : BuiltInChatPlugin
             }
         }
 
-        return $"Executed {steps.Count} action(s).";
-    }
-
-    private static IReadOnlyList<VisualActionStep> DeserializeActions(string json)
-    {
-        try
-        {
-            return JsonSerializer.Deserialize<List<VisualActionStep>>(json, ActionSerializerOptions) ?? [];
-        }
-        catch (JsonException ex)
-        {
-            throw new ArgumentException("The action queue payload is not valid JSON.", nameof(json), ex);
-        }
+        return $"Executed {actions.Length} action(s).";
     }
 
     private static bool TryParseActionType(string? value, out VisualActionType actionType)
@@ -245,44 +176,40 @@ public class VisualTreePlugin : BuiltInChatPlugin
 
     private static VisualElementShortcut ResolveShortcut(VisualActionStep step, string argumentName)
     {
-        if (!string.IsNullOrWhiteSpace(step.Shortcut))
+        if (string.IsNullOrWhiteSpace(step.Key))
         {
-            return ParseShortcutExpression(step.Shortcut, argumentName);
+            throw new ArgumentException("Key is required for send_shortcut actions. Use standard VK codes (e.g., VK_RETURN, VK_CONTROL, VK_A).", argumentName);
         }
 
-        if (!string.IsNullOrWhiteSpace(step.Key))
+        var key = ParseVirtualKey(step.Key, argumentName);
+        var modifiers = VirtualKey.None;
+
+        if (step.Modifiers != null && step.Modifiers.Length > 0)
         {
-            var key = ParseShortcutKey(step.Key, argumentName);
-            var modifiers = ParseShortcutModifiers(step.Modifiers, argumentName);
-            return new VisualElementShortcut(key, modifiers);
+            foreach (var modifier in step.Modifiers)
+            {
+                modifiers |= ParseVirtualKey(modifier, argumentName);
+            }
         }
 
-        throw new ArgumentException("Shortcut is required for send_shortcut actions.", argumentName);
-    }
-
-    private static VisualElementShortcut ParseShortcutExpression(string shortcutExpression, string argumentName)
-    {
-        var tokens = shortcutExpression.Split('+', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        if (tokens.Length == 0)
-        {
-            throw new ArgumentException("Shortcut expression cannot be empty.", argumentName);
-        }
-
-        var keyToken = tokens[^1];
-        var key = ParseShortcutKey(keyToken, argumentName);
-        var modifiers = ParseShortcutModifiers(tokens.Take(tokens.Length - 1).ToArray(), argumentName);
         return new VisualElementShortcut(key, modifiers);
     }
 
-    private static VirtualKey ParseShortcutKey(string token, string argumentName)
+    private static VirtualKey ParseVirtualKey(string vkCode, string argumentName)
     {
-        var normalized = NormalizeShortcutToken(token);
-
-        if (ShortcutKeyAliases.TryGetValue(normalized, out var mapped))
+        if (string.IsNullOrWhiteSpace(vkCode))
         {
-            return mapped;
+            throw new ArgumentException("Virtual key code cannot be empty.", argumentName);
         }
 
+        // Remove VK_ prefix if present
+        var normalized = vkCode.Trim();
+        if (normalized.StartsWith("VK_", StringComparison.OrdinalIgnoreCase))
+        {
+            normalized = normalized.Substring(3);
+        }
+
+        // Handle single character keys (letters, digits)
         if (normalized.Length == 1)
         {
             var ch = char.ToUpperInvariant(normalized[0]);
@@ -292,36 +219,76 @@ public class VisualTreePlugin : BuiltInChatPlugin
             }
         }
 
-        throw new ArgumentException($"Unsupported shortcut key token '{token}'.", argumentName);
-    }
-
-    private static VirtualKey ParseShortcutModifiers(IReadOnlyCollection<string>? tokens, string argumentName)
-    {
-        if (tokens is null || tokens.Count == 0) return VirtualKey.None;
-
-        var modifiers = VirtualKey.None;
-        foreach (var raw in tokens)
+        // Handle common virtual key names using Windows API constants
+        var upperNormalized = normalized.ToUpperInvariant();
+        switch (upperNormalized)
         {
-            var normalized = NormalizeShortcutToken(raw);
-            if (normalized.Length == 0)
-            {
-                continue;
-            }
-
-            if (ShortcutModifierAliases.TryGetValue(normalized, out var modifier))
-            {
-                modifiers |= modifier;
-                continue;
-            }
-
-            throw new ArgumentException($"Unsupported shortcut modifier token '{raw}'.", argumentName);
+            case "RETURN":
+            case "ENTER":
+                return (VirtualKey)0x0D; // VK_RETURN
+            case "CONTROL":
+            case "CTRL":
+                return (VirtualKey)0x11; // VK_CONTROL
+            case "SHIFT":
+                return (VirtualKey)0x10; // VK_SHIFT
+            case "ALT":
+            case "MENU":
+                return (VirtualKey)0x12; // VK_MENU
+            case "TAB":
+                return (VirtualKey)0x09; // VK_TAB
+            case "ESCAPE":
+            case "ESC":
+                return (VirtualKey)0x1B; // VK_ESCAPE
+            case "SPACE":
+                return (VirtualKey)0x20; // VK_SPACE
+            case "BACKSPACE":
+            case "BACK":
+                return (VirtualKey)0x08; // VK_BACK
+            case "DELETE":
+            case "DEL":
+                return (VirtualKey)0x2E; // VK_DELETE
+            case "LEFT":
+                return (VirtualKey)0x25; // VK_LEFT
+            case "RIGHT":
+                return (VirtualKey)0x27; // VK_RIGHT
+            case "UP":
+                return (VirtualKey)0x26; // VK_UP
+            case "DOWN":
+                return (VirtualKey)0x28; // VK_DOWN
+            case "F1":
+                return (VirtualKey)0x70; // VK_F1
+            case "F2":
+                return (VirtualKey)0x71; // VK_F2
+            case "F3":
+                return (VirtualKey)0x72; // VK_F3
+            case "F4":
+                return (VirtualKey)0x73; // VK_F4
+            case "F5":
+                return (VirtualKey)0x74; // VK_F5
+            case "F6":
+                return (VirtualKey)0x75; // VK_F6
+            case "F7":
+                return (VirtualKey)0x76; // VK_F7
+            case "F8":
+                return (VirtualKey)0x77; // VK_F8
+            case "F9":
+                return (VirtualKey)0x78; // VK_F9
+            case "F10":
+                return (VirtualKey)0x79; // VK_F10
+            case "F11":
+                return (VirtualKey)0x7A; // VK_F11
+            case "F12":
+                return (VirtualKey)0x7B; // VK_F12
         }
 
-        return modifiers;
-    }
+        // Try to parse as VirtualKey enum
+        if (Enum.TryParse<VirtualKey>(normalized, ignoreCase: true, out var virtualKey))
+        {
+            return virtualKey;
+        }
 
-    private static string NormalizeShortcutToken(string token) =>
-        token.Trim().ToLowerInvariant().Replace("_", string.Empty).Replace("-", string.Empty).Replace(" ", string.Empty);
+        throw new ArgumentException($"Invalid virtual key code '{vkCode}'. Use standard VK codes (e.g., VK_RETURN, VK_CONTROL, VK_A, D).", argumentName);
+    }
 
     private static IVisualElement ResolveVisualElement(ChatContext chatContext, int elementId, string? argumentName = null)
     {
@@ -333,46 +300,57 @@ public class VisualTreePlugin : BuiltInChatPlugin
         return visualElement;
     }
 
-    private sealed record VisualActionStep
+    /// <summary>
+    /// Represents a single action in the visual automation queue.
+    /// </summary>
+    public sealed record VisualActionStep
     {
-        [JsonPropertyName("type")]
+        /// <summary>
+        /// The type of action: "click", "set_text", "send_shortcut", or "wait"
+        /// </summary>
+        [Description("Type of action: click, set_text, send_shortcut, or wait")]
         public string? Type { get; init; }
 
-        [JsonPropertyName("element_id")]
+        /// <summary>
+        /// The ID of the target visual element (required for click, set_text, send_shortcut actions; not used for wait actions)
+        /// </summary>
+        [Description("ID of the target visual element (required for click, set_text, send_shortcut actions)")]
         public int? ElementId { get; init; }
 
-        [JsonPropertyName("target_id")]
-        public int? TargetId { get; init; }
-
-        [JsonPropertyName("text")]
+        /// <summary>
+        /// The text to input (for set_text actions)
+        /// </summary>
+        [Description("Text to input (for set_text action)")]
         public string? Text { get; init; }
 
-        [JsonPropertyName("shortcut")]
-        public string? Shortcut { get; init; }
-
-        [JsonPropertyName("key")]
+        /// <summary>
+        /// The virtual key code to send (e.g., VK_RETURN, VK_A). Required for send_shortcut actions.
+        /// </summary>
+        [Description("Virtual key code (e.g., VK_RETURN, VK_A) for send_shortcut action")]
         public string? Key { get; init; }
 
-        [JsonPropertyName("modifiers")]
+        /// <summary>
+        /// Modifier keys (e.g., VK_CONTROL, VK_SHIFT) for send_shortcut actions
+        /// </summary>
+        [Description("Modifier virtual key codes (e.g., VK_CONTROL, VK_SHIFT) for send_shortcut action")]
         public string[]? Modifiers { get; init; }
 
-        [JsonPropertyName("delay_ms")]
-        public int? DelayMilliseconds { get; init; }
+        /// <summary>
+        /// Delay in milliseconds (for wait actions)
+        /// </summary>
+        [Description("Delay in milliseconds (for wait action)")]
+        public int? DelayMs { get; init; }
 
-        [JsonPropertyName("duration_ms")]
-        public int? DurationMilliseconds { get; init; }
-
-        public int RequireElementId() => ElementId ?? TargetId ?? throw new ArgumentException("Element id is required for this action.");
+        public int RequireElementId() => ElementId ?? throw new ArgumentException("Element id is required for this action.");
 
         public int ResolveDelayMilliseconds()
         {
-            var delay = DelayMilliseconds ?? DurationMilliseconds;
-            if (delay is null)
+            if (DelayMs is null)
             {
                 throw new ArgumentException("Delay must be provided for wait actions.");
             }
 
-            return delay.Value;
+            return DelayMs.Value;
         }
     }
 
