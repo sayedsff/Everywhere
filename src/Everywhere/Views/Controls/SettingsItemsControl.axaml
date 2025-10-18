@@ -98,7 +98,8 @@
 
                   <DataTemplate DataType="c:SettingsCustomizableItem">
                     <DockPanel
-                      HorizontalSpacing="8" LastChildFill="True">
+                      HorizontalAlignment="Left" HorizontalSpacing="8"
+                      LastChildFill="True">
                       <Button
                         Classes="Ghost" DockPanel.Dock="Right"
                         Width="36" Padding="0"
