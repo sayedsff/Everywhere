@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 using Avalonia.Controls;
 using Avalonia.Reactive;
 using Everywhere.Utilities;
@@ -19,6 +20,8 @@ public abstract partial class DynamicResourceKeyBase : IObservable<object?>
     /// <summary>
     /// so why axaml DOES NOT SUPPORT {Binding .^} ???????
     /// </summary>
+    [JsonIgnore]
+    [IgnoreMember]
     public DynamicResourceKeyBase Self => this;
 
     public abstract IDisposable Subscribe(IObserver<object?> observer);
