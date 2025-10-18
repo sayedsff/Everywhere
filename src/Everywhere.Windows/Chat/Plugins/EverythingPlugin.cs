@@ -43,6 +43,13 @@ public class EverythingPlugin : BuiltInChatPlugin
         {
             await _watchdogManager.RegisterProcessAsync(process.Id);
         }
+        
+        var maxAttempts = 5;
+        do
+        {
+            await Task.Delay(300);
+        }
+        while (!EverythingState.IsReady() && maxAttempts-- > 0);
     }
 
     [KernelFunction("search_files")]
