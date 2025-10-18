@@ -80,6 +80,9 @@
     <data name="SettingsSelectionItem_Model_WebSearchProvider_bocha" xml:space="preserve">
         <value>博查</value>
     </data>
+    <data name="SettingsSelectionItem_Model_WebSearchProvider_jina" xml:space="preserve">
+        <value>Jina</value>
+    </data>
     <data name="Settings_Plugin_WebSearchEngine_SelectedWebSearchEngineProvider_EndPoint_Header" xml:space="preserve">
         <value>API 调用地址</value>
     </data>
