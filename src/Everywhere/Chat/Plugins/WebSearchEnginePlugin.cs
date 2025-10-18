@@ -495,7 +495,7 @@ public partial class WebSearchEnginePlugin : BuiltInChatPlugin
         private readonly ILogger _logger;
         private readonly HttpClient _httpClient;
         private readonly Uri? _uri;
-        private const string DefaultUri = "https://s.jina.ai/";
+        private const string DefaultUri = "https://s.jina.ai/?q";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="JinaConnector"/> class.
