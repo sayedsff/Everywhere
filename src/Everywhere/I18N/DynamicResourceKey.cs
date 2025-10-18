@@ -50,8 +50,7 @@ public partial class DynamicResourceKey(object key) : DynamicResourceKeyBase
     [Key(0)]
     public object Key { get; } = key;
 
-    protected IObservable<object?> GetObservable() =>
-        Application.Current?.Resources.GetResourceObservable(Key, NotFoundConverter) ?? EmptyDynamicResourceKey.Shared;
+    protected IObservable<object?> GetObservable() => LocaleManager.Shared.GetResourceObservable(Key, NotFoundConverter);
 
     private object? NotFoundConverter(object? value) => value is UnsetValueType ? Key : value;
 
@@ -61,12 +60,11 @@ public partial class DynamicResourceKey(object key) : DynamicResourceKeyBase
     [return: NotNullIfNotNull(nameof(key))]
     public static implicit operator DynamicResourceKey?(string? key) => key == null ? null : new DynamicResourceKey(key);
 
-    public static bool Exists(object key) =>
-        Application.Current?.Resources.TryGetResource(key, null, out _) is true;
+    public static bool Exists(object key) => LocaleManager.Shared.TryGetResource(key, null, out _);
 
     public static bool TryResolve(object key, [NotNullWhen(true)] out string? result)
     {
-        if (Application.Current?.Resources.TryGetResource(key, null, out var resource) is true)
+        if (LocaleManager.Shared.TryGetResource(key, null, out var resource))
         {
             result = resource?.ToString() ?? string.Empty;
             return true;
@@ -77,7 +75,7 @@ public partial class DynamicResourceKey(object key) : DynamicResourceKeyBase
     }
 
     public static string Resolve(object key) =>
-        (Application.Current?.Resources.TryGetResource(key, null, out var resource) is true ? resource?.ToString() : key.ToString()) ?? string.Empty;
+        (LocaleManager.Shared.TryGetResource(key, null, out var resource) ? resource?.ToString() : key.ToString()) ?? string.Empty;
 
     public override string? ToString() => Resolve(Key);
 }

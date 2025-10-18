@@ -104,7 +104,7 @@
                         Classes="Ghost" DockPanel.Dock="Right"
                         Width="36" Padding="0"
                         Command="{Binding ResetCommand}"
-                        ToolTip.Tip="{I18N {x:Static LocaleKey.SettingsPage_RestoreDefault_Button_ToolTip}}">
+                        ToolTip.Tip="{I18N {x:Static LocaleKey.SettingsPage_Reset_Button_ToolTip}}">
                         <LucideIcon
                           Width="18" Height="18"
                           Kind="RotateCcw" Size="18"/>

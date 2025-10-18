@@ -124,8 +124,11 @@
                         Orientation="Vertical" Spacing="4">
                         <TextBlock
                           Classes="Muted" HorizontalAlignment="Left"
-                          FontSize="12"
-                          Text="{Binding Date}"/>
+                          FontSize="12">
+                          <TextBlock.Text>
+                            <I18N Key="{Binding Date, Converter={x:Static vc:DynamicResourceKeyConverter.Shared}}"/>
+                          </TextBlock.Text>
+                        </TextBlock>
 
                         <ListBox
                           Padding="0" Background="Transparent"

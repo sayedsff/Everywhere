@@ -297,13 +297,13 @@
         <value>Yesterday</value>
     </data>
     <data name="HumanizedDate_LastWeek" xml:space="preserve">
-        <value>Last week</value>
+        <value>Last Week</value>
     </data>
     <data name="HumanizedDate_LastMonth" xml:space="preserve">
-        <value>Last month</value>
+        <value>Last Month</value>
     </data>
     <data name="HumanizedDate_LastYear" xml:space="preserve">
-        <value>Last year</value>
+        <value>Last Year</value>
     </data>
     <data name="HumanizedDate_Earlier" xml:space="preserve">
         <value>Earlier</value>
@@ -360,7 +360,8 @@
         <value>Unknown error, please try again later.</value>
     </data>
     <data name="FriendlyExceptionMessage_Aggregate" xml:space="preserve">
-        <value>One or more errors occurred.</value>
+        <value>One or more errors occurred.
+{0}</value>
     </data>
     <data name="FriendlyExceptionMessage_TaskCanceled" xml:space="preserve">
         <value>Task canceled.</value>
@@ -551,8 +552,8 @@
     <data name="Settings_CustomAssistant_MaxTokens_Header" xml:space="preserve">
         <value>Maximum Context Length (max_tokens)</value>
     </data>
-    <data name="SettingsPage_RestoreDefault_Button_ToolTip" xml:space="preserve">
-        <value>Restore Default</value>
+    <data name="SettingsPage_Reset_Button_ToolTip" xml:space="preserve">
+        <value>Reset</value>
     </data>
     <data name="Settings_CustomAssistant_Schema_Header" xml:space="preserve">
         <value>API Schema</value>
@@ -1121,5 +1122,14 @@ Placeholders can be used within the prompt, enclosed in {}, and will be replaced
     </data>
     <data name="CustomAssistantPage_DeleteCustomAssistantButton_ToolTip" xml:space="preserve">
         <value>Deletes the selected assistant permanently.</value>
+    </data>
+    <data name="ChatInputBox_ContextFlyout_CopyMenuItem_Header" xml:space="preserve">
+        <value>Copy</value>
+    </data>
+    <data name="ChatInputBox_ContextFlyout_CutMenuItem_Header" xml:space="preserve">
+        <value>Cut</value>
+    </data>
+    <data name="ChatInputBox_ContextFlyout_PasteMenuItem_Header" xml:space="preserve">
+        <value>Paste</value>
     </data>
 </root>

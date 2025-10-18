@@ -1,6 +1,5 @@
 ﻿using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Avalonia.Input;
@@ -79,26 +78,7 @@ public partial class CommonSettings : SettingsCategory
     [SettingsSelectionItem(ItemsSourceBindingPath = nameof(LanguageSource), I18N = true)]
     public string Language
     {
-        get
-        {
-            var currentLocale = LocaleManager.CurrentLocale;
-            if (currentLocale is not null) return currentLocale;
-
-            var cultureInfo = CultureInfo.CurrentUICulture;
-            while (!string.IsNullOrEmpty(cultureInfo.Name))
-            {
-                var nameLowered = cultureInfo.Name.ToLower();
-                if (LocaleManager.AvailableLocaleNames.Contains(nameLowered))
-                {
-                    currentLocale = nameLowered;
-                    break;
-                }
-
-                cultureInfo = cultureInfo.Parent;
-            }
-
-            return LocaleManager.CurrentLocale = currentLocale ?? "default";
-        }
+        get => LocaleManager.CurrentLocale;
         set
         {
             if (LocaleManager.CurrentLocale == value) return;

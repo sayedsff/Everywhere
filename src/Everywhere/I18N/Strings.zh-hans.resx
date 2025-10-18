@@ -341,7 +341,8 @@
     <data name="FriendlyExceptionMessage_Socket_0" xml:space="preserve">
         <value>未知错误，请稍后再试。</value>
     </data><data name="FriendlyExceptionMessage_Aggregate" xml:space="preserve">
-        <value>发生一个或多个错误。</value>
+        <value>发生一个或多个错误。
+{0}</value>
     </data>
     <data name="FriendlyExceptionMessage_TaskCanceled" xml:space="preserve">
         <value>任务已取消。</value>
@@ -538,8 +539,8 @@
     <data name="Settings_CustomAssistant_MaxTokens_Header" xml:space="preserve">
         <value>最大上下文长度 (max_tokens)</value>
     </data>
-    <data name="SettingsPage_RestoreDefault_Button_ToolTip" xml:space="preserve">
-        <value>恢复默认</value>
+    <data name="SettingsPage_Reset_Button_ToolTip" xml:space="preserve">
+        <value>重置</value>
     </data>
     <data name="Settings_CustomAssistant_Schema_Header" xml:space="preserve">
         <value>API 模式</value>
@@ -1103,5 +1104,14 @@
     </data>
     <data name="CustomAssistantPage_DeleteCustomAssistantButton_ToolTip" xml:space="preserve">
         <value>永久删除选中的 AI 助手。</value>
+    </data>
+    <data name="ChatInputBox_ContextFlyout_CopyMenuItem_Header" xml:space="preserve">
+        <value>复制</value>
+    </data>
+    <data name="ChatInputBox_ContextFlyout_CutMenuItem_Header" xml:space="preserve">
+        <value>剪切</value>
+    </data>
+    <data name="ChatInputBox_ContextFlyout_PasteMenuItem_Header" xml:space="preserve">
+        <value>粘贴</value>
     </data>
 </root>
