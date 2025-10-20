@@ -206,19 +206,34 @@ public partial class ChatWindowViewModel : BusyViewModelBase
         {
             if (_chatAttachments.Count >= Settings.Internal.MaxChatAttachmentCount) return;
 
-            var formats = await Clipboard.GetDataFormatsAsync();
-            if (formats.Count == 0)
+            // TODO: Avalonia Clipboard API update
+            // var formats = await Clipboard.GetDataFormatsAsync();
+            // if (formats.Count == 0)
+            var formats = await Clipboard.GetFormatsAsync();
+            if (formats.Length == 0)
             {
                 _logger.LogWarning("Clipboard is empty.");
                 return;
             }
-
-            if (formats.Contains(DataFormat.File))
+            
+            //if (formats.Contains(DataFormat.File))
+            if (formats.Contains(DataFormats.Files))
             {
-                var files = await Clipboard.TryGetFilesAsync();
-                if (files != null)
+                //var files = await Clipboard.TryGetFilesAsync();
+                // if (files != null)
+                // {
+                //     foreach (var storageItem in files)
+                //     {
+                //         var uri = storageItem.Path;
+                //         if (!uri.IsFile) break;
+                //         await AddFileUncheckAsync(uri.AbsolutePath);
+                //         if (_chatAttachments.Count >= Settings.Internal.MaxChatAttachmentCount) break;
+                //     }
+                // }
+                var files = await Clipboard.GetDataAsync(DataFormats.Files);
+                if (files is IEnumerable enumerable)
                 {
-                    foreach (var storageItem in files)
+                    foreach (var storageItem in enumerable.OfType<IStorageItem>())
                     {
                         var uri = storageItem.Path;
                         if (!uri.IsFile) break;
