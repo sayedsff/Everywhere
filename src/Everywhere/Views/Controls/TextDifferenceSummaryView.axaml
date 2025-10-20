@@ -1,0 +1,67 @@
+﻿<ResourceDictionary
+  xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:v="using:Everywhere.Views" xmlns:vc="clr-namespace:Everywhere.ValueConverters">
+  <Design.PreviewWith>
+    <v:TextDifferenceSummaryView/>
+  </Design.PreviewWith>
+
+  <ControlTheme
+    x:Key="{x:Type v:TextDifferenceSummaryView}"
+    TargetType="v:TextDifferenceSummaryView">
+    <Setter Property="FontSize" Value="12"/>
+    <Setter Property="Template">
+      <ControlTemplate TargetType="v:TextDifferenceSummaryView">
+        <StackPanel Orientation="Vertical">
+          <StackPanel.Styles>
+            <Style Selector="Run.Monospace">
+              <Setter Property="FontFamily" Value="Cascadia Mono, Consolas, Menlo, 'Courier New', monospace"/>
+            </Style>
+          </StackPanel.Styles>
+
+          <HyperlinkButton
+            Command="{Binding OpenFileCommand, RelativeSource={RelativeSource TemplatedParent}}"
+            Content="{Binding TextDifference.FilePath, RelativeSource={RelativeSource TemplatedParent}, FallbackValue={x:Null}, Converter={x:Static vc:CommonConverters.FullPathToFileName}}"/>
+          <TextBlock
+            FontSize="{TemplateBinding FontSize}"
+            Foreground="{DynamicResource SuccessColor60}">
+            <Run
+              Classes="Monospace" Text="+ "/>
+            <Run
+              Classes="Monospace"
+              Text="{Binding AddedLineCount, RelativeSource={RelativeSource TemplatedParent}, FallbackValue=0}"/>
+            <Run Text="{I18N {x:Static LocaleKey.TextDifferenceSummaryView_AddedLineCountTextRun_Text}}"/>
+          </TextBlock>
+          <TextBlock
+            FontSize="{TemplateBinding FontSize}"
+            Foreground="{DynamicResource ErrorColor60}">
+            <Run
+              Classes="Monospace" Text="- "/>
+            <Run
+              Classes="Monospace"
+              Text="{Binding RemovedLineCount, RelativeSource={RelativeSource TemplatedParent}, FallbackValue=0}"/>
+            <Run Text="{I18N {x:Static LocaleKey.TextDifferenceSummaryView_RemovedLineCountTextRun_Text}}"/>
+          </TextBlock>
+          <UniformGrid
+            Margin="0,4,0,0" ColumnSpacing="4"
+            Columns="3"
+            IsVisible="{Binding TextDifference.Acceptance, RelativeSource={RelativeSource TemplatedParent}, FallbackValue=False, Converter={x:Static ObjectConverters.IsNull}}">
+            <Button
+              MinHeight="0"
+              Background="{DynamicResource SuccessColor20}"
+              Command="{Binding TextDifference.AcceptAll, RelativeSource={RelativeSource TemplatedParent}, FallbackValue={x:Null}}"
+              Content="{I18N {x:Static LocaleKey.TextDifferenceSummaryView_AcceptAllButton_Content}}"/>
+            <Button
+              Classes="Secondary" MinHeight="0"
+              Command="{Binding EditCommand, RelativeSource={RelativeSource TemplatedParent}}"
+              Content="{I18N {x:Static LocaleKey.TextDifferenceSummaryView_EditButton_Content}}"/>
+            <Button
+              MinHeight="0"
+              Background="{DynamicResource ErrorColor20}"
+              Command="{Binding TextDifference.RejectAll, RelativeSource={RelativeSource TemplatedParent}, FallbackValue={x:Null}}"
+              Content="{I18N {x:Static LocaleKey.TextDifferenceSummaryView_RejectAllButton_Content}}"/>
+          </UniformGrid>
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

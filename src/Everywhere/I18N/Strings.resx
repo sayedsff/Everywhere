@@ -1132,4 +1132,37 @@ Placeholders can be used within the prompt, enclosed in {}, and will be replaced
     <data name="ChatInputBox_ContextFlyout_PasteMenuItem_Header" xml:space="preserve">
         <value>Paste</value>
     </data>
+    <data name="ConsentDecision_Deny" xml:space="preserve">
+        <value>Deny</value>
+    </data>
+    <data name="ConsentDecision_AllowOnce" xml:space="preserve">
+        <value>Allow once</value>
+    </data>
+    <data name="ConsentDecision_AllowSession" xml:space="preserve">
+        <value>Allow in session</value>
+    </data>
+    <data name="ConsentDecision_AlwaysAllow" xml:space="preserve">
+        <value>Always allow</value>
+    </data>
+    <data name="TextDifferenceEditor_AcceptButton_Content" xml:space="preserve">
+        <value>Accpet</value>
+    </data>
+    <data name="TextDifferenceEditor_RevertButton_Content" xml:space="preserve">
+        <value>Revert</value>
+    </data>
+    <data name="TextDifferenceSummaryView_AddedLineCountTextRun_Text" xml:space="preserve">
+        <value> lines added</value>
+    </data>
+    <data name="TextDifferenceSummaryView_RemovedLineCountTextRun_Text" xml:space="preserve">
+        <value> lines deleted</value>
+    </data>
+    <data name="TextDifferenceSummaryView_AcceptAllButton_Content" xml:space="preserve">
+        <value>Accept All</value>
+    </data>
+    <data name="TextDifferenceSummaryView_EditButton_Content" xml:space="preserve">
+        <value>Edit</value>
+    </data>
+    <data name="TextDifferenceSummaryView_RejectAllButton_Content" xml:space="preserve">
+        <value>Reject All</value>
+    </data>
 </root>

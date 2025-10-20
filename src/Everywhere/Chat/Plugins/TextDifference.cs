@@ -1,7 +1,10 @@
-﻿using System.Security.Cryptography;
+﻿using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using CommunityToolkit.Mvvm.ComponentModel;
 using MessagePack;
+using ObservableCollections;
+using ZLinq;
 
 namespace Everywhere.Chat.Plugins;
 
@@ -116,13 +119,69 @@ public sealed partial class TextChange : ObservableObject
 /// This record is not used for serialization; use ToString() for text representation.
 /// </remarks>
 [MessagePackObject(OnlyIncludeKeyedMembers = true)]
-public partial class TextDifference(string filePath)
+public partial class TextDifference : ObservableObject
 {
     [Key(0)]
-    public string FilePath { get; } = filePath;
+    public string FilePath { get; }
 
     [Key(1)]
-    public List<TextChange> Changes { get; set; } = [];
+    [field: AllowNull, MaybeNull]
+    public ObservableList<TextChange> Changes
+    {
+        get;
+        set
+        {
+            if (field == value) return;
+            if (field != null) field.CollectionChanged -= HandleChangesCollectionChanged;
+            field = value;
+            if (field != null) field.CollectionChanged += HandleChangesCollectionChanged;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(Accepted));
+        }
+    } = [];
+
+    /// <summary>
+    /// Indicates whether any changes are accepted (true), all rejected (false), or some pending (null).
+    /// </summary>
+    public bool? Accepted
+    {
+        get
+        {
+            var accepted = false;
+            foreach (var change in Changes)
+            {
+                if (change.Accepted is null) return null;
+                if (change.Accepted.Value) accepted = true;
+            }
+
+            return accepted;
+        }
+    }
+
+    public TextDifference(string filePath)
+    {
+        FilePath = filePath;
+        Changes.CollectionChanged += HandleChangesCollectionChanged;
+    }
+
+    private void HandleChangesCollectionChanged(in NotifyCollectionChangedEventArgs<TextChange> e)
+    {
+        if (e.NewItem is not null) e.NewItem.PropertyChanged += HandleChangePropertyChanged;
+        if (e.OldItem is not null) e.OldItem.PropertyChanged -= HandleChangePropertyChanged;
+        foreach (var item in e.NewItems)
+        {
+            item.PropertyChanged += HandleChangePropertyChanged;
+        }
+        foreach (var item in e.OldItems)
+        {
+            item.PropertyChanged -= HandleChangePropertyChanged;
+        }
+    }
+
+    private void HandleChangePropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(TextChange.Accepted)) OnPropertyChanged(nameof(Accepted));
+    }
 
     public void Add(params TextChange[] changes)
     {
@@ -185,11 +244,6 @@ public partial class TextDifference(string filePath)
     public string ToModelSummary(string original, in TextDifferenceRenderOptions options)
         => TextDifferenceRenderer.ToModelSummary(this, original, options);
 
-    public static string ComputeSha256(string? content)
-    {
-        return Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(content ?? string.Empty)));
-    }
-
     private void SetAll(bool accepted)
     {
         foreach (var c in Changes) c.Accepted = accepted;
@@ -230,7 +284,7 @@ public static class TextDifferenceRenderer
 
             sb.AppendLine(
                 $"@@ -{startLine},{origLines} +{startLine},{newLines} " +
-                $"@@ {ch.Kind} id={ch.Id} accepted={ch.Accepted?.ToString().ToLowerInvariant() ?? "null"}");
+                $"@@ {ch.Kind} id={ch.Id[..6]} accepted={ch.Accepted?.ToString().ToLowerInvariant() ?? "null"}");
 
             foreach (var line in TakeLines(before, options.MaxPreviewLinesPerChange))
                 sb.AppendLine($"- {line}");
@@ -283,7 +337,7 @@ public static class TextDifferenceRenderer
         return (line, col);
     }
 
-    private static int CountLines(string s)
+    public static int CountLines(string s)
     {
         if (s.Length == 0) return 0;
         return 1 + s.Count(t => t == '\n');
@@ -329,7 +383,11 @@ internal static class MyersDifference
                     x = Get(v, k - 1) + 1;
 
                 var y = x - k;
-                while (x < n && y < m && a[x] == b[y]) { x++; y++; }
+                while (x < n && y < m && a[x] == b[y])
+                {
+                    x++;
+                    y++;
+                }
                 vv[k] = x;
 
                 if (x < n || y < m) continue;
@@ -449,8 +507,8 @@ internal static class MyersDifference
             }
 
             var kind = (hasDel && hasIns) ? EditKind.Replace
-                     : hasDel ? EditKind.Delete
-                     : EditKind.Insert;
+                : hasDel ? EditKind.Delete
+                : EditKind.Insert;
 
             res.Add(new Edit(kind, @as, ae, bs, be));
             i = k;

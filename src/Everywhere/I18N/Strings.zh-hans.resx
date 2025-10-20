@@ -1114,4 +1114,37 @@
     <data name="ChatInputBox_ContextFlyout_PasteMenuItem_Header" xml:space="preserve">
         <value>粘贴</value>
     </data>
+    <data name="ConsentDecision_AllowOnce" xml:space="preserve">
+        <value>允许一次</value>
+    </data>
+    <data name="ConsentDecision_AllowSession" xml:space="preserve">
+        <value>当前对话中允许</value>
+    </data>
+    <data name="ConsentDecision_AlwaysAllow" xml:space="preserve">
+        <value>总是允许</value>
+    </data>
+    <data name="ConsentDecision_Deny" xml:space="preserve">
+        <value>拒绝</value>
+    </data>
+    <data name="TextDifferenceEditor_AcceptButton_Content" xml:space="preserve">
+        <value>接受</value>
+    </data>
+    <data name="TextDifferenceEditor_RevertButton_Content" xml:space="preserve">
+        <value>重置</value>
+    </data>
+    <data name="TextDifferenceSummaryView_RemovedLineCountTextRun_Text" xml:space="preserve">
+        <value> 行删除</value>
+    </data>
+    <data name="TextDifferenceSummaryView_AcceptAllButton_Content" xml:space="preserve">
+        <value>接受所有</value>
+    </data>
+    <data name="TextDifferenceSummaryView_AddedLineCountTextRun_Text" xml:space="preserve">
+        <value> 行添加</value>
+    </data>
+    <data name="TextDifferenceSummaryView_EditButton_Content" xml:space="preserve">
+        <value>编辑</value>
+    </data>
+    <data name="TextDifferenceSummaryView_RejectAllButton_Content" xml:space="preserve">
+        <value>拒绝所有</value>
+    </data>
 </root>

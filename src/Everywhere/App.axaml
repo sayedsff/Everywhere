@@ -19,6 +19,7 @@
         <ResourceInclude Source="avares://Everywhere/Views/Controls/IconPresenter.axaml"/>
         <ResourceInclude Source="avares://Everywhere/Views/Controls/SettingsItemsControl.axaml"/>
         <ResourceInclude Source="avares://Everywhere/Views/Controls/TextDifferenceEditor.axaml"/>
+        <ResourceInclude Source="avares://Everywhere/Views/Controls/TextDifferenceSummaryView.axaml"/>
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </Application.Resources>
