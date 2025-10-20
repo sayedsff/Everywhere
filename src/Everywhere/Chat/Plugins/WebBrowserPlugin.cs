@@ -123,6 +123,9 @@ public partial class WebBrowserPlugin : BuiltInChatPlugin
             throw new InvalidOperationException("EndPoint is not a valid absolute URI.");
         }
 
+        // Extract only the base URI without query parameters
+        uri = new UriBuilder(uri) { Query = string.Empty }.Uri;
+
         _connector = provider.Id.ToLower() switch
         {
             "google" => new GoogleConnector(
@@ -134,9 +137,9 @@ public partial class WebBrowserPlugin : BuiltInChatPlugin
                 provider.SearchEngineId ?? throw new UnauthorizedAccessException("Search Engine ID is not set."),
                 _loggerFactory),
             "tavily" => new TavilyConnector(EnsureApiKey(provider.ApiKey), uri, _loggerFactory),
-            "brave" => new BraveConnector(EnsureApiKey(provider.ApiKey), uri, _loggerFactory),
+            "brave" => new BraveConnector(EnsureApiKey(provider.ApiKey), new Uri(uri, "?q"), _loggerFactory),
             "bocha" => new BoChaConnector(EnsureApiKey(provider.ApiKey), uri, _loggerFactory),
-            "jina" => new JinaConnector(EnsureApiKey(provider.ApiKey), uri, _loggerFactory),
+            "jina" => new JinaConnector(EnsureApiKey(provider.ApiKey), new Uri(uri, "?q"), _loggerFactory),
             "searxng" => new SearxngConnector(uri, _loggerFactory),
             _ => throw new NotSupportedException($"Web search engine provider '{provider.Id}' is not supported.")
         };
@@ -355,7 +358,7 @@ public partial class WebBrowserPlugin : BuiltInChatPlugin
         }
     }
 
-    private partial class SearxngConnector(Uri? uri, ILoggerFactory? loggerFactory) : IWebSearchEngineConnector
+    private partial class SearxngConnector(Uri uri, ILoggerFactory? loggerFactory) : IWebSearchEngineConnector
     {
         private readonly HttpClient _httpClient = new();
         private readonly ILogger _logger = loggerFactory?.CreateLogger(typeof(SearxngConnector)) ?? NullLogger.Instance;
@@ -373,8 +376,12 @@ public partial class WebBrowserPlugin : BuiltInChatPlugin
 
             _logger.LogDebug("Sending request: {Uri}", uri);
 
-            var requestUrl = $"{uri}?q={HttpUtility.UrlEncode(query)}&format=json";
-            using var responseMessage = await _httpClient.GetAsync(requestUrl, cancellationToken).ConfigureAwait(false);
+            using var responseMessage = await _httpClient.GetAsync(
+                new UriBuilder(uri)
+                {
+                    Query = $"q={HttpUtility.UrlEncode(query)}&format=json"
+                }.Uri,
+                cancellationToken).ConfigureAwait(false);
 
             if (!responseMessage.IsSuccessStatusCode)
             {
@@ -475,8 +482,7 @@ public partial class WebBrowserPlugin : BuiltInChatPlugin
     {
         private readonly ILogger _logger;
         private readonly HttpClient _httpClient;
-        private readonly Uri? _uri;
-        private const string DefaultUri = "https://api.bochaai.com/v1/web-search";
+        private readonly Uri _uri;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BoChaConnector"/> class.
@@ -484,12 +490,12 @@ public partial class WebBrowserPlugin : BuiltInChatPlugin
         /// <param name="apiKey">The API key to authenticate the connector.</param>
         /// <param name="uri">The URI of the Bing Search instance. Defaults to "https://api.bing.microsoft.com/v7.0/search?q".</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory"/> to use for logging. If null, no logging will be performed.</param>
-        public BoChaConnector(string apiKey, Uri? uri, ILoggerFactory? loggerFactory)
+        public BoChaConnector(string apiKey, Uri uri, ILoggerFactory? loggerFactory)
         {
             _logger = loggerFactory?.CreateLogger(typeof(BoChaConnector)) ?? NullLogger.Instance;
             _httpClient = new HttpClient();
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
-            _uri = uri ?? new Uri(DefaultUri);
+            _uri = uri;
         }
 
         /// <inheritdoc/>
@@ -620,8 +626,7 @@ public partial class WebBrowserPlugin : BuiltInChatPlugin
     {
         private readonly ILogger _logger;
         private readonly HttpClient _httpClient;
-        private readonly Uri? _uri;
-        private const string DefaultUri = "https://s.jina.ai/?q";
+        private readonly Uri _uri;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="JinaConnector"/> class.
@@ -629,13 +634,13 @@ public partial class WebBrowserPlugin : BuiltInChatPlugin
         /// <param name="apiKey">The API key to authenticate the connector.</param>
         /// <param name="uri">The URI of the Jina Search instance. Defaults to "https://s.jina.ai/".</param>
         /// <param name="loggerFactory">The <see cref="ILoggerFactory"/> to use for logging. If null, no logging will be performed.</param>
-        public JinaConnector(string apiKey, Uri? uri, ILoggerFactory? loggerFactory)
+        public JinaConnector(string apiKey, Uri uri, ILoggerFactory? loggerFactory)
         {
             _logger = loggerFactory?.CreateLogger(typeof(JinaConnector)) ?? NullLogger.Instance;
             _httpClient = new HttpClient();
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            _uri = uri ?? new Uri(DefaultUri);
+            _uri = uri;
         }
 
         /// <inheritdoc/>

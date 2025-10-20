@@ -86,7 +86,7 @@ public class SettingsInitializer : IAsyncInitializer
                 {
                     Id = "brave",
                     DisplayName = "Brave",
-                    EndPoint = "https://api.search.brave.com/res/v1/web/search?q"
+                    EndPoint = "https://api.search.brave.com/res/v1/web/search"
                 },
                 new WebSearchEngineProvider
                 {
@@ -98,7 +98,7 @@ public class SettingsInitializer : IAsyncInitializer
                 {
                     Id = "jina",
                     DisplayName = "Jina",
-                    EndPoint = "https://s.jina.ai/?q"
+                    EndPoint = "https://s.jina.ai"
                 },
                 new WebSearchEngineProvider
                 {
