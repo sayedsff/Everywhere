@@ -4,7 +4,6 @@ using System.Text;
 using CommunityToolkit.Mvvm.ComponentModel;
 using MessagePack;
 using ObservableCollections;
-using ZLinq;
 
 namespace Everywhere.Chat.Plugins;
 
@@ -136,27 +135,31 @@ public partial class TextDifference : ObservableObject
             field = value;
             if (field != null) field.CollectionChanged += HandleChangesCollectionChanged;
             OnPropertyChanged();
-            OnPropertyChanged(nameof(Accepted));
+            OnPropertyChanged(nameof(Acceptance));
         }
     } = [];
 
     /// <summary>
     /// Indicates whether any changes are accepted (true), all rejected (false), or some pending (null).
     /// </summary>
-    public bool? Accepted
+    public bool? Acceptance
     {
         get
         {
-            var accepted = false;
+            var acceptance = false;
             foreach (var change in Changes)
             {
                 if (change.Accepted is null) return null;
-                if (change.Accepted.Value) accepted = true;
+                if (change.Accepted.Value) acceptance = true;
             }
 
-            return accepted;
+            _acceptanceTcs?.TrySetResult(acceptance);
+
+            return acceptance;
         }
     }
+
+    private TaskCompletionSource<bool>? _acceptanceTcs;
 
     public TextDifference(string filePath)
     {
@@ -166,8 +169,10 @@ public partial class TextDifference : ObservableObject
 
     private void HandleChangesCollectionChanged(in NotifyCollectionChangedEventArgs<TextChange> e)
     {
-        if (e.NewItem is not null) e.NewItem.PropertyChanged += HandleChangePropertyChanged;
-        if (e.OldItem is not null) e.OldItem.PropertyChanged -= HandleChangePropertyChanged;
+        // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
+        e.NewItem?.PropertyChanged += HandleChangePropertyChanged;
+        // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
+        e.OldItem?.PropertyChanged -= HandleChangePropertyChanged;
         foreach (var item in e.NewItems)
         {
             item.PropertyChanged += HandleChangePropertyChanged;
@@ -180,7 +185,7 @@ public partial class TextDifference : ObservableObject
 
     private void HandleChangePropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(TextChange.Accepted)) OnPropertyChanged(nameof(Accepted));
+        if (e.PropertyName == nameof(TextChange.Accepted)) OnPropertyChanged(nameof(Acceptance));
     }
 
     public void Add(params TextChange[] changes)
@@ -191,6 +196,18 @@ public partial class TextDifference : ObservableObject
     public void AcceptAll() => SetAll(true);
 
     public void RejectAll() => SetAll(false);
+
+    /// <summary>
+    /// Wait until at least one change is accepted or all are rejected.
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public Task<bool> WaitForAcceptanceAsync(CancellationToken cancellationToken = default)
+    {
+        _acceptanceTcs ??= new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        cancellationToken.Register(() => _acceptanceTcs?.TrySetCanceled());
+        return _acceptanceTcs.Task;
+    }
 
     /// <summary>
     /// Get changes filtered according to the given options.
