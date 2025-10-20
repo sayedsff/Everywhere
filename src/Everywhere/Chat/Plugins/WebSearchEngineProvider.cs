@@ -10,17 +10,26 @@ public partial class WebSearchEngineProvider : ObservableObject
     [HiddenSettingsItem]
     [IgnoreDataMember]
     public required string Id { get; init; }
-
+    
+    [JsonIgnore]
+    [HiddenSettingsItem]
+    public required string DisplayName { get; init; }
+    
     public required Customizable<string> EndPoint { get; init; }
 
     [IgnoreDataMember]
     [ObservableProperty]
+    [SettingsItem(IsVisibleBindingPath = nameof(IsApiKeyRequired))]
     [SettingsStringItem(IsPassword = true)]
     public partial string? ApiKey { get; set; }
 
     [JsonIgnore]
     [HiddenSettingsItem]
     public bool IsSearchEngineIdVisible => Id.Equals("google", StringComparison.OrdinalIgnoreCase);
+    
+    [JsonIgnore]
+    [HiddenSettingsItem]
+    public bool IsApiKeyRequired => !Id.Equals("searxng", StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
     /// for Google search engine, this is the search engine ID.

@@ -64,6 +64,6 @@
   <DataTemplate
     x:Key="{x:Type plugins:WebSearchEngineProvider}"
     x:DataType="plugins:WebSearchEngineProvider">
-    <TextBlock Text="{Binding Id, FallbackValue={x:Null}}"/>
+    <TextBlock Text="{Binding DisplayName, FallbackValue={x:Null}}"/>
   </DataTemplate>
 </ResourceDictionary>
