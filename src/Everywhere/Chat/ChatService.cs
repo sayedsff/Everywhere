@@ -54,7 +54,7 @@ public class ChatService(
         var assistantChatMessage = new AssistantChatMessage { IsBusy = true };
         chatContext.Add(assistantChatMessage);
 
-        await GenerateAsync(chatContext, customAssistant, assistantChatMessage, cancellationToken);
+        await Task.Run(() => GenerateAsync(chatContext, customAssistant, assistantChatMessage, cancellationToken), cancellationToken);
     }
 
     public async Task RetryAsync(ChatMessageNode node, CancellationToken cancellationToken)
@@ -73,7 +73,7 @@ public class ChatService(
         var assistantChatMessage = new AssistantChatMessage { IsBusy = true };
         node.Context.CreateBranchOn(node, assistantChatMessage);
 
-        await GenerateAsync(node.Context, customAssistant, assistantChatMessage, cancellationToken);
+        await Task.Run(() => GenerateAsync(node.Context, customAssistant, assistantChatMessage, cancellationToken), cancellationToken);
     }
 
     public Task EditAsync(ChatMessageNode node, CancellationToken cancellationToken)
