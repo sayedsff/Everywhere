@@ -40,14 +40,6 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
     // Inject sentinel to ignore self-injected events
     private const nuint InjectExtra = 0x0d000721;
 
-    // Keyboard hook state
-    private static KeyModifiers _pressedMods;
-    private static bool _triggerActive;
-    private static HotkeySig _activeSig;
-    private static bool _winHeldSuppressed;
-    private static bool _injectedWinDown;
-    private static VIRTUAL_KEY _winVk;
-
     // Concurrency: light lock for hotkey maps
     private static readonly Lock SyncLock = new();
 
@@ -212,6 +204,8 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
     }
 
     // ---------- keyboard hook (fallback) ----------
+    // Reference: PowerToys
+    // https://github.com/microsoft/PowerToys/blob/main/src/modules/cmdpal/CmdPalKeyboardService/KeyboardListener.cpp
 
     private static void EnsureKeyboardHook()
     {
@@ -221,128 +215,72 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
 
     private static void KeyboardHookProc(UIntPtr wParam, ref KBDLLHOOKSTRUCT lParam, ref bool blockNext)
     {
+        // Ignore self-injected events
         if (lParam.dwExtraInfo == InjectExtra) return;
 
         var msg = (WINDOW_MESSAGE)wParam;
+        if (msg != WINDOW_MESSAGE.WM_KEYDOWN && msg != WINDOW_MESSAGE.WM_SYSKEYDOWN)
+            return;
+
+        // Resolve current modifiers using GetAsyncKeyState (best-effort snapshot)
+        var mods = GetAsyncModifiers();
+
+        // Resolve main key from vkCode
         var vk = (VIRTUAL_KEY)lParam.vkCode;
         var key = vk.ToAvaloniaKey();
-        var mod = vk.ToKeyModifiers();
 
-        static bool IsWin(VIRTUAL_KEY v) => v is VIRTUAL_KEY.VK_LWIN or VIRTUAL_KEY.VK_RWIN;
+        // Build hotkey signature and lookup handlers
+        List<Action>? handlers = null;
+        var sig = new HotkeySig(mods, key);
 
-        switch (msg)
-        {
-            case WINDOW_MESSAGE.WM_KEYDOWN:
-            case WINDOW_MESSAGE.WM_SYSKEYDOWN:
-            {
-                if (mod != KeyModifiers.None)
-                    _pressedMods |= mod;
-
-                if (IsWin(vk) && AnyHookMetaHotkey())
-                {
-                    _winHeldSuppressed = true;
-                    _injectedWinDown = false;
-                    _winVk = vk;
-                    blockNext = true;
-                    return;
-                }
-
-                if (mod == KeyModifiers.None)
-                {
-                    var sig = new HotkeySig(_pressedMods, key);
-                    List<Action>? handlers;
-                    lock (SyncLock)
-                    {
-                        handlers = HookKbHandlers.TryGetValue(sig, out var list) ? list.Snapshot() : null;
-                    }
-
-                    if (!_triggerActive && handlers is not null)
-                    {
-                        _triggerActive = true;
-                        _activeSig = sig;
-                        blockNext = true; // block main key down
-                        foreach (var h in handlers)
-                        {
-                            try { h(); } catch { /* swallow */ }
-                        }
-                        return;
-                    }
-
-                    if (_winHeldSuppressed)
-                    {
-                        // Not our hotkey: compensate Win down then let OS see this key
-                        if (!_injectedWinDown)
-                        {
-                            InjectKey(_winVk, true);
-                            _injectedWinDown = true;
-                            _winHeldSuppressed = false;
-                        }
-                        return;
-                    }
-                }
-
-                return;
-            }
-
-            case WINDOW_MESSAGE.WM_KEYUP:
-            case WINDOW_MESSAGE.WM_SYSKEYUP:
-            {
-                if (mod != KeyModifiers.None)
-                    _pressedMods &= ~mod;
-
-                if (_triggerActive && key == _activeSig.Key)
-                {
-                    blockNext = true; // block main key up
-                }
-
-                if (IsWin(vk) && AnyHookMetaHotkey())
-                {
-                    if (_triggerActive && _activeSig.Modifiers.HasFlag(KeyModifiers.Meta))
-                    {
-                        // Our combo contained Meta: swallow Win up to avoid Start menu
-                        blockNext = true;
-                    }
-                    else if (_injectedWinDown)
-                    {
-                        // We injected Win down: swallow real up, inject up
-                        blockNext = true;
-                        InjectKey(_winVk, false);
-                    }
-                    else if (_winHeldSuppressed)
-                    {
-                        // Single-tap Win: swallow real up, inject down+up to open Start
-                        blockNext = true;
-                        InjectKey(_winVk, true);
-                        InjectKey(_winVk, false);
-                    }
-
-                    _winHeldSuppressed = false;
-                    _injectedWinDown = false;
-                    _winVk = 0;
-                }
-
-                if (_pressedMods == KeyModifiers.None)
-                {
-                    _triggerActive = false;
-                    _activeSig = default;
-                }
-
-                return;
-            }
-        }
-    }
-
-    private static bool AnyHookMetaHotkey()
-    {
         lock (SyncLock)
         {
-            foreach (var k in HookKbHandlers.Keys)
-                if ((k.Modifiers & KeyModifiers.Meta) != 0) return true;
+            if (HookKbHandlers.TryGetValue(sig, out var list))
+            {
+                handlers = list.Snapshot();
+            }
         }
-        return false;
+
+        if (handlers is null || handlers.Count == 0)
+            return;
+
+        // Execute handlers outside the lock
+        foreach (var h in handlers)
+        {
+            try { h(); } catch { /* swallow */ }
+        }
+
+        // Send a dummy key-up to prevent Start menu from activating on Win-key release
+        SendDummyKeyUp();
+
+        // Swallow this key press
+        blockNext = true;
     }
 
-    private static void InjectKey(VIRTUAL_KEY vk, bool down)
+    private static KeyModifiers GetAsyncModifiers()
+    {
+        // Note: Using async state to query left/right Win, Ctrl, Shift, Alt.
+        // This mirrors the PowerToys approach and avoids maintaining custom state.
+        static bool Down(VIRTUAL_KEY v) => (PInvoke.GetAsyncKeyState((int)v) & 0x8000) != 0;
+
+        var mods = KeyModifiers.None;
+
+        if (Down(VIRTUAL_KEY.VK_LWIN) || Down(VIRTUAL_KEY.VK_RWIN))
+            mods |= KeyModifiers.Meta;
+        if ((PInvoke.GetAsyncKeyState((int)VIRTUAL_KEY.VK_CONTROL) & 0x8000) != 0)
+            mods |= KeyModifiers.Control;
+        if ((PInvoke.GetAsyncKeyState((int)VIRTUAL_KEY.VK_SHIFT) & 0x8000) != 0)
+            mods |= KeyModifiers.Shift;
+        if ((PInvoke.GetAsyncKeyState((int)VIRTUAL_KEY.VK_MENU) & 0x8000) != 0)
+            mods |= KeyModifiers.Alt;
+
+        return mods;
+    }
+
+    /// <summary>
+    /// Inject a harmless key-up (VK 0xFF) to cancel Start-menu activation
+    /// </summary>
+    private static void SendDummyKeyUp()
     {
         var inputs = new INPUT[1];
         inputs[0] = new INPUT
@@ -352,14 +290,15 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
             {
                 ki = new KEYBDINPUT
                 {
-                    wVk = vk,
+                    wVk = (VIRTUAL_KEY)0xFF,
                     wScan = 0,
-                    dwFlags = down ? 0 : KEYBD_EVENT_FLAGS.KEYEVENTF_KEYUP,
+                    dwFlags = KEYBD_EVENT_FLAGS.KEYEVENTF_KEYUP,
                     time = 0,
                     dwExtraInfo = InjectExtra
                 }
             }
         };
+
         fixed (INPUT* p = inputs)
         {
             PInvoke.SendInput(new ReadOnlySpan<INPUT>(p, 1), sizeof(INPUT));
