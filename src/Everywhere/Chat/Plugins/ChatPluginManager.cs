@@ -82,7 +82,7 @@ public class ChatPluginManager : IChatPluginManager
 
     public IChatPluginScope CreateScope(ChatContext chatContext, CustomAssistant customAssistant)
     {
-        return new Scope(
+        return new ChatPluginScope(
             _builtInPlugins
                 .AsValueEnumerable()
                 .Cast<ChatPlugin>()
@@ -92,28 +92,7 @@ public class ChatPluginManager : IChatPluginManager
                 .ToList());
     }
 
-    private class ChatPluginSnapshot : ChatPlugin
-    {
-        public override DynamicResourceKeyBase HeaderKey => _originalChatPlugin.HeaderKey;
-        public override DynamicResourceKeyBase DescriptionKey => _originalChatPlugin.DescriptionKey;
-        public override LucideIconKind? Icon => _originalChatPlugin.Icon;
-        public override string? BeautifulIcon => _originalChatPlugin.BeautifulIcon;
-
-        private readonly ChatPlugin _originalChatPlugin;
-
-        public ChatPluginSnapshot(
-            ChatPlugin originalChatPlugin,
-            ChatContext chatContext,
-            CustomAssistant customAssistant
-        ) : base(originalChatPlugin.Name)
-        {
-            _originalChatPlugin = originalChatPlugin;
-            AllowedPermissions = originalChatPlugin.AllowedPermissions.ActualValue;
-            _functions.AddRange(originalChatPlugin.SnapshotFunctions(chatContext, customAssistant));
-        }
-    }
-
-    private class Scope(List<ChatPluginSnapshot> pluginSnapshots) : IChatPluginScope
+    private class ChatPluginScope(List<ChatPluginSnapshot> pluginSnapshots) : IChatPluginScope
     {
         public IEnumerable<ChatPlugin> Plugins => pluginSnapshots;
 
@@ -135,6 +114,27 @@ public class ChatPluginManager : IChatPluginManager
             plugin = null;
             function = null;
             return false;
+        }
+    }
+
+    private class ChatPluginSnapshot : ChatPlugin
+    {
+        public override DynamicResourceKeyBase HeaderKey => _originalChatPlugin.HeaderKey;
+        public override DynamicResourceKeyBase DescriptionKey => _originalChatPlugin.DescriptionKey;
+        public override LucideIconKind? Icon => _originalChatPlugin.Icon;
+        public override string? BeautifulIcon => _originalChatPlugin.BeautifulIcon;
+
+        private readonly ChatPlugin _originalChatPlugin;
+
+        public ChatPluginSnapshot(
+            ChatPlugin originalChatPlugin,
+            ChatContext chatContext,
+            CustomAssistant customAssistant
+        ) : base(originalChatPlugin.Name)
+        {
+            _originalChatPlugin = originalChatPlugin;
+            AllowedPermissions = originalChatPlugin.AllowedPermissions.ActualValue;
+            _functions.AddRange(originalChatPlugin.SnapshotFunctions(chatContext, customAssistant));
         }
     }
 }

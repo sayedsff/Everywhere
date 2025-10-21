@@ -21,11 +21,11 @@ public abstract partial class ChatFunction : ObservableObject
     public abstract KernelFunction KernelFunction { get; }
 }
 
-public class AnonymousChatFunction : ChatFunction
+public class NativeChatFunction : ChatFunction
 {
     public override KernelFunction KernelFunction { get; }
 
-    public AnonymousChatFunction(Delegate method, ChatFunctionPermissions permissions, LucideIconKind? icon = null)
+    public NativeChatFunction(Delegate method, ChatFunctionPermissions permissions, LucideIconKind? icon = null)
     {
         Icon = icon;
         Permissions = permissions;

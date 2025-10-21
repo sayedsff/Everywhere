@@ -44,8 +44,8 @@ public partial class ChatWindow : ReactiveWindow<ChatWindowViewModel>
         set => SetValue(PlacementProperty, value);
     }
 
-    public static readonly StyledProperty<bool> IsWindowPinnedProperty = AvaloniaProperty.Register<ChatWindow, bool>(
-        nameof(IsWindowPinned));
+    public static readonly StyledProperty<bool> IsWindowPinnedProperty =
+        AvaloniaProperty.Register<ChatWindow, bool>(nameof(IsWindowPinned));
 
     public bool IsWindowPinned
     {

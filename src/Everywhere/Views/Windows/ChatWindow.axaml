@@ -3,17 +3,18 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:at="clr-namespace:Everywhere.AttachedProperties"
   xmlns:be="clr-namespace:Everywhere.Behaviors" xmlns:chat="clr-namespace:Everywhere.Chat"
   xmlns:common="clr-namespace:Everywhere.Common" xmlns:interop="clr-namespace:Everywhere.Interop"
-  xmlns:md="clr-namespace:LiveMarkdown.Avalonia;assembly=LiveMarkdown.Avalonia" xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI"
-  xmlns:sys="clr-namespace:System;assembly=System.Runtime" xmlns:themes="clr-namespace:ShadUI.Themes;assembly=ShadUI"
-  xmlns:v="clr-namespace:Everywhere.Views" xmlns:vc="clr-namespace:Everywhere.ValueConverters"
-  xmlns:vm="clr-namespace:Everywhere.ViewModels" MinWidth="400"
-  MinHeight="144.8" x:DataType="vm:ChatWindowViewModel"
-  x:TypeArguments="vm:ChatWindowViewModel" Background="Transparent"
-  CanResize="False" ExtendClientAreaChromeHints="NoChrome"
-  ExtendClientAreaToDecorationsHint="True"
+  xmlns:md="clr-namespace:LiveMarkdown.Avalonia;assembly=LiveMarkdown.Avalonia" xmlns:plugins="clr-namespace:Everywhere.Chat.Plugins"
+  xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI" xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+  xmlns:themes="clr-namespace:ShadUI.Themes;assembly=ShadUI" xmlns:v="clr-namespace:Everywhere.Views"
+  xmlns:vc="clr-namespace:Everywhere.ValueConverters" xmlns:vm="clr-namespace:Everywhere.ViewModels"
+  MinWidth="400" MinHeight="144.8"
+  x:DataType="vm:ChatWindowViewModel" x:TypeArguments="vm:ChatWindowViewModel"
+  Background="Transparent" CanResize="False"
+  ExtendClientAreaChromeHints="NoChrome" ExtendClientAreaToDecorationsHint="True"
   IsOpened="{Binding IsOpened, Mode=OneWayToSource}"
   RequestedThemeVariant="{x:Static themes:ThemeVariants.Acrylic}"
-  SizeToContent="WidthAndHeight" SystemDecorations="BorderOnly"
+  ShowActivated="True" SizeToContent="WidthAndHeight"
+  SystemDecorations="BorderOnly"
   TargetBoundingRect="{Binding TargetBoundingRect}"
   Topmost="True" TransparencyLevelHint="AcrylicBlur"
   WindowStartupLocation="Manual">
@@ -706,6 +707,35 @@
                           FontSize="13"
                           Text="{Binding ErrorMessageKey^, FallbackValue={x:Null}}"/>
                       </v:ChatActionBubble.ErrorContent>
+                      <ItemsControl ItemsSource="{Binding DisplayBlocks}">
+                        <ItemsControl.DataTemplates>
+                          <DataTemplate DataType="plugins:ChatPluginTextDisplayBlock">
+                            <SelectableTextBlock
+                              Text="{Binding Text}"
+                              TextWrapping="Wrap"/>
+                          </DataTemplate>
+                          <DataTemplate DataType="plugins:ChatPluginMarkdownDisplayBlock">
+                            <md:MarkdownRenderer MarkdownBuilder="{Binding MarkdownBuilder}"/>
+                          </DataTemplate>
+                          <DataTemplate DataType="plugins:ChatPluginProgressDisplayBlock">
+                            <StackPanel Spacing="4">
+                              <TextBlock Text="{Binding HeaderKey^}"/>
+                              <ProgressBar
+                                IsIndeterminate="{Binding Progress, Converter={x:Static shadui:DoubleConverters.IsNaN}}"
+                                Maximum="1" Minimum="0"
+                                Value="{Binding Progress}"/>
+                            </StackPanel>
+                          </DataTemplate>
+                          <DataTemplate DataType="plugins:ChatPluginFileReferenceDisplayBlock">
+                            <!--  TODO  -->
+                          </DataTemplate>
+                          <DataTemplate DataType="plugins:ChatPluginFileDifferenceDisplayBlock">
+                            <v:TextDifferenceSummaryView
+                              OriginalText="{Binding OriginalText}"
+                              TextDifference="{Binding Difference}"/>
+                          </DataTemplate>
+                        </ItemsControl.DataTemplates>
+                      </ItemsControl>
                     </v:ChatActionBubble>
                   </DataTemplate>
                 </DataTemplates>

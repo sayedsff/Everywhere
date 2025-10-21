@@ -1147,4 +1147,10 @@
     <data name="TextDifferenceSummaryView_RejectAllButton_Content" xml:space="preserve">
         <value>拒绝所有</value>
     </data>
+    <data name="NativeChatPlugin_FileSystem_DeleteFiles_DeletionConsent_Header" xml:space="preserve">
+        <value>Everywhere wants to delete {0} files or directories</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_DeleteFiles_SystemFile_DeletionConsent_Header" xml:space="preserve">
+        <value>Everywhere wants to delete system file or directory</value>
+    </data>
 </root>

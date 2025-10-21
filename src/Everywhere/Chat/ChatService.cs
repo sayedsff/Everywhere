@@ -33,9 +33,10 @@ public class ChatService(
     IKernelMixinFactory kernelMixinFactory,
     Settings settings,
     ILogger<ChatService> logger
-) : IChatService
+) : IChatService, IChatPluginUserInterface
 {
     private readonly ActivitySource _activitySource = new(typeof(ChatService).FullName.NotNull());
+    private FunctionCallChatMessage? _currentFunctionCallChatMessage;
 
     public async Task SendMessageAsync(UserChatMessage message, CancellationToken cancellationToken)
     {
@@ -274,6 +275,7 @@ public class ChatService(
 
         builder.Services.AddSingleton(kernelMixin.ChatCompletionService);
         builder.Services.AddSingleton(chatContext);
+        builder.Services.AddSingleton<IChatPluginUserInterface>(this);
 
         if (kernelMixin.IsFunctionCallingSupported && settings.Internal.IsToolCallEnabled)
         {
@@ -454,23 +456,6 @@ public class ChatService(
                             }
                         }
 
-                        // TODO: move to openai sdk
-                        // for those LLM who doesn't implement function calling correctly,
-                        // we need to generate a unique ToolCallId for each tool call update.
-                        for (var i = 0; i < streamingContent.Items.Count; i++)
-                        {
-                            var item = streamingContent.Items[i];
-                            if (item is StreamingFunctionCallUpdateContent { Name.Length: > 0, CallId: null or { Length: 0 } } idiotContent)
-                            {
-                                // Generate a unique ToolCallId for the function call update.
-                                streamingContent.Items[i] = new StreamingFunctionCallUpdateContent(
-                                    Guid.NewGuid().ToString("N"),
-                                    idiotContent.Name,
-                                    idiotContent.Arguments,
-                                    idiotContent.FunctionCallIndex);
-                            }
-                        }
-
                         authorRole ??= streamingContent.Role;
                         functionCallContentBuilder.Append(streamingContent);
                     }
@@ -513,7 +498,7 @@ public class ChatService(
                         throw new InvalidOperationException($"Function '{functionCallContentGroup.Key}' is not available");
                     }
 
-                    var functionCallChatMessage = new FunctionCallChatMessage(
+                    var functionCallChatMessage = _currentFunctionCallChatMessage = new FunctionCallChatMessage(
                         chatFunction.Icon ?? chatPlugin.Icon ?? LucideIconKind.Hammer,
                         chatPlugin.HeaderKey)
                     {
@@ -568,6 +553,7 @@ public class ChatService(
 
                     functionCallChatMessage.FinishedAt = DateTimeOffset.UtcNow;
                     functionCallChatMessage.IsBusy = false;
+                    _currentFunctionCallChatMessage = null;
                 }
 
                 chatSpan.FinishedAt = DateTimeOffset.UtcNow;
@@ -783,5 +769,25 @@ public class ChatService(
             activity?.SetStatus(ActivityStatusCode.Error, e.Message);
             logger.LogError(e, "Failed to generate chat title");
         }
+    }
+
+    public Task<bool> RequestConsentAsync(
+        string id,
+        DynamicResourceKeyBase headerKey,
+        object? content = null,
+        CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<string> RequestInputAsync(DynamicResourceKeyBase message, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IChatPluginDisplaySink RequestDisplaySink()
+    {
+        if (_currentFunctionCallChatMessage is null) throw new InvalidOperationException("No active function call to display sink for");
+        return _currentFunctionCallChatMessage;
     }
 }

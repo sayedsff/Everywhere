@@ -86,11 +86,11 @@ public partial class WebBrowserPlugin : BuiltInChatPlugin
             TimeSpan.FromMinutes(5)); // Dispose browser after 5 minutes of inactivity
 
         _functions.Add(
-            new AnonymousChatFunction(
+            new NativeChatFunction(
                 WebSearchAsync,
                 ChatFunctionPermissions.NetworkAccess));
         _functions.Add(
-            new AnonymousChatFunction(
+            new NativeChatFunction(
                 WebSnapshotAsync,
                 ChatFunctionPermissions.NetworkAccess));
 

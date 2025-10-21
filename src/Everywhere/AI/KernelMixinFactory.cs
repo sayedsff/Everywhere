@@ -36,7 +36,7 @@ public class KernelMixinFactory : IKernelMixinFactory
         if (_cachedKernelMixin is not null &&
             _cachedKernelMixin.Schema == customAssistant.Schema &&
             _cachedKernelMixin.ModelId == customAssistant.ModelId &&
-            _cachedKernelMixin.Endpoint == customAssistant.Endpoint &&
+            _cachedKernelMixin.Endpoint == customAssistant.Endpoint.ActualValue.Trim().Trim('/') &&
             _cachedKernelMixin.ApiKey == apiKey)
         {
             return _cachedKernelMixin;

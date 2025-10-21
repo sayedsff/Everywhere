@@ -26,11 +26,11 @@ public class VisualTreePlugin : BuiltInChatPlugin
         _settings = settings;
 
         _functions.Add(
-            new AnonymousChatFunction(
+            new NativeChatFunction(
                 CaptureVisualElementByIdAsync,
                 ChatFunctionPermissions.ScreenRead));
         _functions.Add(
-            new AnonymousChatFunction(
+            new NativeChatFunction(
                 CaptureFullScreenAsync,
                 ChatFunctionPermissions.ScreenRead));
     }

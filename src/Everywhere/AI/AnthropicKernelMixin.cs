@@ -32,9 +32,9 @@ public sealed class AnthropicKernelMixin : KernelMixinBase
     /// </summary>
     public AnthropicKernelMixin(CustomAssistant customAssistant) : base(customAssistant)
     {
-        _chatClient = new AnthropicClient(new APIAuthentication(customAssistant.ApiKey))
+        _chatClient = new AnthropicClient(new APIAuthentication(ApiKey))
         {
-            ApiUrlFormat = customAssistant.Endpoint + "/{0}/{1}"
+            ApiUrlFormat = Endpoint + "/{0}/{1}"
         }.Messages;
         ChatCompletionService = _chatClient.AsChatCompletionService();
     }

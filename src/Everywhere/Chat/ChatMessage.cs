@@ -1,8 +1,10 @@
 ﻿using System.Collections.Immutable;
+using System.Collections.ObjectModel;
 using System.Text.Json.Serialization;
 using Avalonia.Controls.Documents;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Everywhere.Chat.Plugins;
 using Everywhere.Serialization;
 using LiveMarkdown.Avalonia;
 using Lucide.Avalonia;
@@ -268,7 +270,7 @@ public partial class ActionChatMessage : ChatMessage
 /// Represents a function call action message in the chat.
 /// </summary>
 [MessagePackObject(AllowPrivate = true, OnlyIncludeKeyedMembers = true)]
-public partial class FunctionCallChatMessage : ChatMessage, IChatMessageWithAttachments
+public partial class FunctionCallChatMessage : ChatMessage, IChatMessageWithAttachments, IChatPluginDisplaySink
 {
     [Key(0)]
     public override AuthorRole Role => AuthorRole.Tool;
@@ -287,10 +289,6 @@ public partial class FunctionCallChatMessage : ChatMessage, IChatMessageWithAtta
         set => HeaderKey = value;
     }
 
-    [Key(9)]
-    [ObservableProperty]
-    public partial DynamicResourceKeyBase? HeaderKey { get; set; }
-
     [Key(3)]
     public string? Content { get; set; }
 
@@ -304,15 +302,22 @@ public partial class FunctionCallChatMessage : ChatMessage, IChatMessageWithAtta
     public partial DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 
     [Key(6)]
-    public ObservableList<FunctionCallContent> Calls { get; set; } = [];
+    public ObservableCollection<FunctionCallContent> Calls { get; set; } = [];
 
     [Key(7)]
-    public ObservableList<FunctionResultContent> Results { get; set; } = [];
+    public ObservableCollection<FunctionResultContent> Results { get; set; } = [];
 
     [Key(8)]
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ElapsedSeconds))]
     public partial DateTimeOffset FinishedAt { get; set; } = DateTimeOffset.UtcNow;
+
+    [Key(9)]
+    [ObservableProperty]
+    public partial DynamicResourceKeyBase? HeaderKey { get; set; }
+
+    [Key(10)]
+    public ObservableCollection<ChatPluginDisplayBlock> DisplayBlocks { get; set; } = [];
 
     [IgnoreMember]
     [JsonIgnore]
@@ -331,5 +336,39 @@ public partial class FunctionCallChatMessage : ChatMessage, IChatMessageWithAtta
     {
         Icon = icon;
         HeaderKey = headerKey;
+    }
+
+    public void AppendText(string text)
+    {
+        DisplayBlocks.Add(new ChatPluginTextDisplayBlock(text));
+    }
+
+    public void AppendDynamicResourceKey(DynamicResourceKeyBase resourceKey)
+    {
+        DisplayBlocks.Add(new ChatPluginDynamicResourceKeyDisplayBlock(resourceKey));
+    }
+
+    public ObservableStringBuilder AppendMarkdown()
+    {
+        var markdownBlock = new ChatPluginMarkdownDisplayBlock();
+        DisplayBlocks.Add(markdownBlock);
+        return markdownBlock.MarkdownBuilder;
+    }
+
+    public IProgress<double> AppendProgress(DynamicResourceKeyBase headerKey)
+    {
+        var progressBlock = new ChatPluginProgressDisplayBlock(headerKey);
+        DisplayBlocks.Add(progressBlock);
+        return progressBlock.ProgressReporter;
+    }
+
+    public void AppendFileReference(string filePath, string? displayName = null)
+    {
+        DisplayBlocks.Add(new ChatPluginFileReferenceDisplayBlock(filePath, displayName));
+    }
+
+    public void AppendFileDifference(TextDifference difference, string originalText)
+    {
+        DisplayBlocks.Add(new ChatPluginFileDifferenceDisplayBlock(difference, originalText));
     }
 }

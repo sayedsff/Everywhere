@@ -29,9 +29,9 @@ public class WindowsSystemApiPlugin : BuiltInChatPlugin
     {
         _logger = logger;
 
-        _functions.Add(new AnonymousChatFunction(OpenControlPanelAsync, ChatFunctionPermissions.ProcessAccess));
-        _functions.Add(new AnonymousChatFunction(MouseActionAsync, ChatFunctionPermissions.ScreenAccess));
-        _functions.Add(new AnonymousChatFunction(KeyboardActionAsync, ChatFunctionPermissions.ScreenAccess));
+        _functions.Add(new NativeChatFunction(OpenControlPanelAsync, ChatFunctionPermissions.ProcessAccess));
+        _functions.Add(new NativeChatFunction(MouseActionAsync, ChatFunctionPermissions.ScreenAccess));
+        _functions.Add(new NativeChatFunction(KeyboardActionAsync, ChatFunctionPermissions.ScreenAccess));
     }
 
     private static readonly IReadOnlyDictionary<ControlPanelItem, string> ControlPanelArguments = new Dictionary<ControlPanelItem, string>
