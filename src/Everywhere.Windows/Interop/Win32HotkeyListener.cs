@@ -561,36 +561,44 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
 
         public event IKeyboardHotkeyScope.HotkeyFinishedHandler? HotkeyFinished;
 
-        private readonly LowLevelKeyboardHook _keyboardHook;
+        private readonly LowLevelKeyboardHook _hook;
 
         private KeyModifiers _pressedKeyModifiers = KeyModifiers.None;
 
         public KeyboardHotkeyScopeImpl()
         {
-            _keyboardHook = new LowLevelKeyboardHook(KeyboardHookCallback);
+            _hook = new LowLevelKeyboardHook(KeyboardHookCallback);
         }
 
         private void KeyboardHookCallback(UIntPtr wParam, ref KBDLLHOOKSTRUCT lParam, ref bool blockNext)
         {
             var virtualKey = (VIRTUAL_KEY)lParam.vkCode;
             var keyModifiers = virtualKey.ToKeyModifiers();
-
-            switch ((WINDOW_MESSAGE)wParam)
+            bool? isKeyDown = wParam switch
             {
-                case WINDOW_MESSAGE.WM_KEYDOWN when keyModifiers == KeyModifiers.None:
+                (UIntPtr)WINDOW_MESSAGE.WM_KEYDOWN => true,
+                (UIntPtr)WINDOW_MESSAGE.WM_SYSKEYDOWN => true,
+                (UIntPtr)WINDOW_MESSAGE.WM_KEYUP => false,
+                (UIntPtr)WINDOW_MESSAGE.WM_SYSKEYUP => false,
+                _ => null
+            };
+
+            switch (isKeyDown)
+            {
+                case true when keyModifiers == KeyModifiers.None:
                 {
                     PressingHotkey = PressingHotkey with { Key = virtualKey.ToAvaloniaKey() };
                     PressingHotkeyChanged?.Invoke(this, PressingHotkey);
                     break;
                 }
-                case WINDOW_MESSAGE.WM_KEYDOWN:
+                case true:
                 {
                     _pressedKeyModifiers |= keyModifiers;
                     PressingHotkey = PressingHotkey with { Modifiers = _pressedKeyModifiers };
                     PressingHotkeyChanged?.Invoke(this, PressingHotkey);
                     break;
                 }
-                case WINDOW_MESSAGE.WM_KEYUP:
+                case false:
                 {
                     _pressedKeyModifiers &= ~keyModifiers;
                     if (_pressedKeyModifiers == KeyModifiers.None)
@@ -598,6 +606,11 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
                         if (PressingHotkey.Modifiers != KeyModifiers.None && PressingHotkey.Key == Key.None)
                         {
                             PressingHotkey = default; // modifiers only hotkey, reset it
+                        }
+
+                        if (PressingHotkey.Modifiers == KeyModifiers.None)
+                        {
+                            PressingHotkey = default; // no modifiers, reset it
                         }
 
                         // system key is all released, capture is done
@@ -616,7 +629,7 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
             if (IsDisposed) return;
             IsDisposed = true;
 
-            _keyboardHook.Dispose();
+            _hook.Dispose();
         }
     }
 }
