@@ -10,10 +10,10 @@ public partial class WebSearchEngineProvider : ObservableObject
     [HiddenSettingsItem]
     [IgnoreDataMember]
     public required string Id { get; init; }
-    
+
     [JsonIgnore]
     [HiddenSettingsItem]
-    public required string DisplayName { get; init; }
+    public string DisplayName { get; init; } = string.Empty;
     
     public required Customizable<string> EndPoint { get; init; }
 
