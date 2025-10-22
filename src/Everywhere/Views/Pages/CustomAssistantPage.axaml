@@ -1,16 +1,11 @@
 ﻿<UserControl
   x:Class="Everywhere.Views.Pages.CustomAssistantPage" xmlns="https://github.com/avaloniaui"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ai="clr-namespace:Everywhere.AI"
-  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI" xmlns:v="clr-namespace:Everywhere.Views"
-  xmlns:vm="clr-namespace:Everywhere.ViewModels" d:DesignHeight="450"
-  d:DesignWidth="800" x:DataType="vm:CustomAssistantPageViewModel"
-  mc:Ignorable="d">
+  xmlns:vm="clr-namespace:Everywhere.ViewModels" x:DataType="vm:CustomAssistantPageViewModel">
   <Grid
-    Margin="32,0,32,24" ColumnDefinitions="*,8,4*"
-    RowDefinitions="Auto,*" RowSpacing="16">
-
+    ColumnDefinitions="*,8,3*" RowDefinitions="Auto,*"
+    RowSpacing="16">
     <Button
       Classes="Primary" Grid.Row="0"
       Grid.Column="0" HorizontalAlignment="Left"
@@ -27,6 +22,11 @@
       ItemsSource="{Binding CustomAssistants}"
       ScrollViewer.HorizontalScrollBarVisibility="Disabled"
       SelectedItem="{Binding SelectedCustomAssistant, Mode=TwoWay}">
+      <ListBox.Styles>
+        <Style Selector="Border">
+          <Setter Property="Background" Value="{DynamicResource CardBackgroundColor}"/>
+        </Style>
+      </ListBox.Styles>
       <ListBox.DataTemplates>
         <DataTemplate DataType="ai:CustomAssistant">
           <DockPanel
