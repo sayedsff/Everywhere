@@ -14,7 +14,8 @@
           Padding="4"
           BorderBrush="{DynamicResource ThemeBorderLowBrush}"
           BorderThickness="1">
-          <ScrollViewer Focusable="False">
+          <ScrollViewer
+            Focusable="False" HorizontalScrollBarVisibility="Auto">
             <ItemsControl
               Margin="4,6,12,6" ClipToBounds="False"
               Grid.IsSharedSizeScope="True"
@@ -120,40 +121,40 @@
                         IsVisible="False"/>
 
                       <Border
-                        Classes="Actions" Margin="-10,0,0,-10"
-                        HorizontalAlignment="Right" VerticalAlignment="Top"
+                        Classes="Actions" Margin="-14,0,0,-14"
+                        Padding="2,2" HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
                         Background="{DynamicResource CardBackgroundColor}"
-                        CornerRadius="3" IsVisible="False">
-                        <Panel Margin="2">
+                        CornerRadius="10" IsVisible="False">
+                        <StackPanel
+                          Margin="2" Orientation="Horizontal"
+                          Spacing="4">
                           <Button
-                            Padding="4,2"
+                            Classes="Compact"
+                            shadui:ButtonAssist.HoverBackground="{DynamicResource SuccessColor20}"
+                            shadui:ButtonAssist.Icon="{LucideIconContent Check}"
                             Background="{DynamicResource SuccessColor60}"
-                            Command="{Binding $parent[v:TextDifferenceEditor].ApplyBlockCommand}"
+                            Command="{Binding $parent[v:TextDifferenceEditor].AcceptBlockCommand}"
                             CommandParameter="{Binding ChangeId}"
                             Content="{I18N {x:Static LocaleKey.TextDifferenceEditor_AcceptButton_Content}}"
-                            CornerRadius="2"
-                            IsVisible="{Binding Accepted, Converter={x:Static ObjectConverters.IsNull}}">
-                            <shadui:ButtonAssist.Icon>
-                              <LucideIcon
-                                Margin="0,0,2,0" Kind="Check"
-                                Size="16"/>
-                            </shadui:ButtonAssist.Icon>
-                          </Button>
+                            IsVisible="{Binding Accepted, Converter={x:Static ObjectConverters.IsNull}}"/>
                           <Button
-                            Padding="4,2"
+                            Classes="Compact"
+                            shadui:ButtonAssist.HoverBackground="{DynamicResource ErrorColor20}"
+                            shadui:ButtonAssist.Icon="{LucideIconContent X}"
                             Background="{DynamicResource ErrorColor60}"
+                            Command="{Binding $parent[v:TextDifferenceEditor].DiscardBlockCommand}"
+                            CommandParameter="{Binding ChangeId}"
+                            Content="{I18N {x:Static LocaleKey.TextDifferenceEditor_DiscardButton_Content}}"
+                            IsVisible="{Binding Accepted, Converter={x:Static ObjectConverters.IsNull}}"/>
+                          <Button
+                            Classes="Secondary Compact"
+                            shadui:ButtonAssist.Icon="{LucideIconContent RotateCcw}"
                             Command="{Binding $parent[v:TextDifferenceEditor].UndoBlockCommand}"
                             CommandParameter="{Binding ChangeId}"
                             Content="{I18N {x:Static LocaleKey.TextDifferenceEditor_RevertButton_Content}}"
-                            CornerRadius="2"
-                            IsVisible="{Binding Accepted, Converter={x:Static ObjectConverters.IsNotNull}}">
-                            <shadui:ButtonAssist.Icon>
-                              <LucideIcon
-                                Margin="0,0,2,0" Kind="RotateCcw"
-                                Size="16"/>
-                            </shadui:ButtonAssist.Icon>
-                          </Button>
-                        </Panel>
+                            IsVisible="{Binding Accepted, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+                        </StackPanel>
                       </Border>
                     </Panel>
                   </Border>

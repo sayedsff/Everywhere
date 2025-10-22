@@ -126,11 +126,20 @@ public partial class TextDifferenceEditor : TemplatedControl
         => sender.Rebuild();
 
     [RelayCommand]
-    private void ApplyBlock(string changeId)
+    private void AcceptBlock(string changeId)
     {
         var change = TextDifference?.Changes.FirstOrDefault(c => c.Id == changeId);
         if (change is null) return;
         change.Accepted = true;
+        Rebuild();
+    }
+    
+    [RelayCommand]
+    private void DiscardBlock(string changeId)
+    {
+        var change = TextDifference?.Changes.FirstOrDefault(c => c.Id == changeId);
+        if (change is null) return;
+        change.Accepted = false;
         Rebuild();
     }
 

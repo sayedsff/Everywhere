@@ -195,7 +195,7 @@ public partial class TextDifference : ObservableObject
 
     public void AcceptAll() => SetAll(true);
 
-    public void RejectAll() => SetAll(false);
+    public void DiscardAll() => SetAll(false);
 
     /// <summary>
     /// Wait until at least one change is accepted or all are rejected.

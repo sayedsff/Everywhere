@@ -1144,7 +1144,7 @@
     <data name="TextDifferenceSummaryView_EditButton_Content" xml:space="preserve">
         <value>编辑</value>
     </data>
-    <data name="TextDifferenceSummaryView_RejectAllButton_Content" xml:space="preserve">
+    <data name="TextDifferenceSummaryView_DiscardAllButton_Content" xml:space="preserve">
         <value>拒绝所有</value>
     </data>
     <data name="NativeChatPlugin_FileSystem_DeleteFiles_DeletionConsent_Header" xml:space="preserve">
@@ -1152,5 +1152,8 @@
     </data>
     <data name="NativeChatPlugin_FileSystem_DeleteFiles_SystemFile_DeletionConsent_Header" xml:space="preserve">
         <value>Everywhere wants to delete system file or directory</value>
+    </data>
+    <data name="TextDifferenceEditor_DiscardButton_Content" xml:space="preserve">
+        <value>拒绝</value>
     </data>
 </root>

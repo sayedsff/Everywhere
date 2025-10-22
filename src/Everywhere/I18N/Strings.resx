@@ -1145,7 +1145,7 @@ Placeholders can be used within the prompt, enclosed in {}, and will be replaced
         <value>Always allow</value>
     </data>
     <data name="TextDifferenceEditor_AcceptButton_Content" xml:space="preserve">
-        <value>Accpet</value>
+        <value>Accept</value>
     </data>
     <data name="TextDifferenceEditor_RevertButton_Content" xml:space="preserve">
         <value>Revert</value>
@@ -1162,13 +1162,16 @@ Placeholders can be used within the prompt, enclosed in {}, and will be replaced
     <data name="TextDifferenceSummaryView_EditButton_Content" xml:space="preserve">
         <value>Edit</value>
     </data>
-    <data name="TextDifferenceSummaryView_RejectAllButton_Content" xml:space="preserve">
-        <value>Reject All</value>
+    <data name="TextDifferenceSummaryView_DiscardAllButton_Content" xml:space="preserve">
+        <value>Discard All</value>
     </data>
     <data name="NativeChatPlugin_FileSystem_DeleteFiles_DeletionConsent_Header" xml:space="preserve">
         <value>Everywhere 想要删除 {0} 个文件或文件夹</value>
     </data>
     <data name="NativeChatPlugin_FileSystem_DeleteFiles_SystemFile_DeletionConsent_Header" xml:space="preserve">
         <value>Everywhere 想要删除系统文件</value>
+    </data>
+    <data name="TextDifferenceEditor_DiscardButton_Content" xml:space="preserve">
+        <value>Discard</value>
     </data>
 </root>
