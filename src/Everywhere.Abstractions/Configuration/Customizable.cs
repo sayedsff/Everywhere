@@ -30,13 +30,50 @@ public partial class Customizable<T> : ObservableObject where T : notnull
             {
                 // When setting from JSON deserialization, the value may be of a different type.
                 // Try to convert it to the correct type.
-                try
+                if (typeof(T).IsEnum)
                 {
-                    value = (T)Convert.ChangeType(value, typeof(T));
+                    // Enum is serialized as string (int or name)
+                    if (value is string enumString)
+                    {
+                        if (int.TryParse(enumString, out var enumValue))
+                        {
+                            value = Enum.ToObject(typeof(T), enumValue);
+                        }
+                        else
+                        {
+                            try
+                            {
+                                value = Enum.Parse(typeof(T), enumString, true);
+                            }
+                            catch
+                            {
+                                value = default(T);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        try
+                        {
+                            var enumInt = Convert.ToInt32(value);
+                            value = Enum.ToObject(typeof(T), enumInt);
+                        }
+                        catch
+                        {
+                            value = default(T);
+                        }
+                    }
                 }
-                catch
+                else
                 {
-                    value = default(T);
+                    try
+                    {
+                        value = (T)Convert.ChangeType(value, typeof(T));
+                    }
+                    catch
+                    {
+                        value = default(T);
+                    }
                 }
             }
 
