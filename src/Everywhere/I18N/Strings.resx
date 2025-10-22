@@ -197,6 +197,9 @@
     <data name="KeyboardHotkeyInputBox_Watermark" xml:space="preserve">
         <value>Click to set a hotkey</value>
     </data>
+    <data name="KeyboardHotkeyInputBox_SettingWatermark" xml:space="preserve">
+        <value>Setting...</value>
+    </data>
     <data name="ChatContext_Metadata_Title_Default" xml:space="preserve">
         <value>Unnamed session</value>
     </data>

@@ -577,20 +577,20 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
 
             switch ((WINDOW_MESSAGE)wParam)
             {
-                case WINDOW_MESSAGE.WM_KEYDOWN when keyModifiers == KeyModifiers.None:
+                case WINDOW_MESSAGE.WM_KEYDOWN or WINDOW_MESSAGE.WM_SYSKEYDOWN when keyModifiers == KeyModifiers.None:
                 {
                     PressingHotkey = PressingHotkey with { Key = virtualKey.ToAvaloniaKey() };
                     PressingHotkeyChanged?.Invoke(this, PressingHotkey);
                     break;
                 }
-                case WINDOW_MESSAGE.WM_KEYDOWN:
+                case WINDOW_MESSAGE.WM_KEYDOWN or WINDOW_MESSAGE.WM_SYSKEYDOWN:
                 {
                     _pressedKeyModifiers |= keyModifiers;
                     PressingHotkey = PressingHotkey with { Modifiers = _pressedKeyModifiers };
                     PressingHotkeyChanged?.Invoke(this, PressingHotkey);
                     break;
                 }
-                case WINDOW_MESSAGE.WM_KEYUP:
+                case WINDOW_MESSAGE.WM_KEYUP or WINDOW_MESSAGE.WM_SYSKEYUP:
                 {
                     _pressedKeyModifiers &= ~keyModifiers;
                     if (_pressedKeyModifiers == KeyModifiers.None)
