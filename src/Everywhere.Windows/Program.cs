@@ -76,7 +76,7 @@ public static class Program
 
                 #region Initialize
 
-                .AddTransient<IAsyncInitializer, HotkeyInitializer>()
+                .AddTransient<IAsyncInitializer, ChatWindowInitializer>()
                 .AddTransient<IAsyncInitializer, UpdaterInitializer>()
 
             #endregion

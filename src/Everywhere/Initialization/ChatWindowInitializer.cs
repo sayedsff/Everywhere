@@ -1,5 +1,4 @@
-﻿using Avalonia.Input;
-using Avalonia.Threading;
+﻿using Avalonia.Threading;
 using Everywhere.Common;
 using Everywhere.Configuration;
 using Everywhere.Interop;
@@ -8,14 +7,21 @@ using Microsoft.Extensions.Logging;
 
 namespace Everywhere.Initialization;
 
-public class HotkeyInitializer(
+/// <summary>
+/// Initializes the chat window hotkey listener and preloads the chat window.
+/// </summary>
+/// <param name="settings"></param>
+/// <param name="hotkeyListener"></param>
+/// <param name="visualElementContext"></param>
+/// <param name="logger"></param>
+public class ChatWindowInitializer(
     Settings settings,
     IHotkeyListener hotkeyListener,
     IVisualElementContext visualElementContext,
-    ILogger<HotkeyInitializer> logger
+    ILogger<ChatWindowInitializer> logger
 ) : IAsyncInitializer
 {
-    public AsyncInitializerPriority Priority => AsyncInitializerPriority.AfterSettings;
+    public AsyncInitializerPriority Priority => AsyncInitializerPriority.Startup;
 
     private readonly Lock _syncLock = new();
 
@@ -33,6 +39,14 @@ public class HotkeyInitializer(
         };
 
         HandleChatHotkeyChanged(settings.ChatWindow.Hotkey);
+
+        Dispatcher.UIThread.Invoke(() =>
+        {
+            // Preload ChatWindow to avoid delay on first open
+            var chatWindow = ServiceLocator.Resolve<ChatWindow>();
+            chatWindow.ViewModel.IsOpened = true;
+            chatWindow.ViewModel.IsOpened = false;
+        });
 
         return Task.CompletedTask;
     }
