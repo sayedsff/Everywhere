@@ -377,13 +377,6 @@
               <Setter Property="ToolTip.Tip" Value="Invalid"/>
             </Style>
 
-            <Style Selector="Button.Ghost">
-              <Setter Property="Padding" Value="4"/>
-              <Setter Property="MinHeight" Value="0"/>
-              <Setter Property="Height" Value="NaN"/>
-              <Setter Property="Cursor" Value="Hand"/>
-            </Style>
-
             <Style Selector="Button LucideIcon">
               <Setter Property="Size" Value="14"/>
             </Style>
@@ -564,14 +557,14 @@
                           Value="{Binding $parent[ContentControl].((chat:ChatMessageNode)DataContext).Parent.ChoiceIndex, FallbackValue=1, Converter={x:Static vc:Int32Converters.Plus}, ConverterParameter=1}"/>
 
                         <Button
-                          Classes="Ghost"
+                          Classes="Ghost Compact"
                           Command="{Binding $parent[v:ChatWindow].ViewModel.RetryCommand}"
                           CommandParameter="{Binding $parent[ContentControl].DataContext}"
                           ToolTip.Tip="{I18N {x:Static LocaleKey.ChatWindow_ChatMessage_Assistant_Regenerate}}">
                           <LucideIcon Kind="RefreshCcw"/>
                         </Button>
                         <Button
-                          Classes="Ghost"
+                          Classes="Ghost Compact"
                           Command="{Binding $parent[v:ChatWindow].ViewModel.CopyCommand}"
                           CommandParameter="{Binding}"
                           ToolTip.Tip="{I18N {x:Static LocaleKey.ChatWindow_ChatMessage_Assistant_Copy}}">
