@@ -74,8 +74,28 @@ public partial class TextDifferenceSummaryView : TemplatedControl
                 ShowLineNumbers = true
             }
         };
+        window.Closed += delegate
+        {
+            textDifference.TrySetAcceptanceResult();
+        };
 
         if (TopLevel.GetTopLevel(this) is Window owner) window.ShowDialog(owner);
         else window.Show();
+    }
+
+    [RelayCommand]
+    private void AcceptAll()
+    {
+        if (TextDifference is not { } textDifference) return;
+        textDifference.AcceptAll();
+        textDifference.TrySetAcceptanceResult();
+    }
+
+    [RelayCommand]
+    private void DiscardAll()
+    {
+        if (TextDifference is not { } textDifference) return;
+        textDifference.DiscardAll();
+        textDifference.TrySetAcceptanceResult();
     }
 }

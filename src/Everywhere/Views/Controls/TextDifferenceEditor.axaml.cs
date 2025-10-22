@@ -3,6 +3,7 @@ using Avalonia.Controls.Primitives;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Everywhere.Chat.Plugins;
+using ZLinq;
 
 namespace Everywhere.Views;
 
@@ -133,7 +134,7 @@ public partial class TextDifferenceEditor : TemplatedControl
         change.Accepted = true;
         Rebuild();
     }
-    
+
     [RelayCommand]
     private void DiscardBlock(string changeId)
     {
@@ -152,6 +153,22 @@ public partial class TextDifferenceEditor : TemplatedControl
         Rebuild();
     }
 
+    [RelayCommand]
+    private void AcceptAll()
+    {
+        if (TextDifference is null) return;
+        TextDifference.AcceptAll();
+        Rebuild();
+    }
+
+    [RelayCommand]
+    private void DiscardAll()
+    {
+        if (TextDifference is null) return;
+        TextDifference.DiscardAll();
+        Rebuild();
+    }
+
     private void Rebuild()
     {
         Blocks.Clear();
@@ -159,6 +176,7 @@ public partial class TextDifferenceEditor : TemplatedControl
 
         var opts = new TextDifferenceRenderOptions(OnlyAccepted, IncludePending, 0);
         var changes = TextDifference.GetFilteredChanges(opts)
+            .AsValueEnumerable()
             .OrderBy(c => c.Range.Start)
             .ToList();
 
@@ -166,7 +184,7 @@ public partial class TextDifferenceEditor : TemplatedControl
         var originalLines = SplitOriginalIntoLines(OriginalText); // List<(start, endInclBreak, content)>
         var lineIdx = 0; // current line index in original
         var lineNumber = 1; // current line number in original (1-based)
-        var newLineNumber = 1;  // new document line index (1-based, only accepted changes are applied conceptually)
+        var newLineNumber = 1; // new document line index (1-based, only accepted changes are applied conceptually)
         var cursor = 0; // current char cursor in original
 
         foreach (var change in changes)
@@ -206,91 +224,101 @@ public partial class TextDifferenceEditor : TemplatedControl
             var before = change.GetOriginalSlice(OriginalText);
             var after = change.NewText ?? string.Empty;
 
-            if (change.Accepted == true)
+            switch (change.Accepted)
             {
-                // Applied view -> render final content as Context
-                switch (change.Kind)
+                case true:
                 {
-                    case TextChangeKind.Insert:
-                    case TextChangeKind.Replace:
+                    // Applied view -> render final content as Context
+                    switch (change.Kind)
                     {
-                        foreach (var line in SplitLinesNoBreak(after))
+                        case TextChangeKind.Insert:
+                        case TextChangeKind.Replace:
                         {
+                            foreach (var line in SplitLinesNoBreak(after))
+                            {
+                                block.Lines.Add(
+                                    new TextDifferenceLine
+                                    {
+                                        LineNumber = lineNumber++,
+                                        Kind = TextDifferenceLineKind.Context,
+                                        Text = line
+                                    });
+                            }
+                            break;
+                        }
+                        case TextChangeKind.Delete:
+                        {
+                            // Applied delete -> nothing remains; keep a placeholder for Undo
                             block.Lines.Add(
                                 new TextDifferenceLine
                                 {
-                                    LineNumber = lineNumber++,
                                     Kind = TextDifferenceLineKind.Context,
-                                    Text = line
+                                    Text = string.Empty
                                 });
+
+                            // consume original lines covered by this delete
+                            while (lineIdx < originalLines.Count && originalLines[lineIdx].start < change.Range.End) lineIdx++;
+                            break;
                         }
-                        break;
                     }
-                    case TextChangeKind.Delete:
+
+                    if (!string.IsNullOrEmpty(after)) newLineNumber += after.AsValueEnumerable().Count(c => c == '\n');
+                    break;
+                }
+                case false:
+                {
+                    // Rejected view -> render original content as Context
+                    while (lineIdx < originalLines.Count && originalLines[lineIdx].start < change.Range.End)
                     {
-                        // Applied delete -> nothing remains; keep a placeholder for Undo
+                        block.Lines.Add(
+                            new TextDifferenceLine
+                            {
+                                LineNumber = lineNumber++,
+                                Kind = TextDifferenceLineKind.Context,
+                                Text = originalLines[lineIdx].content
+                            });
+                        lineIdx++;
+                    }
+
+                    if (block.Lines.Count == 0 && change.Kind == TextChangeKind.Insert)
+                    {
+                        // Rejected insert -> nothing remains; keep a placeholder for Undo
                         block.Lines.Add(
                             new TextDifferenceLine
                             {
                                 Kind = TextDifferenceLineKind.Context,
                                 Text = string.Empty
                             });
-
-                        // consume original lines covered by this delete
-                        while (lineIdx < originalLines.Count && originalLines[lineIdx].start < change.Range.End) lineIdx++;
-                        break;
                     }
+
+                    if (!string.IsNullOrEmpty(after)) newLineNumber += after.AsValueEnumerable().Count(c => c == '\n');
+                    break;
                 }
-            }
-            else
-            {
-                // Diff view
-                switch (change.Kind)
+                default:
                 {
-                    case TextChangeKind.Delete:
+                    // Diff view
+                    switch (change.Kind)
                     {
-                        // consume removed lines from original
-                        while (lineIdx < originalLines.Count && originalLines[lineIdx].start < change.Range.End)
+                        case TextChangeKind.Delete:
                         {
-                            block.Lines.Add(
-                                new TextDifferenceLine
-                                {
-                                    LineNumber = lineNumber++,
-                                    Kind = TextDifferenceLineKind.Removed,
-                                    Text = originalLines[lineIdx].content
-                                });
-                            lineIdx++;
+                            // consume removed lines from original
+                            while (lineIdx < originalLines.Count && originalLines[lineIdx].start < change.Range.End)
+                            {
+                                block.Lines.Add(
+                                    new TextDifferenceLine
+                                    {
+                                        LineNumber = lineNumber++,
+                                        Kind = TextDifferenceLineKind.Removed,
+                                        Text = originalLines[lineIdx].content
+                                    });
+                                lineIdx++;
+                            }
+                            break;
                         }
-                        break;
-                    }
 
-                    case TextChangeKind.Insert:
-                    {
-                        foreach (var line in SplitLinesNoBreak(after))
+                        case TextChangeKind.Insert:
                         {
-                            block.Lines.Add(
-                                new TextDifferenceLine
-                                {
-                                    NewLineNumber = newLineNumber++,
-                                    Kind = TextDifferenceLineKind.Added,
-                                    Text = line
-                                });
-                        }
-                        // insertion does not consume original lines
-                        break;
-                    }
-
-                    case TextChangeKind.Replace:
-                    {
-                        // Remember where this change starts in original
-                        var startLineIdx = lineIdx;
-
-                        var a = SplitLinesNoBreak(before);
-                        var b = SplitLinesNoBreak(after);
-
-                        foreach (var (kind, line, aIndex) in MergeReplaceLinesWithIndex(a, b))
-                        {
-                            if (kind == TextDifferenceLineKind.Added)
+                            foreach (var line in SplitLinesNoBreak(after))
                             {
                                 block.Lines.Add(
                                     new TextDifferenceLine
@@ -300,24 +328,50 @@ public partial class TextDifferenceEditor : TemplatedControl
                                         Text = line
                                     });
                             }
-                            else
-                            {
-                                // Context/Removed lines originate from original "a"
-                                block.Lines.Add(
-                                    new TextDifferenceLine
-                                    {
-                                        LineNumber = lineNumber++,
-                                        NewLineNumber = kind == TextDifferenceLineKind.Removed ? null : newLineNumber++,
-                                        Kind = kind,
-                                        Text = line
-                                    });
-                            }
+                            // insertion does not consume original lines
+                            break;
                         }
 
-                        // consume the original "a" lines
-                        lineIdx = startLineIdx + a.Length;
-                        break;
+                        case TextChangeKind.Replace:
+                        {
+                            // Remember where this change starts in original
+                            var startLineIdx = lineIdx;
+
+                            var a = SplitLinesNoBreak(before);
+                            var b = SplitLinesNoBreak(after);
+
+                            foreach (var (kind, line, _) in MergeReplaceLinesWithIndex(a, b))
+                            {
+                                if (kind == TextDifferenceLineKind.Added)
+                                {
+                                    block.Lines.Add(
+                                        new TextDifferenceLine
+                                        {
+                                            NewLineNumber = newLineNumber++,
+                                            Kind = TextDifferenceLineKind.Added,
+                                            Text = line
+                                        });
+                                }
+                                else
+                                {
+                                    // Context/Removed lines originate from original "a"
+                                    block.Lines.Add(
+                                        new TextDifferenceLine
+                                        {
+                                            LineNumber = lineNumber++,
+                                            NewLineNumber = kind == TextDifferenceLineKind.Removed ? null : newLineNumber++,
+                                            Kind = kind,
+                                            Text = line
+                                        });
+                                }
+                            }
+
+                            // consume the original "a" lines
+                            lineIdx = startLineIdx + a.Count;
+                            break;
+                        }
                     }
+                    break;
                 }
             }
 
@@ -346,7 +400,7 @@ public partial class TextDifferenceEditor : TemplatedControl
         // --- helpers ---
 
         // Split original into lines, preserving absolute start index and content text (no line break)
-        static List<(int start, int end, string content)> SplitOriginalIntoLines(string s)
+        static IReadOnlyList<(int start, int end, string content)> SplitOriginalIntoLines(string s)
         {
             var list = new List<(int start, int end, string content)>();
             int i = 0, start = 0;
@@ -380,9 +434,9 @@ public partial class TextDifferenceEditor : TemplatedControl
         }
 
         // Split by line breaks, no CR/LF in result
-        static string[] SplitLinesNoBreak(string s)
+        static IReadOnlyList<string> SplitLinesNoBreak(string s)
         {
-            if (string.IsNullOrEmpty(s)) return Array.Empty<string>();
+            if (string.IsNullOrEmpty(s)) return [];
             var list = new List<string>();
             int i = 0, start = 0;
             while (i < s.Length)
@@ -397,13 +451,15 @@ public partial class TextDifferenceEditor : TemplatedControl
             }
             if (start < s.Length) list.Add(s[start..]);
             if (list.Count == 0) list.Add(string.Empty);
-            return list.ToArray();
+            return list;
         }
 
         // LCS merge with A-index: equal->Context (from A), otherwise Removed/Added
-        static IEnumerable<(TextDifferenceLineKind kind, string line, int aIndex)> MergeReplaceLinesWithIndex(string[] a, string[] b)
+        static IEnumerable<(TextDifferenceLineKind kind, string line, int aIndex)> MergeReplaceLinesWithIndex(
+            IReadOnlyList<string> a,
+            IReadOnlyList<string> b)
         {
-            int n = a.Length, m = b.Length;
+            int n = a.Count, m = b.Count;
             var dp = new int[n + 1, m + 1];
             for (var i = n - 1; i >= 0; i--)
             for (var j = m - 1; j >= 0; j--)

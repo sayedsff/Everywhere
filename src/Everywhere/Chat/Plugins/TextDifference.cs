@@ -135,12 +135,12 @@ public partial class TextDifference : ObservableObject
             field = value;
             if (field != null) field.CollectionChanged += HandleChangesCollectionChanged;
             OnPropertyChanged();
-            OnPropertyChanged(nameof(Acceptance));
+            NotifyChangesPropertiesChanged();
         }
     } = [];
 
     /// <summary>
-    /// Indicates whether any changes are accepted (true), all rejected (false), or some pending (null).
+    /// Indicates whether any changes are accepted (true), all discarded (false), or some pending (null).
     /// </summary>
     public bool? Acceptance
     {
@@ -153,11 +153,16 @@ public partial class TextDifference : ObservableObject
                 if (change.Accepted.Value) acceptance = true;
             }
 
-            _acceptanceTcs?.TrySetResult(acceptance);
-
             return acceptance;
         }
     }
+
+    public int TotalChangesCount => Changes.Count;
+
+    /// <summary>
+    /// Count of changes that are not pending (i.e., Accepted is true or false).
+    /// </summary>
+    public int NotPendingChangesCount => Changes.Count(c => c.Accepted.HasValue);
 
     private TaskCompletionSource<bool>? _acceptanceTcs;
 
@@ -185,7 +190,14 @@ public partial class TextDifference : ObservableObject
 
     private void HandleChangePropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(TextChange.Accepted)) OnPropertyChanged(nameof(Acceptance));
+        if (e.PropertyName == nameof(TextChange.Accepted)) NotifyChangesPropertiesChanged();
+    }
+
+    private void NotifyChangesPropertiesChanged()
+    {
+        OnPropertyChanged(nameof(Acceptance));
+        OnPropertyChanged(nameof(TotalChangesCount));
+        OnPropertyChanged(nameof(NotPendingChangesCount));
     }
 
     public void Add(params TextChange[] changes)
@@ -207,6 +219,14 @@ public partial class TextDifference : ObservableObject
         _acceptanceTcs ??= new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
         cancellationToken.Register(() => _acceptanceTcs?.TrySetCanceled());
         return _acceptanceTcs.Task;
+    }
+
+    internal void TrySetAcceptanceResult()
+    {
+        var acceptance = Acceptance;
+        if (!acceptance.HasValue) return;
+        _acceptanceTcs?.TrySetResult(acceptance.Value);
+        _acceptanceTcs = null;
     }
 
     /// <summary>

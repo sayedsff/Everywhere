@@ -68,14 +68,14 @@
               shadui:ButtonAssist.HoverBackground="{DynamicResource SuccessColor10}"
               shadui:ButtonAssist.Icon="{LucideIconContent CheckCheck}"
               Background="{DynamicResource SuccessColor20}"
-              Command="{Binding TextDifference.AcceptAll, RelativeSource={RelativeSource TemplatedParent}, FallbackValue={x:Null}}"
+              Command="{Binding AcceptAllCommand, RelativeSource={RelativeSource TemplatedParent}, FallbackValue={x:Null}}"
               Content="{I18N {x:Static LocaleKey.TextDifferenceSummaryView_AcceptAllButton_Content}}"/>
             <Button
               Classes="Compact"
               shadui:ButtonAssist.HoverBackground="{DynamicResource ErrorColor10}"
               shadui:ButtonAssist.Icon="{LucideIconContent X}"
               Background="{DynamicResource ErrorColor20}"
-              Command="{Binding TextDifference.DiscardAll, RelativeSource={RelativeSource TemplatedParent}, FallbackValue={x:Null}}"
+              Command="{Binding DiscardAllCommand, RelativeSource={RelativeSource TemplatedParent}, FallbackValue={x:Null}}"
               Content="{I18N {x:Static LocaleKey.TextDifferenceSummaryView_DiscardAllButton_Content}}"/>
           </StackPanel>
         </StackPanel>
