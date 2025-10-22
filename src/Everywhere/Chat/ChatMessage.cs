@@ -1,5 +1,7 @@
 ﻿using System.Collections.Immutable;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Text;
 using System.Text.Json.Serialization;
 using Avalonia.Controls.Documents;
 using Avalonia.Threading;
@@ -118,7 +120,7 @@ public partial class AssistantChatMessage : ChatMessage
 
     public override string ToString()
     {
-        var builder = new System.Text.StringBuilder();
+        var builder = new StringBuilder();
         foreach (var span in Spans.AsValueEnumerable().Where(s => s.MarkdownBuilder.Length > 0))
         {
             builder.AppendLine(span.MarkdownBuilder.ToString());
@@ -312,6 +314,10 @@ public partial class FunctionCallChatMessage : ChatMessage, IChatMessageWithAtta
     [NotifyPropertyChangedFor(nameof(ElapsedSeconds))]
     public partial DateTimeOffset FinishedAt { get; set; } = DateTimeOffset.UtcNow;
 
+    [IgnoreMember]
+    [JsonIgnore]
+    public double ElapsedSeconds => Math.Max((FinishedAt - CreatedAt).TotalSeconds, 0);
+
     [Key(9)]
     [ObservableProperty]
     public partial DynamicResourceKeyBase? HeaderKey { get; set; }
@@ -321,7 +327,7 @@ public partial class FunctionCallChatMessage : ChatMessage, IChatMessageWithAtta
 
     [IgnoreMember]
     [JsonIgnore]
-    public double ElapsedSeconds => Math.Max((FinishedAt - CreatedAt).TotalSeconds, 0);
+    public bool IsWaitingForUserInput => DisplayBlocks.Any(db => db.IsWaitingForUserInput);
 
     /// <summary>
     /// Attachments associated with this action message. Used to provide additional context of a tool call result.
@@ -336,6 +342,32 @@ public partial class FunctionCallChatMessage : ChatMessage, IChatMessageWithAtta
     {
         Icon = icon;
         HeaderKey = headerKey;
+
+        DisplayBlocks.CollectionChanged += (_, e) =>
+        {
+            OnPropertyChanged(nameof(IsWaitingForUserInput));
+
+            if (e.NewItems is { } newItems)
+            {
+                foreach (var item in newItems.OfType<ChatPluginDisplayBlock>())
+                {
+                    item.PropertyChanged += HandleDisplayBlockPropertyChanged;
+                }
+            }
+
+            if (e.OldItems is { } oldItems)
+            {
+                foreach (var item in oldItems.OfType<ChatPluginDisplayBlock>())
+                {
+                    item.PropertyChanged -= HandleDisplayBlockPropertyChanged;
+                }
+            }
+        };
+
+        void HandleDisplayBlockPropertyChanged(object? sender, PropertyChangedEventArgs args)
+        {
+            if (args.PropertyName == nameof(ChatPluginDisplayBlock.IsWaitingForUserInput)) OnPropertyChanged(nameof(IsWaitingForUserInput));
+        }
     }
 
     public void AppendText(string text)

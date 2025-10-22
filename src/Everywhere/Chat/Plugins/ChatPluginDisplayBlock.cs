@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using CommunityToolkit.Mvvm.ComponentModel;
 using LiveMarkdown.Avalonia;
 using MessagePack;
@@ -15,7 +16,14 @@ namespace Everywhere.Chat.Plugins;
 [Union(3, typeof(ChatPluginProgressDisplayBlock))]
 [Union(4, typeof(ChatPluginFileReferenceDisplayBlock))]
 [Union(5, typeof(ChatPluginFileDifferenceDisplayBlock))]
-public abstract partial class ChatPluginDisplayBlock : ObservableObject;
+public abstract partial class ChatPluginDisplayBlock : ObservableObject
+{
+    /// <summary>
+    /// Indicates whether this display block is waiting for user input.
+    /// </summary>
+    [IgnoreMember]
+    public virtual bool IsWaitingForUserInput => false;
+}
 
 [MessagePackObject(AllowPrivate = true, OnlyIncludeKeyedMembers = true)]
 public sealed partial class ChatPluginTextDisplayBlock(string text) : ChatPluginDisplayBlock
@@ -77,8 +85,23 @@ public sealed partial class ChatPluginFileDifferenceDisplayBlock(TextDifference 
 
     public string? OriginalText { get; init; }
 
+    public override bool IsWaitingForUserInput => Difference.Acceptance is null;
+
     public ChatPluginFileDifferenceDisplayBlock(TextDifference difference, string originalText) : this(difference)
     {
         OriginalText = originalText;
+
+        // Only subscribe to property changes in this constructor since deserialization will not change the Difference property.
+        difference.PropertyChanged += HandleDifferencePropertyChanged;
+    }
+
+    /// <summary>
+    /// Handles property changes on the TextDifference to update the IsWaitingForUserInput property.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void HandleDifferencePropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(TextDifference.Acceptance)) OnPropertyChanged(nameof(IsWaitingForUserInput));
     }
 }

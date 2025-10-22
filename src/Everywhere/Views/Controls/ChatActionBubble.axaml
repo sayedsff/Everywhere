@@ -37,7 +37,7 @@
               MinHeight="0"
               Padding="{TemplateBinding Padding}"
               CornerRadius="{TemplateBinding CornerRadius}"
-              IsChecked="True">
+              IsChecked="{TemplateBinding IsExpanded, Mode=TwoWay}">
               <StackPanel
                 Orientation="Horizontal" Spacing="4">
                 <LucideIcon
@@ -95,7 +95,9 @@
                   Property="IsError"/>
               </MultiBinding>
             </Border.IsVisible>
-            <ContentPresenter Content="{TemplateBinding Content}"/>
+            <ContentPresenter
+              Margin="8,0,0,0"
+              Content="{TemplateBinding Content}"/>
           </Border>
 
           <Border
@@ -109,7 +111,9 @@
                 <TemplateBinding Property="IsError"/>
               </MultiBinding>
             </Border.IsVisible>
-            <ContentPresenter Content="{TemplateBinding ErrorContent}"/>
+            <ContentPresenter
+              Margin="8,0,0,0"
+              Content="{TemplateBinding ErrorContent}"/>
           </Border>
         </StackPanel>
       </ControlTemplate>

@@ -58,4 +58,13 @@ public class ChatActionBubble : ContentControl
         get => GetValue(IconProperty);
         set => SetValue(IconProperty, value);
     }
+
+    public static readonly StyledProperty<bool> IsExpandedProperty =
+        AvaloniaProperty.Register<ChatActionBubble, bool>(nameof(IsExpanded), true);
+
+    public bool IsExpanded
+    {
+        get => GetValue(IsExpandedProperty);
+        set => SetValue(IsExpandedProperty, value);
+    }
 }

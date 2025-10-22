@@ -453,6 +453,7 @@
             </Style>
 
             <Style Selector="ContentControl.ChatMessage">
+              <Setter Property="ClipToBounds" Value="False"/>
               <Setter Property="at:DataTemplatesAttach.DataTemplates">
                 <DataTemplates>
                   <DataTemplate DataType="chat:AssistantChatMessage">
@@ -462,7 +463,7 @@
                       <ItemsControl ItemsSource="{Binding Spans, Converter={x:Static vc:ObservableListConverters.ObservableOnDispatcher}}">
                         <ItemsControl.ItemsPanel>
                           <ItemsPanelTemplate>
-                            <StackPanel/>
+                            <StackPanel Spacing="8"/>
                           </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
 
@@ -490,11 +491,12 @@
                                 MarkdownBuilder="{Binding MarkdownBuilder}"/>
 
                               <ItemsControl
+                                ClipToBounds="False"
                                 IsVisible="{Binding !!$self.ItemCount}"
                                 ItemsSource="{Binding FunctionCalls, Converter={x:Static vc:ObservableListConverters.ObservableOnDispatcher}}">
                                 <ItemsControl.ItemsPanel>
                                   <ItemsPanelTemplate>
-                                    <StackPanel Spacing="4"/>
+                                    <StackPanel Spacing="8"/>
                                   </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
 
@@ -696,17 +698,57 @@
 
                   <DataTemplate DataType="chat:FunctionCallChatMessage">
                     <v:ChatActionBubble
+                      x:Name="FunctionCallChatActionBubble" AdornerLayer.IsClipEnabled="False"
+                      ClipToBounds="False"
                       ElapsedSeconds="{Binding ElapsedSeconds}"
                       Header="{Binding HeaderKey^, FallbackValue={x:Null}}"
                       Icon="{Binding Icon}"
                       IsBusy="{Binding IsBusy}"
-                      IsError="{Binding ErrorMessageKey, Converter={x:Static ObjectConverters.IsNotNull}}">
+                      IsError="{Binding ErrorMessageKey, Converter={x:Static ObjectConverters.IsNotNull}}"
+                      IsExpanded="{Binding IsWaitingForUserInput, Mode=OneWay}">
+                      <AdornerLayer.Adorner>
+                        <shadui:Badge
+                          Width="20" Height="20"
+                          Margin="0,-8,-8,0" Padding="0"
+                          HorizontalAlignment="Right" VerticalAlignment="Top"
+                          Background="{DynamicResource ErrorColor}"
+                          Content="!" CornerRadius="10"
+                          FontSize="10">
+                          <shadui:Badge.IsVisible>
+                            <MultiBinding Converter="{x:Static BoolConverters.And}">
+                              <Binding Path="!#FunctionCallChatActionBubble.IsExpanded"/>
+                              <Binding Path="IsWaitingForUserInput"/>
+                            </MultiBinding>
+                          </shadui:Badge.IsVisible>
+
+                          <shadui:Badge.Styles>
+                            <Style Selector="ContentPresenter">
+                              <Style.Animations>
+                                <Animation
+                                  IterationCount="Infinite" Duration="0:0:2">
+                                  <KeyFrame Cue="0%">
+                                    <Setter Property="Opacity" Value="1.0"/>
+                                  </KeyFrame>
+                                  <KeyFrame Cue="50%">
+                                    <Setter Property="Opacity" Value="0.5"/>
+                                  </KeyFrame>
+                                  <KeyFrame Cue="100%">
+                                    <Setter Property="Opacity" Value="1.0"/>
+                                  </KeyFrame>
+                                </Animation>
+                              </Style.Animations>
+                            </Style>
+                          </shadui:Badge.Styles>
+                        </shadui:Badge>
+                      </AdornerLayer.Adorner>
+
                       <v:ChatActionBubble.ErrorContent>
                         <SelectableTextBlock
                           Classes="Muted" Margin="6,4"
                           FontSize="13"
                           Text="{Binding ErrorMessageKey^, FallbackValue={x:Null}}"/>
                       </v:ChatActionBubble.ErrorContent>
+
                       <ItemsControl ItemsSource="{Binding DisplayBlocks}">
                         <ItemsControl.DataTemplates>
                           <DataTemplate DataType="plugins:ChatPluginTextDisplayBlock">
