@@ -10,12 +10,6 @@
       Padding="8"
       Expanded="{Binding Settings.Internal.IsMainViewSidebarExpanded}"
       SelectedSidebarItem="{Binding SelectedPage, Mode=TwoWay}">
-      <shadui:Sidebar.Styles>
-        <Style Selector="LucideIcon">
-          <Setter Property="Foreground" Value="{Binding $parent[shadui:SidebarItem].Foreground}"/>
-        </Style>
-      </shadui:Sidebar.Styles>
-
       <shadui:Sidebar.Header>
         <Border
           Width="48" Height="48"
