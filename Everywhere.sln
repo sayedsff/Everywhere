@@ -22,6 +22,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		ThirdPartyNotices.txt = ThirdPartyNotices.txt
 		CHANGELOG.md = CHANGELOG.md
 		DATA_AND_PRIVACY.md = DATA_AND_PRIVACY.md
+		global.json = global.json
+		nuget.config = nuget.config
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3rd", "3rd", "{53D93485-1520-4753-81CE-DA1CFF334372}"
@@ -167,16 +169,12 @@ Global
 		{BCD7009B-3ACA-4FD4-8C64-70DCD2E39D4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BCD7009B-3ACA-4FD4-8C64-70DCD2E39D4F}.Debug|ARM64.ActiveCfg = Debug|Any CPU
 		{BCD7009B-3ACA-4FD4-8C64-70DCD2E39D4F}.Debug|ARM64.Build.0 = Debug|Any CPU
-		{BCD7009B-3ACA-4FD4-8C64-70DCD2E39D4F}.Debug|x64.ActiveCfg = Debug|x64
-		{BCD7009B-3ACA-4FD4-8C64-70DCD2E39D4F}.Debug|x64.Build.0 = Debug|x64
 		{BCD7009B-3ACA-4FD4-8C64-70DCD2E39D4F}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{BCD7009B-3ACA-4FD4-8C64-70DCD2E39D4F}.Debug|x86.Build.0 = Debug|Any CPU
 		{BCD7009B-3ACA-4FD4-8C64-70DCD2E39D4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BCD7009B-3ACA-4FD4-8C64-70DCD2E39D4F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BCD7009B-3ACA-4FD4-8C64-70DCD2E39D4F}.Release|ARM64.ActiveCfg = Release|Any CPU
 		{BCD7009B-3ACA-4FD4-8C64-70DCD2E39D4F}.Release|ARM64.Build.0 = Release|Any CPU
-		{BCD7009B-3ACA-4FD4-8C64-70DCD2E39D4F}.Release|x64.ActiveCfg = Release|x64
-		{BCD7009B-3ACA-4FD4-8C64-70DCD2E39D4F}.Release|x64.Build.0 = Release|x64
 		{BCD7009B-3ACA-4FD4-8C64-70DCD2E39D4F}.Release|x86.ActiveCfg = Release|Any CPU
 		{BCD7009B-3ACA-4FD4-8C64-70DCD2E39D4F}.Release|x86.Build.0 = Release|Any CPU
 		{0E6C8529-D309-43F3-90BC-619EF9E6B1F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
