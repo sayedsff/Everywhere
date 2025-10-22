@@ -1,0 +1,30 @@
+﻿<ResourceDictionary
+  xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:v="using:Everywhere.Views">
+  <Design.PreviewWith>
+    <v:ConsentDecisionCard/>
+  </Design.PreviewWith>
+
+  <ControlTheme
+    x:Key="{x:Type v:ConsentDecisionCard}"
+    TargetType="v:ConsentDecisionCard">
+    <Setter Property="Header">
+      <DockPanel
+        HorizontalSpacing="4" LastChildFill="True">
+        <Button
+          Classes="Ghost" DockPanel.Dock="Right"
+          Content="{I18N {x:Static LocaleKey.ConsentDecision_AlwaysAllow}}"/>
+        <ContentPresenter Content="{Binding $parent[v:ConsentDecisionCard].Header}"/>
+      </DockPanel>
+    </Setter>
+    <Setter Property="Footer">
+      <StackPanel Spacing="4">
+        <Button
+          Classes="Primary"
+          Content="{I18N {x:Static LocaleKey.ConsentDecision_AllowOnce}}"/>
+        <Button Content="{I18N {x:Static LocaleKey.ConsentDecision_AllowSession}}"/>
+        <Button Content="{I18N {x:Static LocaleKey.ConsentDecision_Deny}}"/>
+      </StackPanel>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

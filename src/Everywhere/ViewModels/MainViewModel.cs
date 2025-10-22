@@ -62,14 +62,14 @@ public partial class MainViewModel(IServiceProvider serviceProvider, Settings se
         {
             DialogManager
                 .CreateDialog(ServiceLocator.Resolve<WelcomeView>())
-                .Show();
+                .ShowAsync();
         }
         else if (previousLaunchVersion != version)
         {
             DialogManager
                 .CreateDialog(ServiceLocator.Resolve<ChangeLogView>())
                 .Dismissible()
-                .Show();
+                .ShowAsync();
         }
 
         settings.Internal.PreviousLaunchVersion = version?.ToString();

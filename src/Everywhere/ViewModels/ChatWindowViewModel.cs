@@ -3,24 +3,27 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Avalonia.Input;
-using Avalonia.Input.Platform;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Everywhere.Chat;
+using Everywhere.Chat.Permissions;
+using Everywhere.Chat.Plugins;
 using Everywhere.Common;
 using Everywhere.Configuration;
 using Everywhere.Interop;
 using Everywhere.Storage;
 using Everywhere.Utilities;
+using Everywhere.Views;
 using Lucide.Avalonia;
 using Microsoft.Extensions.Logging;
 using ObservableCollections;
+using ShadUI;
 using ZLinq;
 
 namespace Everywhere.ViewModels;
 
-public partial class ChatWindowViewModel : BusyViewModelBase
+public partial class ChatWindowViewModel : BusyViewModelBase, IEventSubscriber<ChatPluginConsentRequest>
 {
     public Settings Settings { get; }
 
@@ -215,7 +218,7 @@ public partial class ChatWindowViewModel : BusyViewModelBase
                 _logger.LogWarning("Clipboard is empty.");
                 return;
             }
-            
+
             //if (formats.Contains(DataFormat.File))
             if (formats.Contains(DataFormats.Files))
             {
@@ -447,5 +450,14 @@ public partial class ChatWindowViewModel : BusyViewModelBase
             RetryCommand.NotifyCanExecuteChanged();
             CancelCommand.NotifyCanExecuteChanged();
         }
+    }
+
+    public void HandleEvent(ChatPluginConsentRequest @event)
+    {
+        var card = new ConsentDecisionCard();
+        DialogManager
+            .CreateDialog(card)
+            .ShowAsync()
+            .ContinueWith(_ => @event.Promise.TrySetResult(card.SelectedConsent ?? ConsentDecision.Deny));
     }
 }
