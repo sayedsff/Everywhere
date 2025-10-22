@@ -1,7 +1,5 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Input.Platform;
-using Avalonia.Platform.Storage;
 using Everywhere.AI;
 using Everywhere.Chat;
 using Everywhere.Chat.Plugins;
@@ -10,10 +8,6 @@ using Everywhere.Configuration;
 using Everywhere.Extensions;
 using Everywhere.Initialization;
 using Everywhere.Interop;
-using Everywhere.ViewModels;
-using Everywhere.Views;
-using Everywhere.Views.Configuration;
-using Everywhere.Views.Pages;
 using Everywhere.Windows.Chat.Plugins;
 using Everywhere.Windows.Configuration;
 using Everywhere.Windows.Interop;

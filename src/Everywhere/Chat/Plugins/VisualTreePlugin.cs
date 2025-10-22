@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 using Everywhere.AI;
-using Everywhere.Configuration;
 using Everywhere.Database;
 using Everywhere.Interop;
 using Everywhere.Storage;
@@ -17,13 +16,11 @@ public class VisualTreePlugin : BuiltInChatPlugin
 
     private readonly IBlobStorage _blobStorage;
     private readonly IVisualElementContext _visualElementContext;
-    private readonly Settings _settings;
 
-    public VisualTreePlugin(IBlobStorage blobStorage, IVisualElementContext visualElementContext, Settings settings) : base("visual_tree")
+    public VisualTreePlugin(IBlobStorage blobStorage, IVisualElementContext visualElementContext) : base("visual_tree")
     {
         _blobStorage = blobStorage;
         _visualElementContext = visualElementContext;
-        _settings = settings;
 
         _functions.Add(
             new NativeChatFunction(

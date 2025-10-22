@@ -196,7 +196,7 @@ public class JsonDynamicResourceKey : Dictionary<string, string>, IObservable<ob
     public IDisposable Subscribe(IObserver<object?> observer)
     {
         LocaleManager.LocaleChanged += HandleLocaleChanged;
-        PostValue(LocaleManager.CurrentLocale ?? "default");
+        PostValue(LocaleManager.CurrentLocale);
 
         return new AnonymousDisposable(() =>
         {

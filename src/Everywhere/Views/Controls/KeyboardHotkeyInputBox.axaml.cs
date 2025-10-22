@@ -3,7 +3,6 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Everywhere.Common;
-using Everywhere.Configuration;
 using Everywhere.Interop;
 using Everywhere.Utilities;
 
