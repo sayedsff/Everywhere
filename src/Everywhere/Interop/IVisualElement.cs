@@ -88,6 +88,12 @@ public interface IVisualElement
     /// </remarks>
     string? GetText(int maxLength = -1);
 
+    // /// <summary>
+    // /// Get the selected text of the visual element.
+    // /// </summary>
+    // /// <returns></returns>
+    // string? GetSelectionText();
+
     Task<Bitmap> CaptureAsync();
 }
 

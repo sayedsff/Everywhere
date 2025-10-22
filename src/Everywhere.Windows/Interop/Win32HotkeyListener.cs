@@ -1,5 +1,4 @@
-﻿using System.Runtime.InteropServices;
-using Windows.Win32;
+﻿using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Windows.Win32.UI.WindowsAndMessaging;
@@ -11,7 +10,7 @@ namespace Everywhere.Windows.Interop;
 
 public unsafe class Win32HotkeyListener : IHotkeyListener
 {
-    private static HWND _hwnd;
+    private static HWND HWnd => Win32MessageWindow.Shared.HWnd;
 
     // Unique id generator for RegisterHotKey
     private static int _nextId = 1;
@@ -47,9 +46,15 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
 
     static Win32HotkeyListener()
     {
-        var t = new Thread(WindowLoop) { IsBackground = true, Name = "HotkeyWindow", };
-        t.SetApartmentState(ApartmentState.STA);
-        t.Start();
+        Win32MessageWindow.Shared.AddHandler(
+            (uint)WINDOW_MESSAGE.WM_HOTKEY,
+            static (in msg) =>
+            {
+                var id = (int)msg.wParam.Value;
+                OsReg? bundle;
+                lock (SyncLock) IdToOsReg.TryGetValue(id, out bundle);
+                if (bundle is not null) InvokeHandlers(bundle.Handlers);
+            });
     }
 
     public IKeyboardHotkeyScope StartCaptureKeyboardHotkey()
@@ -65,7 +70,7 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
     {
         if (hotkey.Key == Key.None || hotkey.Modifiers == KeyModifiers.None)
             throw new ArgumentException("Invalid keyboard hotkey.", nameof(hotkey));
-        if (handler is null) throw new ArgumentNullException(nameof(handler));
+        ArgumentNullException.ThrowIfNull(handler);
 
         lock (SyncLock)
         {
@@ -84,7 +89,7 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
             if (hotkey.Modifiers.HasFlag(KeyModifiers.Meta)) mods |= HOT_KEY_MODIFIERS.MOD_WIN;
 
             var id = _nextId++;
-            if (PInvoke.RegisterHotKey(_hwnd, id, mods, (uint)hotkey.Key.ToVirtualKey()))
+            if (PInvoke.RegisterHotKey(HWnd, id, mods, (uint)hotkey.Key.ToVirtualKey()))
             {
                 var bundle = new OsReg(id, new List<Action> { handler });
                 OsRegs[hotkey] = bundle;
@@ -126,7 +131,7 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
             // Unregister all OS hotkeys
             foreach (var kv in OsRegs)
             {
-                PInvoke.UnregisterHotKey(_hwnd, kv.Value.Id);
+                PInvoke.UnregisterHotKey(HWnd, kv.Value.Id);
             }
             OsRegs.Clear();
             IdToOsReg.Clear();
@@ -149,57 +154,19 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
         }
     }
 
-    // ---------- window & message loop ----------
-
-    private static void WindowLoop()
-    {
-        using var hModule = PInvoke.GetModuleHandle(null);
-        _hwnd = PInvoke.CreateWindowEx(
-            WINDOW_EX_STYLE.WS_EX_NOACTIVATE,
-            "STATIC",
-            "Everywhere.MultiHotkeyWindow",
-            WINDOW_STYLE.WS_POPUP,
-            0, 0, 0, 0,
-            HWND.Null,
-            null,
-            hModule,
-            null);
-
-        if (_hwnd.IsNull)
-            Marshal.ThrowExceptionForHR(Marshal.GetLastWin32Error());
-
-        MSG msg;
-        while (PInvoke.GetMessage(&msg, HWND.Null, 0, 0) != 0)
-        {
-            switch (msg.message)
-            {
-                case (uint)WINDOW_MESSAGE.WM_HOTKEY:
-                {
-                    var id = (int)msg.wParam.Value;
-                    OsReg? bundle;
-                    lock (SyncLock)
-                    {
-                        IdToOsReg.TryGetValue(id, out bundle);
-                    }
-                    if (bundle is not null)
-                    {
-                        // Invoke OS-registered handlers
-                        InvokeHandlers(bundle.Handlers);
-                    }
-                    break;
-                }
-            }
-
-            PInvoke.DispatchMessage(&msg);
-        }
-    }
-
     private static void InvokeHandlers(List<Action> handlers)
     {
         // Execute handlers safely; avoid holding locks while invoking.
         foreach (var handler in handlers.ToArray())
         {
-            try { handler(); } catch { /* swallow */ }
+            try
+            {
+                handler();
+            }
+            catch
+            {
+                /* swallow */
+            }
         }
     }
 
@@ -247,7 +214,10 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
         // Execute handlers outside the lock
         foreach (var h in handlers)
         {
-            try { h(); } catch { /* swallow */ }
+            try { h(); }
+            catch
+            { /* swallow */
+            }
         }
 
         // Send a dummy key-up to prevent Start menu from activating on Win-key release
@@ -376,7 +346,7 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
 
             OsRegs.Remove(hotkey);
             IdToOsReg.Remove(bundle.Id);
-            PInvoke.UnregisterHotKey(_hwnd, bundle.Id);
+            PInvoke.UnregisterHotKey(HWnd, bundle.Id);
         }
     }
 
@@ -449,7 +419,7 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
         public MouseHotkey Hotkey { get; } = hotkey;
         public Action Handler { get; } = handler;
         private Timer? _timer;
-        private int _armed;    // 1 when button is considered pressed/pending
+        private int _armed; // 1 when button is considered pressed/pending
 
         public void OnDown()
         {
@@ -463,13 +433,17 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
             }
 
             CancelTimer(); // defensive
-            _timer = new Timer(_ =>
-            {
-                if (Interlocked.CompareExchange(ref _armed, 1, 1) == 1)
+            _timer = new Timer(
+                _ =>
                 {
-                    SafeInvoke();
-                }
-            }, null, Hotkey.Delay, Timeout.InfiniteTimeSpan);
+                    if (Interlocked.CompareExchange(ref _armed, 1, 1) == 1)
+                    {
+                        SafeInvoke();
+                    }
+                },
+                null,
+                Hotkey.Delay,
+                Timeout.InfiniteTimeSpan);
         }
 
         public void OnUp()
@@ -486,7 +460,10 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
 
         private void SafeInvoke()
         {
-            try { Handler(); } catch { /* swallow */ }
+            try { Handler(); }
+            catch
+            { /* swallow */
+            }
         }
     }
 

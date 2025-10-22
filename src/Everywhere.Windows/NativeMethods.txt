@@ -13,22 +13,36 @@ GetWindowPlacement
 SetLayeredWindowAttributes
 GetForegroundWindow
 SetForegroundWindow
+SetWindowPos
+SetActiveWindow
+IsIconic
+SetFocus
+HWND_BOTTOM
+HWND_TOPMOST
 
 GetMessage
 TranslateMessage
 DispatchMessage
 PostMessage
+SendMessage
 SetTimer
 KillTimer
 SetWinEventHook
 UnhookWinEvent
 RegisterHotKey
 UnregisterHotKey
+WM_COPY
+
+GetWindowThreadProcessId
+GetCurrentThreadId
+AttachThreadInput
+GetFocus
 
 GetCursorPos
 SetCapture
 ReleaseCapture
 SendInput
+GetAsyncKeyState
 SetCursorPos
 BlockInput
 SetWindowsHookEx
@@ -53,6 +67,7 @@ GetCurrentProcessId
 GetModuleHandle
 EnumWindows
 
+AddClipboardFormatListener
 OpenClipboard
 CloseClipboard
 GetClipboardData
@@ -60,6 +75,7 @@ GetDIBits
 GetObject
 BITMAP
 BI_COMPRESSION
+WM_CLIPBOARDUPDATE
 
 CreateDispatcherQueueController
 SIZE

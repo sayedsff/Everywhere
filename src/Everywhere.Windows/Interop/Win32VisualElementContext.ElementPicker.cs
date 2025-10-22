@@ -19,7 +19,7 @@ public partial class Win32VisualElementContext
     private class ElementPicker : Window
     {
         private readonly Win32VisualElementContext _context;
-        private readonly INativeHelper _nativeHelper;
+        private readonly IWindowHelper _windowHelper;
         private readonly PickElementMode _mode;
 
         private readonly PixelRect _screenBounds;
@@ -34,11 +34,11 @@ public partial class Win32VisualElementContext
 
         private ElementPicker(
             Win32VisualElementContext context,
-            INativeHelper nativeHelper,
+            IWindowHelper windowHelper,
             PickElementMode mode)
         {
             _context = context;
-            _nativeHelper = nativeHelper;
+            _windowHelper = windowHelper;
             _mode = mode;
 
             var allScreens = Screens.All;
@@ -113,7 +113,7 @@ public partial class Win32VisualElementContext
 
         protected override void OnPointerPressed(PointerPressedEventArgs e)
         {
-            _nativeHelper.SetWindowHitTestInvisible(this);
+            _windowHelper.SetHitTestVisible(this, false);
 
             if (PInvoke.GetCursorPos(out var point)) Pick(point);
         }
@@ -206,10 +206,10 @@ public partial class Win32VisualElementContext
 
         public static Task<IVisualElement?> PickAsync(
             Win32VisualElementContext context,
-            INativeHelper nativeHelper,
+            IWindowHelper windowHelper,
             PickElementMode mode)
         {
-            var window = new ElementPicker(context, nativeHelper, mode);
+            var window = new ElementPicker(context, windowHelper, mode);
             window.Show();
             return window._taskCompletionSource.Task;
         }

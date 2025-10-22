@@ -43,6 +43,7 @@ public static class Program
                 .AddSingleton<IVisualElementContext, Win32VisualElementContext>()
                 .AddSingleton<IHotkeyListener, Win32HotkeyListener>()
                 .AddSingleton<INativeHelper, Win32NativeHelper>()
+                .AddSingleton<IWindowHelper, Win32WindowHelper>()
                 .AddSingleton<ISoftwareUpdater, SoftwareUpdater>()
                 .AddSettings()
                 .AddWatchdogManager()
