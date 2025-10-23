@@ -33,8 +33,7 @@
             </Border.Styles>
 
             <ToggleButton
-              x:Name="PART_ToggleButton" Classes="Ghost"
-              MinHeight="0"
+              Classes="Ghost" MinHeight="0"
               Padding="{TemplateBinding Padding}"
               CornerRadius="{TemplateBinding CornerRadius}"
               IsChecked="{TemplateBinding IsExpanded, Mode=TwoWay}">
@@ -88,8 +87,7 @@
             BorderThickness="3,0,0,0" CornerRadius="3">
             <Border.IsVisible>
               <MultiBinding Converter="{x:Static BoolConverters.And}">
-                <Binding
-                  ElementName="PART_ToggleButton" Path="IsChecked"/>
+                <TemplateBinding Property="IsEffectivelyExpanded"/>
                 <TemplateBinding
                   Converter="{x:Static BoolConverters.Not}"
                   Property="IsError"/>
@@ -106,8 +104,7 @@
             BorderThickness="3,0,0,0" CornerRadius="3">
             <Border.IsVisible>
               <MultiBinding Converter="{x:Static BoolConverters.And}">
-                <Binding
-                  ElementName="PART_ToggleButton" Path="IsChecked"/>
+                <TemplateBinding Property="IsEffectivelyExpanded"/>
                 <TemplateBinding Property="IsError"/>
               </MultiBinding>
             </Border.IsVisible>

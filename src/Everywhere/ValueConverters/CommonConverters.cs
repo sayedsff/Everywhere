@@ -29,7 +29,10 @@ public static class CommonConverters
 
     public static IMultiValueConverter AllEquals { get; } = new AllEqualsConverter();
 
-    public static IMultiValueConverter FirstNonNull { get; } = new FirstNonNullConverter();
+    /// <summary>
+    /// Returns the first non-null and non-UnsetValue value from the input values.
+    /// </summary>
+    public static IMultiValueConverter FirstNotNull { get; } = new FirstNonNullConverter();
 
     private class DefaultMultiValueConverter : IMultiValueConverter
     {

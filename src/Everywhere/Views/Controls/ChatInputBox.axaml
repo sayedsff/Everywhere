@@ -13,8 +13,10 @@
     TargetType="v:ChatInputBox">
 
     <Style Selector="^ /template/ ToggleButton.Rounded">
-      <Setter Property="Height" Value="30"/>
       <Setter Property="MinHeight" Value="30"/>
+      <Setter Property="Height" Value="30"/>
+      <Setter Property="MinWidth" Value="30"/>
+      <Setter Property="Width" Value="30"/>
       <Setter Property="Padding" Value="8,0"/>
       <Setter Property="CornerRadius" Value="15"/>
     </Style>
