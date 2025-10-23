@@ -28,6 +28,7 @@ using PixelFormat = System.Drawing.Imaging.PixelFormat;
 using Point = System.Drawing.Point;
 using Size = System.Drawing.Size;
 using Vector = Avalonia.Vector;
+using WindowState = Avalonia.Controls.WindowState;
 
 namespace Everywhere.Windows.Interop;
 
@@ -97,19 +98,8 @@ public partial class Win32VisualElementContext : IVisualElementContext
         return !PInvoke.GetCursorPos(out var point) ? null : ElementFromPoint(new PixelPoint(point.X, point.Y), mode);
     }
 
-    public async Task<IVisualElement?> PickElementAsync(PickElementMode mode)
-    {
-        if (Application.Current is not { ApplicationLifetime: ClassicDesktopStyleApplicationLifetime desktopLifetime })
-        {
-            return null;
-        }
-
-        var windows = desktopLifetime.Windows.AsValueEnumerable().Where(w => w.IsVisible).ToList();
-        foreach (var window in windows) _windowHelper.SetCloaked(window, true);
-        var result = await ElementPicker.PickAsync(this, _windowHelper, mode);
-        foreach (var window in windows) window.IsVisible = true;
-        return result;
-    }
+    public Task<IVisualElement?> PickElementAsync(PickElementMode mode) =>
+        ElementPickerWindow.PickAsync(this, _windowHelper, mode);
 
     private AutomationVisualElementImpl? TryFrom(Func<AutomationElement?> factory, bool windowBarrier = true)
     {

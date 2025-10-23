@@ -8,7 +8,6 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Everywhere.Chat;
-using Everywhere.Chat.Permissions;
 using Everywhere.Chat.Plugins;
 using Everywhere.Common;
 using Everywhere.Configuration;
@@ -200,7 +199,14 @@ public partial class ChatWindowViewModel : BusyViewModelBase, IEventSubscriber<C
         {
             if (_chatAttachments.Count >= Settings.Internal.MaxChatAttachmentCount) return;
 
-            if (await _visualElementContext.PickElementAsync(mode) is not { } element) return;
+            // Hide the chat window to avoid picking itself
+            var chatWindow = ServiceLocator.Resolve<ChatWindow>();
+            var windowHelper = ServiceLocator.Resolve<IWindowHelper>();
+            windowHelper.SetCloaked(chatWindow, true);
+            var element = await _visualElementContext.PickElementAsync(mode);
+            windowHelper.SetCloaked(chatWindow, false);
+
+            if (element is null) return;
             if (_chatAttachments.OfType<ChatVisualElementAttachment>().Any(a => Equals(a.Element?.Target, element))) return;
             _chatAttachments.Add(await Task.Run(() => CreateFromVisualElement(element), cancellationToken));
         },
