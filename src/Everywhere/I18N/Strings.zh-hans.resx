@@ -1162,4 +1162,7 @@
     <data name="Common_Comma" xml:space="preserve">
         <value>，</value>
     </data>
+    <data name="ChatWindow_ScrollToBottom_ToolTip" xml:space="preserve">
+        <value>滚动到底部</value>
+    </data>
 </root>

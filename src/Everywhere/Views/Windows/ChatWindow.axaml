@@ -290,9 +290,9 @@
     </DockPanel>
 
     <ScrollViewer
-      Grid.Row="1" DockPanel.Dock="Top"
-      HorizontalContentAlignment="Stretch" HorizontalScrollBarVisibility="Disabled"
-      VerticalScrollBarVisibility="Auto">
+      x:Name="ChatMessageScrollViewer" Grid.Row="1"
+      DockPanel.Dock="Top" HorizontalContentAlignment="Stretch"
+      HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
       <Interaction.Behaviors>
         <be:AutoScrollBehavior/>
       </Interaction.Behaviors>
@@ -798,141 +798,156 @@
       </Panel>
     </ScrollViewer>
 
-    <Border
-      Grid.Row="2" Padding="0"
-      BorderBrush="{DynamicResource BorderColor}"
-      BorderThickness="0,1,0,0" CornerRadius="0">
-      <ExperimentalAcrylicBorder Name="PART_AcrylicBorder">
-        <ExperimentalAcrylicBorder.Material>
-          <ExperimentalAcrylicMaterial
-            FallbackColor="#99000000" MaterialOpacity="0.7"
-            TintColor="#222222" TintOpacity="0.7"/>
-        </ExperimentalAcrylicBorder.Material>
+    <Button
+      Classes="Primary Rounded" Grid.Row="1"
+      Margin="8" HorizontalAlignment="Right"
+      VerticalAlignment="Bottom"
+      Command="{Binding #ChatMessageScrollViewer.ScrollToEnd}"
+      ToolTip.Tip="{I18N {x:Static LocaleKey.ChatWindow_ScrollToBottom_ToolTip}}">
+      <Button.IsVisible>
+        <MultiBinding Converter="{x:Static vc:DoubleConverters.MultiSmallerThanAny}">
+          <Binding
+            Converter="{x:Static vc:DoubleConverters.Plus}"
+            ConverterParameter="30" Path="#ChatMessageScrollViewer.Offset.Y"/>
+          <Binding Path="#ChatMessageScrollViewer.ScrollBarMaximum.Y"/>
+        </MultiBinding>
+      </Button.IsVisible>
 
-        <v:ChatInputBox
-          x:Name="ChatInputBox" Margin="8"
-          AcceptsReturn="True"
-          CancelCommand="{Binding CancelCommand}"
-          CaretIndex="{x:Static sys:Int32.MaxValue}"
-          ChatAttachmentItemsSource="{Binding ChatAttachments}"
-          Command="{Binding SendMessageCommand}"
-          CustomAssistants="{Binding Settings.Model.CustomAssistants}"
-          Focusable="True" IsImageEnabled="False"
-          IsImageSupported="False"
-          IsSendButtonEnabled="{Binding !IsBusy}"
-          IsToolCallEnabled="{Binding Settings.Internal.IsToolCallEnabled, Mode=TwoWay}"
-          IsToolCallSupported="{Binding Settings.Model.SelectedCustomAssistant.IsFunctionCallingSupported, FallbackValue=false}"
-          MaxChatAttachmentCount="{Binding Settings.Internal.MaxChatAttachmentCount}"
-          SelectedCustomAssistant="{Binding Settings.Model.SelectedCustomAssistant, Mode=TwoWay}"
-          Text="{Binding Settings.Internal.ChatInputBoxText, Mode=TwoWay}"
-          TextWrapping="Wrap">
-          <v:ChatInputBox.AddChatAttachmentMenuItems>
-            <MenuItem
-              Command="{Binding PickElementCommand}"
-              CommandParameter="{x:Static interop:PickElementMode.Screen}"
-              Header="{I18N {x:Static LocaleKey.ChatWindow_ChatInputBox_AddAttachmentMenuItems_PickScreen}}">
-              <MenuItem.Icon>
-                <LucideIcon
-                  Width="18" Height="18"
-                  Kind="Monitor" Size="18"/>
-              </MenuItem.Icon>
-            </MenuItem>
-            <MenuItem
-              Command="{Binding PickElementCommand}"
-              CommandParameter="{x:Static interop:PickElementMode.Window}"
-              Header="{I18N {x:Static LocaleKey.ChatWindow_ChatInputBox_AddAttachmentMenuItems_PickWindow}}">
-              <MenuItem.Icon>
-                <LucideIcon
-                  Width="18" Height="18"
-                  Kind="AppWindow" Size="18"/>
-              </MenuItem.Icon>
-            </MenuItem>
-            <MenuItem
-              Command="{Binding PickElementCommand}"
-              CommandParameter="{x:Static interop:PickElementMode.Element}"
-              Header="{I18N {x:Static LocaleKey.ChatWindow_ChatInputBox_AddAttachmentMenuItems_PickElement}}">
-              <MenuItem.Icon>
-                <LucideIcon
-                  Width="18" Height="18"
-                  Kind="SquareMousePointer" Size="18"/>
-              </MenuItem.Icon>
-            </MenuItem>
-            <MenuItem
-              Command="{Binding AddClipboardCommand}"
-              Header="{I18N {x:Static LocaleKey.ChatWindow_ChatInputBox_AddAttachmentMenuItems_PasteFromClipboard}}">
-              <MenuItem.Icon>
-                <LucideIcon
-                  Width="18" Height="18"
-                  Kind="ClipboardPaste" Size="18"/>
-              </MenuItem.Icon>
-            </MenuItem>
-            <MenuItem
-              Command="{Binding AddFileCommand}"
-              Header="{I18N {x:Static LocaleKey.ChatWindow_ChatInputBox_AddAttachmentMenuItems_AttachFile}}">
-              <MenuItem.Icon>
-                <LucideIcon
-                  Width="18" Height="18"
-                  Kind="File" Size="18"/>
-              </MenuItem.Icon>
-            </MenuItem>
-          </v:ChatInputBox.AddChatAttachmentMenuItems>
+      <LucideIcon
+        Kind="ArrowDown" Size="16"/>
+    </Button>
 
-          <v:ChatInputBox.SettingsMenuItems>
-            <MenuItem StaysOpenOnClick="True">
-              <MenuItem.Header>
+    <ExperimentalAcrylicBorder
+      Name="PART_AcrylicBorder" Grid.Row="2">
+      <ExperimentalAcrylicBorder.Material>
+        <ExperimentalAcrylicMaterial
+          FallbackColor="#99000000" MaterialOpacity="0.7"
+          TintColor="#222222" TintOpacity="0.7"/>
+      </ExperimentalAcrylicBorder.Material>
+
+      <v:ChatInputBox
+        x:Name="ChatInputBox" Margin="8"
+        AcceptsReturn="True"
+        CancelCommand="{Binding CancelCommand}"
+        CaretIndex="{x:Static sys:Int32.MaxValue}"
+        ChatAttachmentItemsSource="{Binding ChatAttachments}"
+        Command="{Binding SendMessageCommand}"
+        CustomAssistants="{Binding Settings.Model.CustomAssistants}"
+        Focusable="True" IsImageEnabled="False"
+        IsImageSupported="False"
+        IsSendButtonEnabled="{Binding !IsBusy}"
+        IsToolCallEnabled="{Binding Settings.Internal.IsToolCallEnabled, Mode=TwoWay}"
+        IsToolCallSupported="{Binding Settings.Model.SelectedCustomAssistant.IsFunctionCallingSupported, FallbackValue=false}"
+        MaxChatAttachmentCount="{Binding Settings.Internal.MaxChatAttachmentCount}"
+        SelectedCustomAssistant="{Binding Settings.Model.SelectedCustomAssistant, Mode=TwoWay}"
+        Text="{Binding Settings.Internal.ChatInputBoxText, Mode=TwoWay}"
+        TextWrapping="Wrap">
+        <v:ChatInputBox.AddChatAttachmentMenuItems>
+          <MenuItem
+            Command="{Binding PickElementCommand}"
+            CommandParameter="{x:Static interop:PickElementMode.Screen}"
+            Header="{I18N {x:Static LocaleKey.ChatWindow_ChatInputBox_AddAttachmentMenuItems_PickScreen}}">
+            <MenuItem.Icon>
+              <LucideIcon
+                Width="18" Height="18"
+                Kind="Monitor" Size="18"/>
+            </MenuItem.Icon>
+          </MenuItem>
+          <MenuItem
+            Command="{Binding PickElementCommand}"
+            CommandParameter="{x:Static interop:PickElementMode.Window}"
+            Header="{I18N {x:Static LocaleKey.ChatWindow_ChatInputBox_AddAttachmentMenuItems_PickWindow}}">
+            <MenuItem.Icon>
+              <LucideIcon
+                Width="18" Height="18"
+                Kind="AppWindow" Size="18"/>
+            </MenuItem.Icon>
+          </MenuItem>
+          <MenuItem
+            Command="{Binding PickElementCommand}"
+            CommandParameter="{x:Static interop:PickElementMode.Element}"
+            Header="{I18N {x:Static LocaleKey.ChatWindow_ChatInputBox_AddAttachmentMenuItems_PickElement}}">
+            <MenuItem.Icon>
+              <LucideIcon
+                Width="18" Height="18"
+                Kind="SquareMousePointer" Size="18"/>
+            </MenuItem.Icon>
+          </MenuItem>
+          <MenuItem
+            Command="{Binding AddClipboardCommand}"
+            Header="{I18N {x:Static LocaleKey.ChatWindow_ChatInputBox_AddAttachmentMenuItems_PasteFromClipboard}}">
+            <MenuItem.Icon>
+              <LucideIcon
+                Width="18" Height="18"
+                Kind="ClipboardPaste" Size="18"/>
+            </MenuItem.Icon>
+          </MenuItem>
+          <MenuItem
+            Command="{Binding AddFileCommand}"
+            Header="{I18N {x:Static LocaleKey.ChatWindow_ChatInputBox_AddAttachmentMenuItems_AttachFile}}">
+            <MenuItem.Icon>
+              <LucideIcon
+                Width="18" Height="18"
+                Kind="File" Size="18"/>
+            </MenuItem.Icon>
+          </MenuItem>
+        </v:ChatInputBox.AddChatAttachmentMenuItems>
+
+        <v:ChatInputBox.SettingsMenuItems>
+          <MenuItem StaysOpenOnClick="True">
+            <MenuItem.Header>
+              <StackPanel
+                Orientation="Vertical" Spacing="4">
                 <StackPanel
-                  Orientation="Vertical" Spacing="4">
+                  Orientation="Horizontal" Spacing="4">
+                  <TextBlock
+                    Classes="Muted" VerticalAlignment="Center"
+                    FontSize="12"
+                    Text="{I18N {x:Static LocaleKey.ChatWindow_ChatInputBox_SettingsMenuItems_VisualTreeTokenLimit}}"/>
+                  <TextBlock
+                    Classes="Muted" VerticalAlignment="Center"
+                    FontSize="12"
+                    Text="{Binding Settings.Internal.VisualTreeTokenLimit, Mode=OneWay}"/>
+                </StackPanel>
+
+                <Slider
+                  MinWidth="200" VerticalAlignment="Center">
+                  <Interaction.Behaviors>
+                    <be:LogarithmicSliderBehavior
+                      Maximum="{Binding Settings.Model.SelectedCustomAssistant.MaxTokens.ActualValue, FallbackValue=8192, Converter={x:Static vc:DoubleConverters.Multiply}, ConverterParameter=0.5}"
+                      Minimum="512"
+                      Value="{Binding Settings.Internal.VisualTreeTokenLimit, Mode=TwoWay}"/>
+                  </Interaction.Behaviors>
+                </Slider>
+
+                <StackPanel
+                  Margin="0,4,0,0" Orientation="Vertical"
+                  Spacing="4">
                   <StackPanel
                     Orientation="Horizontal" Spacing="4">
                     <TextBlock
                       Classes="Muted" VerticalAlignment="Center"
                       FontSize="12"
-                      Text="{I18N {x:Static LocaleKey.ChatWindow_ChatInputBox_SettingsMenuItems_VisualTreeTokenLimit}}"/>
+                      Text="{I18N {x:Static LocaleKey.ChatWindow_ChatInputBox_SettingsMenuItems_VisualTreeDetailLevel}}"/>
                     <TextBlock
                       Classes="Muted" VerticalAlignment="Center"
-                      FontSize="12"
-                      Text="{Binding Settings.Internal.VisualTreeTokenLimit, Mode=OneWay}"/>
+                      FontSize="12">
+                      <TextBlock.Text>
+                        <I18N Key="{Binding Settings.ChatWindow.VisualTreeDetailLevel, Converter={x:Static vc:DynamicResourceKeyConverter.Shared}}"/>
+                      </TextBlock.Text>
+                    </TextBlock>
                   </StackPanel>
-
                   <Slider
-                    MinWidth="200" VerticalAlignment="Center">
-                    <Interaction.Behaviors>
-                      <be:LogarithmicSliderBehavior
-                        Maximum="{Binding Settings.Model.SelectedCustomAssistant.MaxTokens.ActualValue, FallbackValue=8192, Converter={x:Static vc:DoubleConverters.Multiply}, ConverterParameter=0.5}"
-                        Minimum="512"
-                        Value="{Binding Settings.Internal.VisualTreeTokenLimit, Mode=TwoWay}"/>
-                    </Interaction.Behaviors>
-                  </Slider>
-
-                  <StackPanel
-                    Margin="0,4,0,0" Orientation="Vertical"
-                    Spacing="4">
-                    <StackPanel
-                      Orientation="Horizontal" Spacing="4">
-                      <TextBlock
-                        Classes="Muted" VerticalAlignment="Center"
-                        FontSize="12"
-                        Text="{I18N {x:Static LocaleKey.ChatWindow_ChatInputBox_SettingsMenuItems_VisualTreeDetailLevel}}"/>
-                      <TextBlock
-                        Classes="Muted" VerticalAlignment="Center"
-                        FontSize="12">
-                        <TextBlock.Text>
-                          <I18N Key="{Binding Settings.ChatWindow.VisualTreeDetailLevel, Converter={x:Static vc:DynamicResourceKeyConverter.Shared}}"/>
-                        </TextBlock.Text>
-                      </TextBlock>
-                    </StackPanel>
-                    <Slider
-                      MinWidth="160" IsSnapToTickEnabled="True"
-                      Maximum="2" Minimum="0"
-                      TickFrequency="1"
-                      Value="{Binding Settings.ChatWindow.VisualTreeDetailLevel, Mode=TwoWay, Converter={x:Static vc:Int32Converters.FromEnum}}"/>
-                  </StackPanel>
+                    MinWidth="160" IsSnapToTickEnabled="True"
+                    Maximum="2" Minimum="0"
+                    TickFrequency="1"
+                    Value="{Binding Settings.ChatWindow.VisualTreeDetailLevel, Mode=TwoWay, Converter={x:Static vc:Int32Converters.FromEnum}}"/>
                 </StackPanel>
-              </MenuItem.Header>
-            </MenuItem>
-          </v:ChatInputBox.SettingsMenuItems>
-        </v:ChatInputBox>
-      </ExperimentalAcrylicBorder>
-    </Border>
+              </StackPanel>
+            </MenuItem.Header>
+          </MenuItem>
+        </v:ChatInputBox.SettingsMenuItems>
+      </v:ChatInputBox>
+    </ExperimentalAcrylicBorder>
   </Grid>
 </v:ReactiveShadWindow>

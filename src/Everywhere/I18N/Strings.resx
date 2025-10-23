@@ -1180,4 +1180,7 @@ Placeholders can be used within the prompt, enclosed in {}, and will be replaced
     <data name="Common_Comma" xml:space="preserve">
         <value>, </value>
     </data>
+    <data name="ChatWindow_ScrollToBottom_ToolTip" xml:space="preserve">
+        <value>Scroll to bottom</value>
+    </data>
 </root>

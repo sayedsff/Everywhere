@@ -26,13 +26,6 @@
       <Setter Property="CornerRadius" Value="15"/>
     </Style>
 
-    <Style Selector="^ /template/ Button.Rounded">
-      <Setter Property="Width" Value="30"/>
-      <Setter Property="Height" Value="30"/>
-      <Setter Property="Padding" Value="0"/>
-      <Setter Property="CornerRadius" Value="15"/>
-    </Style>
-
     <Style Selector="^ /template/ Button#PART_CancelButton:disabled">
       <Setter Property="IsVisible" Value="False"/>
     </Style>
@@ -387,8 +380,7 @@
               </MenuItem>
 
               <MenuItem
-                Classes="Outline Rounded" Width="30"
-                Height="30" shadui:MenuItemAssist.PopupPlacement="Top"
+                Classes="Outline Rounded" shadui:MenuItemAssist.PopupPlacement="Top"
                 shadui:MenuItemAssist.PopupVerticalOffset="-4"
                 ItemsSource="{TemplateBinding AddChatAttachmentMenuItems}"
                 ToolTip.Tip="{I18N {x:Static LocaleKey.ChatInputBox_AddAttachmentMenuItem_ToolTip}}">
@@ -412,8 +404,7 @@
             </Menu>
 
             <ToggleButton
-              Classes="Outline Rounded" Width="30"
-              Height="30" Focusable="False"
+              Classes="Outline Rounded" Focusable="False"
               IsChecked="{Binding IsImageEnabled, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
               IsVisible="{TemplateBinding IsImageSupported}"
               ToolTip.Tip="{I18N {x:Static LocaleKey.ChatInputBox_ImageButton_ToolTip}}">
@@ -422,8 +413,7 @@
             </ToggleButton>
 
             <ToggleButton
-              Classes="Outline Rounded" Width="30"
-              Height="30" Focusable="False"
+              Classes="Outline Rounded" Focusable="False"
               IsChecked="{Binding IsToolCallEnabled, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
               IsVisible="{TemplateBinding IsToolCallSupported}"
               ToolTip.Tip="{I18N {x:Static LocaleKey.ChatInputBox_ToolCallButton_ToolTip}}">
@@ -434,8 +424,7 @@
 
             <Menu Focusable="False">
               <MenuItem
-                Classes="Outline Rounded" Width="30"
-                Height="30" shadui:MenuItemAssist.PopupPlacement="Top"
+                Classes="Outline Rounded" shadui:MenuItemAssist.PopupPlacement="Top"
                 shadui:MenuItemAssist.PopupVerticalOffset="-4"
                 ItemsSource="{TemplateBinding SettingsMenuItems}"
                 ToolTip.Tip="{I18N {x:Static LocaleKey.ChatInputBox_SettingsMenuItem_ToolTip}}">

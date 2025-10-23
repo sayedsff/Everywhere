@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using Avalonia.Data.Converters;
+using ZLinq;
 
 namespace Everywhere.ValueConverters;
 
@@ -25,6 +26,15 @@ public class NumberConverters<T> where T : struct, INumber<T>
     public static IValueConverter GreaterThan { get; } = new BidirectionalFuncValueConverter<T, bool>(
         convert: static (x, p) => x > ChangeType(p),
         convertBack: static (_, _) => throw new NotSupportedException()
+    );
+
+    /// <summary>
+    /// Multi-value converter that returns true if the first value is smaller than any subsequent values.
+    /// </summary>
+    public static IMultiValueConverter MultiSmallerThanAny { get; } = new FuncMultiValueConverter<T, bool>(
+        // ReSharper disable PossibleMultipleEnumeration
+        numbers => numbers.AsValueEnumerable().First() < numbers.AsValueEnumerable().Skip(1).Min()
+        // ReSharper restore PossibleMultipleEnumeration
     );
 
     public static IValueConverter FromEnum { get; } = new FromEnumConverter();
