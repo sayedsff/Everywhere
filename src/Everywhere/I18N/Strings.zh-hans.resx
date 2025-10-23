@@ -1156,4 +1156,10 @@
     <data name="TextDifferenceEditor_DiscardButton_Content" xml:space="preserve">
         <value>拒绝</value>
     </data>
+    <data name="ChatPluginConsentRequest_Common_Header" xml:space="preserve">
+        <value>是否允许“{0}”访问 {1} 权限？</value>
+    </data>
+    <data name="Common_Comma" xml:space="preserve">
+        <value>，</value>
+    </data>
 </root>

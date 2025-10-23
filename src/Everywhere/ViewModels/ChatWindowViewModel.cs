@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Avalonia.Input;
 using Avalonia.Platform.Storage;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Everywhere.Chat;
@@ -92,6 +93,8 @@ public partial class ChatWindowViewModel : BusyViewModelBase, IEventSubscriber<C
         _nativeHelper = nativeHelper;
         _blobStorage = blobStorage;
         _logger = logger;
+
+        EventHub<ChatPluginConsentRequest>.Subscribe(this);
 
         InitializeCommands();
     }
@@ -454,10 +457,21 @@ public partial class ChatWindowViewModel : BusyViewModelBase, IEventSubscriber<C
 
     public void HandleEvent(ChatPluginConsentRequest @event)
     {
-        var card = new ConsentDecisionCard();
-        DialogManager
-            .CreateDialog(card)
-            .ShowAsync()
-            .ContinueWith(_ => @event.Promise.TrySetResult(card.SelectedConsent ?? ConsentDecision.Deny));
+        Dispatcher.UIThread.InvokeOnDemand(() =>
+        {
+            var card = new ConsentDecisionCard
+            {
+                Header = @event.HeaderKey.ToTextBlock(),
+                Content = @event.Content,
+            };
+            card.ConsentSelected += (_, args) =>
+            {
+                @event.Promise.TrySetResult(args.Decision);
+                DialogManager.Close(card);
+            };
+            DialogManager
+                .CreateDialog(card)
+                .ShowAsync(@event.CancellationToken);
+        });
     }
 }

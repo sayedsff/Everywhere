@@ -1,22 +1,29 @@
-﻿using Everywhere.Chat.Permissions;
+﻿using Avalonia.Interactivity;
+using CommunityToolkit.Mvvm.Input;
+using Everywhere.Chat.Permissions;
 using ShadUI;
 
 namespace Everywhere.Views;
 
-public class ConsentDecisionCard : Card
+public class ConsentDecisionEventArgs(ConsentDecision decision) : RoutedEventArgs
 {
-    /// <summary>
-    /// Defines the <see cref="SelectedConsent"/> property.
-    /// </summary>
-    public static readonly StyledProperty<ConsentDecision?> SelectedConsentProperty =
-        AvaloniaProperty.Register<ConsentDecisionCard, ConsentDecision?>(nameof(SelectedConsent));
+    public ConsentDecision Decision { get; } = decision;
+}
 
-    /// <summary>
-    /// Gets or sets the selected consent decision. null if no decision has been made.
-    /// </summary>
-    public ConsentDecision? SelectedConsent
+public partial class ConsentDecisionCard : Card
+{
+    public static readonly RoutedEvent<ConsentDecisionEventArgs> ConsentSelectedEvent =
+        RoutedEvent.Register<ConsentDecisionCard, ConsentDecisionEventArgs>(nameof(ConsentSelected), RoutingStrategies.Bubble);
+
+    public event EventHandler<ConsentDecisionEventArgs>? ConsentSelected
     {
-        get => GetValue(SelectedConsentProperty);
-        set => SetValue(SelectedConsentProperty, value);
+        add => AddHandler(ConsentSelectedEvent, value);
+        remove => RemoveHandler(ConsentSelectedEvent, value);
+    }
+
+    [RelayCommand]
+    private void SelectConsent(ConsentDecision decision)
+    {
+        RaiseEvent(new ConsentDecisionEventArgs(decision) { RoutedEvent = ConsentSelectedEvent });
     }
 }

@@ -262,7 +262,7 @@ public partial class TextDifferenceEditor : TemplatedControl
                         }
                     }
 
-                    if (!string.IsNullOrEmpty(after)) newLineNumber += after.AsValueEnumerable().Count(c => c == '\n');
+                    newLineNumber += TextDifferenceRenderer.CountLines(after);
                     break;
                 }
                 case false:
@@ -291,7 +291,7 @@ public partial class TextDifferenceEditor : TemplatedControl
                             });
                     }
 
-                    if (!string.IsNullOrEmpty(after)) newLineNumber += after.AsValueEnumerable().Count(c => c == '\n');
+                    newLineNumber += TextDifferenceRenderer.CountLines(after);
                     break;
                 }
                 default:

@@ -28,7 +28,8 @@ public partial class VisualTreeXmlBuilder(
     IReadOnlyList<IVisualElement> coreElements,
     int approximateTokenLimit,
     int startingId,
-    VisualTreeDetailLevel detailLevel)
+    VisualTreeDetailLevel detailLevel
+)
 {
     private enum QueueOrigin
     {
@@ -71,31 +72,6 @@ public partial class VisualTreeXmlBuilder(
     private readonly HashSet<XmlVisualElement> _rootElements = [];
     private StringBuilder? _visualTreeXmlBuilder;
     private bool _detailLevelApplied;
-
-    private static readonly HashSet<VisualElementType> InteractiveElementTypes = new()
-    {
-        VisualElementType.Button,
-        VisualElementType.Hyperlink,
-        VisualElementType.CheckBox,
-        VisualElementType.RadioButton,
-        VisualElementType.ComboBox,
-        VisualElementType.ListView,
-        VisualElementType.ListViewItem,
-        VisualElementType.TreeView,
-        VisualElementType.TreeViewItem,
-        VisualElementType.DataGrid,
-        VisualElementType.DataGridItem,
-        VisualElementType.TabControl,
-        VisualElementType.TabItem,
-        VisualElementType.Menu,
-        VisualElementType.MenuItem,
-        VisualElementType.Slider,
-        VisualElementType.ScrollBar,
-        VisualElementType.ProgressBar,
-        VisualElementType.TextEdit,
-        VisualElementType.Table,
-        VisualElementType.TableRow
-    };
 
     private const VisualElementStates InteractiveStates = VisualElementStates.Focused | VisualElementStates.Selected;
 
@@ -396,7 +372,27 @@ public partial class VisualTreeXmlBuilder(
 
     private static bool IsInteractiveElement(IVisualElement element)
     {
-        if (InteractiveElementTypes.Contains(element.Type)) return true;
+        if (element.Type is VisualElementType.Button or
+            VisualElementType.Hyperlink or
+            VisualElementType.CheckBox or
+            VisualElementType.RadioButton or
+            VisualElementType.ComboBox or
+            VisualElementType.ListView or
+            VisualElementType.ListViewItem or
+            VisualElementType.TreeView or
+            VisualElementType.TreeViewItem or
+            VisualElementType.DataGrid or
+            VisualElementType.DataGridItem or
+            VisualElementType.TabControl or
+            VisualElementType.TabItem or
+            VisualElementType.Menu or
+            VisualElementType.MenuItem or
+            VisualElementType.Slider or
+            VisualElementType.ScrollBar or
+            VisualElementType.ProgressBar or
+            VisualElementType.TextEdit or
+            VisualElementType.Table or
+            VisualElementType.TableRow) return true;
 
         return (element.States & InteractiveStates) != 0;
     }

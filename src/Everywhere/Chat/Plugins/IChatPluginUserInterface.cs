@@ -4,7 +4,6 @@ namespace Everywhere.Chat.Plugins;
 
 public record ChatPluginConsentRequest(
     TaskCompletionSource<ConsentDecision> Promise,
-    string Id,
     DynamicResourceKeyBase HeaderKey,
     object? Content,
     CancellationToken CancellationToken

@@ -4,6 +4,7 @@ using System.Text;
 using CommunityToolkit.Mvvm.ComponentModel;
 using MessagePack;
 using ObservableCollections;
+using ZLinq;
 
 namespace Everywhere.Chat.Plugins;
 
@@ -374,16 +375,18 @@ public static class TextDifferenceRenderer
         return (line, col);
     }
 
-    public static int CountLines(string s)
-    {
-        if (s.Length == 0) return 0;
-        return 1 + s.Count(t => t == '\n');
-    }
+    public static int CountLines(string? s) =>
+        s.IsNullOrEmpty() ? 0 : TakeLines(s, -1).AsValueEnumerable().Where(l => l.Length > 0).Count();
 
     private static IEnumerable<string> TakeLines(string s, int maxLines)
     {
-        var lines = s.Replace("\r\n", "\n").Split('\n');
-        return maxLines <= 0 ? lines : lines.Take(maxLines);
+        using var reader = new StringReader(s);
+        while (maxLines-- != 0) // use != to allow -1 (unlimited)
+        {
+            var line = reader.ReadLine();
+            if (line is null) yield break;
+            yield return line;
+        }
     }
 }
 

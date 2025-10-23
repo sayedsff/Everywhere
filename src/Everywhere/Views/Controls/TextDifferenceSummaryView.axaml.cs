@@ -29,21 +29,13 @@ public partial class TextDifferenceSummaryView : TemplatedControl
     public int AddedLineCount =>
         TextDifference?.Changes
             .AsValueEnumerable()
-            .Where(change => change.Kind == TextChangeKind.Insert)
-            .Sum(change => TextDifferenceRenderer.CountLines(change.NewText ?? string.Empty)) +
-        TextDifference?.Changes
-            .AsValueEnumerable()
-            .Where(change => change.Kind == TextChangeKind.Replace)
+            .Where(change => change.Kind is TextChangeKind.Insert or TextChangeKind.Replace)
             .Sum(change => TextDifferenceRenderer.CountLines(change.NewText ?? string.Empty)) ?? 0;
 
     public int RemovedLineCount =>
         TextDifference?.Changes
             .AsValueEnumerable()
-            .Where(change => change.Kind == TextChangeKind.Delete)
-            .Sum(change => TextDifferenceRenderer.CountLines(change.GetOriginalSlice(OriginalText ?? string.Empty))) +
-        TextDifference?.Changes
-            .AsValueEnumerable()
-            .Where(change => change.Kind == TextChangeKind.Replace)
+            .Where(change => change.Kind is TextChangeKind.Delete or TextChangeKind.Replace)
             .Sum(change => TextDifferenceRenderer.CountLines(change.GetOriginalSlice(OriginalText ?? string.Empty))) ?? 0;
 
     [RelayCommand]

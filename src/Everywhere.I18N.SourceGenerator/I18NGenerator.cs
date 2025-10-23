@@ -305,7 +305,17 @@ public class I18NSourceGenerator : IIncrementalGenerator
                     get => field ?? throw new InvalidOperationException("LocaleManager is not initialized yet.");
                     set
                     {
-                        Avalonia.Threading.Dispatcher.UIThread.InvokeOnDemand(() => 
+                        var dispatcher = Avalonia.Threading.Dispatcher.UIThread;
+                    
+                        if (dispatcher.CheckAccess())
+                        {
+                            SetField();
+                            return;
+                        }
+                        
+                        dispatcher.Invoke(SetField);
+                        
+                        void SetField()
                         {
                             if (field == value) return;
                             
@@ -320,9 +330,9 @@ public class I18NSourceGenerator : IIncrementalGenerator
                             {
                                 Shared[key] = val;
                             }
-            
+                        
                             LocaleChanged?.Invoke(oldLocaleName, field);
-                        });
+                        }
                     }
                 }
             }

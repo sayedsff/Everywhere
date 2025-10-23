@@ -9,11 +9,16 @@ public abstract partial class ChatFunction : ObservableObject
 {
     public LucideIconKind? Icon { get; set; }
 
-    [ObservableProperty]
-    public partial ChatFunctionPermissions? Permissions { get; set; }
+    /// <summary>
+    /// The permissions required by this function.
+    /// </summary>
+    public virtual ChatFunctionPermissions Permissions => ChatFunctionPermissions.AllAccess;
 
+    /// <summary>
+    /// The permissions currently granted to this function.
+    /// </summary>
     [ObservableProperty]
-    public partial Customizable<ChatFunctionPermissions> AllowedPermissions { get; set; } = ChatFunctionPermissions.None;
+    public partial Customizable<ChatFunctionPermissions> GrantedPermissions { get; set; } = ChatFunctionPermissions.None;
 
     [ObservableProperty]
     public partial bool IsEnabled { get; set; } = true;
@@ -21,8 +26,10 @@ public abstract partial class ChatFunction : ObservableObject
     public abstract KernelFunction KernelFunction { get; }
 }
 
-public class NativeChatFunction : ChatFunction
+public sealed class NativeChatFunction : ChatFunction
 {
+    public override ChatFunctionPermissions Permissions { get; }
+
     public override KernelFunction KernelFunction { get; }
 
     public NativeChatFunction(Delegate method, ChatFunctionPermissions permissions, LucideIconKind? icon = null)
