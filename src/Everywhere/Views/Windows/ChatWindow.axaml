@@ -9,15 +9,24 @@
   xmlns:vc="clr-namespace:Everywhere.ValueConverters" xmlns:vm="clr-namespace:Everywhere.ViewModels"
   MinWidth="400" MinHeight="144.8"
   x:DataType="vm:ChatWindowViewModel" x:TypeArguments="vm:ChatWindowViewModel"
-  Background="Transparent" CanResize="False"
-  ExtendClientAreaChromeHints="NoChrome" ExtendClientAreaToDecorationsHint="True"
+  Background="Transparent" ExtendClientAreaChromeHints="NoChrome"
+  ExtendClientAreaToDecorationsHint="True"
   IsOpened="{Binding IsOpened, Mode=OneWayToSource}"
+  IsTitleBarVisible="False"
   RequestedThemeVariant="{x:Static themes:ThemeVariants.Acrylic}"
   ShowActivated="True" SizeToContent="WidthAndHeight"
   SystemDecorations="BorderOnly"
   TargetBoundingRect="{Binding TargetBoundingRect}"
   Topmost="True" TransparencyLevelHint="AcrylicBlur"
   WindowStartupLocation="Manual">
+
+  <v:ReactiveShadWindow.Hosts>
+    <shadui:DialogHost
+      x:Name="PART_DialogHost" Margin="0,36,0,0"
+      Owner="{Binding RelativeSource={RelativeSource AncestorType=v:ChatWindow}}"/>
+    <shadui:ToastHost
+      x:Name="PART_ToastHost" Margin="0,36,0,0"/>
+  </v:ReactiveShadWindow.Hosts>
 
   <Grid
     x:Name="RootGrid" RowDefinitions="44,*,Auto">
@@ -924,20 +933,6 @@
           </v:ChatInputBox.SettingsMenuItems>
         </v:ChatInputBox>
       </ExperimentalAcrylicBorder>
-    </Border>
-
-    <Border
-      Grid.Row="2" Width="10"
-      Height="10" Margin="2.5"
-      HorizontalAlignment="Right" VerticalAlignment="Bottom"
-      Background="Transparent" Cursor="BottomRightCorner"
-      PointerPressed="HandleResizeThumbPointerPressed">
-      <Viewbox Stretch="Uniform">
-        <Path
-          Data="M0 14.1 14.2 0M6 14.1l8.2-8.2"
-          Stroke="{DynamicResource BorderColor}"
-          StrokeThickness="2"/>
-      </Viewbox>
     </Border>
   </Grid>
 </v:ReactiveShadWindow>

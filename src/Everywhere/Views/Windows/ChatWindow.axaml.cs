@@ -13,11 +13,16 @@ using Everywhere.Configuration;
 using Everywhere.Interop;
 using LiveMarkdown.Avalonia;
 using Microsoft.Extensions.Logging;
+using ShadUI;
 
 namespace Everywhere.Views;
 
-public partial class ChatWindow : ReactiveWindow<ChatWindowViewModel>
+public partial class ChatWindow : ReactiveShadWindow<ChatWindowViewModel>, IReactiveHost
 {
+    public DialogHost DialogHost => PART_DialogHost;
+
+    public ToastHost ToastHost => PART_ToastHost;
+
     public static readonly DirectProperty<ChatWindow, bool> IsOpenedProperty =
         AvaloniaProperty.RegisterDirect<ChatWindow, bool>(nameof(IsOpened), o => o.IsOpened);
 
@@ -366,16 +371,6 @@ public partial class ChatWindow : ReactiveWindow<ChatWindowViewModel>
         if (!ViewModel.AddClipboardCommand.CanExecute(null)) return;
 
         ViewModel.AddClipboardCommand.Execute(null);
-    }
-
-    private void HandleResizeThumbPointerPressed(object? sender, PointerPressedEventArgs e)
-    {
-        if (!e.Pointer.IsPrimary) return;
-
-        // BeginResizeDrag implementation requires CanResize to be true, so we temporarily set it to true, then set it back
-        CanResize = true;
-        BeginResizeDrag(WindowEdge.SouthEast, e);
-        CanResize = false;
     }
 
     protected override void OnKeyDown(KeyEventArgs e)
