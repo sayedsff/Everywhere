@@ -393,7 +393,7 @@ public class ChatService(
                 // If the chat history only contains one user message and one assistant message,
                 // we can generate a title for the chat context.
                 GenerateTitleAsync(
-                    kernelMixin.ChatCompletionService,
+                    kernelMixin,
                     userMessage,
                     assistantMessage,
                     chatContext.Metadata,
@@ -882,7 +882,7 @@ public class ChatService(
     }
 
     private async Task GenerateTitleAsync(
-        IChatCompletionService chatCompletionService,
+        IKernelMixin kernelMixin,
         string userMessage,
         string assistantMessage,
         ChatContextMetadata metadata,
@@ -912,10 +912,14 @@ public class ChatService(
                             { "SystemLanguage", () => language }
                         })),
             };
-            var chatMessageContent = await chatCompletionService.GetChatMessageContentAsync(
+            var chatMessageContent = await kernelMixin.ChatCompletionService.GetChatMessageContentAsync(
                 chatHistory,
+                kernelMixin.GetPromptExecutionSettings(),
                 cancellationToken: cancellationToken);
-            metadata.Topic = chatMessageContent.Content?.Trim().Trim('.', '!', '?', '。', '！', '？').SafeSubstring(0, 50);
+
+            Span<char> punctuationChars = ['.', ',', '!', '?', '。', '，', '！', '？'];
+            metadata.Topic = chatMessageContent.Content?.Trim().Trim(punctuationChars).Trim().SafeSlice(0, 50).ToString();
+
             activity?.SetTag("topic.length", metadata.Topic?.Length ?? 0);
         }
         catch (Exception e)
