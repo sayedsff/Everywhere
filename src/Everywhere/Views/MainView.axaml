@@ -9,6 +9,7 @@
       Width="180" MinWidth="68"
       Padding="8"
       Expanded="{Binding Settings.Internal.IsMainViewSidebarExpanded}"
+      IsVisible="{Binding !!#NavigationItemsControl.ItemCount}"
       SelectedSidebarItem="{Binding SelectedPage, Mode=TwoWay}">
       <shadui:Sidebar.Header>
         <Border
@@ -30,7 +31,8 @@
       </shadui:Sidebar.Header>
 
       <ItemsControl
-        Padding="6" VerticalAlignment="Top"
+        Name="NavigationItemsControl" Padding="6"
+        VerticalAlignment="Top"
         Background="{DynamicResource CardBackgroundColor}"
         BorderThickness="0"
         CornerRadius="{DynamicResource 3XlCornerRadius}"
