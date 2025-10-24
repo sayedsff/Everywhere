@@ -22,7 +22,8 @@
         Icon="{Binding Icon}"
         IconSize="14"/>
       <TextBlock
-        Grid.Column="1" VerticalAlignment="Center"
+        Grid.Column="1" Margin="4,0,0,0"
+        VerticalAlignment="Center"
         Text="{Binding Name}"
         TextTrimming="CharacterEllipsis"
         ToolTip.Tip="{Binding Description}"/>
@@ -60,7 +61,7 @@
           <LucideIcon Kind="Brain"/>
         </shadui:Badge>
         <shadui:Badge
-          Background="MediumSlateBlue"
+          Padding="6,0" Background="MediumSlateBlue"
           IsVisible="{Binding MaxTokens.ActualValue}"
           ToolTip.Tip="{I18N {x:Static LocaleKey.Settings_CustomAssistant_MaxTokens_Header}}">
           <TextBlock
@@ -434,19 +435,47 @@
                 Size="16"/>
             </ToggleButton>
 
-            <Menu Focusable="False">
-              <MenuItem
-                Classes="Outline Rounded" shadui:MenuItemAssist.PopupPlacement="Top"
-                shadui:MenuItemAssist.PopupVerticalOffset="-4"
-                ItemsSource="{TemplateBinding SettingsMenuItems}"
-                ToolTip.Tip="{I18N {x:Static LocaleKey.ChatInputBox_SettingsMenuItem_ToolTip}}">
-                <MenuItem.Header>
-                  <LucideIcon
-                    HorizontalAlignment="Center" VerticalAlignment="Center"
-                    Kind="Settings" Size="16"/>
-                </MenuItem.Header>
-              </MenuItem>
-            </Menu>
+            <Button
+              Classes="Outline Rounded"
+              Content="{LucideIconContent Settings,
+                                          Size=16}"
+              ToolTip.Tip="{I18N {x:Static LocaleKey.ChatInputBox_SettingsButton_ToolTip}}">
+              <Button.Flyout>
+                <Flyout
+                  Placement="Top" VerticalOffset="-4">
+                  <LayoutTransformControl
+                    Margin="6" RenderTransformOrigin="50%, 0%">
+                    <ItemsControl ItemsSource="{TemplateBinding SettingsMenuItems}"/>
+                    <LayoutTransformControl.Transitions>
+                      <Transitions>
+                        <TransformOperationsTransition
+                          Property="RenderTransform" Duration="0:0:0.10"/>
+                      </Transitions>
+                    </LayoutTransformControl.Transitions>
+                  </LayoutTransformControl>
+                </Flyout>
+              </Button.Flyout>
+              <Button.Styles>
+                <Style Selector="Button:flyout-open LayoutTransformControl">
+                  <Style.Animations>
+                    <Animation
+                      Easing="SineEaseInOut" FillMode="Forward"
+                      Duration="0:0:0.10">
+                      <KeyFrame Cue="0%">
+                        <Setter Property="ScaleTransform.ScaleY" Value="0.90"/>
+                        <Setter Property="ScaleTransform.ScaleX" Value="0.90"/>
+                        <Setter Property="Opacity" Value="0"/>
+                      </KeyFrame>
+                      <KeyFrame Cue="100%">
+                        <Setter Property="ScaleTransform.ScaleY" Value="1"/>
+                        <Setter Property="ScaleTransform.ScaleX" Value="1"/>
+                        <Setter Property="Opacity" Value="1"/>
+                      </KeyFrame>
+                    </Animation>
+                  </Style.Animations>
+                </Style>
+              </Button.Styles>
+            </Button>
           </StackPanel>
 
           <StackPanel
