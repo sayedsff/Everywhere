@@ -4,7 +4,7 @@
     <MicrosoftPackageVersion>9.0.9</MicrosoftPackageVersion>
     <EntityFrameworkVersion>9.0.7</EntityFrameworkVersion>
     <SemanticKernelVersion>1.66.0</SemanticKernelVersion>
-    <AvaloniaVersion>11.3.4</AvaloniaVersion>
+    <AvaloniaVersion>11.3.8</AvaloniaVersion>
     <SkiaSharpVersion>3.119.1</SkiaSharpVersion>
   </PropertyGroup>
   <ItemGroup>
@@ -39,7 +39,7 @@
     <PackageVersion Include="ObservableCollections" Version="3.3.4" />
     <PackageVersion Include="ZLinq" Version="1.5.3" />
     <!-- AI packages -->
-    <PackageVersion Include="Anthropic.SDK" Version="5.6.0" />
+    <PackageVersion Include="Anthropic.SDK" Version="5.7.1" />
     <PackageVersion Include="Microsoft.ML.OnnxRuntime" Version="1.22.0" />
     <PackageVersion Include="Microsoft.SemanticKernel.Abstractions" Version="$(SemanticKernelVersion)" />
     <PackageVersion Include="Microsoft.SemanticKernel" Version="$(SemanticKernelVersion)" />
