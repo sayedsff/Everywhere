@@ -48,8 +48,11 @@
                     </ItemsPanelTemplate>
                   </ListBox.ItemsPanel>
                   <ListBox.ItemTemplate>
-                    <DataTemplate DataType="LucideIconKind">
-                      <TextBlock Text="{Binding}"/>
+                    <DataTemplate>
+                      <TextBlock
+                        Width="24" Height="24"
+                        FontSize="20"
+                        Text="{Binding}"/>
                     </DataTemplate>
                   </ListBox.ItemTemplate>
                 </ListBox>
