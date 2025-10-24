@@ -1186,4 +1186,19 @@ Placeholders can be used within the prompt, enclosed in {}, and will be replaced
     <data name="ChatContext_Temporary" xml:space="preserve">
         <value>Temporary Chat</value>
     </data>
+    <data name="TemporaryChatMode_Never" xml:space="preserve">
+        <value>Never</value>
+    </data>
+    <data name="TemporaryChatMode_RememberLast" xml:space="preserve">
+        <value>Remember Last</value>
+    </data>
+    <data name="TemporaryChatMode_Always" xml:space="preserve">
+        <value>Always</value>
+    </data>
+    <data name="Settings_ChatWindow_TemporaryChatMode_Header" xml:space="preserve">
+        <value>Whether to use temporary chats when creating new chats.</value>
+    </data>
+    <data name="Settings_ChatWindow_TemporaryChatMode_Description" xml:space="preserve">
+        <value>Temporary Chat Mode</value>
+    </data>
 </root>

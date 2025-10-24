@@ -155,14 +155,24 @@ public partial class ChatContextManager : ObservableObject, IChatContextManager,
     {
         if (IsEmptyContext(_current)) return;
 
-        if (_current?.IsTemporary is true) Remove(_current);
+        var isCurrentTemporary = _current?.IsTemporary is true;
+        if (isCurrentTemporary) Remove(_current!); // Remove the temporary chat context before creating a new one
 
         var renderedSystemPrompt = Prompts.RenderPrompt(
             _settings.Model.SelectedCustomAssistant?.SystemPrompt ?? Prompts.DefaultSystemPrompt,
             SystemPromptVariables
         );
 
-        _current = new ChatContext(renderedSystemPrompt);
+        _current = new ChatContext(renderedSystemPrompt)
+        {
+            IsTemporary = _settings.ChatWindow.TemporaryChatMode switch
+            {
+                TemporaryChatMode.RememberLast => isCurrentTemporary,
+                TemporaryChatMode.Always => true,
+                _ => false
+            },
+        };
+
         _current.Changed += HandleChatContextChanged;
         _history.Add(_current.Metadata.Id, _current);
         // After created, the chat context is not added to the storage yet.

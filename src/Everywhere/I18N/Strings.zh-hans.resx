@@ -1168,4 +1168,19 @@
     <data name="ChatContext_Temporary" xml:space="preserve">
         <value>临时聊天</value>
     </data>
+    <data name="TemporaryChatMode_Always" xml:space="preserve">
+        <value>总是</value>
+    </data>
+    <data name="TemporaryChatMode_Never" xml:space="preserve">
+        <value>从不</value>
+    </data>
+    <data name="TemporaryChatMode_RememberLast" xml:space="preserve">
+        <value>记住上次</value>
+    </data>
+    <data name="Settings_ChatWindow_TemporaryChatMode_Description" xml:space="preserve">
+        <value>临时聊天模式</value>
+    </data>
+    <data name="Settings_ChatWindow_TemporaryChatMode_Header" xml:space="preserve">
+        <value>新建聊天时是否使用临时聊天。</value>
+    </data>
 </root>
