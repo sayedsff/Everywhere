@@ -11,15 +11,6 @@ namespace Everywhere.Storage;
 public interface IChatContextStorage
 {
     /// <summary>
-    /// Adds a new chat context. The <see cref="ChatContextEntity.Id"/> must be a Guid v7.
-    /// If a record with the same ID already exists, implementations may either throw or upsert;
-    /// choose and document a single behavior. Recommended: throw to catch accidental duplicates.
-    /// </summary>
-    /// <param name="context">Context entity to insert.</param>
-    /// <param name="cancellationToken">Cancellation.</param>
-    Task AddChatContextAsync(ChatContext context, CancellationToken cancellationToken = default);
-
-    /// <summary>
     /// Soft-deletes a chat context by its ID. Implementations should mark <see cref="ChatContextEntity.IsDeleted"/> = true
     /// and update <see cref="ChatContextEntity.UpdatedAt"/> for LWW resolution. Children rows should also be treated accordingly.
     /// </summary>

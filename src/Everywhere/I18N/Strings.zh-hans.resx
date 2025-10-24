@@ -1165,4 +1165,7 @@
     <data name="ChatWindow_ScrollToBottom_ToolTip" xml:space="preserve">
         <value>滚动到底部</value>
     </data>
+    <data name="ChatContext_Temporary" xml:space="preserve">
+        <value>临时聊天</value>
+    </data>
 </root>

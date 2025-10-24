@@ -383,7 +383,8 @@ public class ChatService(
 
             activity?.SetTag("tool_calls.count", toolCallCount);
 
-            if (chatContext.Metadata.Topic.IsNullOrEmpty() &&
+            if (!chatContext.IsTemporary && // Do not generate titles for temporary contexts.
+                chatContext.Metadata.Topic.IsNullOrEmpty() &&
                 chatHistory.Any(c => c.Role == AuthorRole.User) &&
                 chatHistory.Any(c => c.Role == AuthorRole.Assistant) &&
                 chatHistory.First(c => c.Role == AuthorRole.User).Content is { Length: > 0 } userMessage &&

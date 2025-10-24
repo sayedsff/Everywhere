@@ -242,9 +242,18 @@
 
                           <ListBox.ItemTemplate>
                             <DataTemplate DataType="chat:ChatContext">
-                              <TextBlock
-                                Text="{Binding Metadata.Topic, TargetNullValue={I18N {x:Static LocaleKey.ChatContext_Metadata_Title_Default}, Resolve=True}}"
-                                TextTrimming="CharacterEllipsis"/>
+                              <TextBlock TextTrimming="CharacterEllipsis">
+                                <TextBlock.Text>
+                                  <MultiBinding Converter="{x:Static vc:CommonConverters.FirstNotNull}">
+                                    <MultiBinding Converter="{x:Static shadui:BooleanConverters.Gate}">
+                                      <Binding Path="IsTemporary"/>
+                                      <I18N Key="{x:Static LocaleKey.ChatContext_Temporary}"/>
+                                    </MultiBinding>
+                                    <Binding Path="Metadata.Topic"/>
+                                    <I18N Key="{x:Static LocaleKey.ChatContext_Metadata_Title_Default}"/>
+                                  </MultiBinding>
+                                </TextBlock.Text>
+                              </TextBlock>
                             </DataTemplate>
                           </ListBox.ItemTemplate>
                         </ListBox>
@@ -295,6 +304,10 @@
         </TextBlock.Transitions>
         <TextBlock.Text>
           <MultiBinding Converter="{x:Static vc:CommonConverters.FirstNotNull}">
+            <MultiBinding Converter="{x:Static shadui:BooleanConverters.Gate}">
+              <Binding Path="ChatContextManager.Current.IsTemporary"/>
+              <I18N Key="{x:Static LocaleKey.ChatContext_Temporary}"/>
+            </MultiBinding>
             <Binding Path="ChatContextManager.Current.Metadata.Topic"/>
             <I18N Key="{x:Static LocaleKey.ChatWindow_Title}"/>
           </MultiBinding>
@@ -317,62 +330,64 @@
           </Style>
         </Panel.Styles>
 
-        <ItemsControl
+        <StackPanel
           Margin="0,0,0,8"
-          ItemsSource="{Binding QuickActions}">
-          <ItemsControl.IsVisible>
-            <MultiBinding Converter="{x:Static BoolConverters.And}">
-              <Binding Path="!!$self.ItemCount"/>
-              <Binding
-                Converter="{x:Static vc:Int32Converters.NotGreaterThan}"
-                ConverterParameter="1" Path="ChatContextManager.ChatMessageNodes.Count"/>
-            </MultiBinding>
-          </ItemsControl.IsVisible>
+          IsVisible="{Binding ChatContextManager.ChatMessageNodes.Count, Converter={x:Static vc:Int32Converters.NotGreaterThan}, ConverterParameter=1}"
+          Spacing="8">
+          <ToggleSwitch
+            HorizontalAlignment="Center" shadui:ToggleSwitchAssist.RightAlignedContent="True"
+            IsChecked="{Binding ChatContextManager.Current.IsTemporary, Mode=TwoWay}"
+            OffContent="{I18N {x:Static LocaleKey.ChatContext_Temporary}}"
+            OnContent="{I18N {x:Static LocaleKey.ChatContext_Temporary}}"/>
 
-          <ItemsControl.DataTemplates>
-            <DataTemplate DataType="common:DynamicNamedCommand">
-              <Button
-                Classes="Secondary" Height="32"
-                Padding="12,4"
-                Command="{Binding Command}"
-                CommandParameter="{Binding CommandParameter}"
-                CornerRadius="18">
-                <StackPanel
-                  VerticalAlignment="Center" Orientation="Vertical"
-                  Spacing="4">
+          <ItemsControl
+            IsVisible="{Binding $self.ItemCount, Converter={x:Static vc:Int32Converters.GreaterThan}, ConverterParameter=0}"
+            ItemsSource="{Binding QuickActions}">
+            <ItemsControl.DataTemplates>
+              <DataTemplate DataType="common:DynamicNamedCommand">
+                <Button
+                  Classes="Secondary" Height="32"
+                  Padding="12,4"
+                  Command="{Binding Command}"
+                  CommandParameter="{Binding CommandParameter}"
+                  CornerRadius="18">
                   <StackPanel
-                    Orientation="Horizontal" Spacing="6">
-                    <LucideIcon
-                      VerticalAlignment="Center"
-                      Kind="{Binding Icon}"
-                      Size="19"/>
+                    VerticalAlignment="Center" Orientation="Vertical"
+                    Spacing="4">
+                    <StackPanel
+                      Orientation="Horizontal" Spacing="6">
+                      <LucideIcon
+                        VerticalAlignment="Center"
+                        Kind="{Binding Icon}"
+                        Size="19"/>
+                      <TextBlock
+                        VerticalAlignment="Center"
+                        Text="{Binding HeaderKey^}"/>
+                    </StackPanel>
+
                     <TextBlock
-                      VerticalAlignment="Center"
-                      Text="{Binding HeaderKey^}"/>
+                      IsVisible="{Binding !!DescriptionKey}"
+                      Text="{Binding DescriptionKey^, FallbackValue={x:Null}}"
+                      TextWrapping="Wrap"/>
                   </StackPanel>
+                </Button>
+              </DataTemplate>
+            </ItemsControl.DataTemplates>
 
-                  <TextBlock
-                    IsVisible="{Binding !!DescriptionKey}"
-                    Text="{Binding DescriptionKey^, FallbackValue={x:Null}}"
-                    TextWrapping="Wrap"/>
-                </StackPanel>
-              </Button>
-            </DataTemplate>
-          </ItemsControl.DataTemplates>
-
-          <ItemsControl.ItemsPanel>
-            <ItemsPanelTemplate>
-              <WrapPanel
-                HorizontalAlignment="Center" VerticalAlignment="Center"
-                ItemSpacing="8" LineSpacing="6"/>
-            </ItemsPanelTemplate>
-          </ItemsControl.ItemsPanel>
-        </ItemsControl>
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <WrapPanel
+                  HorizontalAlignment="Center" VerticalAlignment="Center"
+                  ItemSpacing="8" LineSpacing="6"/>
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+          </ItemsControl>
+        </StackPanel>
 
         <ItemsControl
           x:Name="ItemsControl" Margin="0,0,0,8"
           Padding="8,0"
-          IsVisible="{Binding !!$self.ItemCount}"
+          IsVisible="{Binding $self.ItemCount, Converter={x:Static vc:Int32Converters.GreaterThan}, ConverterParameter=0}"
           ItemsSource="{Binding ChatContextManager.ChatMessageNodes}">
           <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>

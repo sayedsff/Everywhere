@@ -1183,4 +1183,7 @@ Placeholders can be used within the prompt, enclosed in {}, and will be replaced
     <data name="ChatWindow_ScrollToBottom_ToolTip" xml:space="preserve">
         <value>Scroll to bottom</value>
     </data>
+    <data name="ChatContext_Temporary" xml:space="preserve">
+        <value>Temporary Chat</value>
+    </data>
 </root>
