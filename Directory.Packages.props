@@ -4,8 +4,11 @@
     <MicrosoftPackageVersion>9.0.9</MicrosoftPackageVersion>
     <EntityFrameworkVersion>9.0.7</EntityFrameworkVersion>
     <SemanticKernelVersion>1.66.0</SemanticKernelVersion>
+    <OpenTelemetryVersion>1.13.1</OpenTelemetryVersion>
+    <SentryVersion>5.16.1</SentryVersion>
     <AvaloniaVersion>11.3.8</AvaloniaVersion>
     <SkiaSharpVersion>3.119.1</SkiaSharpVersion>
+    <XamlBehaviorsVersion>11.3.6.6</XamlBehaviorsVersion>
   </PropertyGroup>
   <ItemGroup>
     <!-- Base packages -->
@@ -24,11 +27,11 @@
     <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="$(MicrosoftPackageVersion)" />
     <PackageVersion Include="Microsoft.PowerShell.SDK" Version="7.5.3" />
     <PackageVersion Include="Nito.AsyncEx" Version="5.1.2" />
-    <PackageVersion Include="OpenTelemetry" Version="1.13.1" />
-    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.13.1" />
-    <PackageVersion Include="Sentry" Version="5.16.0" />
-    <PackageVersion Include="Sentry.OpenTelemetry" Version="5.16.0" />
-    <PackageVersion Include="Sentry.Serilog" Version="5.16.0" />
+    <PackageVersion Include="OpenTelemetry" Version="$(OpenTelemetryVersion)" />
+    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="$(OpenTelemetryVersion)" />
+    <PackageVersion Include="Sentry" Version="$(SentryVersion)" />
+    <PackageVersion Include="Sentry.OpenTelemetry" Version="$(SentryVersion)" />
+    <PackageVersion Include="Sentry.Serilog" Version="$(SentryVersion)" />
     <PackageVersion Include="Serilog" Version="4.3.0" />
     <PackageVersion Include="Serilog.Extensions.Logging" Version="9.0.2" />
     <PackageVersion Include="Serilog.Sinks.Console" Version="6.0.0" />
@@ -70,9 +73,10 @@
     <PackageVersion Include="SkiaSharp.NativeAssets.Linux" Version="$(SkiaSharpVersion)" />
     <PackageVersion Include="SkiaSharp.NativeAssets.macOS" Version="$(SkiaSharpVersion)" />
     <PackageVersion Include="SkiaSharp.NativeAssets.Win32" Version="$(SkiaSharpVersion)" />
-    <PackageVersion Include="Xaml.Behaviors.Avalonia" Version="11.3.2" />
+    <PackageVersion Include="Xaml.Behaviors.Avalonia" Version="$(XamlBehaviorsVersion)" />
+    <PackageVersion Include="Xaml.Behaviors.Interactivity" Version="$(XamlBehaviorsVersion)" />
     <!-- Windows packages -->
-    <PackageVersion Include="Microsoft.Windows.CsWin32" Version="0.3.183">
+    <PackageVersion Include="Microsoft.Windows.CsWin32" Version="0.3.228">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageVersion>
