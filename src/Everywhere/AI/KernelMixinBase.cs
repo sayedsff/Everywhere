@@ -46,6 +46,7 @@ public abstract class KernelMixinBase(CustomAssistant customAssistant) : IKernel
             new ChatMessageContent(AuthorRole.System, "You're a helpful assistant."),
             new ChatMessageContent(AuthorRole.User, Prompts.TestPrompt)
         ],
+        GetPromptExecutionSettings(),
         cancellationToken: cancellationToken);
 
     public virtual void Dispose() { }
