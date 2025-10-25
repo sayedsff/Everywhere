@@ -1,6 +1,8 @@
 ﻿using System.Collections.Immutable;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.Json.Serialization;
 using Avalonia.Controls.Documents;
@@ -304,10 +306,10 @@ public partial class FunctionCallChatMessage : ChatMessage, IChatMessageWithAtta
     public partial DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 
     [Key(6)]
-    public ObservableCollection<FunctionCallContent> Calls { get; set; } = [];
+    public List<FunctionCallContent> Calls { get; set; } = [];
 
     [Key(7)]
-    public ObservableCollection<FunctionResultContent> Results { get; set; } = [];
+    public List<FunctionResultContent> Results { get; set; } = [];
 
     [Key(8)]
     [ObservableProperty]
@@ -322,6 +324,19 @@ public partial class FunctionCallChatMessage : ChatMessage, IChatMessageWithAtta
     [ObservableProperty]
     public partial DynamicResourceKeyBase? HeaderKey { get; set; }
 
+    /// <summary>
+    /// The display blocks that make up the content of this function call message,
+    /// which can include text, markdown, progress indicators, file references, and function call/result displays.
+    /// These blocks are rendered in the chat UI to present the function call information to the user.
+    /// And can be serialized for persistence or transmission.
+    /// </summary>
+    /// <remarks>
+    /// The reason why we need to populate the Content property of function call/result display blocks
+    /// is that during deserialization, the references to the actual FunctionCallContent and FunctionResultContent
+    /// objects are not automatically restored. Therefore, we need to manually link them back
+    /// based on their IDs after deserialization. This ensures that the display blocks have access
+    /// to the full details of the function calls and results they are meant to represent.
+    /// </remarks>
     [Key(10)]
     public ObservableCollection<ChatPluginDisplayBlock> DisplayBlocks { get; set; } = [];
 
@@ -394,9 +409,9 @@ public partial class FunctionCallChatMessage : ChatMessage, IChatMessageWithAtta
         return progressBlock.ProgressReporter;
     }
 
-    public void AppendFileReference(string filePath, string? displayName = null)
+    public void AppendFileReferences(params IReadOnlyList<ChatPluginFileReference> references)
     {
-        DisplayBlocks.Add(new ChatPluginFileReferenceDisplayBlock(filePath, displayName));
+        DisplayBlocks.Add(new ChatPluginFileReferencesDisplayBlock(references));
     }
 
     public void AppendFileDifference(TextDifference difference, string originalText)

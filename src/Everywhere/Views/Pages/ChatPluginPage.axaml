@@ -199,14 +199,14 @@
                       Grid.Row="0" Grid.RowSpan="2"
                       Grid.Column="1" Margin="0,0,12,0"
                       VerticalAlignment="Center"
-                      IsVisible="{Binding !!Icon}"
+                      IsVisible="{Binding Icon, Converter={x:Static ObjectConverters.IsNotNull}}"
                       Kind="{Binding Icon}"
                       Size="22"/>
 
                     <TextBlock
                       Classes="p" Grid.Row="0"
                       Grid.Column="2" Margin="0,-4,0,0"
-                      Text="{Binding KernelFunction.Name}"
+                      Text="{Binding HeaderKey^}"
                       TextWrapping="Wrap"/>
                     <TextBlock
                       Classes="Muted" Grid.Row="1"

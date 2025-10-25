@@ -1148,10 +1148,10 @@
         <value>拒绝所有</value>
     </data>
     <data name="NativeChatPlugin_FileSystem_DeleteFiles_DeletionConsent_Header" xml:space="preserve">
-        <value>Everywhere wants to delete {0} files or directories</value>
+        <value>即将删除 {0} 个文件或文件夹。</value>
     </data>
     <data name="NativeChatPlugin_FileSystem_DeleteFiles_SystemFile_DeletionConsent_Header" xml:space="preserve">
-        <value>Everywhere wants to delete system file or directory</value>
+        <value>即将删除系统文件或文件夹。</value>
     </data>
     <data name="TextDifferenceEditor_DiscardButton_Content" xml:space="preserve">
         <value>拒绝</value>
@@ -1177,10 +1177,55 @@
     <data name="TemporaryChatMode_RememberLast" xml:space="preserve">
         <value>记住上次</value>
     </data>
-    <data name="Settings_ChatWindow_TemporaryChatMode_Description" xml:space="preserve">
+    <data name="Settings_ChatWindow_TemporaryChatMode_Header" xml:space="preserve">
         <value>临时聊天模式</value>
     </data>
-    <data name="Settings_ChatWindow_TemporaryChatMode_Header" xml:space="preserve">
+    <data name="NativeChatPlugin_FileSystem_SearchFiles_Header" xml:space="preserve">
+        <value>查找文件</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_GetFileInformation_Header" xml:space="preserve">
+        <value>获取文件信息</value>
+    </data>
+    <data name="Settings_ChatWindow_TemporaryChatMode_Description" xml:space="preserve">
         <value>新建聊天时是否使用临时聊天。</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_SearchFileContent_Header" xml:space="preserve">
+        <value>搜索文件内容</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_DeleteFiles_Header" xml:space="preserve">
+        <value>删除一个或多个文件</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_MoveFile_Header" xml:space="preserve">
+        <value>移动或重命名文件</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_ReadFile_Header" xml:space="preserve">
+        <value>读取文件</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_ReplaceFileContent_Header" xml:space="preserve">
+        <value>修改文件内容</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_WriteToFile_Header" xml:space="preserve">
+        <value>写到文件</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_CreateDirectory_Header" xml:space="preserve">
+        <value>创建文件夹</value>
+    </data>
+    <data name="NativeChatPlugin_WebBrowser_WebSearch_Searching" xml:space="preserve">
+        <value>搜索: {0}</value>
+    </data>
+    <data name="NativeChatPlugin_WebBrowser_WebSearch_Header" xml:space="preserve">
+        <value>网络搜索</value>
+    </data>
+    <data name="ChatPluginDisplayBlockPresenter_FileReferences_TotalCountRun_Text" xml:space="preserve">
+        <value>文件数: </value>
+    </data>
+    <data name="ChatPluginDisplayBlockPresenter_FileReferences_HasMoreReferencesTextBlock_Text" xml:space="preserve">
+        <value>其余略</value>
+    </data>
+    <data name="NativeChatPlugin_WebBrowser_WebSnapshot_Header" xml:space="preserve">
+        <value>访问网页</value>
+    </data>
+    <data name="NativeChatPlugin_WebBrowser_WebSnapshot_Visiting" xml:space="preserve">
+        <value>前往: {0}</value>
     </data>
 </root>

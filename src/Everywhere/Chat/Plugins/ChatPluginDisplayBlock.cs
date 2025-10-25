@@ -1,8 +1,13 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Everywhere.Common;
+using Everywhere.Interop;
 using LiveMarkdown.Avalonia;
 using MessagePack;
+using Microsoft.SemanticKernel;
+using ZLinq;
 
 namespace Everywhere.Chat.Plugins;
 
@@ -14,8 +19,9 @@ namespace Everywhere.Chat.Plugins;
 [Union(1, typeof(ChatPluginDynamicResourceKeyDisplayBlock))]
 [Union(2, typeof(ChatPluginMarkdownDisplayBlock))]
 [Union(3, typeof(ChatPluginProgressDisplayBlock))]
-[Union(4, typeof(ChatPluginFileReferenceDisplayBlock))]
+[Union(4, typeof(ChatPluginFileReferencesDisplayBlock))]
 [Union(5, typeof(ChatPluginFileDifferenceDisplayBlock))]
+[Union(6, typeof(ChatPluginFunctionContentDisplayBlock))]
 public abstract partial class ChatPluginDisplayBlock : ObservableObject
 {
     /// <summary>
@@ -66,14 +72,36 @@ public sealed partial class ChatPluginProgressDisplayBlock(DynamicResourceKeyBas
     public partial double Progress { get; set; }
 }
 
+/// <summary>
+/// Represents a reference to a file or folder in a chat plugin display block.
+/// </summary>
+/// <param name="FullPath"></param>
+/// <param name="DisplayNameKey"></param>
+/// <param name="IsFolder"></param>
 [MessagePackObject(AllowPrivate = true, OnlyIncludeKeyedMembers = true)]
-public sealed partial class ChatPluginFileReferenceDisplayBlock(string filePath, string? displayName) : ChatPluginDisplayBlock
+public partial record ChatPluginFileReference(
+    [property: Key(0)] string FullPath,
+    [property: Key(1)] DynamicResourceKeyBase? DisplayNameKey = null,
+    [property: Key(2)] bool IsFolder = false
+)
+{
+    private void OpenFileLocation()
+    {
+        ServiceLocator.Resolve<INativeHelper>().OpenFileLocation(FullPath);
+    }
+}
+
+[MessagePackObject(AllowPrivate = true, OnlyIncludeKeyedMembers = true)]
+public sealed partial class ChatPluginFileReferencesDisplayBlock(params IReadOnlyList<ChatPluginFileReference> references) : ChatPluginDisplayBlock
 {
     [Key(0)]
-    public string FilePath { get; } = filePath;
+    public IReadOnlyList<ChatPluginFileReference> References { get; } = references.AsValueEnumerable().Take(10).ToList();
 
     [Key(1)]
-    public string? DisplayName { get; } = displayName;
+    public int TotalReferenceCount { get; set; } = references.Count;
+
+    [IgnoreMember]
+    public bool HasMoreReferences => TotalReferenceCount > References.Count;
 }
 
 [MessagePackObject(AllowPrivate = true, OnlyIncludeKeyedMembers = true)]
@@ -104,4 +132,22 @@ public sealed partial class ChatPluginFileDifferenceDisplayBlock(TextDifference 
     {
         if (e.PropertyName == nameof(TextDifference.Acceptance)) OnPropertyChanged(nameof(IsWaitingForUserInput));
     }
+}
+
+/// <summary>
+/// Represents the content of a function (call or result) with optional display content.
+/// </summary>
+/// <param name="id"></param>
+/// <param name="content"></param>
+[MessagePackObject(AllowPrivate = true, OnlyIncludeKeyedMembers = true)]
+public sealed partial class ChatPluginFunctionContentDisplayBlock(string id, ChatPluginDisplayBlock? content) : ChatPluginDisplayBlock
+{
+    /// <summary>
+    /// The unique identifier for the function call.
+    /// </summary>
+    [Key(0)]
+    public string Id { get; } = id;
+
+    [Key(1)]
+    public ChatPluginDisplayBlock? Content { get; } = content;
 }

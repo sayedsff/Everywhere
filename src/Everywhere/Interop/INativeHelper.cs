@@ -26,6 +26,9 @@ public interface INativeHelper
     /// <exception cref="UnauthorizedAccessException">Thrown if the current user is not an administrator.</exception>
     bool IsAdministratorStartupEnabled { get; set; }
 
+    /// <summary>
+    /// Restart the application as administrator (aka UAC on Windows).
+    /// </summary>
     void RestartAsAdministrator();
 
     /// <summary>
@@ -34,5 +37,16 @@ public interface INativeHelper
     /// <returns></returns>
     Task<WriteableBitmap?> GetClipboardBitmapAsync();
 
+    /// <summary>
+    /// Show a desktop notification with the given message and optional title.
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="title"></param>
     void ShowDesktopNotification(string message, string? title = null);
+
+    /// <summary>
+    /// Open the file location in the system file explorer and select the file.
+    /// </summary>
+    /// <param name="fullPath"></param>
+    void OpenFileLocation(string fullPath);
 }

@@ -344,7 +344,7 @@ public static class TextDifferenceRenderer
             }
 
             sb.AppendLine(
-                $"id={ch.Id[..6]} kind={ch.Kind} accepted={ch.Accepted?.ToString().ToLowerInvariant() ?? "null"} span={ch.Range.Start}:{ch.Range.Length}");
+                $"id={ch.Id[..6]} kind={ch.Kind} accepted={ch.Accepted?.ToString() ?? "False"} span={ch.Range.Start}:{ch.Range.Length}");
             sb.AppendLine("before<<<");
             sb.Append(ch.GetOriginalSlice(original));
             sb.AppendLine();

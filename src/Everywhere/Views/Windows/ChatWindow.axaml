@@ -780,33 +780,7 @@
                       </v:ChatActionBubble.ErrorContent>
 
                       <ItemsControl ItemsSource="{Binding DisplayBlocks}">
-                        <ItemsControl.DataTemplates>
-                          <DataTemplate DataType="plugins:ChatPluginTextDisplayBlock">
-                            <SelectableTextBlock
-                              Text="{Binding Text}"
-                              TextWrapping="Wrap"/>
-                          </DataTemplate>
-                          <DataTemplate DataType="plugins:ChatPluginMarkdownDisplayBlock">
-                            <md:MarkdownRenderer MarkdownBuilder="{Binding MarkdownBuilder}"/>
-                          </DataTemplate>
-                          <DataTemplate DataType="plugins:ChatPluginProgressDisplayBlock">
-                            <StackPanel Spacing="4">
-                              <TextBlock Text="{Binding HeaderKey^}"/>
-                              <ProgressBar
-                                IsIndeterminate="{Binding Progress, Converter={x:Static shadui:DoubleConverters.IsNaN}}"
-                                Maximum="1" Minimum="0"
-                                Value="{Binding Progress}"/>
-                            </StackPanel>
-                          </DataTemplate>
-                          <DataTemplate DataType="plugins:ChatPluginFileReferenceDisplayBlock">
-                            <!--  TODO  -->
-                          </DataTemplate>
-                          <DataTemplate DataType="plugins:ChatPluginFileDifferenceDisplayBlock">
-                            <v:TextDifferenceSummaryView
-                              OriginalText="{Binding OriginalText}"
-                              TextDifference="{Binding Difference}"/>
-                          </DataTemplate>
-                        </ItemsControl.DataTemplates>
+                        <v:ChatPluginDisplayBlockPresenter Content="{Binding}"/>
                       </ItemsControl>
                     </v:ChatActionBubble>
                   </DataTemplate>

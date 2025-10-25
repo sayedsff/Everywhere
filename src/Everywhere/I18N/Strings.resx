@@ -1166,10 +1166,10 @@ Placeholders can be used within the prompt, enclosed in {}, and will be replaced
         <value>Discard All</value>
     </data>
     <data name="NativeChatPlugin_FileSystem_DeleteFiles_DeletionConsent_Header" xml:space="preserve">
-        <value>Everywhere 想要删除 {0} 个文件或文件夹</value>
+        <value>{0} files or folders will be deleted.</value>
     </data>
     <data name="NativeChatPlugin_FileSystem_DeleteFiles_SystemFile_DeletionConsent_Header" xml:space="preserve">
-        <value>Everywhere 想要删除系统文件</value>
+        <value>System file or directory will be deleted.</value>
     </data>
     <data name="TextDifferenceEditor_DiscardButton_Content" xml:space="preserve">
         <value>Discard</value>
@@ -1196,9 +1196,54 @@ Placeholders can be used within the prompt, enclosed in {}, and will be replaced
         <value>Always</value>
     </data>
     <data name="Settings_ChatWindow_TemporaryChatMode_Header" xml:space="preserve">
-        <value>Whether to use temporary chats when creating new chats.</value>
+        <value>Temporary Chat Mode</value>
     </data>
     <data name="Settings_ChatWindow_TemporaryChatMode_Description" xml:space="preserve">
-        <value>Temporary Chat Mode</value>
+        <value>Whether to use temporary chats when creating new chats.</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_SearchFiles_Header" xml:space="preserve">
+        <value>Search files</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_GetFileInformation_Header" xml:space="preserve">
+        <value>Get file info</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_SearchFileContent_Header" xml:space="preserve">
+        <value>Search File Content</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_ReadFile_Header" xml:space="preserve">
+        <value>Read File</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_MoveFile_Header" xml:space="preserve">
+        <value>Move or Rename File</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_DeleteFiles_Header" xml:space="preserve">
+        <value>Delete File(s)</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_CreateDirectory_Header" xml:space="preserve">
+        <value>Create Directory</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_WriteToFile_Header" xml:space="preserve">
+        <value>Write to File</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_ReplaceFileContent_Header" xml:space="preserve">
+        <value>Edit File Content</value>
+    </data>
+    <data name="NativeChatPlugin_WebBrowser_WebSearch_Searching" xml:space="preserve">
+        <value>Searching: {0}</value>
+    </data>
+    <data name="NativeChatPlugin_WebBrowser_WebSearch_Header" xml:space="preserve">
+        <value>Web Search</value>
+    </data>
+    <data name="ChatPluginDisplayBlockPresenter_FileReferences_TotalCountRun_Text" xml:space="preserve">
+        <value>Files Count: </value>
+    </data>
+    <data name="ChatPluginDisplayBlockPresenter_FileReferences_HasMoreReferencesTextBlock_Text" xml:space="preserve">
+        <value>etc.</value>
+    </data>
+    <data name="NativeChatPlugin_WebBrowser_WebSnapshot_Header" xml:space="preserve">
+        <value>Visit Webpage</value>
+    </data>
+    <data name="NativeChatPlugin_WebBrowser_WebSnapshot_Visiting" xml:space="preserve">
+        <value>Visiting {0}</value>
     </data>
 </root>

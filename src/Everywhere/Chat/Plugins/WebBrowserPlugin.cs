@@ -151,6 +151,7 @@ public partial class WebBrowserPlugin : BuiltInChatPlugin
     /// <summary>
     /// Performs a web search using the provided query, count, and offset.
     /// </summary>
+    /// <param name="userInterface"></param>
     /// <param name="query">The text to search for.</param>
     /// <param name="count">The number of results to return. Default is 1.</param>
     /// <param name="offset">The number of results to skip. Default is 0.</param>
@@ -162,7 +163,9 @@ public partial class WebBrowserPlugin : BuiltInChatPlugin
     /// </remarks>
     [KernelFunction("web_search")]
     [Description("Perform a web search. Invoke this multiple times with different queries to get more results.")]
+    [DynamicResourceKey(LocaleKey.NativeChatPlugin_WebBrowser_WebSearch_Header)]
     private async Task<string> WebSearchAsync(
+        [FromKernelServices] IChatPluginUserInterface userInterface,
         [Description("Search query")] string query,
         [Description("Number of results")] int count = 10,
         [Description("Number of results to skip")] int offset = 0,
@@ -170,9 +173,19 @@ public partial class WebBrowserPlugin : BuiltInChatPlugin
     {
         _logger.LogDebug("Performing web search with query: {Query}, count: {Count}, offset: {Offset}", query, count, offset);
 
+        userInterface.RequestDisplaySink().AppendDynamicResourceKey(
+            new FormattedDynamicResourceKey(
+                LocaleKey.NativeChatPlugin_WebBrowser_WebSearch_Searching,
+                new DirectResourceKey(query)));
+
         EnsureConnector();
 
         var results = await _connector.SearchAsync<WebPage>(query, count, offset, cancellationToken).ConfigureAwait(false);
+        userInterface.RequestDisplaySink().AppendDynamicResourceKey(
+            new FormattedDynamicResourceKey(
+                LocaleKey.NativeChatPlugin_WebBrowser_WebSearch_Searching,
+                new DirectResourceKey(query)));
+
         return JsonSerializer.Serialize(results, _jsonSerializerOptions);
     }
 
@@ -256,7 +269,11 @@ public partial class WebBrowserPlugin : BuiltInChatPlugin
 
     [KernelFunction("web_snapshot")]
     [Description("Snapshot accessibility of a web page via Puppeteer, returning a json of the page content and metadata.")]
-    private async Task<string> WebSnapshotAsync([Description("Web page URL to snapshot")] string url, CancellationToken cancellationToken = default)
+    [DynamicResourceKey(LocaleKey.NativeChatPlugin_WebBrowser_WebSnapshot_Header)]
+    private async Task<string> WebSnapshotAsync(
+        [FromKernelServices] IChatPluginUserInterface userInterface,
+        [Description("Web page URL to snapshot")] string url,
+        CancellationToken cancellationToken = default)
     {
         _logger.LogDebug("Taking web snapshot...");
 
@@ -279,6 +296,12 @@ public partial class WebBrowserPlugin : BuiltInChatPlugin
                     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
 #endif
                 );
+
+                userInterface.RequestDisplaySink().AppendDynamicResourceKey(
+                    new FormattedDynamicResourceKey(
+                        LocaleKey.NativeChatPlugin_WebBrowser_WebSnapshot_Visiting,
+                        new DirectResourceKey(url)));
+
                 await page.GoToAsync(url, waitUntil: [WaitUntilNavigation.Load, WaitUntilNavigation.Networkidle2]);
 
                 var node = await page.Accessibility.SnapshotAsync();

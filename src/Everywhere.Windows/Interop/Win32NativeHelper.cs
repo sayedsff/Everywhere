@@ -257,6 +257,13 @@ public class Win32NativeHelper : INativeHelper
         };
     }
 
+    public void OpenFileLocation(string fullPath)
+    {
+        if (fullPath.IsNullOrWhiteSpace()) return;
+        var args = $"/e,/select,\"{fullPath}\"";
+        Process.Start(new ProcessStartInfo("explorer.exe", args) { UseShellExecute = true });
+    }
+
     private record CompositionContext(Compositor Compositor, Visual RootVisual)
     {
         public CompositionClip? Clip { get; set; }

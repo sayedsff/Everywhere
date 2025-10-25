@@ -11,11 +11,11 @@ namespace Everywhere.Chat.Plugins;
 
 public class FileSystemPlugin : BuiltInChatPlugin
 {
+    private static TimeSpan RegexTimeout => TimeSpan.FromSeconds(3);
+
     public override DynamicResourceKeyBase HeaderKey { get; } = new DynamicResourceKey(LocaleKey.NativeChatPlugin_FileSystem_Header);
     public override DynamicResourceKeyBase DescriptionKey { get; } = new DynamicResourceKey(LocaleKey.NativeChatPlugin_FileSystem_Description);
     public override LucideIconKind? Icon => LucideIconKind.FileBox;
-
-    private TimeSpan RegexTimeout => TimeSpan.FromSeconds(3);
 
     private readonly ILogger<FileSystemPlugin> _logger;
 
@@ -37,7 +37,7 @@ public class FileSystemPlugin : BuiltInChatPlugin
                 ChatFunctionPermissions.FileRead));
         _functions.Add(
             new NativeChatFunction(
-                ReadTextFileAsync,
+                ReadFileAsync,
                 ChatFunctionPermissions.FileRead));
         _functions.Add(
             new NativeChatFunction(
@@ -53,7 +53,7 @@ public class FileSystemPlugin : BuiltInChatPlugin
                 ChatFunctionPermissions.FileAccess));
         _functions.Add(
             new NativeChatFunction(
-                WriteFileContentAsync,
+                WriteToFileAsync,
                 ChatFunctionPermissions.FileAccess));
         _functions.Add(
             new NativeChatFunction(
@@ -63,9 +63,11 @@ public class FileSystemPlugin : BuiltInChatPlugin
 
     [KernelFunction("search_files")]
     [Description("Search for files and directories in a specified path matching the given search pattern.")]
+    [DynamicResourceKey(LocaleKey.NativeChatPlugin_FileSystem_SearchFiles_Header)]
+    [FriendlyFunctionCallContentRenderer(typeof(FileRenderer))]
     private string SearchFiles(
         string path,
-        [Description("Regex search pattern to match file and directory names.")] string pattern = ".*",
+        [Description("Regex search pattern to match file and directory names.")] string filePattern = ".*",
         int skip = 0,
         [Description("Maximum number of results to return. Max is 1000.")] int maxCount = 100,
         FilesOrderBy orderBy = FilesOrderBy.Default)
@@ -77,12 +79,12 @@ public class FileSystemPlugin : BuiltInChatPlugin
         _logger.LogDebug(
             "Searching files in path: {Path} with pattern: {SearchPattern}, skip: {Skip}, maxCount: {MaxCount}, orderBy: {OrderBy}",
             path,
-            pattern,
+            filePattern,
             skip,
             maxCount,
             orderBy);
 
-        var regex = new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled, RegexTimeout);
+        var regex = new Regex(filePattern, RegexOptions.IgnoreCase | RegexOptions.Compiled, RegexTimeout);
         ExpandFullPath(ref path);
         var query = EnsureDirectoryInfo(path)
             .EnumerateFileSystemInfos("*", SearchOption.AllDirectories)
@@ -108,6 +110,8 @@ public class FileSystemPlugin : BuiltInChatPlugin
 
     [KernelFunction("get_file_info")]
     [Description("Get information about a file or directory at the specified path.")]
+    [DynamicResourceKey(LocaleKey.NativeChatPlugin_FileSystem_GetFileInformation_Header)]
+    [FriendlyFunctionCallContentRenderer(typeof(FileRenderer))]
     private string GetFileInformation(string path)
     {
         _logger.LogDebug("Getting file information for path: {Path}", path);
@@ -126,6 +130,8 @@ public class FileSystemPlugin : BuiltInChatPlugin
 
     [KernelFunction("search_file_content")]
     [Description("Searches for a specific text pattern within file(s) and returns matching lines.")]
+    [DynamicResourceKey(LocaleKey.NativeChatPlugin_FileSystem_SearchFileContent_Header)]
+    [FriendlyFunctionCallContentRenderer(typeof(FileRenderer))]
     private async Task<string> SearchFileContentAsync(
         [Description("File or directory path to search.")] string path,
         [Description("Regex pattern to search for within the file.")] string pattern,
@@ -216,7 +222,9 @@ public class FileSystemPlugin : BuiltInChatPlugin
     [Description(
         "Reads lines from a text file at the specified path. Supports reading from a specific line and limiting the number of lines." +
         "Binary files will read as hex string, 32 bytes per line.")]
-    private async Task<string> ReadTextFileAsync(
+    [DynamicResourceKey(LocaleKey.NativeChatPlugin_FileSystem_ReadFile_Header)]
+    [FriendlyFunctionCallContentRenderer(typeof(FileRenderer))]
+    private async Task<string> ReadFileAsync(
         string path,
         long startBytes = 0L,
         long maxReadBytes = 10240L,
@@ -299,6 +307,8 @@ public class FileSystemPlugin : BuiltInChatPlugin
 
     [KernelFunction("move_file")]
     [Description("Moves or renames a file or directory.")]
+    [DynamicResourceKey(LocaleKey.NativeChatPlugin_FileSystem_MoveFile_Header)]
+    [FriendlyFunctionCallContentRenderer(typeof(FileRenderer))]
     private bool MoveFile(
         [Description("Source file or directory path.")] string source,
         [Description("Destination file or directory path. Type must match the source.")] string destination)
@@ -342,13 +352,18 @@ public class FileSystemPlugin : BuiltInChatPlugin
     }
 
     [KernelFunction("delete_files")]
-    [Description("Delete files and directories at the specified path matching the given pattern. The maximum number of deletions is limited to 10,000.")]
+    [Description(
+        "Delete files and directories at the specified path matching the given pattern.")]
+    [DynamicResourceKey(LocaleKey.NativeChatPlugin_FileSystem_DeleteFiles_Header)]
+    [FriendlyFunctionCallContentRenderer(typeof(FileRenderer))]
     private async Task<string> DeleteFilesAsync(
         [FromKernelServices] IChatPluginUserInterface userInterface,
         [Description("File or directory path to delete.")] string path,
         [Description(
-            "Regex search pattern to match file and directory names. Effective when path is a folder. Warn that this will delete all matching files and directories recursively.")]
-        string pattern = ".*",
+            "Regex search pattern to match file and directory names (not full path). " +
+            "Effective when path is a folder. " +
+            "Warn that this will delete all matching files and directories recursively.")]
+        string filePattern = ".*",
         CancellationToken cancellationToken = default)
     {
         _logger.LogDebug("Deleting file at {Path}", path);
@@ -366,39 +381,18 @@ public class FileSystemPlugin : BuiltInChatPlugin
             throw new UnauthorizedAccessException("Cannot delete system files or directories.");
         }
 
-        List<FileInfo> filesToDelete;
-        List<DirectoryInfo> directoriesToDelete = [];
+        List<FileSystemInfo> infosToDelete;
         switch (fileSystemInfo)
         {
             case FileInfo fileInfo:
             {
-                filesToDelete = [fileInfo];
+                infosToDelete = [fileInfo];
                 break;
             }
             case DirectoryInfo directoryInfo:
             {
-                var regex = new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled, RegexTimeout);
-
-                // directories matching pattern (will be deleted recursively)
-                directoriesToDelete = directoryInfo
-                    .EnumerateDirectories("*", SearchOption.AllDirectories)
-                    .AsValueEnumerable()
-                    .Where(d => regex.IsMatch(d.Name))
-                    .OrderByDescending(d => d.FullName.Length) // deeper first
-                    .ToList();
-
-                // files matching pattern that are NOT inside directoriesToDelete (to avoid double work)
-                var deleteDirPrefixes = directoriesToDelete
-                    .Select(d => Path.GetFullPath(d.FullName.TrimEnd(Path.DirectorySeparatorChar)) + Path.DirectorySeparatorChar)
-                    .ToArray();
-
-                filesToDelete = directoryInfo
-                    .EnumerateFiles("*", SearchOption.AllDirectories)
-                    .AsValueEnumerable()
-                    .Take(10000) // limit to 10k files
-                    .Where(f => regex.IsMatch(f.Name) &&
-                        !deleteDirPrefixes.Any(p => f.FullName.StartsWith(p, StringComparison.OrdinalIgnoreCase)))
-                    .ToList();
+                var regex = new Regex(filePattern, RegexOptions.IgnoreCase | RegexOptions.Compiled, RegexTimeout);
+                infosToDelete = directoryInfo.EnumerateFileSystemInfos("*").AsValueEnumerable().Where(i => regex.IsMatch(i.Name)).ToList();
                 break;
             }
             default:
@@ -407,29 +401,16 @@ public class FileSystemPlugin : BuiltInChatPlugin
             }
         }
 
-        var fileNames = string.Join(Environment.NewLine, filesToDelete.Select(f => f.Name).Take(10));
-        var consent = await userInterface.RequestConsentAsync(
-            "deletion",
-            new FormattedDynamicResourceKey(
-                LocaleKey.NativeChatPlugin_FileSystem_DeleteFiles_DeletionConsent_Header,
-                new DirectResourceKey(filesToDelete.Count)),
-            fileNames,
-            cancellationToken);
-        if (!consent)
-        {
-            return $"{filesToDelete.Count} files/directories deletion was cancelled by user.";
-        }
-
         var successCount = 0;
         var errorCount = 0;
-        foreach (var info in filesToDelete)
+        foreach (var info in infosToDelete)
         {
             if (info.Attributes.HasFlag(FileAttributes.System))
             {
-                consent = await userInterface.RequestConsentAsync(
+                var consent = await userInterface.RequestConsentAsync(
                     "system",
                     new DynamicResourceKey(LocaleKey.NativeChatPlugin_FileSystem_DeleteFiles_SystemFile_DeletionConsent_Header),
-                    info.FullName,
+                    new ChatPluginFileReferencesDisplayBlock(new ChatPluginFileReference(info.FullName)),
                     cancellationToken);
                 if (!consent)
                 {
@@ -445,7 +426,12 @@ public class FileSystemPlugin : BuiltInChatPlugin
                         $"{successCount} files/directories were deleted successfully, {errorCount} errors occurred.";
                 }
 
-                if (info.Exists) info.Delete();
+                if (info.Exists)
+                {
+                    if (info is DirectoryInfo directoryInfo) directoryInfo.Delete(true);
+                    else info.Delete();
+                }
+
                 successCount++;
             }
             catch
@@ -455,12 +441,14 @@ public class FileSystemPlugin : BuiltInChatPlugin
         }
 
         return errorCount == 0 ?
-            $"{filesToDelete.Count} files/directories were deleted successfully." :
+            $"{infosToDelete.Count} files/directories were deleted successfully." :
             $"{successCount} files/directories were deleted successfully, {errorCount} errors occurred.";
     }
 
     [KernelFunction("create_directory")]
     [Description("Creates a new directory at the specified path.")]
+    [DynamicResourceKey(LocaleKey.NativeChatPlugin_FileSystem_CreateDirectory_Header)]
+    [FriendlyFunctionCallContentRenderer(typeof(FileRenderer))]
     private void CreateDirectory(string path)
     {
         _logger.LogDebug("Creating directory at {Path}", path);
@@ -469,9 +457,11 @@ public class FileSystemPlugin : BuiltInChatPlugin
         Directory.CreateDirectory(path);
     }
 
-    [KernelFunction("write_file_content")]
+    [KernelFunction("write_to_file")]
     [Description("Writes content to a text file at the specified path. Binary files are not supported.")]
-    private async Task WriteFileContentAsync(
+    [DynamicResourceKey(LocaleKey.NativeChatPlugin_FileSystem_WriteToFile_Header)]
+    [FriendlyFunctionCallContentRenderer(typeof(FileRenderer))]
+    private async Task WriteToFileAsync(
         string path,
         string? content,
         [Description("Text encoding name for `System.Text.Encoding.GetEncoding`")] string encoding = "utf-8",
@@ -493,6 +483,8 @@ public class FileSystemPlugin : BuiltInChatPlugin
 
     [KernelFunction("replace_file_content")]
     [Description("Replaces content in a single text file at the specified path with regex. Binary files are not supported.")]
+    [DynamicResourceKey(LocaleKey.NativeChatPlugin_FileSystem_ReplaceFileContent_Header)]
+    [FriendlyFunctionCallContentRenderer(typeof(FileRenderer))]
     private async Task<string> ReplaceFileContentAsync(
         [FromKernelServices] IChatPluginUserInterface userInterface,
         string path,
@@ -659,6 +651,17 @@ public class FileSystemPlugin : BuiltInChatPlugin
         finally
         {
             ArrayPool<byte>.Shared.Return(buffer);
+        }
+    }
+
+    private class FileRenderer : IFriendlyFunctionCallContentRenderer
+    {
+        public ChatPluginDisplayBlock? Render(KernelArguments arguments)
+        {
+            if (!arguments.TryGetValue("path", out var pathObj) || pathObj is not string path) return null;
+
+            // arguments.TryGetValue("filePattern", out var filePatternObj);
+            return new ChatPluginFileReferencesDisplayBlock(new ChatPluginFileReference(path));
         }
     }
 }

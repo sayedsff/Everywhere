@@ -330,11 +330,9 @@ file class DesignTimeNativeHelper : INativeHelper
     public bool IsUserStartupEnabled { get; set; }
     public bool IsAdministratorStartupEnabled { get; set; }
     public void RestartAsAdministrator() { }
-    public void SetWindowNoFocus(Window window) { }
-    public void SetWindowHitTestInvisible(Window window) { }
-    public void HideWindowWithoutAnimation(Window window) { }
     public Task<WriteableBitmap?> GetClipboardBitmapAsync() => Task.FromResult<WriteableBitmap?>(null);
     public void ShowDesktopNotification(string message, string? title) { }
+    public void OpenFileLocation(string fullPath) { }
 }
 
 #pragma warning restore CS0067 // The event is for design-time only.
