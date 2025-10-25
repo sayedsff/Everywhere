@@ -5,7 +5,6 @@ using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
-using Everywhere.Chat.Plugins;
 using Everywhere.Common;
 using Everywhere.Configuration;
 using Everywhere.Interop;
@@ -26,108 +25,6 @@ public class App : Application
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
-
-        var diff = new TextDifference("C:\\Linux\\a.txt");
-        var origin =
-            """
-            using OpenAI;
-            using OpenAI.Chat;
-            using BinaryContent = System.ClientModel.BinaryContent;
-            using ChatMessage = Microsoft.Extensions.AI.ChatMessage;
-            using TextContent = Microsoft.Extensions.AI.TextContent;
-
-            namespace Everywhere.AI;
-            public sealed class OpenAIKernelMixin : KernelMixinBase
-                {
-                    ChatCompletionService = new OptimizedOpenAIApiClient(
-                        new OptimizedChatClient(
-                            customAssistant.ModelId,
-                            // some models don't need API key (e.g. LM Studio)
-                            new ApiKeyCredential(customAssistant.ApiKey.IsNullOrWhiteSpace() ? "NO_API_KEY" : customAssistant.ApiKey),
-                            new OpenAIClientOptions
-                            {
-                                Endpoint = new Uri(customAssistant.Endpoint, UriKind.Absolute)
-                            }
-                        ).AsIChatClient(),
-                        this
-                                update.AdditionalProperties = ApplyReasoningProperties(update.AdditionalProperties);
-                            }
-                            yield return update;
-                        }
-                    }
-            """;
-        var modified =
-            """
-            using OpenAI.Chat;
-            using BinaryContent = System.ClientModel.BinaryContent;
-            using ChatMessage = Microsoft.Extensions.AI.ChatMessage;
-            using FunctionCallContent = Microsoft.Extensions.AI.FunctionCallContent;
-            using TextContent = Microsoft.Extensions.AI.TextContent;
-
-            namespace Everywhere.AI;
-            public sealed class OpenAIKernelMixin : KernelMixinBase
-                {
-                    ChatCompletionService = new OptimizedOpenAIApiClient(
-                        new OptimizedChatClient(
-                            ModelId,
-                            // some models don't need API key (e.g. LM Studio)
-                            new ApiKeyCredential(ApiKey.IsNullOrWhiteSpace() ? "NO_API_KEY" : ApiKey),
-                            new OpenAIClientOptions
-                            {
-                                Endpoint = new Uri(Endpoint, UriKind.Absolute)
-                            }
-                        ).AsIChatClient(),
-                        this
-            public sealed class OpenAIKernelMixin : KernelMixinBase
-                                update.AdditionalProperties = ApplyReasoningProperties(update.AdditionalProperties);
-                            }
-
-                            // Ensure that all FunctionCallContent items have a unique CallId.
-                            for (var i = 0; i < update.Contents.Count; i++)
-                            {
-                                var item = update.Contents[i];
-                                if (item is FunctionCallContent { Name.Length: > 0, CallId: null or { Length: 0 } } missingIdContent)
-                                {
-                                    // Generate a unique ToolCallId for the function call update.
-                                    update.Contents[i] = new FunctionCallContent(
-                                        Guid.CreateVersion7().ToString("N"),
-                                        missingIdContent.Name,
-                                        missingIdContent.Arguments);
-                                }
-                            }
-
-                            yield return update;
-                        }
-                    }
-            """;
-
-        TextDifferenceBuilder.BuildLineDiff(diff, origin, modified);
-
-        // diff.AcceptAll();
-        var summary = diff.ToUnifiedDiff(origin, default);
-        var equals = Equals(diff.Apply(origin), modified);
-
-        new TransientWindow
-        {
-            Content = new StackPanel
-            {
-                Children =
-                {
-                    new TextDifferenceSummaryView
-                    {
-                        TextDifference = diff,
-                        OriginalText = origin
-                    },
-                    new TextDifferenceEditor
-                    {
-                        TextDifference = diff,
-                        OriginalText = origin,
-                        OnlyAccepted = false,
-                        ShowLineNumbers = true
-                    }
-                }
-            }
-        }.Show();
 
         Dispatcher.UIThread.UnhandledException += (_, e) =>
         {
