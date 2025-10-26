@@ -1,4 +1,6 @@
-﻿<root>
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Simplified Chinese (简体中文) -->
+<root>
     <resheader name="resmimetype">
         <value>text/microsoft-resx</value>
     </resheader>
@@ -181,6 +183,9 @@
     </data>
     <data name="KeyboardHotkeyInputBox_Watermark" xml:space="preserve">
         <value>点击设置快捷键</value>
+    </data>
+    <data name="KeyboardHotkeyInputBox_SettingWatermark" xml:space="preserve">
+        <value>设置中</value>
     </data>
     <data name="ChatContext_Metadata_Title_Default" xml:space="preserve">
         <value>未命名会话</value>

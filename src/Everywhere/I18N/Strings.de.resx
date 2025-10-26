@@ -1,4 +1,6 @@
-﻿<root>
+<?xml version="1.0" encoding="utf-8"?>
+<!-- German (Deutsch) -->
+<root>
     <resheader name="resmimetype">
         <value>text/microsoft-resx</value>
     </resheader>
@@ -11,11 +13,350 @@
     <resheader name="writer">
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
+    <data name="SettingsPage_Saved_Toast_Title" xml:space="preserve">
+        <value>Einstellungen gespeichert</value>
+    </data>
+    <data name="Settings_Common_Language_Header" xml:space="preserve">
+        <value>Sprache</value>
+    </data>
+    <data name="SettingsCategory_Common_Header" xml:space="preserve">
+        <value>Allgemeine Einstellungen</value>
+    </data>
+    <data name="Settings_Common_Language_Description" xml:space="preserve">
+        <value>Wählen Sie die Anzeigesprache für die Software aus.</value>
+    </data>
     <data name="SettingsSelectionItem_Common_Language_zh-hans" xml:space="preserve">
         <value>中文 (简体)</value>
     </data>
     <data name="SettingsSelectionItem_Common_Language_default" xml:space="preserve">
         <value>English (United States)</value>
+    </data>
+    <data name="Settings_Common_Theme_Description" xml:space="preserve">
+        <value>Wählen Sie das Anzeigethema für die Software aus.</value>
+    </data>
+    <data name="SettingsSelectionItem_Common_Theme_System" xml:space="preserve">
+        <value>System folgen</value>
+    </data>
+    <data name="SettingsSelectionItem_Common_Theme_Dark" xml:space="preserve">
+        <value>Dunkel</value>
+    </data>
+    <data name="SettingsSelectionItem_Common_Theme_Light" xml:space="preserve">
+        <value>Hell</value>
+    </data>
+    <data name="SettingsCategory_ChatWindow_Header" xml:space="preserve">
+        <value>Chat-Einstellungen</value>
+    </data>
+    <data name="Settings_ChatWindow_Hotkey_Header" xml:space="preserve">
+        <value>Tastenkombination</value>
+    </data>
+    <data name="Settings_ChatWindow_Hotkey_Description" xml:space="preserve">
+        <value>Legen Sie eine Tastenkombination fest, um das Chatfenster jederzeit aufzurufen.</value>
+    </data>
+    <data name="SettingsCategory_Model_Header" xml:space="preserve">
+        <value>KI-Einstellungen</value>
+    </data>
+    <data name="Settings_CustomAssistant_Temperature_Header" xml:space="preserve">
+        <value>Kreativität (temperature)</value>
+    </data>
+    <data name="Settings_CustomAssistant_Temperature_Description" xml:space="preserve">
+        <value>Höhere Werte ergeben phantasievollere, kreativere Antworten; niedrigere Werte erzeugen präzisere, konservativere Ausgaben; beachten Sie, dass Temperaturen über 1,0 bei einigen Modellen zu unleserlichen Ausgaben führen können.</value>
+    </data>
+    <data name="Settings_CustomAssistant_TopP_Header" xml:space="preserve">
+        <value>Denk-Offenheit (top_p)</value>
+    </data>
+    <data name="Settings_CustomAssistant_TopP_Description" xml:space="preserve">
+        <value>Höhere Werte ermöglichen ein breiteres Spektrum möglicher Antworten; niedrigere Werte begünstigen die wahrscheinlichsten Antworten; es wird nicht empfohlen, dies zusammen mit der Temperatur zu ändern. Diese Einstellung wirkt nur bei einigen Modellen. Wenn Sie einen Fehler begegnen, versuchen Sie, den Standardwert wiederherzustellen.</value>
+    </data>
+    <data name="Settings_Plugin_WebSearchEngine_SelectedWebSearchEngineProvider_Description" xml:space="preserve">
+        <value>Wählen Sie den Dienstleister für Web-Suchmaschinen aus.</value>
+    </data>
+    <data name="SettingsSelectionItem_Model_WebSearchProvider_bing" xml:space="preserve">
+        <value>Bing</value>
+    </data>
+    <data name="SettingsSelectionItem_Model_WebSearchProvider_google" xml:space="preserve">
+        <value>Google</value>
+    </data>
+    <data name="SettingsSelectionItem_Model_WebSearchProvider_brave" xml:space="preserve">
+        <value>Brave</value>
+    </data>
+    <data name="SettingsSelectionItem_Model_WebSearchProvider_bocha" xml:space="preserve">
+        <value>Bocha</value>
+    </data>
+    <data name="Settings_Plugin_WebSearchEngine_SelectedWebSearchEngineProvider_EndPoint_Header" xml:space="preserve">
+        <value>API-URL</value>
+    </data>
+    <data name="Settings_Plugin_WebSearchEngine_SelectedWebSearchEngineProvider_EndPoint_Description" xml:space="preserve">
+        <value>Belassen Sie dies bei der Standardeinstellung, wenn Sie nicht wissen, was Sie tun sollen. Muss mit "http(s)://" beginnen.</value>
+    </data>
+    <data name="ChatInputBox_Watermark" xml:space="preserve">
+        <value>Fragen Sie Everywhere oder chatten Sie einfach</value>
+    </data>
+    <data name="ChatInputBox_AddAttachmentMenuItem_ToolTip" xml:space="preserve">
+        <value>Anhänge zur Konversation hinzufügen</value>
+    </data>
+    <data name="ChatInputBox_AddAttachmentMenuItem_Header" xml:space="preserve">
+        <value>Anhang hinzufügen</value>
+    </data>
+    <data name="ChatInputBox_ImageButton_Text" xml:space="preserve">
+        <value>Bild</value>
+    </data>
+    <data name="ChatInputBox_ToolCallButton_ToolTip" xml:space="preserve">
+        <value>Werkzeuge verwenden, um die Fähigkeiten des Assistenten zu verbessern (Strg+T)</value>
+    </data>
+    <data name="ChatInputBox_ToolCallButton_Text" xml:space="preserve">
+        <value>Werkzeuge</value>
+    </data>
+    <data name="ChatInputBox_SendButton_ToolTip" xml:space="preserve">
+        <value>Senden</value>
+    </data>
+    <data name="ChatInputBox_CancelButton_ToolTip" xml:space="preserve">
+        <value>Abbrechen</value>
+    </data>
+    <data name="AssistantCommand_Translate_Description" xml:space="preserve">
+        <value>Ins Zielsprache übersetzen</value>
+    </data>
+    <data name="AssistantCommand_Rewrite_Description" xml:space="preserve">
+        <value>Nach Bedarf umschreiben</value>
+    </data>
+    <data name="ActionChatMessage_Header_AnalyzingContext" xml:space="preserve">
+        <value>Kontext analysieren</value>
+    </data>
+    <data name="ActionChatMessage_Header_WebSearching" xml:space="preserve">
+        <value>Websuche</value>
+    </data>
+    <data name="ChatWindow_ChatMessage_Assistant_Regenerate" xml:space="preserve">
+        <value>Erneuern</value>
+    </data>
+    <data name="ChatWindow_ChatMessage_Assistant_Copy" xml:space="preserve">
+        <value>Kopieren</value>
+    </data>
+    <data name="Application_TrayIcon_Menu_OpenMainWindow" xml:space="preserve">
+        <value>Fenster öffnen</value>
+    </data>
+    <data name="Application_TrayIcon_Menu_Exit" xml:space="preserve">
+        <value>Beenden</value>
+    </data>
+    <data name="Application_TrayIcon_Menu_OpenDebugWindow" xml:space="preserve">
+        <value>Debug-Fenster öffnen</value>
+    </data>
+    <data name="ChatWindow_History_ToolTip" xml:space="preserve">
+        <value>Chat-Verlauf</value>
+    </data>
+    <data name="ChatWindow_CreateNew_ToolTip" xml:space="preserve">
+        <value>Neuen Chat erstellen (Strg+N)</value>
+    </data>
+    <data name="ChatWindow_Close_ToolTip" xml:space="preserve">
+        <value>Schließen (Esc)</value>
+    </data>
+    <data name="ChatWindow_ChatInputBox_AddAttachmentMenuItems_PickScreen" xml:space="preserve">
+        <value>Bildschirm auswählen</value>
+    </data>
+    <data name="ChatWindow_ChatInputBox_AddAttachmentMenuItems_PickWindow" xml:space="preserve">
+        <value>Fenster auswählen</value>
+    </data>
+    <data name="ChatWindow_ChatInputBox_AddAttachmentMenuItems_PickElement" xml:space="preserve">
+        <value>Element auswählen</value>
+    </data>
+    <data name="ChatWindow_ChatInputBox_AddAttachmentMenuItems_AttachFile" xml:space="preserve">
+        <value>Datei anfügen</value>
+    </data>
+    <data name="ChatWindowViewModel_QuickActions_Translate" xml:space="preserve">
+        <value>Übersetzen</value>
+    </data>
+    <data name="ChatWindowViewModel_QuickActions_Verify" xml:space="preserve">
+        <value>Schlüsselpunkte</value>
+    </data>
+    <data name="ChatWindowViewModel_QuickActions_Summarize" xml:space="preserve">
+        <value>Zusammenfassung</value>
+    </data>
+    <data name="ChatWindow_Title" xml:space="preserve">
+        <value>Wie kann ich Ihnen helfen?</value>
+    </data>
+    <data name="KeyboardHotkeyInputBox_Watermark" xml:space="preserve">
+        <value>Klicken Sie, um eine Tastenkombination festzulegen</value>
+    </data>
+    <data name="KeyboardHotkeyInputBox_SettingWatermark" xml:space="preserve">
+        <value>Einstellung...</value>
+    </data>
+    <data name="ChatContext_Metadata_Title_Default" xml:space="preserve">
+        <value>Unbenannte Sitzung</value>
+    </data>
+    <data name="ChatAttachment_RemoveButton_ToolTip" xml:space="preserve">
+        <value>Entfernen</value>
+    </data>
+    <data name="VisualElementType_Unknown" xml:space="preserve">
+        <value>Unbekannt</value>
+    </data>
+    <data name="VisualElementType_Label" xml:space="preserve">
+        <value>Bezeichnung</value>
+    </data>
+    <data name="VisualElementType_TextEdit" xml:space="preserve">
+        <value>Textfeld</value>
+    </data>
+    <data name="VisualElementType_Document" xml:space="preserve">
+        <value>Dokument</value>
+    </data>
+    <data name="VisualElementType_Button" xml:space="preserve">
+        <value>Schaltfläche</value>
+    </data>
+    <data name="VisualElementType_Hyperlink" xml:space="preserve">
+        <value>Hyperlink</value>
+    </data>
+    <data name="VisualElementType_Image" xml:space="preserve">
+        <value>Bild</value>
+    </data>
+    <data name="VisualElementType_CheckBox" xml:space="preserve">
+        <value>Kontrollkästchen</value>
+    </data>
+    <data name="VisualElementType_RadioButton" xml:space="preserve">
+        <value>Optionsfeld</value>
+    </data>
+    <data name="VisualElementType_ComboBox" xml:space="preserve">
+        <value>Kombinationsfeld</value>
+    </data>
+    <data name="VisualElementType_ListView" xml:space="preserve">
+        <value>Liste</value>
+    </data>
+    <data name="VisualElementType_ListViewItem" xml:space="preserve">
+        <value>Listenelement</value>
+    </data>
+    <data name="VisualElementType_TreeView" xml:space="preserve">
+        <value>Baum</value>
+    </data>
+    <data name="VisualElementType_TreeViewItem" xml:space="preserve">
+        <value>Baumelement</value>
+    </data>
+    <data name="VisualElementType_DataGrid" xml:space="preserve">
+        <value>Tabelle</value>
+    </data>
+    <data name="VisualElementType_DataGridItem" xml:space="preserve">
+        <value>Tabellenelement</value>
+    </data>
+    <data name="VisualElementType_TabControl" xml:space="preserve">
+        <value>Registerkarte</value>
+    </data>
+    <data name="VisualElementType_TabItem" xml:space="preserve">
+        <value>Registerkarte</value>
+    </data>
+    <data name="VisualElementType_Table" xml:space="preserve">
+        <value>Tabelle</value>
+    </data>
+    <data name="VisualElementType_TableRow" xml:space="preserve">
+        <value>Tabelle</value>
+    </data>
+    <data name="VisualElementType_Menu" xml:space="preserve">
+        <value>Menü</value>
+    </data>
+    <data name="VisualElementType_MenuItem" xml:space="preserve">
+        <value>Menüelement</value>
+    </data>
+    <data name="VisualElementType_Slider" xml:space="preserve">
+        <value>Schieberegler</value>
+    </data>
+    <data name="VisualElementType_ScrollBar" xml:space="preserve">
+        <value>Scrollleiste</value>
+    </data>
+    <data name="VisualElementType_ProgressBar" xml:space="preserve">
+        <value>Fortschrittsbalken</value>
+    </data>
+    <data name="VisualElementType_Panel" xml:space="preserve">
+        <value>Panel</value>
+    </data>
+    <data name="VisualElementType_TopLevel" xml:space="preserve">
+        <value>Fenster</value>
+    </data>
+    <data name="VisualElementType_Screen" xml:space="preserve">
+        <value>Bildschirm</value>
+    </data>
+    <data name="HumanizedDate_Today" xml:space="preserve">
+        <value>Heute</value>
+    </data>
+    <data name="HumanizedDate_Yesterday" xml:space="preserve">
+        <value>Gestern</value>
+    </data>
+    <data name="HumanizedDate_LastWeek" xml:space="preserve">
+        <value>Letzte Woche</value>
+    </data>
+    <data name="HumanizedDate_LastMonth" xml:space="preserve">
+        <value>Letzter Monat</value>
+    </data>
+    <data name="HumanizedDate_LastYear" xml:space="preserve">
+        <value>Letztes Jahr</value>
+    </data>
+    <data name="HumanizedDate_Earlier" xml:space="preserve">
+        <value>Früher</value>
+    </data>
+    <data name="FriendlyExceptionMessage_HttpRequest" xml:space="preserve">
+        <value>HTTP-Anforderungsfehler ({0}): {1}</value>
+    </data>
+    <data name="FriendlyExceptionMessage_HttpRequest_BadRequest" xml:space="preserve">
+        <value>Ungültige Anfrage, möglicherweise aufgrund eines falschen API-Schlüssels oder eines nicht unterstützten Netzwerks/Region.</value>
+    </data>
+    <data name="FriendlyExceptionMessage_HttpRequest_Unauthorized" xml:space="preserve">
+        <value>Nicht autorisierte Anfrage, möglicherweise aufgrund eines falschen API-Schlüssels oder eines nicht unterstützten Netzwerks/Region.</value>
+    </data>
+    <data name="FriendlyExceptionMessage_HttpRequest_Forbidden" xml:space="preserve">
+        <value>Anfrage verboten, möglicherweise aufgrund eines falschen API-Schlüssels oder eines nicht unterstützten Netzwerks/Bereichs.</value>
+    </data>
+    <data name="FriendlyExceptionMessage_HttpRequest_NotFound" xml:space="preserve">
+        <value>Ergebnis nicht gefunden.</value>
+    </data>
+    <data name="FriendlyExceptionMessage_HttpRequest_InternalServerError" xml:space="preserve">
+        <value>Der Server ist auf einen Fehler gestoßen. Bitte versuchen Sie es später erneut.</value>
+    </data>
+    <data name="FriendlyExceptionMessage_HttpRequest_ServiceUnavailable" xml:space="preserve">
+        <value>Server nicht verfügbar, bitte versuchen Sie es später erneut.</value>
+    </data>
+    <data name="FriendlyExceptionMessage_HttpRequest_GatewayTimeout" xml:space="preserve">
+        <value>Gateway-Verbindungszeitüberschreitung, bitte überprüfen Sie Ihr Netzwerk oder versuchen Sie es später erneut.</value>
+    </data>
+    <data name="FriendlyExceptionMessage_HttpRequest_RequestTimeout" xml:space="preserve">
+        <value>Verbindungszeitüberschreitung der Anforderung, bitte überprüfen Sie Ihr Netzwerk oder versuchen Sie es später erneut.</value>
+    </data>
+    <data name="FriendlyExceptionMessage_HttpRequest_BadGateway" xml:space="preserve">
+        <value>Gateway-Verbindungsfehler, bitte überprüfen Sie Ihr Netzwerk oder versuchen Sie es später erneut.</value>
+    </data>
+    <data name="FriendlyExceptionMessage_HttpRequest_0" xml:space="preserve">
+        <value>Unbekannter Fehler, bitte versuchen Sie es später erneut.</value>
+    </data>
+    <data name="FriendlyExceptionMessage_Socket" xml:space="preserve">
+        <value>Socket-Fehler ({0}): {1}</value>
+    </data>
+    <data name="FriendlyExceptionMessage_Socket_HostNotFound" xml:space="preserve">
+        <value>Hostname konnte nicht aufgelöst werden. Bitte überprüfen Sie Ihre DNS-Einstellungen oder versuchen Sie es später erneut.</value>
+    </data>
+    <data name="FriendlyExceptionMessage_Socket_ConnectionRefused" xml:space="preserve">
+        <value>Verbindung abgelehnt, bitte überprüfen Sie Ihr Netzwerk oder versuchen Sie es später erneut.</value>
+    </data>
+    <data name="FriendlyExceptionMessage_Socket_ConnectionReset" xml:space="preserve">
+        <value>Verbindung zurückgesetzt, bitte überprüfen Sie Ihr Netzwerk oder versuchen Sie es später erneut.</value>
+    </data>
+    <data name="FriendlyExceptionMessage_Socket_ConnectionAborted" xml:space="preserve">
+        <value>Verbindung abgebrochen, bitte überprüfen Sie Ihr Netzwerk oder versuchen Sie es später erneut.</value>
+    </data>
+    <data name="FriendlyExceptionMessage_Socket_0" xml:space="preserve">
+        <value>Unbekannter Fehler, bitte versuchen Sie es später erneut.</value>
+    </data>
+    <data name="FriendlyExceptionMessage_Aggregate" xml:space="preserve">
+        <value>Ein oder mehrere Fehler sind aufgetreten.</value>
+    </data>
+    <data name="FriendlyExceptionMessage_TaskCanceled" xml:space="preserve">
+        <value>Aufgabe abgebrochen.</value>
+    </data>
+    <data name="FriendlyExceptionMessage_OperationCanceled" xml:space="preserve">
+        <value>Vorgang abgebrochen.</value>
+    </data>
+    <data name="FriendlyExceptionMessage_Timeout" xml:space="preserve">
+        <value>Maximale Wartezeit überschritten.</value>
+    </data>
+    <data name="FriendlyExceptionMessage_Json" xml:space="preserve">
+        <value>JSON-Daten konnten nicht analysiert werden.</value>
+    </data>
+    <data name="FriendlyExceptionMessage_Format" xml:space="preserve">
+        <value>Formatfehler.</value>
+    </data>
+    <data name="FriendlyExceptionMessage_Argument" xml:space="preserve">
+        <value>Argumentfehler.</value>
     </data>
     <data name="SettingsSelectionItem_Common_Language_de" xml:space="preserve">
         <value>Deutsch</value>
@@ -38,16 +379,713 @@
     <data name="SettingsSelectionItem_Common_Language_ru" xml:space="preserve">
         <value>Русский</value>
     </data>
+    <data name="Settings_Common_Theme_Header" xml:space="preserve">
+        <value>Thema</value>
+    </data>
     <data name="SettingsSelectionItem_Common_Language_zh-hant" xml:space="preserve">
         <value>中文 (繁體)</value>
     </data>
     <data name="SettingsSelectionItem_Common_Language_zh-hant-hk" xml:space="preserve">
         <value>中文 (繁體 香港特別行政區)</value>
     </data>
-    <data name="ChangeLogView_FeatureRequestHyperlinkButton_NavigateUri" xml:space="preserve">
-        <value>https://github.com/DearVa/Everywhere/issues/new?template=feature-request.yml</value>
+    <data name="AboutPage_Title" xml:space="preserve">
+        <value>Über</value>
+    </data>
+    <data name="AboutPage_Description" xml:space="preserve">
+        <value>Wahrnimmt Ihren Bildschirminhalt in Echtzeit, bricht Anwendungsbarrieren nieder, um intelligente Hilfe zu bieten, die wirklich zum aktuellen Kontext passt, und verwandelt Ihren Desktop in einen nahtlosen, intelligenten Arbeitsbereich.</value>
+    </data>
+    <data name="AboutPage_Version" xml:space="preserve">
+        <value>Version: </value>
+    </data>
+    <data name="AboutPage_GithubRepo" xml:space="preserve">
+        <value>Github-Repository</value>
+    </data>
+    <data name="AboutPage_OpenSourceLicenses" xml:space="preserve">
+        <value>Open-Source-Lizenzen</value>
+    </data>
+    <data name="App_EverywhereIsAlreadyRunning" xml:space="preserve">
+        <value>Everywhere läuft bereits, bitte überprüfen Sie das Tray-Icon.</value>
+    </data>
+    <data name="MainView_EverywhereHasMinimizedToTray" xml:space="preserve">
+        <value>Everywhere wurde in den Tray minimiert</value>
+    </data>
+    <data name="ChatWindow_HistoryAction_Rename" xml:space="preserve">
+        <value>Umbenennen</value>
+    </data>
+    <data name="ChatWindow_HistoryAction_Delete" xml:space="preserve">
+        <value>Löschen</value>
+    </data>
+    <data name="AboutPage_WelcomePage" xml:space="preserve">
+        <value>Willkommensseite</value>
+    </data>
+    <data name="WelcomeView_IntroStep_Message1" xml:space="preserve">
+        <value>👋 Willkommen bei Everywhere</value>
+    </data>
+    <data name="WelcomeView_IntroStep_Message2" xml:space="preserve">
+        <value>Schön, Sie kennenzulernen! Lassen Sie mich Ihr Assistent sein und Ihnen bei der Problemlösung helfen!</value>
+    </data>
+    <data name="ChangeLogView_ReportBugHyperlinkButton_Content" xml:space="preserve">
+        <value>Fehler melden</value>
+    </data>
+    <data name="ChangeLogView_FeatureRequestHyperlinkButton_Content" xml:space="preserve">
+        <value>Funktionsanfrage</value>
     </data>
     <data name="ChangeLogView_ReportBugHyperlinkButton_NavigateUri" xml:space="preserve">
         <value>https://github.com/DearVa/Everywhere/issues/new?template=bug-report.yml</value>
+    </data>
+    <data name="ChangeLogView_FeatureRequestHyperlinkButton_NavigateUri" xml:space="preserve">
+        <value>https://github.com/DearVa/Everywhere/issues/new?template=feature-request.yml</value>
+    </data>
+    <data name="WelcomeView_DiscordHyperlinkButton_Content" xml:space="preserve">
+        <value>Discord</value>
+    </data>
+    <data name="ChatWindow_TogglePin_ToolTip" xml:space="preserve">
+        <value>Fenster anheften (Strg+D)</value>
+    </data>
+    <data name="ChatWindowPinMode_RememberPrevious" xml:space="preserve">
+        <value>Vorherigen Status speichern</value>
+    </data>
+    <data name="ChatWindowPinMode_AlwaysPinned" xml:space="preserve">
+        <value>Immer angeheftet</value>
+    </data>
+    <data name="ChatWindowPinMode_AlwaysUnpinned" xml:space="preserve">
+        <value>Immer nicht angeheftet</value>
+    </data>
+    <data name="ChatWindowPinMode_PinOnInput" xml:space="preserve">
+        <value>Beim Eingeben anheften</value>
+    </data>
+    <data name="VisualTreeXmlDetailLevel_Detailed" xml:space="preserve">
+        <value>Detailliert</value>
+    </data>
+    <data name="VisualTreeXmlDetailLevel_Compact" xml:space="preserve">
+        <value>Kompakt</value>
+    </data>
+    <data name="VisualTreeXmlDetailLevel_Minimal" xml:space="preserve">
+        <value>Minimal</value>
+    </data>
+    <data name="Settings_ChatWindow_WindowPinMode_Header" xml:space="preserve">
+        <value>Fenster-Pin-Modus</value>
+    </data>
+    <data name="Settings_ChatWindow_WindowPinMode_Description" xml:space="preserve">
+        <value>Gibt den Pin-Modus für das Chat-Fenster an, wenn es geöffnet wird. Wenn das Fenster nicht fixiert ist, wird es automatisch ausgeblendet, wenn es den Fokus verliert.</value>
+    </data>
+    <data name="Settings_ChatWindow_VisualTreeDetailLevel_Header" xml:space="preserve">
+        <value>Detailstufe des visuellen Baums</value>
+    </data>
+    <data name="Settings_ChatWindow_VisualTreeDetailLevel_Description" xml:space="preserve">
+        <value>Wählen Sie aus, wie viel Informationen aus dem UI-Baum beim Anfügen von Elementen erfasst werden.</value>
+    </data>
+    <data name="FriendlyExceptionMessage_ClientResult" xml:space="preserve">
+        <value>Client-Fehler.</value>
+    </data>
+    <data name="Settings_CustomAssistant_PresencePenalty_Header" xml:space="preserve">
+        <value>Ausdrucksdivergenz (presence_penalty)</value>
+    </data>
+    <data name="Settings_CustomAssistant_PresencePenalty_Description" xml:space="preserve">
+        <value>Je höher der Wert, desto stärker die Tendenz, verschiedene Ausdrücke zu verwenden und Wiederholungen von Konzepten zu vermeiden; je niedriger der Wert, desto stärker die Tendenz, wiederholte Konzepte oder Erzählungen zu verwenden, was zu einem konsistenteren Ausdruck führt. Diese Einstellung wirkt nur bei einigen Modellen. Wenn Sie einen Fehler begegnen, versuchen Sie, den Standardwert wiederherzustellen.</value>
+    </data>
+    <data name="Settings_CustomAssistant_FrequencyPenalty_Header" xml:space="preserve">
+        <value>Vokabularreichhaltigkeit (frequency_penalty)</value>
+    </data>
+    <data name="Settings_CustomAssistant_FrequencyPenalty_Description" xml:space="preserve">
+        <value>Je höher der Wert, dest diverser und reicher das Vokabular; je niedriger der Wert, dest einfacher und direkter die Sprache. Diese Einstellung wirkt nur bei einigen Modellen. Wenn Sie einen Fehler begegnen, versuchen Sie, den Standardwert wiederherzustellen.</value>
+    </data>
+    <data name="Settings_CustomAssistant_Endpoint_Header" xml:space="preserve">
+        <value>API-URL</value>
+    </data>
+    <data name="Settings_CustomAssistant_Endpoint_Description" xml:space="preserve">
+        <value>Lassen Sie dies auf Standardwert, wenn Sie nicht wissen, was Sie tun sollen. Muss mit "http(s)://" beginnen.</value>
+    </data>
+    <data name="Settings_CustomAssistant_ApiKey_Header" xml:space="preserve">
+        <value>API-Schlüssel</value>
+    </data>
+    <data name="Settings_CustomAssistant_ApiKey_Description" xml:space="preserve">
+        <value>Bei Online-Modellen müssen Sie dies vom entsprechenden Anbieter erhalten. Bitte beachten Sie die Anleitung für weitere Details.</value>
+    </data>
+    <data name="Settings_CustomAssistant_IsImageInputSupported_Header" xml:space="preserve">
+        <value>Bild-Eingabe unterstützen</value>
+    </data>
+    <data name="Settings_CustomAssistant_IsImageInputSupported_Description" xml:space="preserve">
+        <value>Sie können Bilder im Chat-Kontext hochladen. Wenn Sie nicht sicher sind, was Sie tun, behalten Sie den Standardwert bei. Wenn das Modell keine Bild-Eingaben unterstützt, kann das Aktivieren dieser Funktion Fehler verursachen.</value>
+    </data>
+    <data name="Settings_CustomAssistant_IsFunctionCallingSupported_Header" xml:space="preserve">
+        <value>Tool-Nutzung unterstützen</value>
+    </data>
+    <data name="Settings_CustomAssistant_IsFunctionCallingSupported_Description" xml:space="preserve">
+        <value>Das Modell kann Tools verwenden, die Sie im Chat-Kontext konfiguriert haben. Wenn Sie nicht sicher sind, was Sie tun, behalten Sie den Standardwert bei. Wenn das Modell keine Funktionsaufrufe unterstützt, kann das Aktivieren dies zu Fehlern führen.</value>
+    </data>
+    <data name="Settings_CustomAssistant_IsDeepThinkingSupported_Description" xml:space="preserve">
+        <value>Das Modell kann vor dem Antworten nachdenken. Wenn Sie nicht sicher sind, was Sie tun, belassen Sie den Standardwert. Wenn das Modell kein Deep Thinking unterstützt, kann die Aktivierung zu Fehlern führen.</value>
+    </data>
+    <data name="Settings_CustomAssistant_IsDeepThinkingSupported_Header" xml:space="preserve">
+        <value>Tiefes Denken unterstützen</value>
+    </data>
+    <data name="Settings_CustomAssistant_MaxTokens_Description" xml:space="preserve">
+        <value>Die maximale Kontextlänge eines einzelnen Chats. Wenn Sie nicht sicher sind, was Sie tun, belassen Sie den Standardwert. Ein größerer Wert als der Standardwert kann zu Fehlern führen.</value>
+    </data>
+    <data name="Settings_CustomAssistant_MaxTokens_Header" xml:space="preserve">
+        <value>Maximale Kontextlänge (max_tokens)</value>
+    </data>
+    <data name="Settings_CustomAssistant_Schema_Header" xml:space="preserve">
+        <value>API-Schema</value>
+    </data>
+    <data name="Settings_CustomAssistant_Schema_Description" xml:space="preserve">
+        <value>Wählen Sie das API-Schema aus. Lassen Sie dies standardmäßig, wenn Sie nicht wissen, was Sie tun sollen.</value>
+    </data>
+    <data name="Settings_Common_IsStartupEnabled_Header" xml:space="preserve">
+        <value>Beim Systemstart ausführen</value>
+    </data>
+    <data name="Settings_Common_IsStartupEnabled_Description" xml:space="preserve">
+        <value>Everywhere startet automatisch nach dem Systemstart. Wenn „Als Administrator starten“ aktiviert ist, kann diese Option nur im Administratormodus deaktiviert werden.</value>
+    </data>
+    <data name="Settings_Common_IsAdministratorStartupEnabled_Header" xml:space="preserve">
+        <value>Als Administrator starten</value>
+    </data>
+    <data name="Settings_Common_IsAdministratorStartupEnabled_Description" xml:space="preserve">
+        <value>Everywhere startet automatisch als Administrator. Diese Option können Sie nur im Administratormodus aktivieren oder deaktivieren.</value>
+    </data>
+    <data name="Settings_Common_RestartAsAdministrator_Description" xml:space="preserve">
+        <value>Aufgrund von Betriebssystembeschränkungen kann Everywhere nicht korrekt funktionieren, wenn Anwendungen mit Administratorrechten (erhöhte Berechtigungen) im Fokus sind oder versuchen, mit einer Everywhere-Funktion wie "Element auswählen" zu interagieren. Dies kann behoben werden, indem Everywhere als Administrator ausgeführt wird.</value>
+    </data>
+    <data name="Settings_Common_RestartAsAdministrator_Header" xml:space="preserve">
+        <value>Neu starten als Administrator</value>
+    </data>
+    <data name="Settings_Common_RestartAsAdministrator_Button_Content" xml:space="preserve">
+        <value>Neu starten</value>
+    </data>
+    <data name="Common_Error" xml:space="preserve">
+        <value>Fehler</value>
+    </data>
+    <data name="Settings_Common_SoftwareUpdate_CheckForUpdatesButton_Content" xml:space="preserve">
+        <value>Nach Updates suchen</value>
+    </data>
+    <data name="Settings_Common_SoftwareUpdate_TextBlock_Run1_Text" xml:space="preserve">
+        <value>Aktuelle Version: {0}</value>
+    </data>
+    <data name="Settings_Common_SoftwareUpdate_TextBlock_Run2_Text" xml:space="preserve">
+        <value>Letzter Überprüfungszeitpunkt: </value>
+    </data>
+    <data name="Settings_Common_SoftwareUpdate_TextBlock_ReleaseNotes_Text" xml:space="preserve">
+        <value>Versionshinweise</value>
+    </data>
+    <data name="Settings_Common_SoftwareUpdate_PerformUpdateButton_Content" xml:space="preserve">
+        <value>Aktualisieren auf </value>
+    </data>
+    <data name="Common_Unknown" xml:space="preserve">
+        <value>Unbekannt</value>
+    </data>
+    <data name="Settings_Common_SoftwareUpdate_Toast_AlreadyLatestVersion" xml:space="preserve">
+        <value>Everywhere ist bereits auf der neuesten Version.</value>
+    </data>
+    <data name="Settings_Common_SoftwareUpdate_Toast_NewVersionFound" xml:space="preserve">
+        <value>Neue Version {0} gefunden.</value>
+    </data>
+    <data name="Settings_Common_SoftwareUpdate_Header" xml:space="preserve">
+        <value>Software-Aktualisierung</value>
+    </data>
+    <data name="Settings_Common_SoftwareUpdate_Description" xml:space="preserve">
+        <value>Wenn ein Update verfügbar ist, klicken Sie auf Aktualisieren und Everywhere wird automatisch die neueste Version herunterladen und installieren. Möglicherweise müssen Sie während des Vorgangs „Ja“ im Pop-up-Fenster auswählen.</value>
+    </data>
+    <data name="Settings_Common_IsAutomaticUpdateCheckEnabled_Header" xml:space="preserve">
+        <value>Automatische Aktualisierung</value>
+    </data>
+    <data name="Settings_Common_IsAutomaticUpdateCheckEnabled_Description" xml:space="preserve">
+        <value>Wenn aktiviert, überprüft Everywhere regelmäßig auf Updates (nur wenn Everywhere läuft, ohne zusätzliche Systembelastung).</value>
+    </data>
+    <data name="Settings_Common_SoftwareUpdate_Toast_DownloadingUpdate" xml:space="preserve">
+        <value>Aktualisierung herunterladen...</value>
+    </data>
+    <data name="Settings_CustomAssistant_ModelId_Header" xml:space="preserve">
+        <value>Modell-ID</value>
+    </data>
+    <data name="Settings_CustomAssistant_ModelId_Description" xml:space="preserve">
+        <value>Modellkennzeichner für API-Aufrufe, wie z. B. gpt-4o. Wenn Sie sich nicht sicher sind, was dies ist, behalten Sie den Standardwert bei.</value>
+    </data>
+    <data name="ChatPluginPage_Title" xml:space="preserve">
+        <value>Chat-Plugins</value>
+    </data>
+    <data name="ChatPluginPage_Description" xml:space="preserve">
+        <value>Chat-Plugins umfassen integrierte Plugins und MCP-Plugins. LLMs, die Tool-Aufrufe unterstützen, verwenden diese Plugins zu geeigneten Zeiten (z. B. zum Suchen im Internet oder zum Zugriff auf lokale Dateien), um leistungsfähigere Funktionen zu erhalten.</value>
+    </data>
+    <data name="Settings_Plugin_WebSearchEngine_SelectedWebSearchEngineProvider_Header" xml:space="preserve">
+        <value>Web-Suchmaschinenanbieter</value>
+    </data>
+    <data name="Settings_Plugin_WebSearchEngine_SelectedWebSearchEngineProvider_ApiKey_Header" xml:space="preserve">
+        <value>API-Schlüssel</value>
+    </data>
+    <data name="Settings_Plugin_WebSearchEngine_SelectedWebSearchEngineProvider_ApiKey_Description" xml:space="preserve">
+        <value>Sie müssen dies vom entsprechenden offiziellen Anbieter erhalten. Bitte beachten Sie die Anleitung für weitere Details.</value>
+    </data>
+    <data name="Settings_Plugin_WebSearchEngine_SelectedWebSearchEngineProvider_SearchEngineId_Header" xml:space="preserve">
+        <value>Suchmaschinen-ID</value>
+    </data>
+    <data name="Settings_Plugin_WebSearchEngine_SelectedWebSearchEngineProvider_SearchEngineId_Description" xml:space="preserve">
+        <value>(Nur Google) Bietet eine programmierbare Suchmaschinen-ID. Für Details siehe die Anleitung.</value>
+    </data>
+    <data name="NativeChatPlugin_Shell_Header" xml:space="preserve">
+        <value>Terminal</value>
+    </data>
+    <data name="NativeChatPlugin_Shell_Description" xml:space="preserve">
+        <value>Bietet die Möglichkeit, Befehle im Terminal auszuführen, ermöglicht direkte Interaktion mit dem System und bietet unbegrenzte Möglichkeiten.</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_Header" xml:space="preserve">
+        <value>Dateisystem</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_Description" xml:space="preserve">
+        <value>Bietet die Möglichkeit, auf Dateien zuzugreifen, z. B. Auflisten, Erstellen, Löschen, Umbenennen, Lesen oder Schreiben.</value>
+    </data>
+    <data name="NativeChatPlugin_WindowsSystemApi_Header" xml:space="preserve">
+        <value>Windows-System-API</value>
+    </data>
+    <data name="NativeChatPlugin_WindowsSystemApi_Description" xml:space="preserve">
+        <value>Bietet eine kompakte Windows-Steueroberfläche für Assistenten, einschließlich Verknüpfungen zum Systemsteuerung, Aktualisierungen von numerischen und booleschen Systemeinstellungen sowie computerkompatiblen Maus- und Tastaturaktionen.</value>
+    </data>
+    <data name="FriendlyExceptionMessage_InvalidOperation" xml:space="preserve">
+        <value>Ungültiger Vorgang.</value>
+    </data>
+    <data name="FriendlyExceptionMessage_Win32" xml:space="preserve">
+        <value>Windows-Systemfehler. {0}</value>
+    </data>
+    <data name="ChatPluginPage_TabItem_BuiltIn_Header" xml:space="preserve">
+        <value>Eingebaut</value>
+    </data>
+    <data name="ChatPluginPage_TabItem_Settings_Header" xml:space="preserve">
+        <value>Einstellungen</value>
+    </data>
+    <data name="ChatPluginPage_TabItem_Functions_Header" xml:space="preserve">
+        <value>Funktionen</value>
+    </data>
+    <data name="NativeChatPlugin_VisualTree_Header" xml:space="preserve">
+        <value>Visueller Baum</value>
+    </data>
+    <data name="NativeChatPlugin_VisualTree_Description" xml:space="preserve">
+        <value>Bietet die Möglichkeit, Elemente auf dem Bildschirm wahrzunehmen.</value>
+    </data>
+    <data name="ChangeLogView_ViewOnGitHubHyperlinkButton_Content" xml:space="preserve">
+        <value>Auf GitHub anzeigen</value>
+    </data>
+    <data name="ChangeLogView_Header" xml:space="preserve">
+        <value>Everywhere wurde auf die neueste Version aktualisiert 🎉</value>
+    </data>
+    <data name="ChangeLogView_Content" xml:space="preserve">
+        <value>Ich bin noch jung, also falls Sie Probleme haben, klicken Sie bitte auf den untenstehenden Link, um Feedback zu geben. Ich werde stetig weiterentwickelt!\nSie sind auch herzlich eingeladen, auf den untenstehenden Link zu klicken, um der Gruppen Diskussion beizutreten. Weitere Social-Media-Kanäle befinden sich noch im Aufbau, also bleiben Sie dran.\nTipp: Sie können diese Nachricht wieder öffnen, indem Sie auf „Info - Neuerungen“ klicken.</value>
+    </data>
+    <data name="WelcomeView_QQGroupHyperlinkButton_Content" xml:space="preserve">
+        <value>QQ-Gruppe</value>
+    </data>
+    <data name="WelcomeView_OfficialDocsHyperlinkButton_Content" xml:space="preserve">
+        <value>Offizielle Dokumentation</value>
+    </data>
+    <data name="AboutPage_WhatsNew" xml:space="preserve">
+        <value>Neuerungen</value>
+    </data>
+    <data name="WelcomeViewModel_ValidateApiKey_FailedToast_Title" xml:space="preserve">
+        <value>Verifizierung fehlgeschlagen</value>
+    </data>
+    <data name="WelcomeView_LetsStartButton_Content" xml:space="preserve">
+        <value>Los geht's!</value>
+    </data>
+    <data name="WelcomeView_SkipButton_Content" xml:space="preserve">
+        <value>Überspringen</value>
+    </data>
+    <data name="WelcomeView_PreviousStepButton_Content" xml:space="preserve">
+        <value>Vorheriger Schritt</value>
+    </data>
+    <data name="WelcomeView_NextStepButton_Content" xml:space="preserve">
+        <value>Nächster Schritt</value>
+    </data>
+    <data name="WelcomeView_SelectModelProviderStep_Message1" xml:space="preserve">
+        <value>Okay, gehen wir zu Schritt 1 über: Wählen Sie ein "Gehirn" für mich!\nMeine Intelligenz stammt von leistungsstarken Large Language Models (LLMs), die von den unten aufgeführten spezialisierten Dienstleistern bereitgestellt werden. Sie können einen von ihnen auswählen, um mich zu betreiben.</value>
+    </data>
+    <data name="WelcomeView_SelectModelProviderStep_Message2" xml:space="preserve">
+        <value>Bitte wählen Sie einen Anbieter aus, den Sie bereits verwenden oder verwenden möchten, und ich werde Ihnen mehr darüber erzählen. Machen Sie sich keine Sorgen, Everywhere ist nur ein unabhängiger Client und steht nicht offiziell in Verbindung mit ihnen.</value>
+    </data>
+    <data name="WelcomeView_ModelProviderWrapper_openai_Description" xml:space="preserve">
+        <value>OpenAI ist ein beliebter Anbieter von KI-Modellen, bekannt für seine GPT-Serie und andere. Sie können sich auf der offiziellen Website registrieren und einen API-Schlüssel erhalten. Bitte überprüfen Sie die Liste der unterstützten Länder und Regionen.</value>
+    </data>
+    <data name="WelcomeView_ModelProviderWrapper_anthropic_Description" xml:space="preserve">
+        <value>Anthropic konzentriert sich auf die Entwicklung sicherer und zuverlässiger KI-Modelle, wobei das Flagschiffprodukt die Claude-Serie ist. Besuchen Sie bitte ihre offizielle Website für Modelldetails und API-Preise.</value>
+    </data>
+    <data name="WelcomeView_ModelProviderWrapper_google_Description" xml:space="preserve">
+        <value>Google entwickelt die Gemini-Serie von multimodalen KI-Modellen. Sie können einen API-Schlüssel über Google AI Studio oder Google Cloud Platform erhalten. Bitte überprüfen Sie, ob der Dienst in Ihrer Region verfügbar ist.</value>
+    </data>
+    <data name="WelcomeView_ModelProviderWrapper_deepseek_Description" xml:space="preserve">
+        <value>DeepSeek ist ein Unternehmen, das sich auf allgemeine künstliche Intelligenz konzentriert, mit Modellen, die sich hervorragend in der Code-Generierung und der Verarbeitung der chinesischen Sprache auszeichnen. Sie können sich auf ihrer offiziellen Website registrieren und loslegen.</value>
+    </data>
+    <data name="WelcomeView_ModelProviderWrapper_moonshot_Description" xml:space="preserve">
+        <value>Moonshot AI ist bekannt für seinen Kimi-intelligenten Assistenten, der Langtext-Eingaben unterstützt. Das Unternehmen bietet eine offene Plattform mit API-Diensten. Weitere Details finden Sie auf ihrer offiziellen Website.</value>
+    </data>
+    <data name="WelcomeView_ModelProviderWrapper_openrouter_Description" xml:space="preserve">
+        <value>OpenRouter ist ein API-Aggregations- und Routingdienst, der es Ihnen ermöglicht, über eine einzige, einheitliche Schnittstelle auf eine Vielzahl von Modellen von mehreren Anbietern (wie OpenAI, Anthropic, Google usw.) zuzugreifen. Dies ist sehr praktisch zum Testen und Vergleichen verschiedener Modelle (einschließlich kostenloser Modelle). Bitte beachten Sie die offizielle Dokumentation für Preisinformationen und verfügbare Modelle.</value>
+    </data>
+    <data name="WelcomeView_ModelProviderWrapper_siliconflow_Description" xml:space="preserve">
+        <value>SiliconFlow ist eine effiziente KI-Inferenzplattform, die eine Vielzahl von Open-Source- und proprietären Modellen unterstützt (einschließlich kostenloser Modelle). Sie bietet Entwicklern flexible, leistungsstarke Modellbereitstellungs- und Inferenzdienste. Für spezifisch unterstützte Modelle und Preise besuchen Sie bitte ihre offizielle Website.</value>
+    </data>
+    <data name="WelcomeView_EnterApiKeyStep_Message1" xml:space="preserve">
+        <value>Super! Jetzt benötigen wir einen API-Schlüssel, um zu beginnen. Bitte geben Sie ihn unten in das Textfeld ein oder fügen Sie ihn ein. Klicken Sie dann auf "API-Schlüssel überprüfen".</value>
+    </data>
+    <data name="WelcomeView_EnterApiKeyStep_Message2" xml:space="preserve">
+        <value>Keine Sorge, Ihr Schlüssel ist höchst sicher. Er wird nur zur Authentifizierung bei dem Modellanbieter verwendet, und ich werde ihn nicht einlesen.</value>
+    </data>
+    <data name="WelcomeView_SelectModelProviderStep_OfficialWebsiteHyperlinkButton_Content" xml:space="preserve">
+        <value>👉 Offizielle Website</value>
+    </data>
+    <data name="WelcomeView_IntroStep_Message6" xml:space="preserve">
+        <value>Tipp: Sie können „Info - Willkommensseite“ klicken, um diese Nachricht erneut zu öffnen.</value>
+    </data>
+    <data name="WelcomeView_IntroStep_Message5" xml:space="preserve">
+        <value>Nützliche Links: </value>
+    </data>
+    <data name="WelcomeView_IntroStep_Message3" xml:space="preserve">
+        <value>Sie können mich jederzeit, überall aufwecken. Ich kann Ihren aktuellen Arbeitskontext verstehen — sei es E-Mails, Artikel oder Webseiten — und Ihnen helfen, Probleme intelligenter zu lösen!</value>
+    </data>
+    <data name="WelcomeView_IntroStep_Message4" xml:space="preserve">
+        <value>Wenn Sie dies zum ersten Mal verwenden, führe ich Sie in drei einfachen Schritten durch die erste Einrichtung.</value>
+    </data>
+    <data name="WelcomeView_EnterApiKeyStep_Message3" xml:space="preserve">
+        <value>Wenn Sie sich nicht sicher sind, wie Sie es erhalten, können Sie sich dieses Tutorial ansehen, das ich für Sie vorbereitet habe:</value>
+    </data>
+    <data name="WelcomeView_EnterApiKeyStep_Message4" xml:space="preserve">
+        <value>Flüsterhinweis: Es beginnt normalerweise mit „sk-“ oder „AI“, also verpassen Sie es nicht!</value>
+    </data>
+    <data name="WelcomeView_EnterApiKeyStep_HowToGetApiKeyHyperlinkButton_Content" xml:space="preserve">
+        <value>👉 Klicken Sie zum Öffnen</value>
+    </data>
+    <data name="WelcomeView_VerifyApiKeyButton_Content" xml:space="preserve">
+        <value>API-Schlüssel überprüfen</value>
+    </data>
+    <data name="WelcomeView_EnterApiKeyStep_Message5" xml:space="preserve">
+        <value>Außerdem können Sie ein Modell auswählen oder das Standardmodell beibehalten.</value>
+    </data>
+    <data name="WelcomeView_ApiKeyTextBox_Watermark" xml:space="preserve">
+        <value>API-Schlüssel hier eingeben...</value>
+    </data>
+    <data name="WelcomeView_EnterApiKeyStep_Message6" xml:space="preserve">
+        <value>🎉 Verifizierung erfolgreich! Lassen Sie uns zum letzten Schritt übergehen!</value>
+    </data>
+    <data name="WelcomeView_HotkeyStep_Message1" xml:space="preserve">
+        <value>Herzlichen Glückwunsch! Alles ist abgeschlossen. Sie können mich jederzeit mit der unten angegebenen Tastenkombination aufwecken.</value>
+    </data>
+    <data name="WelcomeView_HotkeyStep_Message2" xml:space="preserve">
+        <value>Falls keine Reaktion erfolgt, könnte die Tastenkombination von anderer Software belegt sein. Klicken Sie, um die Tastenkombination zu ändern.</value>
+    </data>
+    <data name="FriendlyExceptionMessage_Authentication" xml:space="preserve">
+        <value>Authentifizierungsfehler.</value>
+    </data>
+    <data name="WelcomeView_TelemetryStep_Message1" xml:space="preserve">
+        <value>Um mir zu helfen, mich zu verbessern, muss ich "Telemetrie" aktivieren, um anonyme Daten zu sammeln. Diese Daten werden ausschließlich zur Analyse verwendet und enthalten keine oder erlauben keine Rückschlüsse auf personenbezogene Informationen über Sie.</value>
+    </data>
+    <data name="WelcomeView_TelemetryStep_Message2" xml:space="preserve">
+        <value>Sie können wählen, nur notwendige Daten zu senden; diese Option wirkt sich nicht auf die Kernfunktionalität aus.</value>
+    </data>
+    <data name="WelcomeView_SendOnlyNecessaryDataButton_Content" xml:space="preserve">
+        <value>Nur notwendige Daten senden</value>
+    </data>
+    <data name="WelcomeView_EnableTelemetryButton_Content" xml:space="preserve">
+        <value>Telemetrie aktivieren</value>
+    </data>
+    <data name="Settings_Common_DiagnosticData_Header" xml:space="preserve">
+        <value>Diagnosedaten</value>
+    </data>
+    <data name="Settings_Common_DiagnosticData_Description" xml:space="preserve">
+        <value>Um uns zu helfen, zu verbessern, benötigen wir die "Telemetrie", um anonyme Daten zu sammeln. Diese Daten werden ausschließlich zur Analyse verwendet und enthalten keine oder erlauben keine Rückschlüsse auf personenbezogene Informationen über Sie. Sie können wählen, nur notwendige Daten zu senden; diese Option wirkt sich nicht auf die Kernfunktionalität aus.</value>
+    </data>
+    <data name="Settings_ChatWindow_ShowChatStatistics_Header" xml:space="preserve">
+        <value>Chat-Statistik anzeigen</value>
+    </data>
+    <data name="Settings_ChatWindow_ShowChatStatistics_Description" xml:space="preserve">
+        <value>Wenn aktiviert, werden Nutzungsdaten am Ende jeder Gesprächsrunde im Chatfenster angezeigt.</value>
+    </data>
+    <data name="ChatWindow_ChatStatisticsTextBlock_InputTokenCountRun" xml:space="preserve">
+        <value>Eingabe</value>
+    </data>
+    <data name="ChatWindow_ChatStatisticsTextBlock_OutputTokenCountRun" xml:space="preserve">
+        <value>Ausgabe</value>
+    </data>
+    <data name="ChatWindow_ChatStatisticsTextBlock_TotalTokenCountRun" xml:space="preserve">
+        <value>Gesamt</value>
+    </data>
+    <data name="ChatWindow_ChatStatisticsTextBlock_ElapsedRun" xml:space="preserve">
+        <value>Verstrichen</value>
+    </data>
+    <data name="HandledChatException_InvalidConfiguration" xml:space="preserve">
+        <value>Das Modell ist nicht korrekt konfiguriert. Der Modellanbieter oder die ID fehlen möglicherweise oder sind nicht korrekt.</value>
+    </data>
+    <data name="HandledChatException_InvalidApiKey" xml:space="preserve">
+        <value>API-Schlüssel fehlt oder ist ungültig.</value>
+    </data>
+    <data name="HandledChatException_QuotaExceeded" xml:space="preserve">
+        <value>API-Nutzungslimit überschritten oder fehlende Berechtigung für den Zugriff auf das aktuelle Modell.</value>
+    </data>
+    <data name="HandledChatException_RateLimit" xml:space="preserve">
+        <value>Ratenlimit überschritten. Bitte versuchen Sie es später erneut.</value>
+    </data>
+    <data name="HandledChatException_EndpointNotReachable" xml:space="preserve">
+        <value>Der Dienstendpunkt ist nicht erreichbar. Bitte überprüfen Sie Ihre Netzwerkverbindung.</value>
+    </data>
+    <data name="HandledChatException_InvalidEndpoint" xml:space="preserve">
+        <value>Der angegebene Dienstendpunkt ist ungültig.</value>
+    </data>
+    <data name="HandledChatException_EmptyResponse" xml:space="preserve">
+        <value>Der Dienst hat eine leere Antwort zurückgegeben, was auf ein Netzwerk- oder Dienstproblem hinweisen könnte.</value>
+    </data>
+    <data name="HandledChatException_FeatureNotSupport" xml:space="preserve">
+        <value>Das ausgewählte Modell unterstützt die angeforderte Funktion nicht.</value>
+    </data>
+    <data name="HandledChatException_Timeout" xml:space="preserve">
+        <value>Anforderung an den Dienst ist abgelaufen. Bitte versuchen Sie es erneut.</value>
+    </data>
+    <data name="HandledChatException_NetworkError" xml:space="preserve">
+        <value>Ein Netzwerkfehler ist aufgetreten. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.</value>
+    </data>
+    <data name="HandledChatException_ServiceUnavailable" xml:space="preserve">
+        <value>Dienst ist derzeit nicht verfügbar. Bitte versuchen Sie es später erneut.</value>
+    </data>
+    <data name="HandledChatException_Unknown" xml:space="preserve">
+        <value>Ein unbekannter Fehler ist aufgetreten.</value>
+    </data>
+    <data name="KernelMixinFactory_UnsupportedModelProviderSchema" xml:space="preserve">
+        <value>Nicht unterstützte API-Schema des Modellproviders.</value>
+    </data>
+    <data name="ChatWindowViewModel_QuickActions_Solve" xml:space="preserve">
+        <value>Lösen</value>
+    </data>
+    <data name="Settings_ChatWindow_AutomaticallyAddElement_Header" xml:space="preserve">
+        <value>Element automatisch hinzufügen</value>
+    </data>
+    <data name="Settings_ChatWindow_AutomaticallyAddElement_Description" xml:space="preserve">
+        <value>Wenn aktiviert, wird das fokussierte Element automatisch als Anlage hinzugefügt, wenn das Chatfenster geöffnet wird.</value>
+    </data>
+    <data name="Settings_ChatWindow_AllowRunInBackground_Header" xml:space="preserve">
+        <value>Im Hintergrund ausführen erlauben</value>
+    </data>
+    <data name="Settings_ChatWindow_AllowRunInBackground_Description" xml:space="preserve">
+        <value>Wenn aktiviert, beendet das Schließen des Chatfensters nicht die aktuelle Aufgabe.</value>
+    </data>
+    <data name="HandledChatException_OperationCancelled" xml:space="preserve">
+        <value>Vorgang abgebrochen.</value>
+    </data>
+    <data name="ChatPluginPage_SelectToViewDetails" xml:space="preserve">
+        <value>Wählen Sie ein Element links aus, um Details anzuzeigen</value>
+    </data>
+    <data name="Settings_Common_SoftwareUpdate_Toast_UpdateFailed_Content" xml:space="preserve">
+        <value>Aktualisierung fehlgeschlagen.</value>
+    </data>
+    <data name="Settings_Common_SoftwareUpdate_Toast_CheckForUpdatesFailed_Content" xml:space="preserve">
+        <value>Überprüfung auf Updates fehlgeschlagen.</value>
+    </data>
+    <data name="SoftwareUpdater_PerformUpdate_FailedToast_Message" xml:space="preserve">
+        <value>Aktualisierung fehlgeschlagen.</value>
+    </data>
+    <data name="ChatWindow_ChatInputBox_SettingsMenuItems_VisualTreeTokenLimit" xml:space="preserve">
+        <value>Begrenzung der Visual Tree-Länge:</value>
+    </data>
+    <data name="ChatWindow_ChatInputBox_SettingsMenuItems_VisualTreeDetailLevel" xml:space="preserve">
+        <value>Detaillierungsgrad des visuellen Baums:</value>
+    </data>
+    <data name="SoftwareUpdater_UpdateAvailable_Toast_Message" xml:space="preserve">
+        <value>Update verfügbar.</value>
+    </data>
+    <data name="ChatWindow_ChatMessage_Assistant_DeepThinking" xml:space="preserve">
+        <value>Tiefes Denken</value>
+    </data>
+    <data name="ChatFunctionPermissions_ScreenRead" xml:space="preserve">
+        <value>Bildschirm lesen</value>
+    </data>
+    <data name="ChatFunctionPermissions_ScreenAccess" xml:space="preserve">
+        <value>Bildschirmzugriff</value>
+    </data>
+    <data name="ChatFunctionPermissions_NetworkAccess" xml:space="preserve">
+        <value>Netzwerkzugriff</value>
+    </data>
+    <data name="ChatFunctionPermissions_ClipboardRead" xml:space="preserve">
+        <value>Zwischenablage lesen</value>
+    </data>
+    <data name="ChatFunctionPermissions_ClipboardAccess" xml:space="preserve">
+        <value>Zugriff auf Zwischenablage</value>
+    </data>
+    <data name="ChatFunctionPermissions_FileRead" xml:space="preserve">
+        <value>Datei lesen</value>
+    </data>
+    <data name="ChatFunctionPermissions_FileAccess" xml:space="preserve">
+        <value>Dateizugriff</value>
+    </data>
+    <data name="ChatFunctionPermissions_ShellExecute" xml:space="preserve">
+        <value>Shell-Skript ausführen</value>
+    </data>
+    <data name="HandledChatException_ContextLengthExceeded" xml:space="preserve">
+        <value>Kontextlänge überschritten.</value>
+    </data>
+    <data name="ChatFunctionPermissions_ProcessAccess" xml:space="preserve">
+        <value>Prozesszugriff</value>
+    </data>
+    <data name="CustomAssistant_Name_Default" xml:space="preserve">
+        <value>Standardassistent</value>
+    </data>
+    <data name="CustomAssistantPage_Title" xml:space="preserve">
+        <value>KI-Assistent</value>
+    </data>
+    <data name="CustomAssistantPage_CreateNewCustomAssistantButton_Content" xml:space="preserve">
+        <value>Erstellen</value>
+    </data>
+    <data name="Settings_CustomAssistant_Name_Header" xml:space="preserve">
+        <value>Name</value>
+    </data>
+    <data name="Settings_CustomAssistant_Name_Description" xml:space="preserve">
+        <value>Geben Sie den Namen des Assistenten an, der ausschließlich zu Anzeige- und Unterscheidungszwecken verwendet wird.</value>
+    </data>
+    <data name="Settings_CustomAssistant_Description_Header" xml:space="preserve">
+        <value>Beschreibung</value>
+    </data>
+    <data name="Settings_CustomAssistant_Description_Description" xml:space="preserve">
+        <value>Geben Sie die Beschreibung des Assistenten an, die ausschließlich zu Anzeige- und Unterscheidungszwecken verwendet wird.</value>
+    </data>
+    <data name="Settings_CustomAssistant_SystemPrompt_Description" xml:space="preserve">
+        <value>Der Systemprompt wird standardmäßig zu Beginn der Konversation an das Modell gesendet. Ein gut gestalteter Prompt enthält eine Einführung, eine Aufgabenbeschreibung und kontextuelle Informationen.
+Platzhalter können im Prompt verwendet werden, eingeschlossen in {}, und werden vor dem Senden an das Modell durch entsprechenden Inhalt ersetzt.</value>
+    </data>
+    <data name="Settings_CustomAssistant_SystemPrompt_Header" xml:space="preserve">
+        <value>Systemaufforderung</value>
+    </data>
+    <data name="CustomAssistantPage_DeleteCustomAssistantButton_Content" xml:space="preserve">
+        <value>Löschen</value>
+    </data>
+    <data name="Common_Warning" xml:space="preserve">
+        <value>Warnung</value>
+    </data>
+    <data name="CustomAssistantPageViewModel_DeleteCustomAssistant_Dialog_Message" xml:space="preserve">
+        <value>Möchten Sie "{0}" wirklich löschen?</value>
+    </data>
+    <data name="Common_Yes" xml:space="preserve">
+        <value>Ja</value>
+    </data>
+    <data name="Common_No" xml:space="preserve">
+        <value>Nein</value>
+    </data>
+    <data name="Settings_CustomAssistant_ModelProviderTemplate_Header" xml:space="preserve">
+        <value>Modellanbieter-Vorlage</value>
+    </data>
+    <data name="Settings_CustomAssistant_ModelDefinitionTemplate_Header" xml:space="preserve">
+        <value>Modelldefinitionsvorlage</value>
+    </data>
+    <data name="Settings_CustomAssistant_ModelDefinitionTemplate_Description" xml:space="preserve">
+        <value>Wählen Sie eine Vorlage aus, um Standardwerte für Optionen wie Modell-ID, Bildeingabestütz, Tool-Verwendungsunterstützung und mehr automatisch festzulegen. Klicken Sie auf die Schaltfläche 'Zurücksetzen', um auf undefinierte Einstellungen zurückzukehren.</value>
+    </data>
+    <data name="Settings_CustomAssistant_ModelProviderTemplate_Description" xml:space="preserve">
+        <value>Wählen Sie eine Vorlage aus, um Standardwerte für Optionen wie die API-Aufrufadresse und den API-Modus automatisch festzulegen. Klicken Sie auf die Zurücksetzen-Schaltfläche, um zu undefinierten Einstellungen zurückzukehren.</value>
+    </data>
+    <data name="HandledSystemException_IOException" xml:space="preserve">
+        <value>Ein allgemeiner E/A-Fehler ist aufgetreten. Dies könnte an einem Problem beim Lesen oder Schreiben einer Datei liegen.</value>
+    </data>
+    <data name="HandledSystemException_UnauthorizedAccess" xml:space="preserve">
+        <value>Zugriff auf eine erforderliche Ressource wurde verweigert. Bitte überprüfen Sie die Dateiberechtigungen oder führen Sie die Anwendung als Administrator aus.</value>
+    </data>
+    <data name="HandledSystemException_PathTooLong" xml:space="preserve">
+        <value>Der angegebene Pfad zur Datei oder zum Verzeichnis ist zu lang. Bitte versuchen Sie, einen kürzeren Pfad zu verwenden.</value>
+    </data>
+    <data name="HandledSystemException_OperationCancelled" xml:space="preserve">
+        <value>Der Vorgang wurde abgebrochen.</value>
+    </data>
+    <data name="HandledSystemException_Timeout" xml:space="preserve">
+        <value>Der Vorgang ist abgelaufen. Bitte überprüfen Sie Ihre Systemleistung und versuchen Sie es erneut.</value>
+    </data>
+    <data name="HandledSystemException_FileNotFound" xml:space="preserve">
+        <value>Die angegebene Datei konnte nicht gefunden werden. Bitte stellen Sie sicher, dass die Datei existiert und der Pfad korrekt ist.</value>
+    </data>
+    <data name="HandledSystemException_DirectoryNotFound" xml:space="preserve">
+        <value>Das angegebene Verzeichnis konnte nicht gefunden werden. Stellen Sie sicher, dass das Verzeichnis existiert und der Pfad korrekt ist.</value>
+    </data>
+    <data name="HandledSystemException_NotSupported" xml:space="preserve">
+        <value>Der angeforderte Vorgang wird auf Ihrem System nicht unterstützt.</value>
+    </data>
+    <data name="HandledSystemException_Security" xml:space="preserve">
+        <value>Ein Sicherheitsfehler ist aufgetreten. Die Anwendung verfügt möglicherweise nicht über die erforderlichen Berechtigungen.</value>
+    </data>
+    <data name="HandledSystemException_COMException" xml:space="preserve">
+        <value>Ein Fehler bei einer Systemkomponente (COM) ist aufgetreten. Dies kann auf ein Problem mit dem Betriebssystem oder einer Abhängigkeit hinweisen.</value>
+    </data>
+    <data name="HandledSystemException_Win32Exception" xml:space="preserve">
+        <value>Ein Windows-Systemfehler ist aufgetreten. Bitte überprüfen Sie die Anwendungslogs für weitere Details.</value>
+    </data>
+    <data name="HandledSystemException_Socket" xml:space="preserve">
+        <value>Ein Netzwerk-Socket-Fehler ist aufgetreten. Bitte überprüfen Sie Ihre Netzwerkverbindung und Firewall-Einstellungen.</value>
+    </data>
+    <data name="HandledSystemException_OutOfMemory" xml:space="preserve">
+        <value>Die Anwendung hat keinen Arbeitsspeicher mehr. Schließen Sie bitte andere Programme und versuchen Sie es erneut.</value>
+    </data>
+    <data name="HandledSystemException_DriveNotFound" xml:space="preserve">
+        <value>Das angegebene Laufwerk konnte nicht gefunden werden. Stellen Sie sicher, dass das Laufwerk verbunden und zugänglich ist.</value>
+    </data>
+    <data name="HandledSystemException_EndOfStream" xml:space="preserve">
+        <value>Ein unerwartetes Ende eines Datenstroms wurde erreicht. Dies könnte auf eine beschädigte Datei oder ein Netzwerkproblem hinweisen.</value>
+    </data>
+    <data name="HandledSystemException_InvalidData" xml:space="preserve">
+        <value>Die verarbeiteten Daten sind ungültig oder beschädigt. Bitte überprüfen Sie die Quelldatei oder die Daten.</value>
+    </data>
+    <data name="HandledSystemException_Unknown" xml:space="preserve">
+        <value>Ein unerwarteter Systemfehler ist aufgetreten. Bitte versuchen Sie es erneut oder überprüfen Sie die Anwendungsprotokolle.</value>
+    </data>
+    <data name="CustomAssistantPage_CheckConnectivityButton_Content" xml:space="preserve">
+        <value>Verbindung prüfen</value>
+    </data>
+    <data name="CustomAssistantPageViewModel_CheckConnectivity_SuccessToast_Title" xml:space="preserve">
+        <value>Überprüfung erfolgreich</value>
+    </data>
+    <data name="CustomAssistantPageViewModel_CheckConnectivity_FailedToast_Title" xml:space="preserve">
+        <value>Überprüfung fehlgeschlagen</value>
+    </data>
+    <data name="ChatInputBox_CustomAssistantsMenuItem_ToolTip" xml:space="preserve">
+        <value>Assistent auswählen</value>
+    </data>
+    <data name="Settings_CustomAssistant_Icon_Description" xml:space="preserve">
+        <value>Klicken Sie, um das Assistenten-Symbol anzupassen.</value>
+    </data>
+    <data name="Settings_CustomAssistant_Icon_Header" xml:space="preserve">
+        <value>Symbol</value>
+    </data>
+    <data name="IconEditor_BackgroundTabItem_Header" xml:space="preserve">
+        <value>Hintergrund</value>
+    </data>
+    <data name="IconEditor_ForegroundTabItem_Header" xml:space="preserve">
+        <value>Vordergrund</value>
+    </data>
+    <data name="IconEditor_IconTabItem_Header" xml:space="preserve">
+        <value>Symbol</value>
+    </data>
+    <data name="HandledSystemException_InvalidOperation" xml:space="preserve">
+        <value>Die Operation ist ungültig. Bitte stellen Sie sicher, dass die Konfiguration korrekt ist.</value>
+    </data>
+    <data name="HandledSystemException_InvalidArgument" xml:space="preserve">
+        <value>Das Argument ist ungültig. Bitte stellen Sie sicher, dass die Konfiguration korrekt ist.</value>
+    </data>
+    <data name="HandledSystemException_InvalidFormat" xml:space="preserve">
+        <value>Das Format ist ungültig. Bitte stellen Sie sicher, dass die Konfiguration korrekt ist.</value>
+    </data>
+    <data name="HandledSystemException_ArgumentNull" xml:space="preserve">
+        <value>Das Argument ist leer. Bitte stellen Sie sicher, dass die Konfiguration korrekt ist.</value>
+    </data>
+    <data name="HandledSystemException_ArgumentOutOfRange" xml:space="preserve">
+        <value>Das Argument liegt außerhalb des gültigen Bereichs. Bitte stellen Sie sicher, dass die Konfiguration korrekt ist.</value>
+    </data>
+    <data name="ChatWindow_ChatInputBox_AddAttachmentMenuItems_PasteFromClipboard" xml:space="preserve">
+        <value>Zwischenablageinhalt</value>
+    </data>
+    <data name="Common_Comma" xml:space="preserve">
+        <value>, </value>
+    </data>
+    <data name="Common_Info" xml:space="preserve">
+        <value>Info</value>
+    </data>
+    <data name="SettingsPage_Reset_Button_ToolTip" xml:space="preserve">
+        <value>Standard</value>
+    </data>
+    <data name="VisualTreeDetailLevel_Compact" xml:space="preserve">
+        <value>Kompakt</value>
+    </data>
+    <data name="VisualTreeDetailLevel_Detailed" xml:space="preserve">
+        <value>Detailliert</value>
+    </data>
+    <data name="VisualTreeDetailLevel_Minimal" xml:space="preserve">
+        <value>Verifizierung fehlgeschlagen</value>
     </data>
 </root>

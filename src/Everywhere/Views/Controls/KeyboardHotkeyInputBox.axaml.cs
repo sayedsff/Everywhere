@@ -49,6 +49,8 @@ public partial class KeyboardHotkeyInputBox : UserControl
 
         if (_hotkeyScope is not null) return;
 
+        HotKeyTextBox.Watermark = LocaleKey.KeyboardHotkeyInputBox_SettingWatermark.I18N();
+
         _hotkeyScope = ServiceLocator.Resolve<IHotkeyListener>().StartCaptureKeyboardHotkey();
         _hotkeyScope.PressingHotkeyChanged += (_, hotkey) => Dispatcher.UIThread.InvokeOnDemand(() => HotKeyTextBox.Text = hotkey.ToString());
         _hotkeyScope.HotkeyFinished += (_, hotkey) =>
@@ -66,6 +68,8 @@ public partial class KeyboardHotkeyInputBox : UserControl
     protected override void OnLostFocus(RoutedEventArgs e)
     {
         base.OnLostFocus(e);
+
+        HotKeyTextBox.Watermark = LocaleKey.KeyboardHotkeyInputBox_Watermark.I18N();
 
         TopLevel.GetTopLevel(this)?.Focus(); // Ensure the focus is moved away from this control.
         DisposeCollector.DisposeToDefault(ref _hotkeyScope);
