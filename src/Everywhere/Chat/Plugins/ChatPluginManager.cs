@@ -23,13 +23,13 @@ public class ChatPluginManager : IChatPluginManager
     {
         _builtInPlugins.AddRange(builtInPlugins);
 
-        var isEnabledRecords = settings.Plugin.IsEnabledRecords;
+        var isEnabledRecords = settings.Plugin.IsEnabled;
         foreach (var builtInPlugin in _builtInPlugins)
         {
-            builtInPlugin.IsEnabled = GetIsEnabled($"built-in.{builtInPlugin.Name}", false);
+            builtInPlugin.IsEnabled = GetIsEnabled($"builtin.{builtInPlugin.Name}", false);
             foreach (var function in builtInPlugin.Functions)
             {
-                function.IsEnabled = GetIsEnabled($"built-in.{builtInPlugin.Name}.{function.KernelFunction.Name}", true);
+                function.IsEnabled = GetIsEnabled($"builtin.{builtInPlugin.Name}.{function.KernelFunction.Name}", true);
             }
         }
 
@@ -59,7 +59,7 @@ public class ChatPluginManager : IChatPluginManager
             {
                 case 2:
                 {
-                    settings.Plugin.IsEnabledRecords[$"built-in.{plugin.Name}"] = plugin.IsEnabled;
+                    settings.Plugin.IsEnabled[$"builtin.{plugin.Name}"] = plugin.IsEnabled;
                     break;
                 }
                 case 4 when
@@ -68,7 +68,7 @@ public class ChatPluginManager : IChatPluginManager
                     functionIndex < plugin.Functions.Count:
                 {
                     var function = plugin.Functions[functionIndex];
-                    settings.Plugin.IsEnabledRecords[$"built-in.{plugin.Name}.{function.KernelFunction.Name}"] = function.IsEnabled;
+                    settings.Plugin.IsEnabled[$"builtin.{plugin.Name}.{function.KernelFunction.Name}"] = function.IsEnabled;
                     break;
                 }
             }
@@ -119,6 +119,7 @@ public class ChatPluginManager : IChatPluginManager
 
     private class ChatPluginSnapshot : ChatPlugin
     {
+        public override string Key => _originalChatPlugin.Key;
         public override DynamicResourceKeyBase HeaderKey => _originalChatPlugin.HeaderKey;
         public override DynamicResourceKeyBase DescriptionKey => _originalChatPlugin.DescriptionKey;
         public override LucideIconKind? Icon => _originalChatPlugin.Icon;

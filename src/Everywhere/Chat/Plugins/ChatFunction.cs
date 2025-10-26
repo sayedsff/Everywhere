@@ -19,20 +19,8 @@ public abstract partial class ChatFunction : ObservableObject
     /// </summary>
     public virtual ChatFunctionPermissions Permissions => ChatFunctionPermissions.AllAccess;
 
-    /// <summary>
-    /// The permissions currently granted to this function.
-    /// </summary>
-    [ObservableProperty]
-    public partial Customizable<ChatFunctionPermissions> GrantedPermissions { get; set; } = ChatFunctionPermissions.None;
-
     [ObservableProperty]
     public partial bool IsEnabled { get; set; } = true;
-
-    /// <summary>
-    /// Key: ID of extra permission
-    /// Specific extra permission granted to this function.
-    /// </summary>
-    public Dictionary<string, ChatFunctionPermissions> GrantedExtraPermissions { get; set; } = [];
 
     public abstract KernelFunction KernelFunction { get; }
 
@@ -42,11 +30,6 @@ public abstract partial class ChatFunction : ObservableObject
     /// <param name="content"></param>
     /// <returns></returns>
     public virtual ChatPluginDisplayBlock? GetFriendlyCallContent(FunctionCallContent content) => null;
-
-    /// <summary>
-    /// Notify that the GrantedExtraPermissions have been updated.
-    /// </summary>
-    internal void SaveGrantedExtraPermissions() => OnPropertyChanged(nameof(GrantedExtraPermissions));
 }
 
 public sealed class NativeChatFunction : ChatFunction

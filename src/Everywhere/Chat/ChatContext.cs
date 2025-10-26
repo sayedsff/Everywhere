@@ -58,11 +58,12 @@ public partial class ChatContext : ObservableObject, IReadOnlyList<ChatMessageNo
     public ResilientCache<int, IVisualElement> VisualElements { get; } = new();
 
     /// <summary>
+    /// A map of granted permissions for plugin functions in this chat context (session).
     /// Key: PluginName.FunctionName.id
     /// Value: Granted permissions for the function.
     /// </summary>
     [IgnoreMember]
-    public Dictionary<string, ChatFunctionPermissions> GrantedSessionFunctionPermissions { get; } = new();
+    public Dictionary<string, ChatFunctionPermissions> GrantedPermissions { get; } = new();
 
     public ChatMessageNode this[int index] => _branchNodes[index];
 

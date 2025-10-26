@@ -12,11 +12,13 @@ using ZLinq;
 namespace Everywhere.Chat.Plugins;
 
 [JsonPolymorphic]
-[JsonDerivedType(typeof(BuiltInChatPlugin), "native")]
+[JsonDerivedType(typeof(BuiltInChatPlugin), "builtin")]
 [JsonDerivedType(typeof(McpChatPlugin), "mcp")]
 [ObservableObject]
 public abstract partial class ChatPlugin(string name) : KernelPlugin(name)
 {
+    public abstract string Key { get; }
+
     [JsonIgnore]
     public abstract DynamicResourceKeyBase HeaderKey { get; }
 
@@ -78,7 +80,10 @@ public abstract partial class ChatPlugin(string name) : KernelPlugin(name)
 /// Chat kernel plugin implemented natively in Everywhere.
 /// </summary>
 /// <param name="name"></param>
-public abstract class BuiltInChatPlugin(string name) : ChatPlugin(name);
+public abstract class BuiltInChatPlugin(string name) : ChatPlugin(name)
+{
+    public override sealed string Key => $"builtin.{Name}";
+}
 
 /// <summary>
 /// Chat kernel plugin implemented with MCP.
@@ -86,6 +91,8 @@ public abstract class BuiltInChatPlugin(string name) : ChatPlugin(name);
 /// <param name="name"></param>
 public partial class McpChatPlugin(string name) : ChatPlugin(name)
 {
+    public override string Key => $"mcp.{Name}";
+
     public override DynamicResourceKey HeaderKey => new DirectResourceKey(Name);
 
     public override DynamicResourceKey DescriptionKey => new DirectResourceKey(Name);

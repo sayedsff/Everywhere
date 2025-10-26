@@ -7,6 +7,7 @@ using Everywhere.Interop;
 using LiveMarkdown.Avalonia;
 using Lucide.Avalonia;
 using MessagePack;
+using ObservableCollections;
 using ZLinq;
 
 namespace Everywhere.Chat.Plugins;
@@ -15,13 +16,14 @@ namespace Everywhere.Chat.Plugins;
 /// Used to represent a block of content displayed by a chat plugin.
 /// </summary>
 [MessagePackObject]
-[Union(0, typeof(ChatPluginTextDisplayBlock))]
-[Union(1, typeof(ChatPluginDynamicResourceKeyDisplayBlock))]
-[Union(2, typeof(ChatPluginMarkdownDisplayBlock))]
-[Union(3, typeof(ChatPluginProgressDisplayBlock))]
-[Union(4, typeof(ChatPluginFileReferencesDisplayBlock))]
-[Union(5, typeof(ChatPluginFileDifferenceDisplayBlock))]
-[Union(6, typeof(ChatPluginUrlsDisplayBlock))]
+[Union(0, typeof(ChatPluginContainerDisplayBlock))]
+[Union(1, typeof(ChatPluginTextDisplayBlock))]
+[Union(2, typeof(ChatPluginDynamicResourceKeyDisplayBlock))]
+[Union(3, typeof(ChatPluginMarkdownDisplayBlock))]
+[Union(4, typeof(ChatPluginProgressDisplayBlock))]
+[Union(5, typeof(ChatPluginFileReferencesDisplayBlock))]
+[Union(6, typeof(ChatPluginFileDifferenceDisplayBlock))]
+[Union(7, typeof(ChatPluginUrlsDisplayBlock))]
 public abstract partial class ChatPluginDisplayBlock : ObservableObject
 {
     /// <summary>
@@ -29,6 +31,16 @@ public abstract partial class ChatPluginDisplayBlock : ObservableObject
     /// </summary>
     [IgnoreMember]
     public virtual bool IsWaitingForUserInput => false;
+}
+
+/// <summary>
+/// Represents a container block that can hold other display blocks.
+/// </summary>
+[MessagePackObject(AllowPrivate = true, OnlyIncludeKeyedMembers = true)]
+public sealed partial class ChatPluginContainerDisplayBlock : ChatPluginDisplayBlock
+{
+    [Key(0)]
+    public ObservableList<ChatPluginDisplayBlock> Children { get; private set; } = [];
 }
 
 [MessagePackObject(AllowPrivate = true, OnlyIncludeKeyedMembers = true)]

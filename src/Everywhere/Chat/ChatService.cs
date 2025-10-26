@@ -49,7 +49,7 @@ public class ChatService(
         FunctionCallChatMessage ChatMessage
     )
     {
-        public string PermissionKey => $"{Plugin.Name}.{Function.KernelFunction.Name}";
+        public string PermissionKey => $"{Plugin.Key}.{Function.KernelFunction.Name}";
     }
 
     private readonly ActivitySource _activitySource = new(typeof(ChatService).FullName.NotNull());
@@ -731,20 +731,19 @@ public class ChatService(
                 {
                     case ConsentDecision.AlwaysAllow:
                     {
-                        context.Function.GrantedPermissions.BindableValue |= context.Function.Permissions;
+                        settings.Plugin.GrantedPermissions.TryGetValue(context.PermissionKey, out var grantedGlobalPermissions);
+                        settings.Plugin.GrantedPermissions[context.PermissionKey] = grantedGlobalPermissions | context.Function.Permissions;
                         break;
                     }
                     case ConsentDecision.AllowSession:
                     {
-                        if (!context.ChatContext.GrantedSessionFunctionPermissions.TryGetValue(
-                                context.PermissionKey,
-                                out var grantedSessionPermissions))
+                        if (!context.ChatContext.GrantedPermissions.TryGetValue(context.PermissionKey, out var grantedSessionPermissions))
                         {
                             grantedSessionPermissions = ChatFunctionPermissions.None;
                         }
 
                         grantedSessionPermissions |= context.Function.Permissions;
-                        context.ChatContext.GrantedSessionFunctionPermissions[context.PermissionKey] = grantedSessionPermissions;
+                        context.ChatContext.GrantedPermissions[context.PermissionKey] = grantedSessionPermissions;
                         break;
                     }
                     case ConsentDecision.Deny:
@@ -761,8 +760,12 @@ public class ChatService(
                 var requiredPermissions = context.Function.Permissions;
                 if (requiredPermissions < ChatFunctionPermissions.FileAccess) return true;
 
-                var grantedPermissions = context.Function.GrantedPermissions.ActualValue;
-                if (context.ChatContext.GrantedSessionFunctionPermissions.TryGetValue(context.PermissionKey, out var grantedSessionPermissions))
+                var grantedPermissions = ChatFunctionPermissions.None;
+                if (settings.Plugin.GrantedPermissions.TryGetValue(context.PermissionKey, out var grantedGlobalPermissions))
+                {
+                    grantedPermissions |= grantedGlobalPermissions;
+                }
+                if (context.ChatContext.GrantedPermissions.TryGetValue(context.PermissionKey, out var grantedSessionPermissions))
                 {
                     grantedPermissions |= grantedSessionPermissions;
                 }
@@ -1022,12 +1025,12 @@ public class ChatService(
 
         // Check if the permission is already granted
         var grantedPermissions = ChatFunctionPermissions.None;
-        var sessionKey = $"{_currentFunctionCallContext.PermissionKey}.{id}";
-        if (_currentFunctionCallContext.Function.GrantedExtraPermissions.TryGetValue(id, out var extra))
+        var permissionKey = $"{_currentFunctionCallContext.PermissionKey}.{id}";
+        if (settings.Plugin.GrantedPermissions.TryGetValue(permissionKey, out var extra))
         {
             grantedPermissions |= extra;
         }
-        if (_currentFunctionCallContext.ChatContext.GrantedSessionFunctionPermissions.TryGetValue(sessionKey, out var session))
+        if (_currentFunctionCallContext.ChatContext.GrantedPermissions.TryGetValue(permissionKey, out var session))
         {
             grantedPermissions |= session;
         }
@@ -1049,21 +1052,23 @@ public class ChatService(
         {
             case ConsentDecision.AlwaysAllow:
             {
-                _currentFunctionCallContext.Function.GrantedExtraPermissions[id] = _currentFunctionCallContext.Function.Permissions;
-                _currentFunctionCallContext.Function.SaveGrantedExtraPermissions();
+                settings.Plugin.GrantedPermissions.TryGetValue(permissionKey, out var grantedGlobalPermissions);
+                settings.Plugin.GrantedPermissions[permissionKey] = grantedGlobalPermissions | _currentFunctionCallContext.Function.Permissions;
                 return true;
             }
             case ConsentDecision.AllowSession:
             {
-                if (!_currentFunctionCallContext.ChatContext.GrantedSessionFunctionPermissions.TryGetValue(
-                        sessionKey,
-                        out var grantedSessionPermissions))
+                if (!_currentFunctionCallContext.ChatContext.GrantedPermissions.TryGetValue(permissionKey, out var grantedSessionPermissions))
                 {
                     grantedSessionPermissions = ChatFunctionPermissions.None;
                 }
 
                 grantedSessionPermissions |= _currentFunctionCallContext.Function.Permissions;
-                _currentFunctionCallContext.ChatContext.GrantedSessionFunctionPermissions[sessionKey] = grantedSessionPermissions;
+                _currentFunctionCallContext.ChatContext.GrantedPermissions[permissionKey] = grantedSessionPermissions;
+                return true;
+            }
+            case ConsentDecision.AllowOnce:
+            {
                 return true;
             }
             case ConsentDecision.Deny:
