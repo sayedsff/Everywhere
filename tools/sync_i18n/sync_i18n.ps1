@@ -254,7 +254,7 @@ function Update-ResxFile {
     $settings.Indent = $true
     $settings.IndentChars = '    '
     $settings.Encoding = [System.Text.UTF8Encoding]::new($false)
-    $settings.OmitXmlDeclaration = $false
+    $settings.OmitXmlDeclaration = $true
     
     $stringWriter = New-Object System.IO.StringWriter
     $writer = [System.Xml.XmlWriter]::Create($stringWriter, $settings)
@@ -264,6 +264,8 @@ function Update-ResxFile {
         
         # Get the XML content
         $content = $stringWriter.ToString()
+        
+        $content = '<?xml version="1.0" encoding="utf-8"?>' + "`r`n" + $content
         
         # Check if language comment already exists
         $hasComment = $false
