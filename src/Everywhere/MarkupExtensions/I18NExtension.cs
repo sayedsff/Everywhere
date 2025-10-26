@@ -111,20 +111,36 @@ public class I18NExtension : MarkupExtension
         public void OnError(Exception error) { }
     }
 
-    private sealed class BindingResourceKey(IBinding binding, AvaloniaObject? target, AvaloniaProperty? property) : DynamicResourceKeyBase
+    /// <summary>
+    /// This class is used to create a dynamic resource key for axaml Binding.
+    /// </summary>
+    /// <param name="binding"></param>
+    /// <param name="target"></param>
+    /// <param name="property"></param>
+    private sealed class BindingResourceKey(IBinding binding, AvaloniaObject? target, AvaloniaProperty? property)
+        : DynamicResourceKeyBase, IObserver<object?>
     {
 #pragma warning disable CS0618
         private readonly InstancedBinding? _bindingInstance = binding.Initiate(target ?? new AvaloniaObject(), property);
 #pragma warning restore CS0618
 
+        private IDisposable? _selfSubscription;
+        private object? _value;
+
         public override IDisposable Subscribe(IObserver<object?> observer)
         {
+            DisposeCollector.DisposeToDefault(ref _selfSubscription);
+            _selfSubscription = _bindingInstance?.Source.Subscribe(this); // Subscribe to the binding so that we can get updates.
+
             return _bindingInstance?.Source.Subscribe(observer) ?? AnonymousDisposable.Empty;
         }
 
-        public override string ToString()
-        {
-            return _bindingInstance?.ToString() ?? string.Empty;
-        }
+        public override string ToString() => _value?.ToString() ?? string.Empty;
+
+        public void OnCompleted() { }
+
+        public void OnError(Exception error) => _value = null;
+
+        public void OnNext(object? value) => _value = value;
     }
 }
