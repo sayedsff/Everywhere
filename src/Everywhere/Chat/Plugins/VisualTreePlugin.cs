@@ -25,7 +25,6 @@ public class VisualTreePlugin : BuiltInChatPlugin
     {
         _blobStorage = blobStorage;
         _visualElementContext = visualElementContext;
-        _settings = settings;
         _functions.Add(
             new NativeChatFunction(
                 CaptureVisualElementByIdAsync,
@@ -35,7 +34,7 @@ public class VisualTreePlugin : BuiltInChatPlugin
                 CaptureFullScreenAsync,
                 ChatFunctionPermissions.ScreenRead));
         _functions.Add(
-            new AnonymousChatFunction(
+            new NativeChatFunction(
                 ExecuteVisualActionQueueAsync,
                 ChatFunctionPermissions.ScreenAccess));
     }

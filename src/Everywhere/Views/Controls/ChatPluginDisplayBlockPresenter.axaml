@@ -3,11 +3,8 @@
   xmlns:at="clr-namespace:Everywhere.AttachedProperties" xmlns:md="clr-namespace:LiveMarkdown.Avalonia;assembly=LiveMarkdown.Avalonia"
   xmlns:plugins="clr-namespace:Everywhere.Chat.Plugins" xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI"
   xmlns:v="using:Everywhere.Views" xmlns:vc="clr-namespace:Everywhere.ValueConverters">
-  <Design.PreviewWith>
-    <v:ChatPluginDisplayBlockPresenter/>
-  </Design.PreviewWith>
 
-  <ControlTheme TargetType="v:ChatPluginDisplayBlockPresenter">
+  <ControlTheme x:Key="{x:Type v:ChatPluginDisplayBlockPresenter}" TargetType="v:ChatPluginDisplayBlockPresenter">
     <Setter Property="at:DataTemplatesAttach.DataTemplates">
       <DataTemplates>
         <DataTemplate DataType="plugins:ChatPluginTextDisplayBlock">
