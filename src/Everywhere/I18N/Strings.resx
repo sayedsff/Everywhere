@@ -1238,7 +1238,7 @@ Placeholders can be used within the prompt, enclosed in {}, and will be replaced
         <value>Web Search</value>
     </data>
     <data name="ChatPluginDisplayBlockPresenter_FileReferences_TotalCountTextBlock_Text" xml:space="preserve">
-        <value>{0} Files</value>
+        <value>{0} Files or Folder</value>
     </data>
     <data name="ChatPluginDisplayBlockPresenter_FileReferences_HasMoreReferencesTextBlock_Text" xml:space="preserve">
         <value>etc.</value>

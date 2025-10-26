@@ -67,7 +67,7 @@
                       <StackPanel
                         Orientation="Horizontal" Spacing="4">
                         <LucideIcon
-                          Kind="{Binding Icon}"
+                          Kind="{Binding IconAsync^}"
                           Size="14"/>
                         <TextBlock Text="{Binding FullPath, Converter={x:Static vc:CommonConverters.FullPathToFileName}}"/>
                       </StackPanel>

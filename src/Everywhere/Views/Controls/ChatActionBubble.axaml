@@ -94,7 +94,7 @@
               </MultiBinding>
             </Border.IsVisible>
             <ContentPresenter
-              Margin="8,0,0,0"
+              Margin="4,0,0,0"
               Content="{TemplateBinding Content}"/>
           </Border>
 

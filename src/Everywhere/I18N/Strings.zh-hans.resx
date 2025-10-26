@@ -1222,7 +1222,7 @@
         <value>网络搜索</value>
     </data>
     <data name="ChatPluginDisplayBlockPresenter_FileReferences_TotalCountTextBlock_Text" xml:space="preserve">
-        <value>{0} 个文件</value>
+        <value>{0} 个文件或文件夹</value>
     </data>
     <data name="ChatPluginDisplayBlockPresenter_FileReferences_HasMoreReferencesTextBlock_Text" xml:space="preserve">
         <value>其余略</value>

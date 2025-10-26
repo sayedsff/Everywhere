@@ -76,7 +76,7 @@ public sealed partial class ChatPluginProgressDisplayBlock(DynamicResourceKeyBas
 /// Represents a reference to a file or folder in a chat plugin display block.
 /// </summary>
 [MessagePackObject(AllowPrivate = true, OnlyIncludeKeyedMembers = true)]
-public partial class ChatPluginFileReference(string fullPath, DynamicResourceKeyBase? displayNameKey = null, bool isFolder = false)
+public partial class ChatPluginFileReference(string fullPath, DynamicResourceKeyBase? displayNameKey = null)
 {
     [Key(0)]
     public string FullPath { get; } = fullPath;
@@ -84,28 +84,22 @@ public partial class ChatPluginFileReference(string fullPath, DynamicResourceKey
     [Key(1)]
     public DynamicResourceKeyBase? DisplayNameKey { get; } = displayNameKey;
 
-    [Key(2)]
-    public bool IsFolder { get; } = isFolder;
-
     [IgnoreMember]
-    public LucideIconKind Icon
+    public Task<LucideIconKind> IconAsync => Task.Run(() =>
     {
-        get
+        if (Directory.Exists(FullPath)) return LucideIconKind.Folder;
+        return Path.GetExtension(FullPath).ToLowerInvariant() switch
         {
-            if (IsFolder) return LucideIconKind.Folder;
-            return Path.GetExtension(FullPath).ToLowerInvariant() switch
-            {
-                ".cs" or ".rs" or ".py" or ".js" or ".ts" or ".cpp" or ".c" or ".html" or ".css" or ".java" => LucideIconKind.FileCode,
-                ".txt" or ".md" or ".markdown" or ".doc" or ".docx" or ".rtf" => LucideIconKind.FileText,
-                ".jpg" or ".jpeg" or ".png" or ".gif" or ".bmp" or ".webp" => LucideIconKind.FileImage,
-                ".mp4" or ".avi" or ".mov" or ".wmv" or ".mkv" => LucideIconKind.FileVideoCamera,
-                ".sh" or ".exe" or ".bat" or ".cmd" or ".ps1" => LucideIconKind.FileTerminal,
-                ".zip" or ".rar" or ".7z" or ".tar" or ".gz" => LucideIconKind.FileArchive,
-                ".mp3" or ".wav" or ".flac" or ".aac" => LucideIconKind.FileAudio,
-                _ => LucideIconKind.File
-            };
-        }
-    }
+            ".cs" or ".rs" or ".py" or ".js" or ".ts" or ".cpp" or ".c" or ".html" or ".css" or ".java" => LucideIconKind.FileCode,
+            ".txt" or ".md" or ".markdown" or ".doc" or ".docx" or ".rtf" => LucideIconKind.FileText,
+            ".jpg" or ".jpeg" or ".png" or ".gif" or ".bmp" or ".webp" => LucideIconKind.FileImage,
+            ".mp4" or ".avi" or ".mov" or ".wmv" or ".mkv" => LucideIconKind.FileVideoCamera,
+            ".sh" or ".exe" or ".bat" or ".cmd" or ".ps1" => LucideIconKind.FileTerminal,
+            ".zip" or ".rar" or ".7z" or ".tar" or ".gz" => LucideIconKind.FileArchive,
+            ".mp3" or ".wav" or ".flac" or ".aac" => LucideIconKind.FileAudio,
+            _ => LucideIconKind.File
+        };
+    });
 
     [RelayCommand]
     private void OpenFileLocation()
