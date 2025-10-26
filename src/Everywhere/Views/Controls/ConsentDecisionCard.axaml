@@ -40,14 +40,14 @@
                   Grid.Row="0" HorizontalAlignment="Center"
                   Content="{TemplateBinding Header}"
                   IsVisible="{TemplateBinding Header, Converter={x:Static ObjectConverters.IsNotNull}}"
-                  TextAlignment="Center"/>
+                  TextAlignment="Center" TextWrapping="Wrap"/>
 
                 <ScrollViewer
                   Grid.Row="1"
                   HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
                   IsVisible="{TemplateBinding Content, Converter={x:Static ObjectConverters.IsNotNull}}"
                   VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}">
-                  <ContentPresenter Content="{TemplateBinding Content}"/>
+                  <v:ChatPluginDisplayBlockPresenter Content="{TemplateBinding Content}"/>
                 </ScrollViewer>
 
                 <StackPanel

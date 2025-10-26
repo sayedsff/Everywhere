@@ -686,7 +686,7 @@
         <value>视觉树</value>
     </data>
     <data name="NativeChatPlugin_VisualTree_Description" xml:space="preserve">
-        <value>提供屏幕内元素的感知能力。</value>
+        <value>提供屏幕内元素的感知和操作能力。</value>
     </data>
     <data name="ChangeLogView_ViewOnGitHubHyperlinkButton_Content" xml:space="preserve">
         <value>访问 GitHub</value>
@@ -1153,10 +1153,10 @@
         <value>拒绝所有</value>
     </data>
     <data name="NativeChatPlugin_FileSystem_DeleteFiles_DeletionConsent_Header" xml:space="preserve">
-        <value>即将删除 {0} 个文件或文件夹。</value>
+        <value>即将删除 {0} 个文件或文件夹</value>
     </data>
     <data name="NativeChatPlugin_FileSystem_DeleteFiles_SystemFile_DeletionConsent_Header" xml:space="preserve">
-        <value>即将删除系统文件或文件夹。</value>
+        <value>即将删除系统文件或文件夹</value>
     </data>
     <data name="TextDifferenceEditor_DiscardButton_Content" xml:space="preserve">
         <value>拒绝</value>
@@ -1235,5 +1235,8 @@
     </data>
     <data name="ChatPluginDisplayBlockPresenter_Urls_TotalCountTextBlock_Text" xml:space="preserve">
         <value>{0} 个链接</value>
+    </data>
+    <data name="NativeChatPlugin_PowerShell_ExecuteScript_ScriptConsent_Header" xml:space="preserve">
+        <value>即将执行下列终端命令</value>
     </data>
 </root>

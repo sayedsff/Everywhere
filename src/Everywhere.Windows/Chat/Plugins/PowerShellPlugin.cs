@@ -4,6 +4,7 @@ using System.Management.Automation.Runspaces;
 using System.Reflection;
 using Everywhere.Chat.Permissions;
 using Everywhere.Chat.Plugins;
+using Everywhere.Extensions;
 using Everywhere.I18N;
 using Lucide.Avalonia;
 using Microsoft.Extensions.Logging;
@@ -44,16 +45,17 @@ public class PowerShellPlugin : BuiltInChatPlugin
 
         _functions.Add(
             new NativeChatFunction(
-                ExecutePowerShellScriptAsync,
+                ExecuteScriptAsync,
                 ChatFunctionPermissions.ShellExecute));
     }
 
-    [KernelFunction("execute_powershell_script")]
+    [KernelFunction("execute_script")]
     [Description("Execute PowerShell script and obtain its output.")]
-    private async Task<string> ExecutePowerShellScriptAsync(
+    private async Task<string> ExecuteScriptAsync(
         [FromKernelServices] IChatPluginUserInterface userInterface,
         [Description("A concise description for user, explaining what you are doing")] string description,
-        [Description("Signle or multi-line")] string script)
+        [Description("Single or multi-line")] string script,
+        CancellationToken cancellationToken)
     {
         _logger.LogDebug("Executing PowerShell script with description: {Description}", description);
 
@@ -61,6 +63,34 @@ public class PowerShellPlugin : BuiltInChatPlugin
         {
             throw new ArgumentException("Script cannot be null or empty.", nameof(script));
         }
+
+        string consentKey;
+        var trimmedScript = script.AsSpan().Trim();
+        if (trimmedScript.Count('\n') == 0)
+        {
+            // single line script, confirm with user
+            var command = trimmedScript[trimmedScript.Split(' ').FirstOrDefault(new Range(0, trimmedScript.Length))].ToString();
+            consentKey = $"single.{command}";
+        }
+        else
+        {
+            // multi-line script, show full script to user
+            consentKey = "multi";
+        }
+
+        var consent = await userInterface.RequestConsentAsync(
+            consentKey,
+            new DynamicResourceKey(LocaleKey.NativeChatPlugin_PowerShell_ExecuteScript_ScriptConsent_Header),
+            new ChatPluginContainerDisplayBlock
+            {
+                Children =
+                {
+                    new ChatPluginTextDisplayBlock(description),
+                    new ChatPluginTextDisplayBlock(script),
+                }
+            },
+            cancellationToken);
+        if (!consent) return "User denied execution of the script.";
 
         // Use PowerShell to execute the script and return the output
         var iss = InitialSessionState.CreateDefault2();

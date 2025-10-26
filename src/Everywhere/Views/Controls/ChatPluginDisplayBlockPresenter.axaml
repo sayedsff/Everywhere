@@ -26,10 +26,21 @@
 
     <Setter Property="at:DataTemplatesAttach.DataTemplates">
       <DataTemplates>
+        <DataTemplate DataType="plugins:ChatPluginContainerDisplayBlock">
+          <ItemsControl ItemsSource="{Binding Children}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <v:ChatPluginDisplayBlockPresenter Content="{Binding}"/>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </DataTemplate>
         <DataTemplate DataType="plugins:ChatPluginTextDisplayBlock">
-          <SelectableTextBlock
-            Text="{Binding Text}"
-            TextWrapping="Wrap"/>
+          <ScrollViewer MaxHeight="300">
+            <SelectableTextBlock
+              Text="{Binding Text}"
+              TextWrapping="Wrap"/>
+          </ScrollViewer>
         </DataTemplate>
         <DataTemplate DataType="plugins:ChatPluginDynamicResourceKeyDisplayBlock">
           <SelectableTextBlock

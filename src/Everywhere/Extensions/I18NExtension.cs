@@ -37,12 +37,20 @@ public static class I18NExtension
             foreach (var v in values)
             {
                 var val = Convert.ToInt64(v);
-                if ((target & val) == val)
+
+                // remove result values that are already covered by larger flags
+                for (var i = 0; i < results.Count; i++)
                 {
-                    results.Add(v);
-                    target -= val;
+                    var existingVal = Convert.ToInt64(results[i]);
+                    if ((existingVal & val) == existingVal)
+                    {
+                        results.RemoveAt(i);
+                        i--;
+                    }
                 }
-                if (target == 0) break;
+
+                if ((target & val) == val) results.Add(v);
+                if (target == val) break;
             }
             values = results;
         }

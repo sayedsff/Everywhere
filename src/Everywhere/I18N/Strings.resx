@@ -697,7 +697,7 @@
         <value>Visual Tree</value>
     </data>
     <data name="NativeChatPlugin_VisualTree_Description" xml:space="preserve">
-        <value>Provides the ability to perceive elements on the screen.</value>
+        <value>Provide the ability to perceive and manipulate elements on the screen.</value>
     </data>
     <data name="ChangeLogView_ViewOnGitHubHyperlinkButton_Content" xml:space="preserve">
         <value>View on GitHub</value>
@@ -1169,10 +1169,10 @@ Placeholders can be used within the prompt, enclosed in {}, and will be replaced
         <value>Discard All</value>
     </data>
     <data name="NativeChatPlugin_FileSystem_DeleteFiles_DeletionConsent_Header" xml:space="preserve">
-        <value>{0} files or folders will be deleted.</value>
+        <value>{0} files or folders will be deleted</value>
     </data>
     <data name="NativeChatPlugin_FileSystem_DeleteFiles_SystemFile_DeletionConsent_Header" xml:space="preserve">
-        <value>System file or directory will be deleted.</value>
+        <value>System file or directory will be deleted</value>
     </data>
     <data name="TextDifferenceEditor_DiscardButton_Content" xml:space="preserve">
         <value>Discard</value>
@@ -1251,5 +1251,8 @@ Placeholders can be used within the prompt, enclosed in {}, and will be replaced
     </data>
     <data name="ChatPluginDisplayBlockPresenter_Urls_TotalCountTextBlock_Text" xml:space="preserve">
         <value>{0} Urls</value>
+    </data>
+    <data name="NativeChatPlugin_PowerShell_ExecuteScript_ScriptConsent_Header" xml:space="preserve">
+        <value>The following terminal commands will be executed</value>
     </data>
 </root>
