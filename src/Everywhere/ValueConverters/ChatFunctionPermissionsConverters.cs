@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using Avalonia.Data.Converters;
 using Avalonia.Media;
+using Everywhere.Chat.Permissions;
 using Everywhere.Chat.Plugins;
 
 namespace Everywhere.ValueConverters;

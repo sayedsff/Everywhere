@@ -655,7 +655,7 @@
         <value>Web Browser</value>
     </data>
     <data name="NativeChatPlugin_WebBrowser_Description" xml:space="preserve">
-        <value>Providing web browsing capabilities, including search engine and webpage access functions, can reduce model hallucinations and deliver up-to-date information. Note: Using the web_search tool requires configuring a search engine API key (different from the model API key). If you do not intend to configure an API key, you may uncheck the web_search tool and use only the web_snapshot tool.</value>
+        <value>Providing web browsing capabilities, including search engine and webpage access functions, can reduce model hallucinations and deliver up-to-date information. Note: Using the "Web Search" tool requires configuring a search engine API key (different from the model API key). If you do not intend to configure an API key, you may uncheck the "Web Search" tool and use only the "Web Browser" tool.</value>
     </data>
     <data name="NativeChatPlugin_Shell_Header" xml:space="preserve">
         <value>Terminal</value>
@@ -1234,8 +1234,8 @@ Placeholders can be used within the prompt, enclosed in {}, and will be replaced
     <data name="NativeChatPlugin_WebBrowser_WebSearch_Header" xml:space="preserve">
         <value>Web Search</value>
     </data>
-    <data name="ChatPluginDisplayBlockPresenter_FileReferences_TotalCountRun_Text" xml:space="preserve">
-        <value>Files Count: </value>
+    <data name="ChatPluginDisplayBlockPresenter_FileReferences_TotalCountTextBlock_Text" xml:space="preserve">
+        <value>{0} Files</value>
     </data>
     <data name="ChatPluginDisplayBlockPresenter_FileReferences_HasMoreReferencesTextBlock_Text" xml:space="preserve">
         <value>etc.</value>
@@ -1245,5 +1245,8 @@ Placeholders can be used within the prompt, enclosed in {}, and will be replaced
     </data>
     <data name="NativeChatPlugin_WebBrowser_WebSnapshot_Visiting" xml:space="preserve">
         <value>Visiting {0}</value>
+    </data>
+    <data name="ChatPluginDisplayBlockPresenter_Urls_TotalCountTextBlock_Text" xml:space="preserve">
+        <value>{0} Urls</value>
     </data>
 </root>

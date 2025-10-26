@@ -1,11 +1,14 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using Avalonia.Collections;
 using Avalonia.Data;
 using Avalonia.Data.Converters;
 using Avalonia.Data.Core;
 using Avalonia.Markup.Xaml;
 using Avalonia.Metadata;
+using Everywhere.Utilities;
 using Microsoft.Extensions.DependencyInjection;
+using ZLinq;
 
 namespace Everywhere.MarkupExtensions;
 
@@ -15,7 +18,7 @@ public class I18NExtension : MarkupExtension
     public required object Key { get; set; }
 
     [Content, AssignBinding]
-    public object[] Arguments { get; set; } = [];
+    public AvaloniaList<object> Arguments { get; set; } = [];
 
     public IValueConverter? Converter { get; set; }
 
@@ -50,10 +53,11 @@ public class I18NExtension : MarkupExtension
         var dynamicResourceKey = Key switch
         {
             DynamicResourceKeyBase key => key,
-            _ when Arguments is { Length: > 0 } args => new FormattedDynamicResourceKey(
+            _ when Arguments is { Count: > 0 } args => new FormattedDynamicResourceKey(
                 Key,
-                args.Select(arg => arg switch
+                args.AsValueEnumerable().Select(arg => arg switch
                 {
+                    IBinding b => new BindingResourceKey(b, target?.TargetObject as AvaloniaObject, target?.TargetProperty as AvaloniaProperty),
                     DynamicResourceKeyBase key => key,
                     _ => new DynamicResourceKey(arg)
                 }).ToList()),
@@ -105,5 +109,22 @@ public class I18NExtension : MarkupExtension
         public void OnCompleted() { }
 
         public void OnError(Exception error) { }
+    }
+
+    private sealed class BindingResourceKey(IBinding binding, AvaloniaObject? target, AvaloniaProperty? property) : DynamicResourceKeyBase
+    {
+#pragma warning disable CS0618
+        private readonly InstancedBinding? _bindingInstance = binding.Initiate(target ?? new AvaloniaObject(), property);
+#pragma warning restore CS0618
+
+        public override IDisposable Subscribe(IObserver<object?> observer)
+        {
+            return _bindingInstance?.Source.Subscribe(observer) ?? AnonymousDisposable.Empty;
+        }
+
+        public override string ToString()
+        {
+            return _bindingInstance?.ToString() ?? string.Empty;
+        }
     }
 }

@@ -4,6 +4,8 @@ namespace Everywhere.Utilities;
 
 public class AnonymousDisposable(Action disposeAction) : IDisposable
 {
+    public static IDisposable Empty { get; } = new AnonymousDisposable(static () => { });
+
     public void Dispose()
     {
         GC.SuppressFinalize(this);

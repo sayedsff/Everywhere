@@ -42,11 +42,15 @@ public class ChatService(
     /// Context for function call invocations.
     /// </summary>
     protected record FunctionCallContext(
-        CustomAssistant Assistant,
+        Kernel Kernel,
+        ChatContext ChatContext,
         ChatPlugin Plugin,
         ChatFunction Function,
         FunctionCallChatMessage ChatMessage
-    );
+    )
+    {
+        public string PermissionKey => $"{Plugin.Name}.{Function.KernelFunction.Name}";
+    }
 
     private readonly ActivitySource _activitySource = new(typeof(ChatService).FullName.NotNull());
     private FunctionCallContext? _currentFunctionCallContext;
@@ -359,7 +363,7 @@ public class ChatService(
 
                 toolCallCount += functionCallContents.Count;
 
-                await InvokeFunctionsAsync(kernel, chatHistory, customAssistant, chatSpan, functionCallContents, cancellationToken);
+                await InvokeFunctionsAsync(kernel, chatContext, chatHistory, chatSpan, functionCallContents, cancellationToken);
 
                 chatSpan.FinishedAt = DateTimeOffset.UtcNow;
             }
@@ -573,16 +577,16 @@ public class ChatService(
     /// This will group the function calls by plugin and function, and invoke them sequentially.
     /// </summary>
     /// <param name="kernel"></param>
+    /// <param name="chatContext"></param>
     /// <param name="chatHistory"></param>
-    /// <param name="customAssistant"></param>
     /// <param name="chatSpan"></param>
     /// <param name="functionCallContents"></param>
     /// <param name="cancellationToken"></param>
     /// <exception cref="InvalidOperationException"></exception>
     private async Task InvokeFunctionsAsync(
         Kernel kernel,
+        ChatContext chatContext,
         ChatHistory chatHistory,
-        CustomAssistant customAssistant,
         AssistantChatMessageSpan chatSpan,
         IReadOnlyList<FunctionCallContent> functionCallContents,
         CancellationToken cancellationToken)
@@ -608,7 +612,8 @@ public class ChatService(
                 IsBusy = true,
             };
             _currentFunctionCallContext = new FunctionCallContext(
-                customAssistant,
+                kernel,
+                chatContext,
                 chatPlugin,
                 chatFunction,
                 functionCallChatMessage);
@@ -640,14 +645,13 @@ public class ChatService(
                     // Also add a display block for the function call content.
                     // This will allow the UI to display the function call content.
                     var friendlyContent = chatFunction.GetFriendlyCallContent(functionCallContent);
-                    functionCallChatMessage.DisplayBlocks.Add(new ChatPluginFunctionContentDisplayBlock(functionCallContent.Id, friendlyContent));
+                    if (friendlyContent is not null) functionCallChatMessage.DisplayBlocks.Add(friendlyContent);
 
                     // Add the function call content to the chat history.
                     // This will allow the LLM to see the function call in the chat history.
                     functionCallMessage.Items.Add(functionCallContent);
 
                     var resultContent = await InvokeFunctionAsync(
-                        kernel,
                         functionCallContent,
                         _currentFunctionCallContext,
                         friendlyContent,
@@ -696,7 +700,6 @@ public class ChatService(
     }
 
     private async Task<FunctionResultContent> InvokeFunctionAsync(
-        Kernel kernel,
         FunctionCallContent content,
         FunctionCallContext context,
         ChatPluginDisplayBlock? friendlyContent,
@@ -709,7 +712,7 @@ public class ChatService(
         FunctionResultContent resultContent;
         try
         {
-            if (!context.Function.IsPermissionsGranted())
+            if (!IsPermissionGranted())
             {
                 // The function requires permissions that are not granted.
                 var promise = new TaskCompletionSource<ConsentDecision>(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -722,16 +725,50 @@ public class ChatService(
                             new DirectResourceKey(context.Function.Permissions.I18N(LocaleKey.Common_Comma.I18N(), true))),
                         friendlyContent,
                         cancellationToken));
+
                 var consentDecision = await promise.Task;
-                if (consentDecision == ConsentDecision.Deny)
+                switch (consentDecision)
                 {
-                    return new FunctionResultContent(
-                        content,
-                        "Error: Function execution denied by user.");
+                    case ConsentDecision.AlwaysAllow:
+                    {
+                        context.Function.GrantedPermissions.BindableValue |= context.Function.Permissions;
+                        break;
+                    }
+                    case ConsentDecision.AllowSession:
+                    {
+                        if (!context.ChatContext.GrantedSessionFunctionPermissions.TryGetValue(
+                                context.PermissionKey,
+                                out var grantedSessionPermissions))
+                        {
+                            grantedSessionPermissions = ChatFunctionPermissions.None;
+                        }
+
+                        grantedSessionPermissions |= context.Function.Permissions;
+                        context.ChatContext.GrantedSessionFunctionPermissions[context.PermissionKey] = grantedSessionPermissions;
+                        break;
+                    }
+                    case ConsentDecision.Deny:
+                    {
+                        return new FunctionResultContent(content, "Error: Function execution denied by user.");
+                    }
                 }
             }
 
-            resultContent = await content.InvokeAsync(kernel, cancellationToken);
+            resultContent = await content.InvokeAsync(context.Kernel, cancellationToken);
+
+            bool IsPermissionGranted()
+            {
+                var requiredPermissions = context.Function.Permissions;
+                if (requiredPermissions < ChatFunctionPermissions.FileAccess) return true;
+
+                var grantedPermissions = context.Function.GrantedPermissions.ActualValue;
+                if (context.ChatContext.GrantedSessionFunctionPermissions.TryGetValue(context.PermissionKey, out var grantedSessionPermissions))
+                {
+                    grantedPermissions |= grantedSessionPermissions;
+                }
+
+                return (grantedPermissions & requiredPermissions) == requiredPermissions;
+            }
         }
         catch (Exception ex)
         {
@@ -973,8 +1010,31 @@ public class ChatService(
         ChatPluginDisplayBlock? content = null,
         CancellationToken cancellationToken = default)
     {
+        if (id.IsNullOrWhiteSpace())
+        {
+            throw new ArgumentException("Consent request ID cannot be null or whitespace", nameof(id));
+        }
+
         if (_currentFunctionCallContext is null)
+        {
             throw new InvalidOperationException("No active function call to request consent for");
+        }
+
+        // Check if the permission is already granted
+        var grantedPermissions = ChatFunctionPermissions.None;
+        var sessionKey = $"{_currentFunctionCallContext.PermissionKey}.{id}";
+        if (_currentFunctionCallContext.Function.GrantedExtraPermissions.TryGetValue(id, out var extra))
+        {
+            grantedPermissions |= extra;
+        }
+        if (_currentFunctionCallContext.ChatContext.GrantedSessionFunctionPermissions.TryGetValue(sessionKey, out var session))
+        {
+            grantedPermissions |= session;
+        }
+        if ((grantedPermissions & _currentFunctionCallContext.Function.Permissions) == _currentFunctionCallContext.Function.Permissions)
+        {
+            return true;
+        }
 
         var promise = new TaskCompletionSource<ConsentDecision>(TaskCreationOptions.RunContinuationsAsynchronously);
         EventHub<ChatPluginConsentRequest>.Publish(
@@ -983,8 +1043,35 @@ public class ChatService(
                 headerKey,
                 content,
                 cancellationToken));
+
         var consentDecision = await promise.Task;
-        return consentDecision != ConsentDecision.Deny;
+        switch (consentDecision)
+        {
+            case ConsentDecision.AlwaysAllow:
+            {
+                _currentFunctionCallContext.Function.GrantedExtraPermissions[id] = _currentFunctionCallContext.Function.Permissions;
+                _currentFunctionCallContext.Function.SaveGrantedExtraPermissions();
+                return true;
+            }
+            case ConsentDecision.AllowSession:
+            {
+                if (!_currentFunctionCallContext.ChatContext.GrantedSessionFunctionPermissions.TryGetValue(
+                        sessionKey,
+                        out var grantedSessionPermissions))
+                {
+                    grantedSessionPermissions = ChatFunctionPermissions.None;
+                }
+
+                grantedSessionPermissions |= _currentFunctionCallContext.Function.Permissions;
+                _currentFunctionCallContext.ChatContext.GrantedSessionFunctionPermissions[sessionKey] = grantedSessionPermissions;
+                return true;
+            }
+            case ConsentDecision.Deny:
+            default:
+            {
+                return false;
+            }
+        }
     }
 
     public Task<string> RequestInputAsync(DynamicResourceKeyBase message, CancellationToken cancellationToken = default)

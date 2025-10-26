@@ -1,4 +1,4 @@
-﻿namespace Everywhere.Chat.Plugins;
+﻿namespace Everywhere.Chat.Permissions;
 
 [Flags]
 public enum ChatFunctionPermissions

@@ -7,12 +7,33 @@
     <v:ChatPluginDisplayBlockPresenter/>
   </Design.PreviewWith>
 
-  <ControlTheme TargetType="v:ChatPluginDisplayBlockPresenter">
+  <ControlTheme
+    x:Key="{x:Type v:ChatPluginDisplayBlockPresenter}"
+    TargetType="v:ChatPluginDisplayBlockPresenter">
+    <Setter Property="Template">
+      <ControlTemplate TargetType="v:ChatPluginDisplayBlockPresenter">
+        <Border
+          Padding="4"
+          Background="{DynamicResource CardBackgroundColor}"
+          CornerRadius="4">
+          <ContentPresenter
+            x:Name="PART_ContentPresenter"
+            Content="{TemplateBinding Content}"
+            ContentTemplate="{TemplateBinding ContentTemplate}"/>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
     <Setter Property="at:DataTemplatesAttach.DataTemplates">
       <DataTemplates>
         <DataTemplate DataType="plugins:ChatPluginTextDisplayBlock">
           <SelectableTextBlock
             Text="{Binding Text}"
+            TextWrapping="Wrap"/>
+        </DataTemplate>
+        <DataTemplate DataType="plugins:ChatPluginDynamicResourceKeyDisplayBlock">
+          <SelectableTextBlock
+            Text="{Binding Key^}"
             TextWrapping="Wrap"/>
         </DataTemplate>
         <DataTemplate DataType="plugins:ChatPluginMarkdownDisplayBlock">
@@ -29,20 +50,34 @@
         </DataTemplate>
         <DataTemplate DataType="plugins:ChatPluginFileReferencesDisplayBlock">
           <StackPanel Spacing="4">
-            <TextBlock>
-              <Run Text="{I18N {x:Static LocaleKey.ChatPluginDisplayBlockPresenter_FileReferences_TotalCountRun_Text}}"/>
-              <Run Text="{Binding TotalReferenceCount}"/>
+            <TextBlock Classes="Muted">
+              <TextBlock.Text>
+                <I18N Key="{x:Static LocaleKey.ChatPluginDisplayBlockPresenter_FileReferences_TotalCountTextBlock_Text}">
+                  <Binding Path="TotalReferenceCount"/>
+                </I18N>
+              </TextBlock.Text>
             </TextBlock>
             <ItemsControl ItemsSource="{Binding References}">
               <ItemsControl.ItemTemplate>
                 <DataTemplate DataType="plugins:ChatPluginFileReference">
                   <HyperlinkButton
-                    Command="{Binding OpenFileLocation}"
-                    Content="{Binding FullPath, Converter={x:Static vc:CommonConverters.FullPathToFileName}}"/>
+                    Padding="2"
+                    Command="{Binding OpenFileLocationCommand}">
+                    <HyperlinkButton.Content>
+                      <StackPanel
+                        Orientation="Horizontal" Spacing="4">
+                        <LucideIcon
+                          Kind="{Binding Icon}"
+                          Size="14"/>
+                        <TextBlock Text="{Binding FullPath, Converter={x:Static vc:CommonConverters.FullPathToFileName}}"/>
+                      </StackPanel>
+                    </HyperlinkButton.Content>
+                  </HyperlinkButton>
                 </DataTemplate>
               </ItemsControl.ItemTemplate>
             </ItemsControl>
             <TextBlock
+              Classes="Muted"
               IsVisible="{Binding HasMoreReferences}"
               Text="{I18N {x:Static LocaleKey.ChatPluginDisplayBlockPresenter_FileReferences_HasMoreReferencesTextBlock_Text}}"/>
           </StackPanel>
@@ -52,8 +87,26 @@
             OriginalText="{Binding OriginalText}"
             TextDifference="{Binding Difference}"/>
         </DataTemplate>
-        <DataTemplate DataType="plugins:ChatPluginFunctionContentDisplayBlock">
-          <v:ChatPluginDisplayBlockPresenter Content="{Binding Content}"/>
+        <DataTemplate DataType="plugins:ChatPluginUrlsDisplayBlock">
+          <StackPanel Spacing="4">
+            <TextBlock Classes="Muted">
+              <TextBlock.Text>
+                <I18N Key="{x:Static LocaleKey.ChatPluginDisplayBlockPresenter_Urls_TotalCountTextBlock_Text}">
+                  <Binding Path="Urls.Count"/>
+                </I18N>
+              </TextBlock.Text>
+            </TextBlock>
+            <ItemsControl ItemsSource="{Binding Urls}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="plugins:ChatPluginUrl">
+                  <HyperlinkButton
+                    Padding="2"
+                    Content="{Binding DisplayNameKey^}"
+                    NavigateUri="{Binding Url, Converter={x:Static vc:CommonConverters.StringToUri}}"/>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
         </DataTemplate>
       </DataTemplates>
     </Setter>

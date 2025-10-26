@@ -2,6 +2,7 @@
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 using System.Reflection;
+using Everywhere.Chat.Permissions;
 using Everywhere.Chat.Plugins;
 using Everywhere.I18N;
 using Lucide.Avalonia;

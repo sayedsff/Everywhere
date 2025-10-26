@@ -642,7 +642,7 @@
         <value>网络浏览器</value>
     </data>
     <data name="NativeChatPlugin_WebBrowser_Description" xml:space="preserve">
-        <value>提供浏览网络的能力，包括搜索引擎和网页访问功能，可减少模型幻觉，并提供最新信息。注意：使用 web_search 工具需要配置搜索引擎 API 密钥（和模型 API 密钥是不同的）。如果你不打算配置 API 密钥，可取消勾选 web_search 工具，仅使用 web_snapshot 工具。</value>
+        <value>提供浏览网络的能力，包括搜索引擎和网页访问功能，可减少模型幻觉，并提供最新信息。注意：使用“网络搜索”工具需要配置搜索引擎 API 密钥（和模型 API 密钥是不同的）。如果你不打算配置 API 密钥，可取消勾选“网络搜索”工具，仅使用“访问网页”工具。</value>
     </data>
     <data name="NativeChatPlugin_Shell_Header" xml:space="preserve">
         <value>终端</value>
@@ -1216,8 +1216,8 @@
     <data name="NativeChatPlugin_WebBrowser_WebSearch_Header" xml:space="preserve">
         <value>网络搜索</value>
     </data>
-    <data name="ChatPluginDisplayBlockPresenter_FileReferences_TotalCountRun_Text" xml:space="preserve">
-        <value>文件数: </value>
+    <data name="ChatPluginDisplayBlockPresenter_FileReferences_TotalCountTextBlock_Text" xml:space="preserve">
+        <value>{0} 个文件</value>
     </data>
     <data name="ChatPluginDisplayBlockPresenter_FileReferences_HasMoreReferencesTextBlock_Text" xml:space="preserve">
         <value>其余略</value>
@@ -1227,5 +1227,8 @@
     </data>
     <data name="NativeChatPlugin_WebBrowser_WebSnapshot_Visiting" xml:space="preserve">
         <value>前往: {0}</value>
+    </data>
+    <data name="ChatPluginDisplayBlockPresenter_Urls_TotalCountTextBlock_Text" xml:space="preserve">
+        <value>{0} 个链接</value>
     </data>
 </root>

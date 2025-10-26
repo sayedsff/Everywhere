@@ -12,7 +12,7 @@ public static class CommonConverters
     );
 
     public static IValueConverter StringToUri { get; } = new BidirectionalFuncValueConverter<string?, Uri?>(
-        convert: (x, _) => x == null ? null : new Uri(x, UriKind.RelativeOrAbsolute),
+        convert: (x, _) => Uri.TryCreate(x, UriKind.RelativeOrAbsolute, out var uri) ? uri : null,
         convertBack: (x, _) => x?.ToString()
     );
 

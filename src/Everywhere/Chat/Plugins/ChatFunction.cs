@@ -1,5 +1,7 @@
-﻿using System.Reflection;
+﻿using System.Collections.ObjectModel;
+using System.Reflection;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Everywhere.Chat.Permissions;
 using Everywhere.Configuration;
 using Lucide.Avalonia;
 using Microsoft.SemanticKernel;
@@ -26,21 +28,13 @@ public abstract partial class ChatFunction : ObservableObject
     [ObservableProperty]
     public partial bool IsEnabled { get; set; } = true;
 
-    public abstract KernelFunction KernelFunction { get; }
-
     /// <summary>
-    /// Checks if the required permissions are granted for this function.
+    /// Key: ID of extra permission
+    /// Specific extra permission granted to this function.
     /// </summary>
-    /// <param name="minimumPermission">The minimum permission level to consider as granted.</param>
-    /// <returns></returns>
-    public bool IsPermissionsGranted(ChatFunctionPermissions minimumPermission = ChatFunctionPermissions.FileRead)
-    {
-        var permissions = Permissions;
-        if ((int)permissions <= (int)minimumPermission) return true;
+    public Dictionary<string, ChatFunctionPermissions> GrantedExtraPermissions { get; set; } = [];
 
-        var grantedPermissions = GrantedPermissions.ActualValue;
-        return (grantedPermissions & permissions) == permissions;
-    }
+    public abstract KernelFunction KernelFunction { get; }
 
     /// <summary>
     /// Converts the function call content to a user-friendly format for UI display.
@@ -48,6 +42,11 @@ public abstract partial class ChatFunction : ObservableObject
     /// <param name="content"></param>
     /// <returns></returns>
     public virtual ChatPluginDisplayBlock? GetFriendlyCallContent(FunctionCallContent content) => null;
+
+    /// <summary>
+    /// Notify that the GrantedExtraPermissions have been updated.
+    /// </summary>
+    internal void SaveGrantedExtraPermissions() => OnPropertyChanged(nameof(GrantedExtraPermissions));
 }
 
 public sealed class NativeChatFunction : ChatFunction

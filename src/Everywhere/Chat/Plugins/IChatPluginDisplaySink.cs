@@ -43,4 +43,6 @@ public interface IChatPluginDisplaySink
     /// <param name="difference"></param>
     /// <param name="originalText"></param>
     void AppendFileDifference(TextDifference difference, string originalText);
+
+    void AppendUrls(IReadOnlyList<ChatPluginUrl> urls);
 }

@@ -7,6 +7,7 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Web;
+using Everywhere.Chat.Permissions;
 using Everywhere.Configuration;
 using Everywhere.Interop;
 using Everywhere.Utilities;
@@ -38,7 +39,11 @@ public partial class WebBrowserPlugin : BuiltInChatPlugin
     private readonly ILoggerFactory _loggerFactory;
     private readonly ILogger<WebBrowserPlugin> _logger;
     private readonly DebounceExecutor<WebBrowserPlugin> _browserDisposer;
-    private readonly JsonSerializerOptions _jsonSerializerOptions = new() { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
+    private readonly JsonSerializerOptions _jsonSerializerOptions = new()
+    {
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        TypeInfoResolver = GeneratedJsonSerializationContext.Default
+    };
     private readonly SemaphoreSlim _browserLock = new(1, 1);
 
     private IWebSearchEngineConnector? _connector;
@@ -162,12 +167,13 @@ public partial class WebBrowserPlugin : BuiltInChatPlugin
     /// Only use this method if you are aware of the potential risks and have validated the input to prevent security vulnerabilities.
     /// </remarks>
     [KernelFunction("web_search")]
-    [Description("Perform a web search. Invoke this multiple times with different queries to get more results.")]
+    [Description("Perform a web search and return the results as a json array of web pages. " +
+        "You can use the results to answer user questions with up-to-date information.")] // TODO: index
     [DynamicResourceKey(LocaleKey.NativeChatPlugin_WebBrowser_WebSearch_Header)]
     private async Task<string> WebSearchAsync(
         [FromKernelServices] IChatPluginUserInterface userInterface,
         [Description("Search query")] string query,
-        [Description("Number of results")] int count = 10,
+        [Description("Number of results")] int count = 20,
         [Description("Number of results to skip")] int offset = 0,
         CancellationToken cancellationToken = default)
     {
@@ -181,12 +187,23 @@ public partial class WebBrowserPlugin : BuiltInChatPlugin
         EnsureConnector();
 
         var results = await _connector.SearchAsync<WebPage>(query, count, offset, cancellationToken).ConfigureAwait(false);
-        userInterface.RequestDisplaySink().AppendDynamicResourceKey(
-            new FormattedDynamicResourceKey(
-                LocaleKey.NativeChatPlugin_WebBrowser_WebSearch_Searching,
-                new DirectResourceKey(query)));
+        var indexedResults = results
+            .AsValueEnumerable()
+            .Select((r, i) => new IndexedWebPage(
+                Index: offset + i + 1,
+                Name: r.Name,
+                Url: r.Url,
+                Snippet: r.Snippet))
+            .ToList();
+        userInterface.RequestDisplaySink().AppendUrls(
+            indexedResults.Select(r => new ChatPluginUrl(
+                r.Url,
+                new DirectResourceKey(r.Name))
+            {
+                Index = r.Index
+            }).ToList());
 
-        return JsonSerializer.Serialize(results, _jsonSerializerOptions);
+        return JsonSerializer.Serialize(indexedResults, _jsonSerializerOptions);
     }
 
     private async ValueTask<IBrowser> EnsureBrowserAsync(CancellationToken cancellationToken)
@@ -331,6 +348,15 @@ public partial class WebBrowserPlugin : BuiltInChatPlugin
             _browserLock.Release();
         }
     }
+
+    private sealed record IndexedWebPage(
+        [property: JsonPropertyName("index")] int Index,
+        [property: JsonPropertyName("name")] string Name,
+        [property: JsonPropertyName("url")] string Url,
+        [property: JsonPropertyName("snippet")] string Snippet);
+
+    [JsonSerializable(typeof(List<IndexedWebPage>))]
+    private partial class GeneratedJsonSerializationContext : JsonSerializerContext;
 
     private class TavilyConnector(string apiKey, Uri? uri, ILoggerFactory? loggerFactory) : IWebSearchEngineConnector
     {

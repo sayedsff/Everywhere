@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using EverythingNet.Core;
+using Everywhere.Chat.Permissions;
 using Everywhere.Chat.Plugins;
 using Everywhere.I18N;
 using Everywhere.Interop;

@@ -398,10 +398,10 @@ public partial class VisualTreeXmlBuilder(
     }
 
     // The token-to-word ratio for English/Latin-based text.
-    private const double EnglishTokenRatio = 2.0;
+    private const double EnglishTokenRatio = 3.0;
 
     // The token-to-character ratio for CJK-based text.
-    private const double CjkTokenRatio = 1.0;
+    private const double CjkTokenRatio = 2.0;
 
     /// <summary>
     ///     Approximates the number of LLM tokens for a given string.

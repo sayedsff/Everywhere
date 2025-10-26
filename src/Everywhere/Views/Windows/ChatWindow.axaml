@@ -780,7 +780,11 @@
                       </v:ChatActionBubble.ErrorContent>
 
                       <ItemsControl ItemsSource="{Binding DisplayBlocks}">
-                        <v:ChatPluginDisplayBlockPresenter Content="{Binding}"/>
+                        <ItemsControl.ItemTemplate>
+                          <DataTemplate>
+                            <v:ChatPluginDisplayBlockPresenter Content="{Binding}"/>
+                          </DataTemplate>
+                        </ItemsControl.ItemTemplate>
                       </ItemsControl>
                     </v:ChatActionBubble>
                   </DataTemplate>

@@ -5,8 +5,8 @@ using CommunityToolkit.Mvvm.Input;
 using Everywhere.Common;
 using Everywhere.Interop;
 using LiveMarkdown.Avalonia;
+using Lucide.Avalonia;
 using MessagePack;
-using Microsoft.SemanticKernel;
 using ZLinq;
 
 namespace Everywhere.Chat.Plugins;
@@ -21,7 +21,7 @@ namespace Everywhere.Chat.Plugins;
 [Union(3, typeof(ChatPluginProgressDisplayBlock))]
 [Union(4, typeof(ChatPluginFileReferencesDisplayBlock))]
 [Union(5, typeof(ChatPluginFileDifferenceDisplayBlock))]
-[Union(6, typeof(ChatPluginFunctionContentDisplayBlock))]
+[Union(6, typeof(ChatPluginUrlsDisplayBlock))]
 public abstract partial class ChatPluginDisplayBlock : ObservableObject
 {
     /// <summary>
@@ -75,16 +75,39 @@ public sealed partial class ChatPluginProgressDisplayBlock(DynamicResourceKeyBas
 /// <summary>
 /// Represents a reference to a file or folder in a chat plugin display block.
 /// </summary>
-/// <param name="FullPath"></param>
-/// <param name="DisplayNameKey"></param>
-/// <param name="IsFolder"></param>
 [MessagePackObject(AllowPrivate = true, OnlyIncludeKeyedMembers = true)]
-public partial record ChatPluginFileReference(
-    [property: Key(0)] string FullPath,
-    [property: Key(1)] DynamicResourceKeyBase? DisplayNameKey = null,
-    [property: Key(2)] bool IsFolder = false
-)
+public partial class ChatPluginFileReference(string fullPath, DynamicResourceKeyBase? displayNameKey = null, bool isFolder = false)
 {
+    [Key(0)]
+    public string FullPath { get; } = fullPath;
+
+    [Key(1)]
+    public DynamicResourceKeyBase? DisplayNameKey { get; } = displayNameKey;
+
+    [Key(2)]
+    public bool IsFolder { get; } = isFolder;
+
+    [IgnoreMember]
+    public LucideIconKind Icon
+    {
+        get
+        {
+            if (IsFolder) return LucideIconKind.Folder;
+            return Path.GetExtension(FullPath).ToLowerInvariant() switch
+            {
+                ".cs" or ".rs" or ".py" or ".js" or ".ts" or ".cpp" or ".c" or ".html" or ".css" or ".java" => LucideIconKind.FileCode,
+                ".txt" or ".md" or ".markdown" or ".doc" or ".docx" or ".rtf" => LucideIconKind.FileText,
+                ".jpg" or ".jpeg" or ".png" or ".gif" or ".bmp" or ".webp" => LucideIconKind.FileImage,
+                ".mp4" or ".avi" or ".mov" or ".wmv" or ".mkv" => LucideIconKind.FileVideoCamera,
+                ".sh" or ".exe" or ".bat" or ".cmd" or ".ps1" => LucideIconKind.FileTerminal,
+                ".zip" or ".rar" or ".7z" or ".tar" or ".gz" => LucideIconKind.FileArchive,
+                ".mp3" or ".wav" or ".flac" or ".aac" => LucideIconKind.FileAudio,
+                _ => LucideIconKind.File
+            };
+        }
+    }
+
+    [RelayCommand]
     private void OpenFileLocation()
     {
         ServiceLocator.Resolve<INativeHelper>().OpenFileLocation(FullPath);
@@ -135,19 +158,30 @@ public sealed partial class ChatPluginFileDifferenceDisplayBlock(TextDifference 
 }
 
 /// <summary>
-/// Represents the content of a function (call or result) with optional display content.
+/// Represents a URL with an optional display name key. Usage example: web search results.
 /// </summary>
-/// <param name="id"></param>
-/// <param name="content"></param>
+/// <param name="url"></param>
+/// <param name="displayNameKey"></param>
 [MessagePackObject(AllowPrivate = true, OnlyIncludeKeyedMembers = true)]
-public sealed partial class ChatPluginFunctionContentDisplayBlock(string id, ChatPluginDisplayBlock? content) : ChatPluginDisplayBlock
+public sealed partial class ChatPluginUrl(string url, DynamicResourceKeyBase displayNameKey)
 {
-    /// <summary>
-    /// The unique identifier for the function call.
-    /// </summary>
     [Key(0)]
-    public string Id { get; } = id;
+    public string Url { get; } = url;
 
     [Key(1)]
-    public ChatPluginDisplayBlock? Content { get; } = content;
+    public DynamicResourceKeyBase DisplayNameKey { get; } = displayNameKey;
+
+    /// <summary>
+    /// The index of this URL in the original list, if applicable.
+    /// Useful to let the LLM refer to the origin of the answer.
+    /// </summary>
+    [Key(2)]
+    public int Index { get; set; }
+}
+
+[MessagePackObject(AllowPrivate = true, OnlyIncludeKeyedMembers = true)]
+public sealed partial class ChatPluginUrlsDisplayBlock(params IReadOnlyList<ChatPluginUrl> urls) : ChatPluginDisplayBlock
+{
+    [Key(0)]
+    public IReadOnlyList<ChatPluginUrl> Urls { get; } = urls;
 }

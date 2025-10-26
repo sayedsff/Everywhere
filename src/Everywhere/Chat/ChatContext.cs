@@ -1,6 +1,8 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Everywhere.Chat.Permissions;
+using Everywhere.Chat.Plugins;
 using Everywhere.Interop;
 using Everywhere.Utilities;
 using MessagePack;
@@ -47,12 +49,20 @@ public partial class ChatContext : ObservableObject, IReadOnlyList<ChatMessageNo
     }
 
     /// <summary>
-    /// VisualElement.Id: VisualElement.
+    /// Key: VisualElement.Id
+    /// Value: VisualElement.
     /// VisualElement is dynamically created and not serialized, so we keep a map here to track them.
     /// This is also not serialized.
     /// </summary>
     [IgnoreMember]
     public ResilientCache<int, IVisualElement> VisualElements { get; } = new();
+
+    /// <summary>
+    /// Key: PluginName.FunctionName.id
+    /// Value: Granted permissions for the function.
+    /// </summary>
+    [IgnoreMember]
+    public Dictionary<string, ChatFunctionPermissions> GrantedSessionFunctionPermissions { get; } = new();
 
     public ChatMessageNode this[int index] => _branchNodes[index];
 

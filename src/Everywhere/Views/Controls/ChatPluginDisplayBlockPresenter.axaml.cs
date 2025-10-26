@@ -1,5 +1,5 @@
-﻿using Avalonia.Controls.Presenters;
+﻿using Avalonia.Controls;
 
 namespace Everywhere.Views;
 
-public class ChatPluginDisplayBlockPresenter : ContentPresenter;
+public class ChatPluginDisplayBlockPresenter : ContentControl;

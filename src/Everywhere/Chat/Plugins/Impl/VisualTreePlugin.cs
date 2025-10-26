@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using Everywhere.AI;
+using Everywhere.Chat.Permissions;
 using Everywhere.Database;
 using Everywhere.Interop;
 using Everywhere.Storage;

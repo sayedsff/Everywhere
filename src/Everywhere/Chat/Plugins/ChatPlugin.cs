@@ -2,6 +2,7 @@
 using System.Text.Json.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Everywhere.AI;
+using Everywhere.Chat.Permissions;
 using Everywhere.Configuration;
 using Lucide.Avalonia;
 using Microsoft.SemanticKernel;

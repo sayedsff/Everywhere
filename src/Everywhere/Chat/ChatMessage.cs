@@ -1,8 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.Json.Serialization;
 using Avalonia.Controls.Documents;
@@ -417,5 +415,10 @@ public partial class FunctionCallChatMessage : ChatMessage, IChatMessageWithAtta
     public void AppendFileDifference(TextDifference difference, string originalText)
     {
         DisplayBlocks.Add(new ChatPluginFileDifferenceDisplayBlock(difference, originalText));
+    }
+
+    public void AppendUrls(IReadOnlyList<ChatPluginUrl> urls)
+    {
+        DisplayBlocks.Add(new ChatPluginUrlsDisplayBlock(urls));
     }
 }

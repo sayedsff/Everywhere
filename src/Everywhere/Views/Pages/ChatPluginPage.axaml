@@ -2,11 +2,11 @@
   x:Class="Everywhere.Views.Pages.ChatPluginPage" xmlns="https://github.com/avaloniaui"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:md="clr-namespace:LiveMarkdown.Avalonia;assembly=LiveMarkdown.Avalonia"
-  xmlns:p="clr-namespace:Everywhere.Chat.Plugins" xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI"
-  xmlns:v="clr-namespace:Everywhere.Views" xmlns:vc="clr-namespace:Everywhere.ValueConverters"
-  xmlns:vm="clr-namespace:Everywhere.ViewModels" d:DesignHeight="450"
-  d:DesignWidth="800" x:DataType="vm:ChatPluginPageViewModel"
-  mc:Ignorable="d">
+  xmlns:p="clr-namespace:Everywhere.Chat.Plugins" xmlns:permissions="clr-namespace:Everywhere.Chat.Permissions"
+  xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI" xmlns:v="clr-namespace:Everywhere.Views"
+  xmlns:vc="clr-namespace:Everywhere.ValueConverters" xmlns:vm="clr-namespace:Everywhere.ViewModels"
+  d:DesignHeight="450" d:DesignWidth="800"
+  x:DataType="vm:ChatPluginPageViewModel" mc:Ignorable="d">
   <UserControl.Styles>
     <Style Selector="ListBox.PluginListBox">
       <Style Selector="^ &gt; Border">
@@ -63,7 +63,7 @@
         </ItemsPanelTemplate>
       </Setter>
       <Setter Property="ItemTemplate">
-        <DataTemplate DataType="p:ChatFunctionPermissions">
+        <DataTemplate DataType="permissions:ChatFunctionPermissions">
           <shadui:Badge>
             <shadui:Badge.Background>
               <MultiBinding Converter="{x:Static vc:ChatFunctionPermissionsConverters.ToBrush}">
