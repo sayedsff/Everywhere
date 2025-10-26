@@ -103,6 +103,11 @@ public interface IVisualElement
     /// Supports common keys and shortcuts like Enter, Ctrl+C, or Ctrl+V even when the window is minimized.
     /// </summary>
     Task SendShortcutAsync(VisualElementShortcut shortcut, CancellationToken cancellationToken = default);
+    // /// <summary>
+    // /// Get the selected text of the visual element.
+    // /// </summary>
+    // /// <returns></returns>
+    // string? GetSelectionText();
 
     Task<Bitmap> CaptureAsync();
 }

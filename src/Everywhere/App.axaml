@@ -10,13 +10,18 @@
   <Application.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
+        <LocaleManager/>
         <ResourceInclude Source="avares://Everywhere/Assets/Resources.axaml"/>
         <ResourceInclude Source="avares://Everywhere/Assets/DataTemplates.axaml"/>
         <ResourceInclude Source="avares://Everywhere/Views/Controls/ChatInputBox.axaml"/>
         <ResourceInclude Source="avares://Everywhere/Views/Controls/ChatActionBubble.axaml"/>
+        <ResourceInclude Source="avares://Everywhere/Views/Controls/ChatPluginDisplayBlockPresenter.axaml"/>
+        <ResourceInclude Source="avares://Everywhere/Views/Controls/ConsentDecisionCard.axaml"/>
         <ResourceInclude Source="avares://Everywhere/Views/Controls/IconEditor.axaml"/>
         <ResourceInclude Source="avares://Everywhere/Views/Controls/IconPresenter.axaml"/>
         <ResourceInclude Source="avares://Everywhere/Views/Controls/SettingsItemsControl.axaml"/>
+        <ResourceInclude Source="avares://Everywhere/Views/Controls/TextDifferenceEditor.axaml"/>
+        <ResourceInclude Source="avares://Everywhere/Views/Controls/TextDifferenceSummaryView.axaml"/>
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </Application.Resources>

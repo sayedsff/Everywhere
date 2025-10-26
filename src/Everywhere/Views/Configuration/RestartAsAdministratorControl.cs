@@ -15,11 +15,10 @@ public class RestartAsAdministratorControl : ContentControl
         Content = new Button
         {
             [!ContentProperty] = new DynamicResourceKey(LocaleKey.Settings_Common_RestartAsAdministrator_Button_Content).ToBinding(),
+            [ButtonAssist.IconSizeProperty] = 18,
             [ButtonAssist.IconProperty] = new LucideIcon
             {
-                Kind = LucideIconKind.Shield,
-                Size = 18,
-                Margin = new Thickness(0, 0, 6, 0)
+                Kind = LucideIconKind.Shield
             },
             Classes = { "Outline" },
             HorizontalAlignment = HorizontalAlignment.Left,

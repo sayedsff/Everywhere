@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Windows;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
@@ -10,6 +11,7 @@ using Windows.Win32.UI.WindowsAndMessaging;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Platform;
+using Avalonia.Threading;
 using Everywhere.Common;
 using Everywhere.Extensions;
 using Everywhere.I18N;
@@ -28,6 +30,8 @@ using Bitmap = Avalonia.Media.Imaging.Bitmap;
 using PixelFormat = System.Drawing.Imaging.PixelFormat;
 using Point = System.Drawing.Point;
 using Size = System.Drawing.Size;
+using Vector = Avalonia.Vector;
+using WindowState = Avalonia.Controls.WindowState;
 
 namespace Everywhere.Windows.Interop;
 
@@ -42,13 +46,13 @@ public partial class Win32VisualElementContext : IVisualElementContext
 
     public IVisualElement? PointerOverElement => TryFrom(static () => PInvoke.GetCursorPos(out var point) ? Automation.FromPoint(point) : null);
 
-    private readonly INativeHelper _nativeHelper;
+    private readonly IWindowHelper _windowHelper;
     private readonly ILogger<Win32VisualElementContext> _logger;
 
-    public Win32VisualElementContext(INativeHelper nativeHelper, ILogger<Win32VisualElementContext> logger)
+    public Win32VisualElementContext(IWindowHelper windowHelper, ILogger<Win32VisualElementContext> logger)
     {
-        this._nativeHelper = nativeHelper;
-        this._logger = logger;        
+        _windowHelper = windowHelper;
+        _logger = logger;
         // Automation.RegisterFocusChangedEvent(element =>
         // {
         //     if (KeyboardFocusedElementChanged is not { } handler) return;
@@ -96,19 +100,8 @@ public partial class Win32VisualElementContext : IVisualElementContext
         return !PInvoke.GetCursorPos(out var point) ? null : ElementFromPoint(new PixelPoint(point.X, point.Y), mode);
     }
 
-    public async Task<IVisualElement?> PickElementAsync(PickElementMode mode)
-    {
-        if (Application.Current is not { ApplicationLifetime: ClassicDesktopStyleApplicationLifetime desktopLifetime })
-        {
-            return null;
-        }
-
-        var windows = desktopLifetime.Windows.AsValueEnumerable().Where(w => w.IsVisible).ToList();
-        foreach (var window in windows) _nativeHelper.HideWindowWithoutAnimation(window);
-        var result = await ElementPicker.PickAsync(this, _nativeHelper, mode);
-        foreach (var window in windows) window.IsVisible = true;
-        return result;
-    }
+    public Task<IVisualElement?> PickElementAsync(PickElementMode mode) =>
+        ElementPickerWindow.PickAsync(this, _windowHelper, mode);
 
     private AutomationVisualElementImpl? TryFrom(Func<AutomationElement?> factory, bool windowBarrier = true)
     {
@@ -556,6 +549,118 @@ public partial class Win32VisualElementContext : IVisualElementContext
             return Task.CompletedTask;
         }
 
+        public string? GetSelectionText()
+        {
+            try
+            {
+                // 1) Prefer UIA TextPattern selection text
+                if (element.Patterns.Text.TryGetPattern() is { } textPattern)
+                {
+                    var ranges = textPattern.GetSelection();
+                    if (ranges is { Length: > 0 })
+                    {
+                        var selected = string.Join(null, ranges.Select(r => r.GetText(-1)));
+                        if (!string.IsNullOrEmpty(selected))
+                            return selected;
+                    }
+                }
+
+                // 2) Fallback to SelectionItemPattern (if selected, return element's text)
+                if (element.Patterns.SelectionItem.TryGetPattern() is { } selectionItemPattern)
+                {
+                    if (selectionItemPattern.IsSelected.ValueOrDefault)
+                    {
+                        var v = GetText();
+                        if (!string.IsNullOrEmpty(v))
+                            return v;
+                    }
+                }
+
+                // TODO: Following method takes no effect QAQ
+                // 3) Last resort: send WM_COPY to the focused child window of target thread, then wait for clipboard update
+                if (!TryGetWindow(element, out var topLevel) || topLevel == 0)
+                    return null;
+
+                var hTop = (HWND)topLevel;
+
+                // Resolve the real focused child HWND in the target GUI thread
+                var target = hTop;
+                uint targetTid;
+                unsafe { targetTid = PInvoke.GetWindowThreadProcessId(hTop); }
+                var currentTid = PInvoke.GetCurrentThreadId();
+                var attached = false;
+                try
+                {
+                    attached = PInvoke.AttachThreadInput(currentTid, targetTid, true);
+                    var hFocus = PInvoke.GetFocus();
+                    if (hFocus != HWND.Null)
+                        target = hFocus;
+                }
+                finally
+                {
+                    if (attached)
+                        _ = PInvoke.AttachThreadInput(currentTid, targetTid, false);
+                }
+
+                // Read clipboard text (best effort)
+                string? result = null;
+                Dispatcher.UIThread.Invoke(() =>
+                {
+                    // Backup current clipboard (best effort, avoid user-visible side effects)
+                    IDataObject? backup = null;
+                    try
+                    {
+                        // backup = Clipboard.GetDataObject();
+                    }
+                    catch
+                    {
+                        /* ignore */
+                    }
+
+                    // Arm the clipboard listener before sending WM_COPY to avoid race
+                    var listener = ClipboardListener.Shared;
+                    listener.BeginWait();
+
+                    // Ask target control to copy selection without simulating Ctrl+C
+                    PInvoke.SendMessage(target, (uint)WINDOW_MESSAGE.WM_COPY, 0, 0);
+
+                    // Wait for WM_CLIPBOARDUPDATE (timeout ~50ms)
+                    if (!listener.WaitNextUpdate(50)) return;
+
+                    try
+                    {
+                        if (Clipboard.ContainsText())
+                        {
+                            result = Clipboard.GetText();
+                        }
+                    }
+                    catch
+                    {
+                        /* ignore */
+                    }
+
+                    // Restore clipboard
+                    if (backup != null)
+                    {
+                        try
+                        {
+                            Clipboard.SetDataObject(backup, true);
+                        }
+                        catch
+                        {
+                            /* ignore */
+                        }
+                    }
+                });
+
+                return string.IsNullOrEmpty(result) ? null : result;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         // BUG: For a minimized window, the captured image is buggy (but child elements are fine).
         public Task<Bitmap> CaptureAsync()
         {
@@ -758,6 +863,8 @@ public partial class Win32VisualElementContext : IVisualElementContext
 
         public Task SendShortcutAsync(VisualElementShortcut shortcut, CancellationToken cancellationToken = default) =>
             Task.FromException(new NotSupportedException("Screen elements do not support shortcut input."));
+
+        public string? GetSelectionText() => null;
 
         public Task<Bitmap> CaptureAsync()
         {

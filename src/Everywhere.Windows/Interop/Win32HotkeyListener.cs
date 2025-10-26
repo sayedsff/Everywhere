@@ -1,5 +1,4 @@
-﻿using System.Runtime.InteropServices;
-using Windows.Win32;
+﻿using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Windows.Win32.UI.WindowsAndMessaging;
@@ -11,7 +10,7 @@ namespace Everywhere.Windows.Interop;
 
 public unsafe class Win32HotkeyListener : IHotkeyListener
 {
-    private static HWND _hwnd;
+    private static HWND HWnd => Win32MessageWindow.Shared.HWnd;
 
     // Unique id generator for RegisterHotKey
     private static int _nextId = 1;
@@ -40,14 +39,6 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
     // Inject sentinel to ignore self-injected events
     private const nuint InjectExtra = 0x0d000721;
 
-    // Keyboard hook state
-    private static KeyModifiers _pressedMods;
-    private static bool _triggerActive;
-    private static HotkeySig _activeSig;
-    private static bool _winHeldSuppressed;
-    private static bool _injectedWinDown;
-    private static VIRTUAL_KEY _winVk;
-
     // Concurrency: light lock for hotkey maps
     private static readonly Lock SyncLock = new();
 
@@ -55,9 +46,15 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
 
     static Win32HotkeyListener()
     {
-        var t = new Thread(WindowLoop) { IsBackground = true, Name = "HotkeyWindow", };
-        t.SetApartmentState(ApartmentState.STA);
-        t.Start();
+        Win32MessageWindow.Shared.AddHandler(
+            (uint)WINDOW_MESSAGE.WM_HOTKEY,
+            static (in msg) =>
+            {
+                var id = (int)msg.wParam.Value;
+                OsReg? bundle;
+                lock (SyncLock) IdToOsReg.TryGetValue(id, out bundle);
+                if (bundle is not null) InvokeHandlers(bundle.Handlers);
+            });
     }
 
     public IKeyboardHotkeyScope StartCaptureKeyboardHotkey()
@@ -73,7 +70,7 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
     {
         if (hotkey.Key == Key.None || hotkey.Modifiers == KeyModifiers.None)
             throw new ArgumentException("Invalid keyboard hotkey.", nameof(hotkey));
-        if (handler is null) throw new ArgumentNullException(nameof(handler));
+        ArgumentNullException.ThrowIfNull(handler);
 
         lock (SyncLock)
         {
@@ -92,7 +89,7 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
             if (hotkey.Modifiers.HasFlag(KeyModifiers.Meta)) mods |= HOT_KEY_MODIFIERS.MOD_WIN;
 
             var id = _nextId++;
-            if (PInvoke.RegisterHotKey(_hwnd, id, mods, (uint)hotkey.Key.ToVirtualKey()))
+            if (PInvoke.RegisterHotKey(HWnd, id, mods, (uint)hotkey.Key.ToVirtualKey()))
             {
                 var bundle = new OsReg(id, new List<Action> { handler });
                 OsRegs[hotkey] = bundle;
@@ -134,7 +131,7 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
             // Unregister all OS hotkeys
             foreach (var kv in OsRegs)
             {
-                PInvoke.UnregisterHotKey(_hwnd, kv.Value.Id);
+                PInvoke.UnregisterHotKey(HWnd, kv.Value.Id);
             }
             OsRegs.Clear();
             IdToOsReg.Clear();
@@ -157,61 +154,25 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
         }
     }
 
-    // ---------- window & message loop ----------
-
-    private static void WindowLoop()
-    {
-        using var hModule = PInvoke.GetModuleHandle(null);
-        _hwnd = PInvoke.CreateWindowEx(
-            WINDOW_EX_STYLE.WS_EX_NOACTIVATE,
-            "STATIC",
-            "Everywhere.MultiHotkeyWindow",
-            WINDOW_STYLE.WS_POPUP,
-            0, 0, 0, 0,
-            HWND.Null,
-            null,
-            hModule,
-            null);
-
-        if (_hwnd.IsNull)
-            Marshal.ThrowExceptionForHR(Marshal.GetLastWin32Error());
-
-        MSG msg;
-        while (PInvoke.GetMessage(&msg, HWND.Null, 0, 0) != 0)
-        {
-            switch (msg.message)
-            {
-                case (uint)WINDOW_MESSAGE.WM_HOTKEY:
-                {
-                    var id = (int)msg.wParam.Value;
-                    OsReg? bundle;
-                    lock (SyncLock)
-                    {
-                        IdToOsReg.TryGetValue(id, out bundle);
-                    }
-                    if (bundle is not null)
-                    {
-                        // Invoke OS-registered handlers
-                        InvokeHandlers(bundle.Handlers);
-                    }
-                    break;
-                }
-            }
-
-            PInvoke.DispatchMessage(&msg);
-        }
-    }
-
     private static void InvokeHandlers(List<Action> handlers)
     {
         // Execute handlers safely; avoid holding locks while invoking.
         foreach (var handler in handlers.ToArray())
         {
-            try { handler(); } catch { /* swallow */ }
+            try
+            {
+                handler();
+            }
+            catch
+            {
+                /* swallow */
+            }
         }
     }
 
     // ---------- keyboard hook (fallback) ----------
+    // Reference: PowerToys
+    // https://github.com/microsoft/PowerToys/blob/main/src/modules/cmdpal/CmdPalKeyboardService/KeyboardListener.cpp
 
     private static void EnsureKeyboardHook()
     {
@@ -221,128 +182,75 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
 
     private static void KeyboardHookProc(UIntPtr wParam, ref KBDLLHOOKSTRUCT lParam, ref bool blockNext)
     {
+        // Ignore self-injected events
         if (lParam.dwExtraInfo == InjectExtra) return;
 
         var msg = (WINDOW_MESSAGE)wParam;
+        if (msg != WINDOW_MESSAGE.WM_KEYDOWN && msg != WINDOW_MESSAGE.WM_SYSKEYDOWN)
+            return;
+
+        // Resolve current modifiers using GetAsyncKeyState (best-effort snapshot)
+        var mods = GetAsyncModifiers();
+
+        // Resolve main key from vkCode
         var vk = (VIRTUAL_KEY)lParam.vkCode;
         var key = vk.ToAvaloniaKey();
-        var mod = vk.ToKeyModifiers();
 
-        static bool IsWin(VIRTUAL_KEY v) => v is VIRTUAL_KEY.VK_LWIN or VIRTUAL_KEY.VK_RWIN;
+        // Build hotkey signature and lookup handlers
+        List<Action>? handlers = null;
+        var sig = new HotkeySig(mods, key);
 
-        switch (msg)
-        {
-            case WINDOW_MESSAGE.WM_KEYDOWN:
-            case WINDOW_MESSAGE.WM_SYSKEYDOWN:
-            {
-                if (mod != KeyModifiers.None)
-                    _pressedMods |= mod;
-
-                if (IsWin(vk) && AnyHookMetaHotkey())
-                {
-                    _winHeldSuppressed = true;
-                    _injectedWinDown = false;
-                    _winVk = vk;
-                    blockNext = true;
-                    return;
-                }
-
-                if (mod == KeyModifiers.None)
-                {
-                    var sig = new HotkeySig(_pressedMods, key);
-                    List<Action>? handlers;
-                    lock (SyncLock)
-                    {
-                        handlers = HookKbHandlers.TryGetValue(sig, out var list) ? list.Snapshot() : null;
-                    }
-
-                    if (!_triggerActive && handlers is not null)
-                    {
-                        _triggerActive = true;
-                        _activeSig = sig;
-                        blockNext = true; // block main key down
-                        foreach (var h in handlers)
-                        {
-                            try { h(); } catch { /* swallow */ }
-                        }
-                        return;
-                    }
-
-                    if (_winHeldSuppressed)
-                    {
-                        // Not our hotkey: compensate Win down then let OS see this key
-                        if (!_injectedWinDown)
-                        {
-                            InjectKey(_winVk, true);
-                            _injectedWinDown = true;
-                            _winHeldSuppressed = false;
-                        }
-                        return;
-                    }
-                }
-
-                return;
-            }
-
-            case WINDOW_MESSAGE.WM_KEYUP:
-            case WINDOW_MESSAGE.WM_SYSKEYUP:
-            {
-                if (mod != KeyModifiers.None)
-                    _pressedMods &= ~mod;
-
-                if (_triggerActive && key == _activeSig.Key)
-                {
-                    blockNext = true; // block main key up
-                }
-
-                if (IsWin(vk) && AnyHookMetaHotkey())
-                {
-                    if (_triggerActive && _activeSig.Modifiers.HasFlag(KeyModifiers.Meta))
-                    {
-                        // Our combo contained Meta: swallow Win up to avoid Start menu
-                        blockNext = true;
-                    }
-                    else if (_injectedWinDown)
-                    {
-                        // We injected Win down: swallow real up, inject up
-                        blockNext = true;
-                        InjectKey(_winVk, false);
-                    }
-                    else if (_winHeldSuppressed)
-                    {
-                        // Single-tap Win: swallow real up, inject down+up to open Start
-                        blockNext = true;
-                        InjectKey(_winVk, true);
-                        InjectKey(_winVk, false);
-                    }
-
-                    _winHeldSuppressed = false;
-                    _injectedWinDown = false;
-                    _winVk = 0;
-                }
-
-                if (_pressedMods == KeyModifiers.None)
-                {
-                    _triggerActive = false;
-                    _activeSig = default;
-                }
-
-                return;
-            }
-        }
-    }
-
-    private static bool AnyHookMetaHotkey()
-    {
         lock (SyncLock)
         {
-            foreach (var k in HookKbHandlers.Keys)
-                if ((k.Modifiers & KeyModifiers.Meta) != 0) return true;
+            if (HookKbHandlers.TryGetValue(sig, out var list))
+            {
+                handlers = list.Snapshot();
+            }
         }
-        return false;
+
+        if (handlers is null || handlers.Count == 0)
+            return;
+
+        // Execute handlers outside the lock
+        foreach (var h in handlers)
+        {
+            try { h(); }
+            catch
+            { /* swallow */
+            }
+        }
+
+        // Send a dummy key-up to prevent Start menu from activating on Win-key release
+        SendDummyKeyUp();
+
+        // Swallow this key press
+        blockNext = true;
     }
 
-    private static void InjectKey(VIRTUAL_KEY vk, bool down)
+    private static KeyModifiers GetAsyncModifiers()
+    {
+        // Note: Using async state to query left/right Win, Ctrl, Shift, Alt.
+        // This mirrors the PowerToys approach and avoids maintaining custom state.
+        static bool Down(VIRTUAL_KEY v) => (PInvoke.GetAsyncKeyState((int)v) & 0x8000) != 0;
+
+        var mods = KeyModifiers.None;
+
+        if (Down(VIRTUAL_KEY.VK_LWIN) || Down(VIRTUAL_KEY.VK_RWIN))
+            mods |= KeyModifiers.Meta;
+        if ((PInvoke.GetAsyncKeyState((int)VIRTUAL_KEY.VK_CONTROL) & 0x8000) != 0)
+            mods |= KeyModifiers.Control;
+        if ((PInvoke.GetAsyncKeyState((int)VIRTUAL_KEY.VK_SHIFT) & 0x8000) != 0)
+            mods |= KeyModifiers.Shift;
+        if ((PInvoke.GetAsyncKeyState((int)VIRTUAL_KEY.VK_MENU) & 0x8000) != 0)
+            mods |= KeyModifiers.Alt;
+
+        return mods;
+    }
+
+    /// <summary>
+    /// Inject a harmless key-up (VK 0xFF) to cancel Start-menu activation
+    /// </summary>
+    private static void SendDummyKeyUp()
     {
         var inputs = new INPUT[1];
         inputs[0] = new INPUT
@@ -352,14 +260,15 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
             {
                 ki = new KEYBDINPUT
                 {
-                    wVk = vk,
+                    wVk = (VIRTUAL_KEY)0xFF,
                     wScan = 0,
-                    dwFlags = down ? 0 : KEYBD_EVENT_FLAGS.KEYEVENTF_KEYUP,
+                    dwFlags = KEYBD_EVENT_FLAGS.KEYEVENTF_KEYUP,
                     time = 0,
                     dwExtraInfo = InjectExtra
                 }
             }
         };
+
         fixed (INPUT* p = inputs)
         {
             PInvoke.SendInput(new ReadOnlySpan<INPUT>(p, 1), sizeof(INPUT));
@@ -437,7 +346,7 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
 
             OsRegs.Remove(hotkey);
             IdToOsReg.Remove(bundle.Id);
-            PInvoke.UnregisterHotKey(_hwnd, bundle.Id);
+            PInvoke.UnregisterHotKey(HWnd, bundle.Id);
         }
     }
 
@@ -510,7 +419,7 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
         public MouseHotkey Hotkey { get; } = hotkey;
         public Action Handler { get; } = handler;
         private Timer? _timer;
-        private int _armed;    // 1 when button is considered pressed/pending
+        private int _armed; // 1 when button is considered pressed/pending
 
         public void OnDown()
         {
@@ -524,13 +433,17 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
             }
 
             CancelTimer(); // defensive
-            _timer = new Timer(_ =>
-            {
-                if (Interlocked.CompareExchange(ref _armed, 1, 1) == 1)
+            _timer = new Timer(
+                _ =>
                 {
-                    SafeInvoke();
-                }
-            }, null, Hotkey.Delay, Timeout.InfiniteTimeSpan);
+                    if (Interlocked.CompareExchange(ref _armed, 1, 1) == 1)
+                    {
+                        SafeInvoke();
+                    }
+                },
+                null,
+                Hotkey.Delay,
+                Timeout.InfiniteTimeSpan);
         }
 
         public void OnUp()
@@ -547,7 +460,10 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
 
         private void SafeInvoke()
         {
-            try { Handler(); } catch { /* swallow */ }
+            try { Handler(); }
+            catch
+            { /* swallow */
+            }
         }
     }
 
@@ -561,36 +477,44 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
 
         public event IKeyboardHotkeyScope.HotkeyFinishedHandler? HotkeyFinished;
 
-        private readonly LowLevelKeyboardHook _keyboardHook;
+        private readonly LowLevelKeyboardHook _hook;
 
         private KeyModifiers _pressedKeyModifiers = KeyModifiers.None;
 
         public KeyboardHotkeyScopeImpl()
         {
-            _keyboardHook = new LowLevelKeyboardHook(KeyboardHookCallback);
+            _hook = new LowLevelKeyboardHook(KeyboardHookCallback);
         }
 
         private void KeyboardHookCallback(UIntPtr wParam, ref KBDLLHOOKSTRUCT lParam, ref bool blockNext)
         {
             var virtualKey = (VIRTUAL_KEY)lParam.vkCode;
             var keyModifiers = virtualKey.ToKeyModifiers();
-
-            switch ((WINDOW_MESSAGE)wParam)
+            bool? isKeyDown = wParam switch
             {
-                case WINDOW_MESSAGE.WM_KEYDOWN or WINDOW_MESSAGE.WM_SYSKEYDOWN when keyModifiers == KeyModifiers.None:
+                (UIntPtr)WINDOW_MESSAGE.WM_KEYDOWN => true,
+                (UIntPtr)WINDOW_MESSAGE.WM_SYSKEYDOWN => true,
+                (UIntPtr)WINDOW_MESSAGE.WM_KEYUP => false,
+                (UIntPtr)WINDOW_MESSAGE.WM_SYSKEYUP => false,
+                _ => null
+            };
+
+            switch (isKeyDown)
+            {
+                case true when keyModifiers == KeyModifiers.None:
                 {
                     PressingHotkey = PressingHotkey with { Key = virtualKey.ToAvaloniaKey() };
                     PressingHotkeyChanged?.Invoke(this, PressingHotkey);
                     break;
                 }
-                case WINDOW_MESSAGE.WM_KEYDOWN or WINDOW_MESSAGE.WM_SYSKEYDOWN:
+                case true:
                 {
                     _pressedKeyModifiers |= keyModifiers;
                     PressingHotkey = PressingHotkey with { Modifiers = _pressedKeyModifiers };
                     PressingHotkeyChanged?.Invoke(this, PressingHotkey);
                     break;
                 }
-                case WINDOW_MESSAGE.WM_KEYUP or WINDOW_MESSAGE.WM_SYSKEYUP:
+                case false:
                 {
                     _pressedKeyModifiers &= ~keyModifiers;
                     if (_pressedKeyModifiers == KeyModifiers.None)
@@ -598,6 +522,11 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
                         if (PressingHotkey.Modifiers != KeyModifiers.None && PressingHotkey.Key == Key.None)
                         {
                             PressingHotkey = default; // modifiers only hotkey, reset it
+                        }
+
+                        if (PressingHotkey.Modifiers == KeyModifiers.None)
+                        {
+                            PressingHotkey = default; // no modifiers, reset it
                         }
 
                         // system key is all released, capture is done
@@ -616,7 +545,7 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
             if (IsDisposed) return;
             IsDisposed = true;
 
-            _keyboardHook.Dispose();
+            _hook.Dispose();
         }
     }
 }

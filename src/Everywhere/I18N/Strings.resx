@@ -94,6 +94,9 @@
     <data name="SettingsSelectionItem_Model_WebSearchProvider_bocha" xml:space="preserve">
         <value>Bocha</value>
     </data>
+    <data name="SettingsSelectionItem_Model_WebSearchProvider_jina" xml:space="preserve">
+        <value>Jina</value>
+    </data>
     <data name="Settings_Plugin_WebSearchEngine_SelectedWebSearchEngineProvider_EndPoint_Header" xml:space="preserve">
         <value>API Url</value>
     </data>
@@ -104,7 +107,7 @@
         <value>Ask Everywhere, or just chat</value>
     </data>
     <data name="ChatInputBox_AddAttachmentMenuItem_ToolTip" xml:space="preserve">
-        <value>Add attachments to the conversation</value>
+        <value>Add attachments to current session</value>
     </data>
     <data name="ChatInputBox_AddAttachmentMenuItem_Header" xml:space="preserve">
         <value>Add Attachment</value>
@@ -165,19 +168,19 @@
     </data>
     <data name="ChatWindow_ChatInputBox_AddAttachmentMenuItems_PickScreen"
         xml:space="preserve">
-        <value>Pick screen</value>
+        <value>Pick Screen</value>
     </data>
     <data name="ChatWindow_ChatInputBox_AddAttachmentMenuItems_PickWindow"
         xml:space="preserve">
-        <value>Pick window</value>
+        <value>Pick Window</value>
     </data>
     <data name="ChatWindow_ChatInputBox_AddAttachmentMenuItems_PickElement"
         xml:space="preserve">
-        <value>Pick element</value>
+        <value>Pick Element</value>
     </data>
-    <data name="ChatWindow_ChatInputBox_AddAttachmentMenuItems_ClipboardContent"
+    <data name="ChatWindow_ChatInputBox_AddAttachmentMenuItems_PasteFromClipboard"
         xml:space="preserve">
-        <value>Clipboard content</value>
+        <value>Paste from Clipboard</value>
     </data>
     <data name="ChatWindow_ChatInputBox_AddAttachmentMenuItems_AttachFile" xml:space="preserve">
         <value>Attach File</value>
@@ -201,7 +204,7 @@
         <value>Setting...</value>
     </data>
     <data name="ChatContext_Metadata_Title_Default" xml:space="preserve">
-        <value>Unnamed session</value>
+        <value>Unnamed Session</value>
     </data>
     <data name="ChatAttachment_RemoveButton_ToolTip" xml:space="preserve">
         <value>Remove</value>
@@ -297,13 +300,13 @@
         <value>Yesterday</value>
     </data>
     <data name="HumanizedDate_LastWeek" xml:space="preserve">
-        <value>Last week</value>
+        <value>Last Week</value>
     </data>
     <data name="HumanizedDate_LastMonth" xml:space="preserve">
-        <value>Last month</value>
+        <value>Last Month</value>
     </data>
     <data name="HumanizedDate_LastYear" xml:space="preserve">
-        <value>Last year</value>
+        <value>Last Year</value>
     </data>
     <data name="HumanizedDate_Earlier" xml:space="preserve">
         <value>Earlier</value>
@@ -360,7 +363,8 @@
         <value>Unknown error, please try again later.</value>
     </data>
     <data name="FriendlyExceptionMessage_Aggregate" xml:space="preserve">
-        <value>One or more errors occurred.</value>
+        <value>One or more errors occurred.
+{0}</value>
     </data>
     <data name="FriendlyExceptionMessage_TaskCanceled" xml:space="preserve">
         <value>Task canceled.</value>
@@ -479,13 +483,13 @@
     <data name="ChatWindowPinMode_PinOnInput" xml:space="preserve">
         <value>Pin on input</value>
     </data>
-    <data name="VisualTreeXmlDetailLevel_Detailed" xml:space="preserve">
+    <data name="VisualTreeDetailLevel_Detailed" xml:space="preserve">
         <value>Detailed</value>
     </data>
-    <data name="VisualTreeXmlDetailLevel_Compact" xml:space="preserve">
+    <data name="VisualTreeDetailLevel_Compact" xml:space="preserve">
         <value>Compact</value>
     </data>
-    <data name="VisualTreeXmlDetailLevel_Minimal" xml:space="preserve">
+    <data name="VisualTreeDetailLevel_Minimal" xml:space="preserve">
         <value>Minimal</value>
     </data>
     <data name="Settings_ChatWindow_WindowPinMode_Header" xml:space="preserve">
@@ -495,7 +499,7 @@
         <value>Specifies the pin mode for the chat window when it is opened. When the window is not fixed, it will be hidden automatically when it loses focus.</value>
     </data>
     <data name="Settings_ChatWindow_VisualTreeDetailLevel_Header" xml:space="preserve">
-        <value>Visual tree detail level</value>
+        <value>Visual Tree Detail Level</value>
     </data>
     <data name="Settings_ChatWindow_VisualTreeDetailLevel_Description" xml:space="preserve">
         <value>Choose how much information is captured from the UI tree when attaching elements.</value>
@@ -525,7 +529,7 @@
         <value>API Key</value>
     </data>
     <data name="Settings_CustomAssistant_ApiKey_Description" xml:space="preserve">
-        <value>In case of online models, you need to get from the corresponding official, please refer to the guide for details.</value>
+        <value>For online models, you need to get from the corresponding official, please refer to the guide for details.</value>
     </data>
     <data name="Settings_CustomAssistant_IsImageInputSupported_Header" xml:space="preserve">
         <value>Support Image Input</value>
@@ -551,8 +555,8 @@
     <data name="Settings_CustomAssistant_MaxTokens_Header" xml:space="preserve">
         <value>Maximum Context Length (max_tokens)</value>
     </data>
-    <data name="SettingsPage_RestoreDefault_Button_ToolTip" xml:space="preserve">
-        <value>Restore Default</value>
+    <data name="SettingsPage_Reset_Button_ToolTip" xml:space="preserve">
+        <value>Reset</value>
     </data>
     <data name="Settings_CustomAssistant_Schema_Header" xml:space="preserve">
         <value>API Schema</value>
@@ -650,11 +654,11 @@
     <data name="Settings_Plugin_WebSearchEngine_SelectedWebSearchEngineProvider_SearchEngineId_Description" xml:space="preserve">
         <value>(Google only) Provides a programmable search engine ID. For details, refer to the guide.</value>
     </data>
-    <data name="NativeChatPlugin_WebSearchEngine_Header" xml:space="preserve">
-        <value>Web Search</value>
+    <data name="NativeChatPlugin_WebBrowser_Header" xml:space="preserve">
+        <value>Web Browser</value>
     </data>
-    <data name="NativeChatPlugin_WebSearchEngine_Description" xml:space="preserve">
-        <value>Provides the ability to search the web before answering, can reduce large language model hallucinations and provide the latest information. Note: Using the web_search tool requires configuring a search engine API key (which is different from the LLM API key). If you do not intend to configure an API key, you can uncheck the web_search tool and use only the web_snapshot tool.</value>
+    <data name="NativeChatPlugin_WebBrowser_Description" xml:space="preserve">
+        <value>Providing web browsing capabilities, including search engine and webpage access functions, can reduce model hallucinations and deliver up-to-date information. Note: Using the web_search tool requires configuring a search engine API key (different from the model API key). If you do not intend to configure an API key, you may uncheck the web_search tool and use only the web_snapshot tool.</value>
     </data>
     <data name="NativeChatPlugin_Shell_Header" xml:space="preserve">
         <value>Terminal</value>
@@ -810,7 +814,7 @@ My intelligence comes from powerful Large language models (LLMs), which are prov
         <value>Authentication error.</value>
     </data>
     <data name="WelcomeView_TelemetryStep_Message1" xml:space="preserve">
-        <value>To help me improve, I need to enable “telemetry” to collect anonymous data. This data is used solely for analysis and does not contain or allow the inference of any personally identifiable information about you.</value>
+        <value>To help me improve, I need to enable “Telemetry” to collect anonymous data. This data is used solely for analysis and does not contain or allow the inference of any personally identifiable information about you.</value>
     </data>
     <data name="WelcomeView_TelemetryStep_Message2" xml:space="preserve">
         <value>You may choose to send only necessary data; this option will not affect core functionality.</value>
@@ -914,7 +918,7 @@ My intelligence comes from powerful Large language models (LLMs), which are prov
     <data name="SoftwareUpdater_PerformUpdate_FailedToast_Message" xml:space="preserve">
         <value>Failed to perform update.</value>
     </data>
-    <data name="ChatInputBox_SettingsMenuItem_ToolTip" xml:space="preserve">
+    <data name="ChatInputBox_SettingsButton_ToolTip" xml:space="preserve">
         <value>Settings</value>
     </data>
     <data name="ChatWindow_ChatInputBox_SettingsMenuItems_VisualTreeTokenLimit" xml:space="preserve">
@@ -930,34 +934,34 @@ My intelligence comes from powerful Large language models (LLMs), which are prov
         <value>Deep thinking</value>
     </data>
     <data name="ChatFunctionPermissions_ScreenRead" xml:space="preserve">
-        <value>Read screen</value>
+        <value>Read Screen</value>
     </data>
     <data name="ChatFunctionPermissions_ScreenAccess" xml:space="preserve">
-        <value>Access screen</value>
+        <value>Access Screen</value>
     </data>
     <data name="ChatFunctionPermissions_NetworkAccess" xml:space="preserve">
-        <value>Access network</value>
+        <value>Access Network</value>
     </data>
     <data name="ChatFunctionPermissions_ClipboardRead" xml:space="preserve">
-        <value>Read clipboard</value>
+        <value>Read Clipboard</value>
     </data>
     <data name="ChatFunctionPermissions_ClipboardAccess" xml:space="preserve">
-        <value>Access clipboard</value>
+        <value>Access Clipboard</value>
     </data>
     <data name="ChatFunctionPermissions_FileRead" xml:space="preserve">
-        <value>Read file</value>
+        <value>Read File</value>
     </data>
     <data name="ChatFunctionPermissions_FileAccess" xml:space="preserve">
-        <value>Access file</value>
+        <value>Access File</value>
     </data>
     <data name="ChatFunctionPermissions_ShellExecute" xml:space="preserve">
-        <value>Execute shell script</value>
+        <value>Execute Shell Script</value>
     </data>
     <data name="HandledChatException_ContextLengthExceeded" xml:space="preserve">
         <value>Context length exceeded.</value>
     </data>
     <data name="ChatFunctionPermissions_ProcessAccess" xml:space="preserve">
-        <value>Access process</value>
+        <value>Access Process</value>
     </data>
     <data name="CustomAssistant_Name_Default" xml:space="preserve">
         <value>Default Assistant</value>
@@ -1021,28 +1025,28 @@ Placeholders can be used within the prompt, enclosed in {}, and will be replaced
         <value>Access to a required resource was denied. Please check file permissions or run the application as an administrator.</value>
     </data>
     <data name="HandledSystemException_PathTooLong" xml:space="preserve">
-        <value>The specified file or directory path is too long. Please try using a shorter path.</value>
+        <value>Specified file or directory path is too long. Please try using a shorter path.</value>
     </data>
     <data name="HandledSystemException_OperationCancelled" xml:space="preserve">
-        <value>The operation was cancelled.</value>
+        <value>Operation was cancelled.</value>
     </data>
     <data name="HandledSystemException_Timeout" xml:space="preserve">
-        <value>The operation timed out. Please check your system performance and try again.</value>
+        <value>Operation timed out. Please check your system performance and try again.</value>
     </data>
     <data name="HandledSystemException_FileNotFound" xml:space="preserve">
-        <value>The specified file could not be found. Please ensure the file exists and the path is correct.</value>
+        <value>Specified file not found. Please ensure the file exists and the path is correct.</value>
     </data>
     <data name="HandledSystemException_DirectoryNotFound" xml:space="preserve">
-        <value>The specified directory could not be found. Please ensure the directory exists and the path is correct.</value>
+        <value>Specified directory not found. Please ensure the directory exists and the path is correct.</value>
     </data>
     <data name="HandledSystemException_NotSupported" xml:space="preserve">
-        <value>The requested operation is not supported on your system.</value>
+        <value>Requested operation is not supported on your system.</value>
     </data>
     <data name="HandledSystemException_Security" xml:space="preserve">
         <value>A security error occurred. The application may not have the necessary permissions.</value>
     </data>
     <data name="HandledSystemException_COMException" xml:space="preserve">
-        <value>A system component (COM) error occurred. This may indicate an issue with the OS or a dependency.</value>
+        <value>System component (COM) error occurred. This may indicate an issue with the OS or a dependency.</value>
     </data>
     <data name="HandledSystemException_Win32Exception" xml:space="preserve">
         <value>A Windows system error occurred. Please check the application logs for more details.</value>
@@ -1051,16 +1055,16 @@ Placeholders can be used within the prompt, enclosed in {}, and will be replaced
         <value>A network socket error occurred. Please check your network connection and firewall settings.</value>
     </data>
     <data name="HandledSystemException_OutOfMemory" xml:space="preserve">
-        <value>The application ran out of memory. Please close other programs and try again.</value>
+        <value>Application ran out of memory. Please close other programs and try again.</value>
     </data>
     <data name="HandledSystemException_DriveNotFound" xml:space="preserve">
-        <value>The specified drive could not be found. Please ensure the drive is connected and accessible.</value>
+        <value>Specified drive not found. Please ensure the drive is connected and accessible.</value>
     </data>
     <data name="HandledSystemException_EndOfStream" xml:space="preserve">
         <value>An unexpected end of a data stream was reached. This might indicate a corrupted file or network issue.</value>
     </data>
     <data name="HandledSystemException_InvalidData" xml:space="preserve">
-        <value>The data being processed is invalid or corrupted. Please check the source file or data.</value>
+        <value>Data being processed is invalid or corrupted. Please check the source file or data.</value>
     </data>
     <data name="HandledSystemException_Unknown" xml:space="preserve">
         <value>An unexpected system error occurred. Please try again or check the application logs.</value>
@@ -1075,7 +1079,7 @@ Placeholders can be used within the prompt, enclosed in {}, and will be replaced
         <value>Check Failed</value>
     </data>
     <data name="ChatInputBox_CustomAssistantsMenuItem_ToolTip" xml:space="preserve">
-        <value>Select Assistant</value>
+        <value>Select the assistant</value>
     </data>
     <data name="Settings_CustomAssistant_Icon_Description" xml:space="preserve">
         <value>Click to customize assistant icon.</value>
@@ -1093,18 +1097,156 @@ Placeholders can be used within the prompt, enclosed in {}, and will be replaced
         <value>Icon</value>
     </data>
     <data name="HandledSystemException_InvalidOperation" xml:space="preserve">
-        <value>The operaction is invalid. Please ensure the configuration is correct.</value>
+        <value>Operation is invalid. Please ensure the configuration is correct.</value>
     </data>
     <data name="HandledSystemException_InvalidArgument" xml:space="preserve">
-        <value>The argument is invalid. Please ensure the configuration is correct.</value>
+        <value>Argument is invalid. Please ensure the configuration is correct.</value>
     </data>
     <data name="HandledSystemException_InvalidFormat" xml:space="preserve">
-        <value>The format is invalid. Please ensure the configuration is correct.</value>
+        <value>Format is invalid. Please ensure the configuration is correct.</value>
     </data>
     <data name="HandledSystemException_ArgumentNull" xml:space="preserve">
-        <value>The argument is empty. Please ensure the configuration is correct.</value>
+        <value>Argument is empty. Please ensure the configuration is correct.</value>
     </data>
     <data name="HandledSystemException_ArgumentOutOfRange" xml:space="preserve">
-        <value>The argument is out of valid range. Please ensure the configuration is correct.</value>
+        <value>Argument is out of valid range. Please ensure the configuration is correct.</value>
+    </data>
+    <data name="NativeChatPlugin_Everything_Header" xml:space="preserve">
+        <value>Everything</value>
+    </data>
+    <data name="NativeChatPlugin_Everything_Description" xml:space="preserve">
+        <value>Use Everything (a high-performance local file search engine) to search for files on your computer.</value>
+    </data>
+    <data name="CustomAssistantPage_CheckConnectivityButton_ToolTip" xml:space="preserve">
+        <value>Confirm the availability of the model service.</value>
+    </data>
+    <data name="CustomAssistantPage_CreateNewCustomAssistantButton_ToolTip" xml:space="preserve">
+        <value>Start a new configuration for an AI assistant.</value>
+    </data>
+    <data name="CustomAssistantPage_DeleteCustomAssistantButton_ToolTip" xml:space="preserve">
+        <value>Deletes the selected assistant permanently.</value>
+    </data>
+    <data name="ChatInputBox_ContextFlyout_CopyMenuItem_Header" xml:space="preserve">
+        <value>Copy</value>
+    </data>
+    <data name="ChatInputBox_ContextFlyout_CutMenuItem_Header" xml:space="preserve">
+        <value>Cut</value>
+    </data>
+    <data name="ChatInputBox_ContextFlyout_PasteMenuItem_Header" xml:space="preserve">
+        <value>Paste</value>
+    </data>
+    <data name="ConsentDecision_Deny" xml:space="preserve">
+        <value>Deny</value>
+    </data>
+    <data name="ConsentDecision_AllowOnce" xml:space="preserve">
+        <value>Allow once</value>
+    </data>
+    <data name="ConsentDecision_AllowSession" xml:space="preserve">
+        <value>Allow in session</value>
+    </data>
+    <data name="ConsentDecision_AlwaysAllow" xml:space="preserve">
+        <value>Always allow</value>
+    </data>
+    <data name="TextDifferenceEditor_AcceptButton_Content" xml:space="preserve">
+        <value>Accept</value>
+    </data>
+    <data name="TextDifferenceEditor_RevertButton_Content" xml:space="preserve">
+        <value>Revert</value>
+    </data>
+    <data name="TextDifferenceSummaryView_AddedLineCountTextRun_Text" xml:space="preserve">
+        <value> lines added</value>
+    </data>
+    <data name="TextDifferenceSummaryView_RemovedLineCountTextRun_Text" xml:space="preserve">
+        <value> lines deleted</value>
+    </data>
+    <data name="TextDifferenceSummaryView_AcceptAllButton_Content" xml:space="preserve">
+        <value>Accept All</value>
+    </data>
+    <data name="TextDifferenceSummaryView_EditButton_Content" xml:space="preserve">
+        <value>Edit</value>
+    </data>
+    <data name="TextDifferenceSummaryView_DiscardAllButton_Content" xml:space="preserve">
+        <value>Discard All</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_DeleteFiles_DeletionConsent_Header" xml:space="preserve">
+        <value>{0} files or folders will be deleted.</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_DeleteFiles_SystemFile_DeletionConsent_Header" xml:space="preserve">
+        <value>System file or directory will be deleted.</value>
+    </data>
+    <data name="TextDifferenceEditor_DiscardButton_Content" xml:space="preserve">
+        <value>Discard</value>
+    </data>
+    <data name="ChatPluginConsentRequest_Common_Header" xml:space="preserve">
+        <value>Should “{0}” be granted permission to {1}?</value>
+    </data>
+    <data name="Common_Comma" xml:space="preserve">
+        <value>, </value>
+    </data>
+    <data name="ChatWindow_ScrollToBottom_ToolTip" xml:space="preserve">
+        <value>Scroll to bottom</value>
+    </data>
+    <data name="ChatContext_Temporary" xml:space="preserve">
+        <value>Temporary Chat</value>
+    </data>
+    <data name="TemporaryChatMode_Never" xml:space="preserve">
+        <value>Never</value>
+    </data>
+    <data name="TemporaryChatMode_RememberLast" xml:space="preserve">
+        <value>Remember Last</value>
+    </data>
+    <data name="TemporaryChatMode_Always" xml:space="preserve">
+        <value>Always</value>
+    </data>
+    <data name="Settings_ChatWindow_TemporaryChatMode_Header" xml:space="preserve">
+        <value>Temporary Chat Mode</value>
+    </data>
+    <data name="Settings_ChatWindow_TemporaryChatMode_Description" xml:space="preserve">
+        <value>Whether to use temporary chats when creating new chats.</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_SearchFiles_Header" xml:space="preserve">
+        <value>Search files</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_GetFileInformation_Header" xml:space="preserve">
+        <value>Get file info</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_SearchFileContent_Header" xml:space="preserve">
+        <value>Search File Content</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_ReadFile_Header" xml:space="preserve">
+        <value>Read File</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_MoveFile_Header" xml:space="preserve">
+        <value>Move or Rename File</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_DeleteFiles_Header" xml:space="preserve">
+        <value>Delete File(s)</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_CreateDirectory_Header" xml:space="preserve">
+        <value>Create Directory</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_WriteToFile_Header" xml:space="preserve">
+        <value>Write to File</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_ReplaceFileContent_Header" xml:space="preserve">
+        <value>Edit File Content</value>
+    </data>
+    <data name="NativeChatPlugin_WebBrowser_WebSearch_Searching" xml:space="preserve">
+        <value>Searching: {0}</value>
+    </data>
+    <data name="NativeChatPlugin_WebBrowser_WebSearch_Header" xml:space="preserve">
+        <value>Web Search</value>
+    </data>
+    <data name="ChatPluginDisplayBlockPresenter_FileReferences_TotalCountRun_Text" xml:space="preserve">
+        <value>Files Count: </value>
+    </data>
+    <data name="ChatPluginDisplayBlockPresenter_FileReferences_HasMoreReferencesTextBlock_Text" xml:space="preserve">
+        <value>etc.</value>
+    </data>
+    <data name="NativeChatPlugin_WebBrowser_WebSnapshot_Header" xml:space="preserve">
+        <value>Visit Webpage</value>
+    </data>
+    <data name="NativeChatPlugin_WebBrowser_WebSnapshot_Visiting" xml:space="preserve">
+        <value>Visiting {0}</value>
     </data>
 </root>

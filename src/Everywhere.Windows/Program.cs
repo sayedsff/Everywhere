@@ -1,7 +1,5 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Input.Platform;
-using Avalonia.Platform.Storage;
 using Everywhere.AI;
 using Everywhere.Chat;
 using Everywhere.Chat.Plugins;
@@ -10,10 +8,6 @@ using Everywhere.Configuration;
 using Everywhere.Extensions;
 using Everywhere.Initialization;
 using Everywhere.Interop;
-using Everywhere.ViewModels;
-using Everywhere.Views;
-using Everywhere.Views.Configuration;
-using Everywhere.Views.Pages;
 using Everywhere.Windows.Chat.Plugins;
 using Everywhere.Windows.Configuration;
 using Everywhere.Windows.Interop;
@@ -43,6 +37,7 @@ public static class Program
                 .AddSingleton<IVisualElementContext, Win32VisualElementContext>()
                 .AddSingleton<IHotkeyListener, Win32HotkeyListener>()
                 .AddSingleton<INativeHelper, Win32NativeHelper>()
+                .AddSingleton<IWindowHelper, Win32WindowHelper>()
                 .AddSingleton<ISoftwareUpdater, SoftwareUpdater>()
                 .AddSettings()
                 .AddWatchdogManager()
@@ -56,10 +51,11 @@ public static class Program
                 #region Chat Plugins
 
                 .AddTransient<BuiltInChatPlugin, VisualTreePlugin>()
-                .AddTransient<BuiltInChatPlugin, WebSearchEnginePlugin>()
+                .AddTransient<BuiltInChatPlugin, WebBrowserPlugin>()
                 .AddTransient<BuiltInChatPlugin, FileSystemPlugin>()
                 .AddTransient<BuiltInChatPlugin, PowerShellPlugin>()
                 .AddTransient<BuiltInChatPlugin, WindowsSystemApiPlugin>()
+                .AddTransient<BuiltInChatPlugin, EverythingPlugin>()
 
                 #endregion
 
@@ -74,7 +70,7 @@ public static class Program
 
                 #region Initialize
 
-                .AddTransient<IAsyncInitializer, HotkeyInitializer>()
+                .AddTransient<IAsyncInitializer, ChatWindowInitializer>()
                 .AddTransient<IAsyncInitializer, UpdaterInitializer>()
 
             #endregion

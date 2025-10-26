@@ -30,7 +30,7 @@ public sealed partial class OllamaKernelMixin : KernelMixinBase
     /// </summary>
     public OllamaKernelMixin(CustomAssistant customAssistant) : base(customAssistant)
     {
-        _client = new OllamaApiClient(customAssistant.Endpoint, customAssistant.ModelId);
+        _client = new OllamaApiClient(Endpoint, ModelId);
         ChatCompletionService = new OptimizedOllamaApiClient(_client, this).AsChatCompletionService();
     }
 

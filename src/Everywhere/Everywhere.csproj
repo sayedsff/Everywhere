@@ -45,6 +45,7 @@
     <PackageReference Include="System.Drawing.Common"/>
     <PackageReference Include="Tavily" />
     <PackageReference Include="Xaml.Behaviors.Avalonia"/>
+    <PackageReference Include="Xaml.Behaviors.Interactivity" />
   </ItemGroup>
 
   <ItemGroup>
@@ -66,18 +67,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="I18N\Strings.de.resx"/>
-    <EmbeddedResource Include="I18N\Strings.es.resx"/>
-    <EmbeddedResource Include="I18N\Strings.fr.resx"/>
-    <EmbeddedResource Include="I18N\Strings.it.resx"/>
-    <EmbeddedResource Include="I18N\Strings.ja.resx"/>
-    <EmbeddedResource Include="I18N\Strings.ko.resx"/>
-    <EmbeddedResource Include="I18N\Strings.resx"/>
-    <EmbeddedResource Include="I18N\Strings.ru.resx"/>
-    <EmbeddedResource Include="I18N\Strings.zh-hans.resx"/>
-    <EmbeddedResource Include="I18N\Strings.zh-hant-hk.resx"/>
-    <EmbeddedResource Include="I18N\Strings.zh-hant.resx"/>
-    <None Remove="i18n.tsv"/>
     <EmbeddedResource Remove="I18N\*.resx"/>
     <AdditionalFiles Include="I18N\*.resx"/>
   </ItemGroup>

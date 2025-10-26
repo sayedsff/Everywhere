@@ -5,22 +5,26 @@ using System.Globalization;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
 using Avalonia.Platform.Storage;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Everywhere.Chat;
+using Everywhere.Chat.Plugins;
 using Everywhere.Common;
 using Everywhere.Configuration;
 using Everywhere.Interop;
 using Everywhere.Storage;
 using Everywhere.Utilities;
+using Everywhere.Views;
 using Lucide.Avalonia;
 using Microsoft.Extensions.Logging;
 using ObservableCollections;
+using ShadUI;
 using ZLinq;
 
 namespace Everywhere.ViewModels;
 
-public partial class ChatWindowViewModel : BusyViewModelBase
+public partial class ChatWindowViewModel : BusyViewModelBase, IEventSubscriber<ChatPluginConsentRequest>
 {
     public Settings Settings { get; }
 
@@ -89,6 +93,8 @@ public partial class ChatWindowViewModel : BusyViewModelBase
         _nativeHelper = nativeHelper;
         _blobStorage = blobStorage;
         _logger = logger;
+
+        EventHub<ChatPluginConsentRequest>.Subscribe(this);
 
         InitializeCommands();
     }
@@ -194,7 +200,14 @@ public partial class ChatWindowViewModel : BusyViewModelBase
         {
             if (_chatAttachments.Count >= Settings.Internal.MaxChatAttachmentCount) return;
 
-            if (await _visualElementContext.PickElementAsync(mode) is not { } element) return;
+            // Hide the chat window to avoid picking itself
+            var chatWindow = ServiceLocator.Resolve<ChatWindow>();
+            var windowHelper = ServiceLocator.Resolve<IWindowHelper>();
+            windowHelper.SetCloaked(chatWindow, true);
+            var element = await _visualElementContext.PickElementAsync(mode);
+            windowHelper.SetCloaked(chatWindow, false);
+
+            if (element is null) return;
             if (_chatAttachments.OfType<ChatVisualElementAttachment>().Any(a => Equals(a.Element?.Target, element))) return;
             _chatAttachments.Add(await Task.Run(() => CreateFromVisualElement(element), cancellationToken));
         },
@@ -432,5 +445,25 @@ public partial class ChatWindowViewModel : BusyViewModelBase
             RetryCommand.NotifyCanExecuteChanged();
             CancelCommand.NotifyCanExecuteChanged();
         }
+    }
+
+    public void HandleEvent(ChatPluginConsentRequest @event)
+    {
+        Dispatcher.UIThread.InvokeOnDemand(() =>
+        {
+            var card = new ConsentDecisionCard
+            {
+                Header = @event.HeaderKey.ToTextBlock(),
+                Content = @event.Content,
+            };
+            card.ConsentSelected += (_, args) =>
+            {
+                @event.Promise.TrySetResult(args.Decision);
+                DialogManager.Close(card);
+            };
+            DialogManager
+                .CreateDialog(card)
+                .ShowAsync(@event.CancellationToken);
+        });
     }
 }

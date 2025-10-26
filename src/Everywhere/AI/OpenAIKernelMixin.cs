@@ -10,6 +10,7 @@ using OpenAI;
 using OpenAI.Chat;
 using BinaryContent = System.ClientModel.BinaryContent;
 using ChatMessage = Microsoft.Extensions.AI.ChatMessage;
+using FunctionCallContent = Microsoft.Extensions.AI.FunctionCallContent;
 using TextContent = Microsoft.Extensions.AI.TextContent;
 
 namespace Everywhere.AI;
@@ -25,12 +26,12 @@ public sealed class OpenAIKernelMixin : KernelMixinBase
     {
         ChatCompletionService = new OptimizedOpenAIApiClient(
             new OptimizedChatClient(
-                customAssistant.ModelId,
+                ModelId,
                 // some models don't need API key (e.g. LM Studio)
-                new ApiKeyCredential(customAssistant.ApiKey.IsNullOrWhiteSpace() ? "NO_API_KEY" : customAssistant.ApiKey),
+                new ApiKeyCredential(ApiKey.IsNullOrWhiteSpace() ? "NO_API_KEY" : ApiKey),
                 new OpenAIClientOptions
                 {
-                    Endpoint = new Uri(customAssistant.Endpoint, UriKind.Absolute)
+                    Endpoint = new Uri(Endpoint, UriKind.Absolute)
                 }
             ).AsIChatClient(),
             this
@@ -185,6 +186,20 @@ public sealed class OpenAIKernelMixin : KernelMixinBase
                             AdditionalProperties = ReasoningProperties
                         });
                     update.AdditionalProperties = ApplyReasoningProperties(update.AdditionalProperties);
+                }
+
+                // Ensure that all FunctionCallContent items have a unique CallId.
+                for (var i = 0; i < update.Contents.Count; i++)
+                {
+                    var item = update.Contents[i];
+                    if (item is FunctionCallContent { Name.Length: > 0, CallId: null or { Length: 0 } } missingIdContent)
+                    {
+                        // Generate a unique ToolCallId for the function call update.
+                        update.Contents[i] = new FunctionCallContent(
+                            Guid.CreateVersion7().ToString("N"),
+                            missingIdContent.Name,
+                            missingIdContent.Arguments);
+                    }
                 }
 
                 yield return update;

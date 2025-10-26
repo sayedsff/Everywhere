@@ -19,7 +19,7 @@ public partial class CustomAssistant : ObservableObject
     public Guid Id { get; set; } = Guid.CreateVersion7();
 
     [ObservableProperty]
-    public partial ColoredIcon? Icon { get; set; }
+    public partial ColoredIcon? Icon { get; set; } = new(ColoredIconType.Lucide) { Kind = LucideIconKind.Bot };
 
     [ObservableProperty]
     [SettingsStringItem(MaxLength = 32)]

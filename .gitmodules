@@ -10,3 +10,6 @@
 [submodule "3rd/LiveMarkdown.Avalonia"]
 	path = 3rd/LiveMarkdown.Avalonia
 	url = https://github.com/DearVa/LiveMarkdown.Avalonia
+[submodule "3rd/EverythingNetCore"]
+	path = 3rd/EverythingNetCore
+	url = https://github.com/Sylinko/EverythingNetCore

@@ -2,29 +2,41 @@
 
 namespace Everywhere.Utilities;
 
-public class DisposeCollector<T>(bool enableDisposeOnFinalize = false) : IReadOnlyList<T>, IDisposable where T : IDisposable
+/// <summary>
+/// A collector for IDisposable objects that can dispose them all at once.
+/// This also provides static utilities for disposing IDisposable objects to default.
+/// </summary>
+/// <param name="disposeOnFinalize"></param>
+/// <typeparam name="T"></typeparam>
+public class DisposeCollector<T>(bool disposeOnFinalize = false) : IReadOnlyList<T>, IDisposable where T : IDisposable
 {
+    /// <summary>
+    /// Indicates whether the collector has been disposed.
+    /// </summary>
     public bool IsDisposed { get; private set; }
 
-    public bool EnableDisposeOnFinalize { get; set; } = enableDisposeOnFinalize;
+    /// <summary>
+    /// Indicates whether to dispose the collected disposables when the collector is finalized.
+    /// </summary>
+    public bool DisposeOnFinalize { get; set; } = disposeOnFinalize;
 
     protected readonly List<T> _disposables = [];
 
     ~DisposeCollector()
     {
-        if (EnableDisposeOnFinalize) Dispose();
+        if (DisposeOnFinalize) Dispose();
     }
 
     public T Add(T disposable)
     {
-        if (IsDisposed) throw new ObjectDisposedException(nameof(DisposeCollector<>));
+        ObjectDisposedException.ThrowIf(IsDisposed, nameof(DisposeCollector<>));
         _disposables.Add(disposable);
         return disposable;
     }
 
     public T Add(Func<T> factory)
     {
-        if (IsDisposed) throw new ObjectDisposedException(nameof(DisposeCollector<>));
+        ObjectDisposedException.ThrowIf(IsDisposed, nameof(DisposeCollector<>));
         var disposable = factory();
         _disposables.Add(disposable);
         return disposable;
@@ -32,7 +44,7 @@ public class DisposeCollector<T>(bool enableDisposeOnFinalize = false) : IReadOn
 
     public void RemoveAndDispose(ref T? disposable)
     {
-        if (IsDisposed) throw new ObjectDisposedException(nameof(DisposeCollector<>));
+        ObjectDisposedException.ThrowIf(IsDisposed, nameof(DisposeCollector<>));
         if (disposable == null) return;
         disposable.Dispose();
         if (!_disposables.Remove(disposable)) return;
@@ -40,21 +52,23 @@ public class DisposeCollector<T>(bool enableDisposeOnFinalize = false) : IReadOn
     }
 
     /// <summary>
-    /// 清空后还能继续使用
+    /// Clear the collector and dispose all collected disposables. You can continue to use the collector after calling this method.
     /// </summary>
-    public void DisposeAndClear()
+    public void Clear()
     {
-        // 逆序释放，防止释放后的对象被再次使用
+        // Dispose in reverse order to prevent disposed objects from being used again
         foreach (var disposable in _disposables.Reversed()) disposable.Dispose();
         _disposables.Clear();
     }
 
+    /// <summary>
+    /// Dispose the collector and all collected disposables. After calling this method, the collector cannot be used anymore.
+    /// </summary>
     public void Dispose()
     {
         if (IsDisposed) return;
-        $"{GetType().Name} is disposing".DebugWriteLineWithDateTime();
         IsDisposed = true;
-        DisposeAndClear();
+        Clear();
         GC.SuppressFinalize(this);
     }
 
@@ -80,7 +94,7 @@ public class DisposeCollector<T>(bool enableDisposeOnFinalize = false) : IReadOn
     public T this[int index] => _disposables[index];
 }
 
-public class DisposeCollector(bool enableDisposeOnFinalize = false) : DisposeCollector<IDisposable>(enableDisposeOnFinalize)
+public class DisposeCollector(bool disposeOnFinalize = false) : DisposeCollector<IDisposable>(disposeOnFinalize)
 {
     public void Add(Action disposer) => Add(new AnonymousDisposable(disposer));
     
@@ -92,7 +106,7 @@ public class DisposeCollector(bool enableDisposeOnFinalize = false) : DisposeCol
 
     public void RemoveAndDispose<T>(ref T? disposable) where T : IDisposable
     {
-        if (IsDisposed) throw new ObjectDisposedException(nameof(DisposeCollector<>));
+        ObjectDisposedException.ThrowIf(IsDisposed, nameof(DisposeCollector<>));
         if (disposable == null) return;
         _disposables.Remove(disposable);
         disposable.Dispose();
@@ -101,7 +115,7 @@ public class DisposeCollector(bool enableDisposeOnFinalize = false) : DisposeCol
 
     public void Replace<T>([NotNullIfNotNull(nameof(newDisposable))] ref T? oldDisposable, T? newDisposable) where T : IDisposable
     {
-        if (IsDisposed) throw new ObjectDisposedException(nameof(DisposeCollector<>));
+        ObjectDisposedException.ThrowIf(IsDisposed, nameof(DisposeCollector<>));
         if (oldDisposable != null)
         {
             oldDisposable.Dispose();

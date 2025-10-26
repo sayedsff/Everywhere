@@ -82,6 +82,9 @@
     <data name="SettingsSelectionItem_Model_WebSearchProvider_bocha" xml:space="preserve">
         <value>博查</value>
     </data>
+    <data name="SettingsSelectionItem_Model_WebSearchProvider_jina" xml:space="preserve">
+        <value>Jina</value>
+    </data>
     <data name="Settings_Plugin_WebSearchEngine_SelectedWebSearchEngineProvider_EndPoint_Header" xml:space="preserve">
         <value>API 调用地址</value>
     </data>
@@ -92,7 +95,7 @@
         <value>向 Everywhere 提问，或是随便聊聊</value>
     </data>
     <data name="ChatInputBox_AddAttachmentMenuItem_ToolTip" xml:space="preserve">
-        <value>添加附件到对话</value>
+        <value>添加附件到当前会话</value>
     </data>
     <data name="ChatInputBox_AddAttachmentMenuItem_Header" xml:space="preserve">
         <value>添加附件</value>
@@ -160,8 +163,8 @@
     <data name="ChatWindow_ChatInputBox_AddAttachmentMenuItems_PickElement" xml:space="preserve">
         <value>选择元素</value>
     </data>
-    <data name="ChatWindow_ChatInputBox_AddAttachmentMenuItems_ClipboardContent" xml:space="preserve">
-        <value>剪切板内容</value>
+    <data name="ChatWindow_ChatInputBox_AddAttachmentMenuItems_PasteFromClipboard" xml:space="preserve">
+        <value>从剪贴板复制</value>
     </data>
     <data name="ChatWindow_ChatInputBox_AddAttachmentMenuItems_AttachFile" xml:space="preserve">
         <value>附加文件</value>
@@ -343,7 +346,8 @@
     <data name="FriendlyExceptionMessage_Socket_0" xml:space="preserve">
         <value>未知错误，请稍后再试。</value>
     </data><data name="FriendlyExceptionMessage_Aggregate" xml:space="preserve">
-        <value>发生一个或多个错误。</value>
+        <value>发生一个或多个错误。
+{0}</value>
     </data>
     <data name="FriendlyExceptionMessage_TaskCanceled" xml:space="preserve">
         <value>任务已取消。</value>
@@ -465,13 +469,13 @@
     <data name="ChatWindowPinMode_AlwaysUnpinned" xml:space="preserve">
         <value>总是不固定</value>
     </data>
-    <data name="VisualTreeXmlDetailLevel_Detailed" xml:space="preserve">
+    <data name="VisualTreeDetailLevel_Detailed" xml:space="preserve">
         <value>详细</value>
     </data>
-    <data name="VisualTreeXmlDetailLevel_Compact" xml:space="preserve">
+    <data name="VisualTreeDetailLevel_Compact" xml:space="preserve">
         <value>精简</value>
     </data>
-    <data name="VisualTreeXmlDetailLevel_Minimal" xml:space="preserve">
+    <data name="VisualTreeDetailLevel_Minimal" xml:space="preserve">
         <value>极简</value>
     </data>
     <data name="ChatWindowPinMode_PinOnInput" xml:space="preserve">
@@ -540,8 +544,8 @@
     <data name="Settings_CustomAssistant_MaxTokens_Header" xml:space="preserve">
         <value>最大上下文长度 (max_tokens)</value>
     </data>
-    <data name="SettingsPage_RestoreDefault_Button_ToolTip" xml:space="preserve">
-        <value>恢复默认</value>
+    <data name="SettingsPage_Reset_Button_ToolTip" xml:space="preserve">
+        <value>重置</value>
     </data>
     <data name="Settings_CustomAssistant_Schema_Header" xml:space="preserve">
         <value>API 模式</value>
@@ -639,11 +643,11 @@
     <data name="Settings_Plugin_WebSearchEngine_SelectedWebSearchEngineProvider_SearchEngineId_Description" xml:space="preserve">
         <value>(Google 专用) 提供可编程搜索引擎 ID，详情请参考指南。</value>
     </data>
-    <data name="NativeChatPlugin_WebSearchEngine_Header" xml:space="preserve">
-        <value>网络搜索</value>
+    <data name="NativeChatPlugin_WebBrowser_Header" xml:space="preserve">
+        <value>网络浏览器</value>
     </data>
-    <data name="NativeChatPlugin_WebSearchEngine_Description" xml:space="preserve">
-        <value>提供网络搜索能力，先搜索后回答，可减少大语言模型幻觉，并提供最新信息。注意：使用 web_search 工具需要配置搜索引擎 API 密钥（和大模型 API 密钥是不同的）。如果你不打算配置 API 密钥，可是取消勾选 web_search 工具，仅使用 web_snapshot 工具。</value>
+    <data name="NativeChatPlugin_WebBrowser_Description" xml:space="preserve">
+        <value>提供浏览网络的能力，包括搜索引擎和网页访问功能，可减少模型幻觉，并提供最新信息。注意：使用 web_search 工具需要配置搜索引擎 API 密钥（和模型 API 密钥是不同的）。如果你不打算配置 API 密钥，可取消勾选 web_search 工具，仅使用 web_snapshot 工具。</value>
     </data>
     <data name="NativeChatPlugin_Shell_Header" xml:space="preserve">
         <value>终端</value>
@@ -897,7 +901,7 @@
     <data name="SoftwareUpdater_PerformUpdate_FailedToast_Message" xml:space="preserve">
         <value>更新失败</value>
     </data>
-    <data name="ChatInputBox_SettingsMenuItem_ToolTip" xml:space="preserve">
+    <data name="ChatInputBox_SettingsButton_ToolTip" xml:space="preserve">
         <value>设置</value>
     </data>
     <data name="ChatWindow_ChatInputBox_SettingsMenuItems_VisualTreeTokenLimit" xml:space="preserve">
@@ -1090,5 +1094,143 @@
     </data>
     <data name="HandledSystemException_InvalidOperation" xml:space="preserve">
         <value>操作无效。请确保配置正确。</value>
+    </data>
+    <data name="NativeChatPlugin_Everything_Header" xml:space="preserve">
+        <value>Everything</value>
+    </data>
+    <data name="NativeChatPlugin_Everything_Description" xml:space="preserve">
+        <value>使用 Everything (一个高性能本地文件搜索引擎) 搜索计算机上的文件。</value>
+    </data>
+    <data name="CustomAssistantPage_CheckConnectivityButton_ToolTip" xml:space="preserve">
+        <value>确认模型服务的可用性。</value>
+    </data>
+    <data name="CustomAssistantPage_CreateNewCustomAssistantButton_ToolTip" xml:space="preserve">
+        <value>创建一个新的 AI 助手。</value>
+    </data>
+    <data name="CustomAssistantPage_DeleteCustomAssistantButton_ToolTip" xml:space="preserve">
+        <value>永久删除选中的 AI 助手。</value>
+    </data>
+    <data name="ChatInputBox_ContextFlyout_CopyMenuItem_Header" xml:space="preserve">
+        <value>复制</value>
+    </data>
+    <data name="ChatInputBox_ContextFlyout_CutMenuItem_Header" xml:space="preserve">
+        <value>剪切</value>
+    </data>
+    <data name="ChatInputBox_ContextFlyout_PasteMenuItem_Header" xml:space="preserve">
+        <value>粘贴</value>
+    </data>
+    <data name="ConsentDecision_AllowOnce" xml:space="preserve">
+        <value>允许一次</value>
+    </data>
+    <data name="ConsentDecision_AllowSession" xml:space="preserve">
+        <value>当前对话中允许</value>
+    </data>
+    <data name="ConsentDecision_AlwaysAllow" xml:space="preserve">
+        <value>总是允许</value>
+    </data>
+    <data name="ConsentDecision_Deny" xml:space="preserve">
+        <value>拒绝</value>
+    </data>
+    <data name="TextDifferenceEditor_AcceptButton_Content" xml:space="preserve">
+        <value>接受</value>
+    </data>
+    <data name="TextDifferenceEditor_RevertButton_Content" xml:space="preserve">
+        <value>重置</value>
+    </data>
+    <data name="TextDifferenceSummaryView_RemovedLineCountTextRun_Text" xml:space="preserve">
+        <value> 行删除</value>
+    </data>
+    <data name="TextDifferenceSummaryView_AcceptAllButton_Content" xml:space="preserve">
+        <value>接受所有</value>
+    </data>
+    <data name="TextDifferenceSummaryView_AddedLineCountTextRun_Text" xml:space="preserve">
+        <value> 行添加</value>
+    </data>
+    <data name="TextDifferenceSummaryView_EditButton_Content" xml:space="preserve">
+        <value>编辑</value>
+    </data>
+    <data name="TextDifferenceSummaryView_DiscardAllButton_Content" xml:space="preserve">
+        <value>拒绝所有</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_DeleteFiles_DeletionConsent_Header" xml:space="preserve">
+        <value>即将删除 {0} 个文件或文件夹。</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_DeleteFiles_SystemFile_DeletionConsent_Header" xml:space="preserve">
+        <value>即将删除系统文件或文件夹。</value>
+    </data>
+    <data name="TextDifferenceEditor_DiscardButton_Content" xml:space="preserve">
+        <value>拒绝</value>
+    </data>
+    <data name="ChatPluginConsentRequest_Common_Header" xml:space="preserve">
+        <value>是否允许“{0}”访问 {1} 权限？</value>
+    </data>
+    <data name="Common_Comma" xml:space="preserve">
+        <value>，</value>
+    </data>
+    <data name="ChatWindow_ScrollToBottom_ToolTip" xml:space="preserve">
+        <value>滚动到底部</value>
+    </data>
+    <data name="ChatContext_Temporary" xml:space="preserve">
+        <value>临时聊天</value>
+    </data>
+    <data name="TemporaryChatMode_Always" xml:space="preserve">
+        <value>总是</value>
+    </data>
+    <data name="TemporaryChatMode_Never" xml:space="preserve">
+        <value>从不</value>
+    </data>
+    <data name="TemporaryChatMode_RememberLast" xml:space="preserve">
+        <value>记住上次</value>
+    </data>
+    <data name="Settings_ChatWindow_TemporaryChatMode_Header" xml:space="preserve">
+        <value>临时聊天模式</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_SearchFiles_Header" xml:space="preserve">
+        <value>查找文件</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_GetFileInformation_Header" xml:space="preserve">
+        <value>获取文件信息</value>
+    </data>
+    <data name="Settings_ChatWindow_TemporaryChatMode_Description" xml:space="preserve">
+        <value>新建聊天时是否使用临时聊天。</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_SearchFileContent_Header" xml:space="preserve">
+        <value>搜索文件内容</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_DeleteFiles_Header" xml:space="preserve">
+        <value>删除一个或多个文件</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_MoveFile_Header" xml:space="preserve">
+        <value>移动或重命名文件</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_ReadFile_Header" xml:space="preserve">
+        <value>读取文件</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_ReplaceFileContent_Header" xml:space="preserve">
+        <value>修改文件内容</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_WriteToFile_Header" xml:space="preserve">
+        <value>写到文件</value>
+    </data>
+    <data name="NativeChatPlugin_FileSystem_CreateDirectory_Header" xml:space="preserve">
+        <value>创建文件夹</value>
+    </data>
+    <data name="NativeChatPlugin_WebBrowser_WebSearch_Searching" xml:space="preserve">
+        <value>搜索: {0}</value>
+    </data>
+    <data name="NativeChatPlugin_WebBrowser_WebSearch_Header" xml:space="preserve">
+        <value>网络搜索</value>
+    </data>
+    <data name="ChatPluginDisplayBlockPresenter_FileReferences_TotalCountRun_Text" xml:space="preserve">
+        <value>文件数: </value>
+    </data>
+    <data name="ChatPluginDisplayBlockPresenter_FileReferences_HasMoreReferencesTextBlock_Text" xml:space="preserve">
+        <value>其余略</value>
+    </data>
+    <data name="NativeChatPlugin_WebBrowser_WebSnapshot_Header" xml:space="preserve">
+        <value>访问网页</value>
+    </data>
+    <data name="NativeChatPlugin_WebBrowser_WebSnapshot_Visiting" xml:space="preserve">
+        <value>前往: {0}</value>
     </data>
 </root>

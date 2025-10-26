@@ -17,7 +17,7 @@
         <Border CornerRadius="{TemplateBinding CornerRadius}">
           <Border.Background>
             <MultiBinding Converter="{x:Static vc:CommonConverters.DefaultMultiValue}">
-              <MultiBinding Converter="{x:Static vc:CommonConverters.FirstNonNull}">
+              <MultiBinding Converter="{x:Static vc:CommonConverters.FirstNotNull}">
                 <Binding
                   FallbackValue="{x:Null}"
                   Path="Icon.BackgroundColor"
@@ -37,7 +37,7 @@
                 Size="{Binding $parent[v:IconPresenter].IconSize}">
                 <LucideIcon.Foreground>
                   <MultiBinding Converter="{x:Static vc:CommonConverters.DefaultMultiValue}">
-                    <MultiBinding Converter="{x:Static vc:CommonConverters.FirstNonNull}">
+                    <MultiBinding Converter="{x:Static vc:CommonConverters.FirstNotNull}">
                       <Binding Path="ForegroundColor"/>
                       <Binding Path="$parent[v:IconPresenter].Foreground"/>
                     </MultiBinding>
@@ -53,7 +53,7 @@
                 Text="{Binding Text}">
                 <TextBlock.Foreground>
                   <MultiBinding Converter="{x:Static vc:CommonConverters.DefaultMultiValue}">
-                    <MultiBinding Converter="{x:Static vc:CommonConverters.FirstNonNull}">
+                    <MultiBinding Converter="{x:Static vc:CommonConverters.FirstNotNull}">
                       <Binding Path="ForegroundColor"/>
                       <Binding Path="$parent[v:IconPresenter].Foreground"/>
                     </MultiBinding>

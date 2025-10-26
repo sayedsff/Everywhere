@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Everywhere.Chat.Plugins;
@@ -73,22 +73,38 @@ public class SettingsInitializer : IAsyncInitializer
                 new WebSearchEngineProvider
                 {
                     Id = "google",
+                    DisplayName = "Google",
                     EndPoint = "https://customsearch.googleapis.com"
                 },
                 new WebSearchEngineProvider
                 {
                     Id = "tavily",
+                    DisplayName = "Tavily",
                     EndPoint = "https://api.tavily.com"
                 },
                 new WebSearchEngineProvider
                 {
                     Id = "brave",
-                    EndPoint = "https://api.search.brave.com/res/v1/web/search?q"
+                    DisplayName = "Brave",
+                    EndPoint = "https://api.search.brave.com/res/v1/web/search"
                 },
                 new WebSearchEngineProvider
                 {
                     Id = "bocha",
+                    DisplayName = "Bocha",
                     EndPoint = "https://api.bochaai.com/v1/web-search"
+                },
+                new WebSearchEngineProvider
+                {
+                    Id = "jina",
+                    DisplayName = "Jina",
+                    EndPoint = "https://s.jina.ai"
+                },
+                new WebSearchEngineProvider
+                {
+                    Id = "searxng",
+                    DisplayName = "SearXNG",
+                    EndPoint = "https://searxng.example.com/search"
                 },
             ],
             webSearchEngineSettings.WebSearchEngineProviders);

@@ -1,5 +1,4 @@
-﻿using Avalonia.Controls;
-using Avalonia.Media.Imaging;
+﻿using Avalonia.Media.Imaging;
 
 namespace Everywhere.Interop;
 
@@ -27,19 +26,10 @@ public interface INativeHelper
     /// <exception cref="UnauthorizedAccessException">Thrown if the current user is not an administrator.</exception>
     bool IsAdministratorStartupEnabled { get; set; }
 
-    void RestartAsAdministrator();
-
     /// <summary>
-    /// Make the window cannot be focused by the system.
+    /// Restart the application as administrator (aka UAC on Windows).
     /// </summary>
-    /// <param name="window"></param>
-    void SetWindowNoFocus(Window window);
-
-    void SetWindowHitTestInvisible(Window window);
-
-    void SetWindowCornerRadius(Window window, CornerRadius cornerRadius);
-
-    void HideWindowWithoutAnimation(Window window);
+    void RestartAsAdministrator();
 
     /// <summary>
     /// Get the bitmap from the clipboard. This method is asynchronous and may return null if the clipboard does not contain a bitmap.
@@ -47,5 +37,16 @@ public interface INativeHelper
     /// <returns></returns>
     Task<WriteableBitmap?> GetClipboardBitmapAsync();
 
+    /// <summary>
+    /// Show a desktop notification with the given message and optional title.
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="title"></param>
     void ShowDesktopNotification(string message, string? title = null);
+
+    /// <summary>
+    /// Open the file location in the system file explorer and select the file.
+    /// </summary>
+    /// <param name="fullPath"></param>
+    void OpenFileLocation(string fullPath);
 }

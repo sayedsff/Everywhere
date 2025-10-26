@@ -122,7 +122,7 @@ public partial class ChatInputBox : TextBox
     {
         get;
         set => SetAndRaise(SettingsMenuItemsProperty, ref field, value);
-    } = new AvaloniaList<MenuItem>();
+    } = new AvaloniaList<object>();
 
     public bool IsImageSupported
     {

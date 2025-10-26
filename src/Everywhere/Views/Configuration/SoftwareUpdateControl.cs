@@ -100,11 +100,10 @@ public class SoftwareUpdateControl : StackPanel
             },
             new Button
             {
+                [ButtonAssist.IconSizeProperty] = 18,
                 [ButtonAssist.IconProperty] = new LucideIcon
                 {
-                    Kind = LucideIconKind.RefreshCcw,
-                    Size = 18,
-                    Margin = new Thickness(0, 0, 6, 0)
+                    Kind = LucideIconKind.RefreshCcw
                 },
                 [!ButtonAssist.ShowProgressProperty] = new Binding
                 {

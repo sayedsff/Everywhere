@@ -1,0 +1,85 @@
+﻿<ResourceDictionary
+  xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI" xmlns:v="using:Everywhere.Views"
+  xmlns:vc="clr-namespace:Everywhere.ValueConverters">
+  <Design.PreviewWith>
+    <v:TextDifferenceSummaryView/>
+  </Design.PreviewWith>
+
+  <ControlTheme
+    x:Key="{x:Type v:TextDifferenceSummaryView}"
+    TargetType="v:TextDifferenceSummaryView">
+    <Setter Property="FontSize" Value="12"/>
+    <Setter Property="Template">
+      <ControlTemplate TargetType="v:TextDifferenceSummaryView">
+        <StackPanel Orientation="Vertical">
+          <StackPanel.Styles>
+            <Style Selector="Run.Monospace">
+              <Setter Property="FontFamily" Value="Cascadia Mono, Consolas, Menlo, 'Courier New', monospace"/>
+            </Style>
+          </StackPanel.Styles>
+
+          <HyperlinkButton
+            Padding="0"
+            Command="{Binding OpenFileCommand, RelativeSource={RelativeSource TemplatedParent}}"
+            Content="{Binding TextDifference.FilePath, RelativeSource={RelativeSource TemplatedParent}, FallbackValue={x:Null}, Converter={x:Static vc:CommonConverters.FullPathToFileName}}">
+            <ToolTip.Tip>
+              <TextBlock
+                Text="{Binding TextDifference.FilePath, RelativeSource={RelativeSource TemplatedParent}, FallbackValue={x:Null}}"
+                TextDecorations="{x:Null}"/>
+            </ToolTip.Tip>
+          </HyperlinkButton>
+          <TextBlock
+            FontSize="{TemplateBinding FontSize}"
+            Foreground="{DynamicResource SuccessColor60}">
+            <Run
+              Classes="Monospace" Text="+ "/>
+            <Run
+              Classes="Monospace"
+              Text="{Binding AddedLineCount, RelativeSource={RelativeSource TemplatedParent}, FallbackValue=0}"/>
+            <Run Text="{I18N {x:Static LocaleKey.TextDifferenceSummaryView_AddedLineCountTextRun_Text}}"/>
+          </TextBlock>
+          <TextBlock
+            FontSize="{TemplateBinding FontSize}"
+            Foreground="{DynamicResource ErrorColor60}">
+            <Run
+              Classes="Monospace" Text="- "/>
+            <Run
+              Classes="Monospace"
+              Text="{Binding RemovedLineCount, RelativeSource={RelativeSource TemplatedParent}, FallbackValue=0}"/>
+            <Run Text="{I18N {x:Static LocaleKey.TextDifferenceSummaryView_RemovedLineCountTextRun_Text}}"/>
+          </TextBlock>
+          <StackPanel
+            Margin="0,4,0,0"
+            IsVisible="{Binding TextDifference.Acceptance, RelativeSource={RelativeSource TemplatedParent}, FallbackValue=False, Converter={x:Static ObjectConverters.IsNull}}"
+            Orientation="Horizontal" Spacing="4">
+            <StackPanel.Styles>
+              <Style Selector="Button.Compact">
+                <Setter Property="Padding" Value="8,4"/>
+              </Style>
+            </StackPanel.Styles>
+            <Button
+              Classes="Secondary Compact"
+              shadui:ButtonAssist.Icon="{LucideIconContent SquarePen}"
+              Command="{Binding EditCommand, RelativeSource={RelativeSource TemplatedParent}}"
+              Content="{I18N {x:Static LocaleKey.TextDifferenceSummaryView_EditButton_Content}}"/>
+            <Button
+              Classes="Compact"
+              shadui:ButtonAssist.HoverBackground="{DynamicResource SuccessColor10}"
+              shadui:ButtonAssist.Icon="{LucideIconContent CheckCheck}"
+              Background="{DynamicResource SuccessColor20}"
+              Command="{Binding AcceptAllCommand, RelativeSource={RelativeSource TemplatedParent}, FallbackValue={x:Null}}"
+              Content="{I18N {x:Static LocaleKey.TextDifferenceSummaryView_AcceptAllButton_Content}}"/>
+            <Button
+              Classes="Compact"
+              shadui:ButtonAssist.HoverBackground="{DynamicResource ErrorColor10}"
+              shadui:ButtonAssist.Icon="{LucideIconContent X}"
+              Background="{DynamicResource ErrorColor20}"
+              Command="{Binding DiscardAllCommand, RelativeSource={RelativeSource TemplatedParent}, FallbackValue={x:Null}}"
+              Content="{I18N {x:Static LocaleKey.TextDifferenceSummaryView_DiscardAllButton_Content}}"/>
+          </StackPanel>
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

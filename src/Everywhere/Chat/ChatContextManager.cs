@@ -59,7 +59,7 @@ public partial class ChatContextManager : ObservableObject, IChatContextManager,
                     RemoveCommand.NotifyCanExecuteChanged();
                     CreateNewCommand.NotifyCanExecuteChanged();
 
-                    if (IsEmptyContext(previous)) Remove(previous);
+                    if (IsEmptyContext(previous) || previous?.IsTemporary is true) Remove(previous);
                 },
                 DispatcherPriority.Background);
 
@@ -83,7 +83,7 @@ public partial class ChatContextManager : ObservableObject, IChatContextManager,
             }).Select(g => new ChatContextHistory(
                 g.Key,
                 g.AsValueEnumerable().OrderByDescending(c => c.Metadata.DateModified).ToImmutableArray())
-            ).ToReadOnlyList();
+            ).OrderBy(g => g.Date).ToReadOnlyList();
         }
     }
 
@@ -125,13 +125,17 @@ public partial class ChatContextManager : ObservableObject, IChatContextManager,
             () => this,
             static that =>
             {
-                ChatContext[] toSave;
+                List<ChatContext> toSave;
                 lock (that._saveBuffer)
                 {
-                    toSave = that._saveBuffer.ToArray();
+                    toSave = that._saveBuffer.ToList(); // ToList is better than ToArray (less allocation)
                     that._saveBuffer.Clear();
                 }
-                Task.WhenAll(toSave.AsValueEnumerable().Select(c => that._chatContextStorage.SaveChatContextAsync(c)).ToList())
+                Task.WhenAll(
+                        toSave.AsValueEnumerable()
+                            .Where(c => !c.IsTemporary)
+                            .Select(c => that._chatContextStorage.SaveChatContextAsync(c))
+                            .ToList())
                     .Detach(that._logger.ToExceptionHandler());
             },
             TimeSpan.FromSeconds(0.5)
@@ -151,15 +155,28 @@ public partial class ChatContextManager : ObservableObject, IChatContextManager,
     {
         if (IsEmptyContext(_current)) return;
 
+        var isCurrentTemporary = _current?.IsTemporary is true;
+        if (isCurrentTemporary) Remove(_current!); // Remove the temporary chat context before creating a new one
+
         var renderedSystemPrompt = Prompts.RenderPrompt(
             _settings.Model.SelectedCustomAssistant?.SystemPrompt ?? Prompts.DefaultSystemPrompt,
             SystemPromptVariables
         );
 
-        _current = new ChatContext(renderedSystemPrompt);
+        _current = new ChatContext(renderedSystemPrompt)
+        {
+            IsTemporary = _settings.ChatWindow.TemporaryChatMode switch
+            {
+                TemporaryChatMode.RememberLast => isCurrentTemporary,
+                TemporaryChatMode.Always => true,
+                _ => false
+            },
+        };
+
         _current.Changed += HandleChatContextChanged;
         _history.Add(_current.Metadata.Id, _current);
-        Task.Run(() => _chatContextStorage.AddChatContextAsync(_current)).Detach(_logger.ToExceptionHandler());
+        // After created, the chat context is not added to the storage yet.
+        // It will be added when it's property has changed.
 
         OnPropertyChanged(nameof(History));
         OnPropertyChanged(nameof(Current));
@@ -196,13 +213,6 @@ public partial class ChatContextManager : ObservableObject, IChatContextManager,
         RemoveCommand.NotifyCanExecuteChanged();
     }
 
-    [RelayCommand]
-    private void Rename(ChatContext chatContext)
-    {
-        foreach (var other in _history.Values) other.IsRenamingMetadataTitle = false;
-        chatContext.IsRenamingMetadataTitle = true;
-    }
-
     public void UpdateHistory()
     {
         UpdateHistoryAsync(int.MaxValue).Detach();
@@ -211,6 +221,11 @@ public partial class ChatContextManager : ObservableObject, IChatContextManager,
     private Task UpdateHistoryAsync(int count) => Task.Run(async () =>
     {
         var newItems = new HashSet<Guid>();
+        if (_current is not null && _current.Metadata.Id != Guid.Empty) // Ensure current is included
+        {
+            newItems.Add(_current.Metadata.Id);
+        }
+
         await foreach (var metadata in _chatContextStorage.QueryChatContextsAsync(count, ChatContextOrderBy.UpdatedAt, true))
         {
             newItems.Add(metadata.Id);

@@ -1,20 +1,17 @@
 ﻿<UserControl
   x:Class="Everywhere.Views.Pages.CustomAssistantPage" xmlns="https://github.com/avaloniaui"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ai="clr-namespace:Everywhere.AI"
-  xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI" xmlns:v="clr-namespace:Everywhere.Views"
-  xmlns:vm="clr-namespace:Everywhere.ViewModels" d:DesignHeight="450"
-  d:DesignWidth="800" x:DataType="vm:CustomAssistantPageViewModel"
-  mc:Ignorable="d">
+  xmlns:vm="clr-namespace:Everywhere.ViewModels" x:DataType="vm:CustomAssistantPageViewModel">
   <Grid
-    Margin="32,24" ColumnDefinitions="*,1,4*"
-    RowDefinitions="Auto,*" RowSpacing="8">
-
+    ColumnDefinitions="*,8,3*" RowDefinitions="Auto,*"
+    RowSpacing="16">
     <Button
       Classes="Primary" Grid.Row="0"
       Grid.Column="0" HorizontalAlignment="Left"
       Command="{Binding CreateNewCustomAssistantCommand}"
-      Content="{I18N {x:Static LocaleKey.CustomAssistantPage_CreateNewCustomAssistantButton_Content}}">
+      Content="{I18N {x:Static LocaleKey.CustomAssistantPage_CreateNewCustomAssistantButton_Content}}"
+      ToolTip.Tip="{I18N {x:Static LocaleKey.CustomAssistantPage_CreateNewCustomAssistantButton_ToolTip}}">
       <shadui:ButtonAssist.Icon>
         <LucideIcon Kind="Plus"/>
       </shadui:ButtonAssist.Icon>
@@ -25,6 +22,11 @@
       ItemsSource="{Binding CustomAssistants}"
       ScrollViewer.HorizontalScrollBarVisibility="Disabled"
       SelectedItem="{Binding SelectedCustomAssistant, Mode=TwoWay}">
+      <ListBox.Styles>
+        <Style Selector="Border">
+          <Setter Property="Background" Value="{DynamicResource CardBackgroundColor}"/>
+        </Style>
+      </ListBox.Styles>
       <ListBox.DataTemplates>
         <DataTemplate DataType="ai:CustomAssistant">
           <DockPanel
@@ -58,8 +60,8 @@
 
     <GridSplitter
       Grid.Row="0" Grid.RowSpan="2"
-      Grid.Column="1" Margin="4,0"
-      VerticalAlignment="Stretch" Background="Transparent"/>
+      Grid.Column="1" VerticalAlignment="Stretch"
+      Background="Transparent"/>
 
     <StackPanel
       Grid.Row="0" Grid.Column="2"
@@ -71,7 +73,8 @@
         shadui:ButtonAssist.ShowProgress="{Binding CheckConnectivityCommand.IsRunning}"
         Command="{Binding CheckConnectivityCommand}"
         Content="{I18N {x:Static LocaleKey.CustomAssistantPage_CheckConnectivityButton_Content}}"
-        IsVisible="{Binding SelectedCustomAssistant, Converter={x:Static ObjectConverters.IsNotNull}}">
+        IsVisible="{Binding SelectedCustomAssistant, Converter={x:Static ObjectConverters.IsNotNull}}"
+        ToolTip.Tip="{I18N {x:Static LocaleKey.CustomAssistantPage_CheckConnectivityButton_ToolTip}}">
         <shadui:ButtonAssist.Icon>
           <LucideIcon Kind="Unplug"/>
         </shadui:ButtonAssist.Icon>
@@ -80,7 +83,8 @@
         Classes="Destructive" VerticalAlignment="Center"
         Command="{Binding DeleteCustomAssistantCommand}"
         Content="{I18N {x:Static LocaleKey.CustomAssistantPage_DeleteCustomAssistantButton_Content}}"
-        IsVisible="{Binding SelectedCustomAssistant, Converter={x:Static ObjectConverters.IsNotNull}}">
+        IsVisible="{Binding SelectedCustomAssistant, Converter={x:Static ObjectConverters.IsNotNull}}"
+        ToolTip.Tip="{I18N {x:Static LocaleKey.CustomAssistantPage_DeleteCustomAssistantButton_ToolTip}}">
         <shadui:ButtonAssist.Icon>
           <LucideIcon Kind="Trash2"/>
         </shadui:ButtonAssist.Icon>

@@ -84,6 +84,7 @@ public record ModelProviderTemplate
             Id = "openai",
             DisplayName = "OpenAI",
             Endpoint = "https://api.openai.com/v1",
+            OfficialWebsiteUrl = "https://openai.com",
             IconUrl = "avares://Everywhere/Assets/Icons/openai.svg",
             Schema = ModelProviderSchema.OpenAI,
             ModelDefinitions =
@@ -156,6 +157,7 @@ public record ModelProviderTemplate
             Id = "anthropic",
             DisplayName = "Anthropic (Claude)",
             Endpoint = "https://api.anthropic.com",
+            OfficialWebsiteUrl = "https://www.anthropic.com",
             IconUrl = "avares://Everywhere/Assets/Icons/anthropic.svg",
             Schema = ModelProviderSchema.Anthropic,
             ModelDefinitions =
@@ -227,6 +229,7 @@ public record ModelProviderTemplate
         {
             Id = "google",
             DisplayName = "Google (Gemini)",
+            OfficialWebsiteUrl = "https://gemini.google.com",
             Endpoint = "https://generativelanguage.googleapis.com/v1beta/openai",
             IconUrl = "avares://Everywhere/Assets/Icons/google-color.svg",
             Schema = ModelProviderSchema.OpenAI,
@@ -343,6 +346,7 @@ public record ModelProviderTemplate
             Id = "deepseek",
             DisplayName = "DeepSeek",
             Endpoint = "https://api.deepseek.com",
+            OfficialWebsiteUrl = "https://www.deepseek.com",
             IconUrl = "avares://Everywhere/Assets/Icons/deepseek-color.svg",
             Schema = ModelProviderSchema.OpenAI,
             ModelDefinitions =
@@ -375,6 +379,7 @@ public record ModelProviderTemplate
             Id = "moonshot",
             DisplayName = "Moonshot (Kimi)",
             Endpoint = "https://api.moonshot.cn/v1",
+            OfficialWebsiteUrl = "https://www.moonshot.cn",
             IconUrl = "avares://Everywhere/Assets/Icons/moonshot.svg",
             Schema = ModelProviderSchema.OpenAI,
             ModelDefinitions =
@@ -416,6 +421,7 @@ public record ModelProviderTemplate
         {
             Id = "openrouter",
             DisplayName = "OpenRouter",
+            OfficialWebsiteUrl = "https://openrouter.ai",
             Endpoint = "https://openrouter.ai/api/v1",
             IconUrl = "avares://Everywhere/Assets/Icons/openrouter.svg",
             Schema = ModelProviderSchema.OpenAI,
@@ -456,8 +462,9 @@ public record ModelProviderTemplate
         },
         new()
         {
-            Id = "siliconflow",
+            Id = "siliconcloud",
             DisplayName = "SiliconCloud (SiliconFlow)",
+            OfficialWebsiteUrl = "https://www.siliconflow.cn",
             Endpoint = "https://api.siliconflow.cn/v1",
             IconUrl = "avares://Everywhere/Assets/Icons/siliconcloud-color.svg",
             Schema = ModelProviderSchema.OpenAI,
@@ -490,6 +497,7 @@ public record ModelProviderTemplate
         {
             Id = "ollama",
             DisplayName = "Ollama",
+            OfficialWebsiteUrl = "https://ollama.com",
             Endpoint = "http://127.0.0.1:11434",
             IconUrl = "avares://Everywhere/Assets/Icons/ollama.svg",
             Schema = ModelProviderSchema.Ollama,

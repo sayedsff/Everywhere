@@ -78,9 +78,9 @@ public class App : Application
         try
         {
             foreach (var group in ServiceLocator
-                       .Resolve<IEnumerable<IAsyncInitializer>>()
-                       .GroupBy(i => i.Priority)
-                       .OrderBy(g => g.Key))
+                         .Resolve<IEnumerable<IAsyncInitializer>>()
+                         .GroupBy(i => i.Priority)
+                         .OrderBy(g => g.Key))
             {
                 Task.WhenAll(group.Select(i => i.InitializeAsync())).WaitOnDispatcherFrame();
             }
@@ -227,12 +227,9 @@ file class DesignTimeNativeHelper : INativeHelper
     public bool IsUserStartupEnabled { get; set; }
     public bool IsAdministratorStartupEnabled { get; set; }
     public void RestartAsAdministrator() { }
-    public void SetWindowNoFocus(Window window) { }
-    public void SetWindowHitTestInvisible(Window window) { }
-    public void SetWindowCornerRadius(Window window, CornerRadius cornerRadius) { }
-    public void HideWindowWithoutAnimation(Window window) { }
     public Task<WriteableBitmap?> GetClipboardBitmapAsync() => Task.FromResult<WriteableBitmap?>(null);
     public void ShowDesktopNotification(string message, string? title) { }
+    public void OpenFileLocation(string fullPath) { }
 }
 
 #pragma warning restore CS0067 // The event is for design-time only.

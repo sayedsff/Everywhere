@@ -15,7 +15,7 @@ public static class ChatFunctionPermissionsConverters
     /// <summary>
     /// Converts ChatFunctionPermissions to a brush representing the highest level of permission.
     /// </summary>
-    public static IValueConverter ToBrush { get; } = new ToBrushImpl();
+    public static IMultiValueConverter ToBrush { get; } = new ToBrushImpl();
 
     private class ToListImpl : IValueConverter
     {
@@ -42,35 +42,27 @@ public static class ChatFunctionPermissionsConverters
         }
     }
 
-    private class ToBrushImpl : IValueConverter
+    private class ToBrushImpl : IMultiValueConverter
     {
-        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        public object? Convert(IList<object?> values, Type targetType, object? parameter, CultureInfo culture)
         {
-            if (value is not ChatFunctionPermissions permissions) return null;
+            if (values is not [ChatFunctionPermissions permissions, Color none, Color low, Color medium, Color high]) return null;
 
-            // Define brushes for different permission levels
-            var brushNone = Brushes.Gray;
-            var brushLow = Brushes.Green;
-            var brushMedium = Brushes.DarkOrange;
-            var brushHigh = Brushes.DarkRed;
-
+            Color color;
             if (permissions == ChatFunctionPermissions.None)
-                return brushNone;
-            if (permissions.HasFlag(ChatFunctionPermissions.ProcessAccess) || permissions.HasFlag(ChatFunctionPermissions.ShellExecute))
-                return brushHigh;
-            if (permissions.HasFlag(ChatFunctionPermissions.FileAccess) || permissions.HasFlag(ChatFunctionPermissions.ClipboardAccess) ||
-                permissions.HasFlag(ChatFunctionPermissions.ScreenAccess))
-                return brushMedium;
-            if (permissions.HasFlag(ChatFunctionPermissions.FileRead) || permissions.HasFlag(ChatFunctionPermissions.ClipboardRead) ||
-                permissions.HasFlag(ChatFunctionPermissions.ScreenRead) || permissions.HasFlag(ChatFunctionPermissions.NetworkAccess))
-                return brushLow;
-
-            return brushNone; // Fallback to gray if no known permissions are set
-        }
-
-        public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-        {
-            throw new NotSupportedException();
+                color = none;
+            else if (permissions.HasFlag(ChatFunctionPermissions.ProcessAccess) || permissions.HasFlag(ChatFunctionPermissions.ShellExecute))
+                color = high;
+            else if (permissions.HasFlag(ChatFunctionPermissions.FileAccess) || permissions.HasFlag(ChatFunctionPermissions.ClipboardAccess) ||
+                     permissions.HasFlag(ChatFunctionPermissions.ScreenAccess))
+                color = medium;
+            else if (permissions.HasFlag(ChatFunctionPermissions.FileRead) || permissions.HasFlag(ChatFunctionPermissions.ClipboardRead) ||
+                     permissions.HasFlag(ChatFunctionPermissions.ScreenRead) || permissions.HasFlag(ChatFunctionPermissions.NetworkAccess))
+                color = low;
+            else
+                color = none;
+            
+            return new SolidColorBrush(color); // Fallback to gray if no known permissions are set
         }
     }
 }

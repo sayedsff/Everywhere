@@ -8,7 +8,7 @@ public abstract class KernelMixinBase(CustomAssistant customAssistant) : IKernel
 {
     // cache properties for comparison
     public ModelProviderSchema Schema { get; } = customAssistant.Schema;
-    public string Endpoint { get; } = customAssistant.Endpoint;
+    public string Endpoint { get; } = customAssistant.Endpoint.ActualValue.Trim().Trim('/');
     public string? ApiKey { get; } = customAssistant.ApiKey;
     public string ModelId { get; } = customAssistant.ModelId;
 
@@ -46,6 +46,7 @@ public abstract class KernelMixinBase(CustomAssistant customAssistant) : IKernel
             new ChatMessageContent(AuthorRole.System, "You're a helpful assistant."),
             new ChatMessageContent(AuthorRole.User, Prompts.TestPrompt)
         ],
+        GetPromptExecutionSettings(),
         cancellationToken: cancellationToken);
 
     public virtual void Dispose() { }

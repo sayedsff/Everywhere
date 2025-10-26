@@ -134,6 +134,7 @@ public partial class WelcomeViewModel : BusyViewModelBase
         var customAssistant = new CustomAssistant
         {
             Name = LocaleKey.CustomAssistant_Name_Default.I18N(),
+            Icon = new ColoredIcon(ColoredIconType.Text) { Text = "🥳" },
             ApiKey = ApiKey,
             ModelProviderTemplateId = SelectedModelProvider.ProviderTemplate.Id,
             ModelDefinitionTemplateId = SelectedModelDefinition.Id

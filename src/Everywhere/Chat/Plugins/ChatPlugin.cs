@@ -17,10 +17,10 @@ namespace Everywhere.Chat.Plugins;
 public abstract partial class ChatPlugin(string name) : KernelPlugin(name)
 {
     [JsonIgnore]
-    public abstract DynamicResourceKey HeaderKey { get; }
+    public abstract DynamicResourceKeyBase HeaderKey { get; }
 
     [JsonIgnore]
-    public abstract DynamicResourceKey DescriptionKey { get; }
+    public abstract DynamicResourceKeyBase DescriptionKey { get; }
 
     [JsonIgnore]
     public virtual LucideIconKind? Icon => null;
@@ -77,12 +77,7 @@ public abstract partial class ChatPlugin(string name) : KernelPlugin(name)
 /// Chat kernel plugin implemented natively in Everywhere.
 /// </summary>
 /// <param name="name"></param>
-public abstract class BuiltInChatPlugin(string name) : ChatPlugin(name)
-{
-    public override DynamicResourceKey HeaderKey => new($"NativeChatPlugin_{Name}_Header");
-
-    public override DynamicResourceKey DescriptionKey => new($"NativeChatPlugin_{Name}_Description");
-}
+public abstract class BuiltInChatPlugin(string name) : ChatPlugin(name);
 
 /// <summary>
 /// Chat kernel plugin implemented with MCP.

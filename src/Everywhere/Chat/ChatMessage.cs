@@ -1,8 +1,14 @@
 ﻿using System.Collections.Immutable;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using System.Text.Json.Serialization;
 using Avalonia.Controls.Documents;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Everywhere.Chat.Plugins;
 using Everywhere.Serialization;
 using LiveMarkdown.Avalonia;
 using Lucide.Avalonia;
@@ -116,7 +122,7 @@ public partial class AssistantChatMessage : ChatMessage
 
     public override string ToString()
     {
-        var builder = new System.Text.StringBuilder();
+        var builder = new StringBuilder();
         foreach (var span in Spans.AsValueEnumerable().Where(s => s.MarkdownBuilder.Length > 0))
         {
             builder.AppendLine(span.MarkdownBuilder.ToString());
@@ -268,7 +274,7 @@ public partial class ActionChatMessage : ChatMessage
 /// Represents a function call action message in the chat.
 /// </summary>
 [MessagePackObject(AllowPrivate = true, OnlyIncludeKeyedMembers = true)]
-public partial class FunctionCallChatMessage : ChatMessage, IChatMessageWithAttachments
+public partial class FunctionCallChatMessage : ChatMessage, IChatMessageWithAttachments, IChatPluginDisplaySink
 {
     [Key(0)]
     public override AuthorRole Role => AuthorRole.Tool;
@@ -277,9 +283,15 @@ public partial class FunctionCallChatMessage : ChatMessage, IChatMessageWithAtta
     [ObservableProperty]
     public partial LucideIconKind Icon { get; set; }
 
+    /// <summary>
+    /// Obsolete: Use HeaderKey instead.
+    /// </summary>
     [Key(2)]
-    [ObservableProperty]
-    public partial DynamicResourceKey? HeaderKey { get; set; }
+    private DynamicResourceKey? ObsoleteHeaderKey
+    {
+        get => null; // for forward compatibility
+        set => HeaderKey = value;
+    }
 
     [Key(3)]
     public string? Content { get; set; }
@@ -294,20 +306,43 @@ public partial class FunctionCallChatMessage : ChatMessage, IChatMessageWithAtta
     public partial DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 
     [Key(6)]
-    public ObservableList<FunctionCallContent> Calls { get; set; } = [];
+    public List<FunctionCallContent> Calls { get; set; } = [];
 
     [Key(7)]
-    public ObservableList<FunctionResultContent> Results { get; set; } = [];
+    public List<FunctionResultContent> Results { get; set; } = [];
 
     [Key(8)]
     [ObservableProperty]
-
     [NotifyPropertyChangedFor(nameof(ElapsedSeconds))]
     public partial DateTimeOffset FinishedAt { get; set; } = DateTimeOffset.UtcNow;
 
     [IgnoreMember]
     [JsonIgnore]
     public double ElapsedSeconds => Math.Max((FinishedAt - CreatedAt).TotalSeconds, 0);
+
+    [Key(9)]
+    [ObservableProperty]
+    public partial DynamicResourceKeyBase? HeaderKey { get; set; }
+
+    /// <summary>
+    /// The display blocks that make up the content of this function call message,
+    /// which can include text, markdown, progress indicators, file references, and function call/result displays.
+    /// These blocks are rendered in the chat UI to present the function call information to the user.
+    /// And can be serialized for persistence or transmission.
+    /// </summary>
+    /// <remarks>
+    /// The reason why we need to populate the Content property of function call/result display blocks
+    /// is that during deserialization, the references to the actual FunctionCallContent and FunctionResultContent
+    /// objects are not automatically restored. Therefore, we need to manually link them back
+    /// based on their IDs after deserialization. This ensures that the display blocks have access
+    /// to the full details of the function calls and results they are meant to represent.
+    /// </remarks>
+    [Key(10)]
+    public ObservableCollection<ChatPluginDisplayBlock> DisplayBlocks { get; set; } = [];
+
+    [IgnoreMember]
+    [JsonIgnore]
+    public bool IsWaitingForUserInput => DisplayBlocks.Any(db => db.IsWaitingForUserInput);
 
     /// <summary>
     /// Attachments associated with this action message. Used to provide additional context of a tool call result.
@@ -318,9 +353,69 @@ public partial class FunctionCallChatMessage : ChatMessage, IChatMessageWithAtta
     [SerializationConstructor]
     private FunctionCallChatMessage() { }
 
-    public FunctionCallChatMessage(LucideIconKind icon, DynamicResourceKey? headerKey)
+    public FunctionCallChatMessage(LucideIconKind icon, DynamicResourceKeyBase? headerKey)
     {
         Icon = icon;
         HeaderKey = headerKey;
+
+        DisplayBlocks.CollectionChanged += (_, e) =>
+        {
+            OnPropertyChanged(nameof(IsWaitingForUserInput));
+
+            if (e.NewItems is { } newItems)
+            {
+                foreach (var item in newItems.OfType<ChatPluginDisplayBlock>())
+                {
+                    item.PropertyChanged += HandleDisplayBlockPropertyChanged;
+                }
+            }
+
+            if (e.OldItems is { } oldItems)
+            {
+                foreach (var item in oldItems.OfType<ChatPluginDisplayBlock>())
+                {
+                    item.PropertyChanged -= HandleDisplayBlockPropertyChanged;
+                }
+            }
+        };
+
+        void HandleDisplayBlockPropertyChanged(object? sender, PropertyChangedEventArgs args)
+        {
+            if (args.PropertyName == nameof(ChatPluginDisplayBlock.IsWaitingForUserInput)) OnPropertyChanged(nameof(IsWaitingForUserInput));
+        }
+    }
+
+    public void AppendText(string text)
+    {
+        DisplayBlocks.Add(new ChatPluginTextDisplayBlock(text));
+    }
+
+    public void AppendDynamicResourceKey(DynamicResourceKeyBase resourceKey)
+    {
+        DisplayBlocks.Add(new ChatPluginDynamicResourceKeyDisplayBlock(resourceKey));
+    }
+
+    public ObservableStringBuilder AppendMarkdown()
+    {
+        var markdownBlock = new ChatPluginMarkdownDisplayBlock();
+        DisplayBlocks.Add(markdownBlock);
+        return markdownBlock.MarkdownBuilder;
+    }
+
+    public IProgress<double> AppendProgress(DynamicResourceKeyBase headerKey)
+    {
+        var progressBlock = new ChatPluginProgressDisplayBlock(headerKey);
+        DisplayBlocks.Add(progressBlock);
+        return progressBlock.ProgressReporter;
+    }
+
+    public void AppendFileReferences(params IReadOnlyList<ChatPluginFileReference> references)
+    {
+        DisplayBlocks.Add(new ChatPluginFileReferencesDisplayBlock(references));
+    }
+
+    public void AppendFileDifference(TextDifference difference, string originalText)
+    {
+        DisplayBlocks.Add(new ChatPluginFileDifferenceDisplayBlock(difference, originalText));
     }
 }

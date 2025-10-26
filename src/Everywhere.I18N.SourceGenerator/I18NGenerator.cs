@@ -241,63 +241,98 @@ public class I18NSourceGenerator : IIncrementalGenerator
               #nullable enable
 
               using global::System.Diagnostics.CodeAnalysis;
+              using global::System.Globalization;
+              using global::System.Reflection;
               using global::Avalonia.Controls;
+              using global::Avalonia.Styling;
 
               namespace Everywhere.I18N;
 
-              public static class LocaleManager
+              public class LocaleManager : ResourceDictionary
               {
+                  public static LocaleManager Shared => shared ?? throw new InvalidOperationException("LocaleManager is not initialized yet.");
+              
                   public static IEnumerable<string> AvailableLocaleNames => Locales.Keys;
 
-                  private static readonly Dictionary<string, ResourceDictionary> Locales = new();
+                  public static readonly Dictionary<string, ResourceDictionary> Locales = new();
+                  
+                  private static LocaleManager? shared;
 
                   static LocaleManager()
                   {
-                      Avalonia.Threading.Dispatcher.UIThread.InvokeOnDemand(() => 
-                      {
-                          Locales.Add("default", new __default());
+                      Locales.Add("default", new __default());
               """);
 
         foreach (var localeName in localeNames)
         {
             var escapedLocaleName = localeName.Replace("-", "_");
-            sb.AppendLine($"            Locales.Add(\"{localeName}\", new __{escapedLocaleName}());");
+            sb.AppendLine($"        Locales.Add(\"{localeName}\", new __{escapedLocaleName}());");
         }
 
         sb.AppendLine(
             """
-                    });
+                }
+                
+                public LocaleManager()
+                {
+                    if (shared is not null) throw new InvalidOperationException("LocaleManager is already initialized.");
+                    shared = this;
+                    
+                    var cultureInfo = CultureInfo.CurrentUICulture;
+                    string? currentLocale = null;
+                    while (!string.IsNullOrEmpty(cultureInfo.Name))
+                    {
+                        var nameLowered = cultureInfo.Name.ToLower();
+                        if (AvailableLocaleNames.Contains(nameLowered))
+                        {
+                            currentLocale = nameLowered;
+                            break;
+                        }
+                                  
+                        cultureInfo = cultureInfo.Parent;
+                    }
+                                  
+                    CurrentLocale = currentLocale ?? "default";
                 }
                 
                 public delegate void LocaleChangedEventHandler(string? oldLocale, string newLocale);
                 
                 public static event LocaleChangedEventHandler? LocaleChanged;
 
-                public static string? CurrentLocale
+                [field: AllowNull, MaybeNull]
+                public static string CurrentLocale
                 {
-                    get => field;
+                    get => field ?? throw new InvalidOperationException("LocaleManager is not initialized yet.");
                     set
                     {
-                        Avalonia.Threading.Dispatcher.UIThread.InvokeOnDemand(() => 
+                        var dispatcher = Avalonia.Threading.Dispatcher.UIThread;
+                    
+                        if (dispatcher.CheckAccess())
+                        {
+                            SetField();
+                            return;
+                        }
+                        
+                        dispatcher.Invoke(SetField);
+                        
+                        void SetField()
                         {
                             if (field == value) return;
                             
-                            var app = Application.Current!;
-                            if (field != null && Locales.TryGetValue(field, out var oldLocale))
-                            {
-                                app.Resources.MergedDictionaries.Remove(oldLocale);
-                            }
-                            
                             var oldLocaleName = field;
-                            field = value;
-                            if (field is null || !Locales.TryGetValue(field, out var newLocale))
+                            if (value is null || !Locales.TryGetValue(value, out var newLocale))
                             {
-                                (field, newLocale) = Locales.First();
+                                (value, newLocale) = Locales.First();
                             }
                             
-                            app.Resources.MergedDictionaries.Add(newLocale);
+                            field = value;
+                            foreach (var (key, val) in newLocale)
+                            {
+                                Shared[key] = val;
+                            }
+                        
                             LocaleChanged?.Invoke(oldLocaleName, field);
-                        });
+                        }
                     }
                 }
             }

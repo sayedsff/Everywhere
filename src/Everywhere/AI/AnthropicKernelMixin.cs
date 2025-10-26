@@ -1,4 +1,5 @@
 ﻿using Anthropic.SDK;
+using Anthropic.SDK.Messaging;
 using Microsoft.Extensions.AI;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
@@ -15,32 +16,72 @@ public sealed class AnthropicKernelMixin : KernelMixinBase
     public override PromptExecutionSettings GetPromptExecutionSettings(FunctionChoiceBehavior? functionChoiceBehavior = null) => new()
     {
         ModelId = ModelId,
-        ExtensionData = new Dictionary<string, object>
-        {
-            { "temperature", _customAssistant.Temperature },
-            { "top_p", _customAssistant.TopP },
-            { "presence_penalty", _customAssistant.PresencePenalty },
-            { "frequency_penalty", _customAssistant.FrequencyPenalty },
-        },
         FunctionChoiceBehavior = functionChoiceBehavior
     };
 
-    private readonly IChatClient _chatClient;
+    private readonly OptimizedChatClient _client;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AnthropicKernelMixin"/> class.
     /// </summary>
     public AnthropicKernelMixin(CustomAssistant customAssistant) : base(customAssistant)
     {
-        _chatClient = new AnthropicClient(new APIAuthentication(customAssistant.ApiKey))
+        var messagesEndpoint = new AnthropicClient(new APIAuthentication(ApiKey))
         {
-            ApiUrlFormat = customAssistant.Endpoint + "/{0}/{1}"
+            ApiUrlFormat = Endpoint + "/{0}/{1}"
         }.Messages;
-        ChatCompletionService = _chatClient.AsChatCompletionService();
+        _client = new OptimizedChatClient(customAssistant, messagesEndpoint);
+        ChatCompletionService = _client.AsChatCompletionService();
     }
 
     public override void Dispose()
     {
-        _chatClient.Dispose();
+        _client.Dispose();
+    }
+
+    private sealed class OptimizedChatClient(CustomAssistant customAssistant, MessagesEndpoint anthropicClient) : IChatClient
+    {
+        private void BuildOptions(ref ChatOptions? options)
+        {
+            options ??= new ChatOptions();
+
+            double? temperature = customAssistant.Temperature.IsCustomValueSet ? customAssistant.Temperature.ActualValue : null;
+            double? topP = customAssistant.TopP.IsCustomValueSet ? customAssistant.TopP.ActualValue : null;
+            double? presencePenalty = customAssistant.PresencePenalty.IsCustomValueSet ? customAssistant.PresencePenalty.ActualValue : null;
+            double? frequencyPenalty = customAssistant.FrequencyPenalty.IsCustomValueSet ? customAssistant.FrequencyPenalty.ActualValue : null;
+
+            if (temperature is not null) options.Temperature = (float)temperature.Value;
+            if (topP is not null) options.TopP = (float)topP.Value;
+            if (presencePenalty is not null) options.PresencePenalty = (float)presencePenalty.Value;
+            if (frequencyPenalty is not null) options.FrequencyPenalty = (float)frequencyPenalty.Value;
+        }
+
+        public Task<ChatResponse> GetResponseAsync(
+            IEnumerable<ChatMessage> messages,
+            ChatOptions? options = null,
+            CancellationToken cancellationToken = default)
+        {
+            BuildOptions(ref options);
+            return ((IChatClient)anthropicClient).GetResponseAsync(messages, options, cancellationToken);
+        }
+
+        public IAsyncEnumerable<ChatResponseUpdate> GetStreamingResponseAsync(
+            IEnumerable<ChatMessage> messages,
+            ChatOptions? options = null,
+            CancellationToken cancellationToken = default)
+        {
+            BuildOptions(ref options);
+            return ((IChatClient)anthropicClient).GetStreamingResponseAsync(messages, options, cancellationToken);
+        }
+
+        public object? GetService(Type serviceType, object? serviceKey = null)
+        {
+            return ((IChatClient)anthropicClient).GetService(serviceType, serviceKey);
+        }
+
+        public void Dispose()
+        {
+            ((IDisposable)anthropicClient).Dispose();
+        }
     }
 }

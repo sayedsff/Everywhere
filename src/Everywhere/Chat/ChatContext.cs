@@ -17,12 +17,21 @@ public delegate void ChatContextChangedEventHandler(ChatContext context);
 [MessagePackObject(AllowPrivate = true)]
 public partial class ChatContext : ObservableObject, IReadOnlyList<ChatMessageNode>
 {
+    [IgnoreMember]
+    public bool IsTemporary
+    {
+        get;
+        set
+        {
+            // Cannot change IsTemporary if there are messages in the context.
+            if (_messageNodeMap.Count == 0) field = value;
+            else field = false;
+            OnPropertyChanged();
+        }
+    }
+
     [Key(0)]
     public ChatContextMetadata Metadata { get; }
-
-    [IgnoreMember]
-    [ObservableProperty]
-    public partial bool IsRenamingMetadataTitle { get; set; }
 
     /// <summary>
     /// Messages in the current branch.

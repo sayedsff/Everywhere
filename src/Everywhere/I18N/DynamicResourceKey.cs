@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 using Avalonia.Controls;
 using Avalonia.Reactive;
 using Everywhere.Utilities;
@@ -19,6 +20,8 @@ public abstract partial class DynamicResourceKeyBase : IObservable<object?>
     /// <summary>
     /// so why axaml DOES NOT SUPPORT {Binding .^} ???????
     /// </summary>
+    [JsonIgnore]
+    [IgnoreMember]
     public DynamicResourceKeyBase Self => this;
 
     public abstract IDisposable Subscribe(IObserver<object?> observer);
@@ -47,8 +50,7 @@ public partial class DynamicResourceKey(object key) : DynamicResourceKeyBase
     [Key(0)]
     public object Key { get; } = key;
 
-    protected IObservable<object?> GetObservable() =>
-        Application.Current?.Resources.GetResourceObservable(Key, NotFoundConverter) ?? EmptyDynamicResourceKey.Shared;
+    protected IObservable<object?> GetObservable() => LocaleManager.Shared.GetResourceObservable(Key, NotFoundConverter);
 
     private object? NotFoundConverter(object? value) => value is UnsetValueType ? Key : value;
 
@@ -58,12 +60,11 @@ public partial class DynamicResourceKey(object key) : DynamicResourceKeyBase
     [return: NotNullIfNotNull(nameof(key))]
     public static implicit operator DynamicResourceKey?(string? key) => key == null ? null : new DynamicResourceKey(key);
 
-    public static bool Exists(object key) =>
-        Application.Current?.Resources.TryGetResource(key, null, out _) is true;
+    public static bool Exists(object key) => LocaleManager.Shared.TryGetResource(key, null, out _);
 
     public static bool TryResolve(object key, [NotNullWhen(true)] out string? result)
     {
-        if (Application.Current?.Resources.TryGetResource(key, null, out var resource) is true)
+        if (LocaleManager.Shared.TryGetResource(key, null, out var resource))
         {
             result = resource?.ToString() ?? string.Empty;
             return true;
@@ -74,7 +75,7 @@ public partial class DynamicResourceKey(object key) : DynamicResourceKeyBase
     }
 
     public static string Resolve(object key) =>
-        (Application.Current?.Resources.TryGetResource(key, null, out var resource) is true ? resource?.ToString() : key.ToString()) ?? string.Empty;
+        (LocaleManager.Shared.TryGetResource(key, null, out var resource) ? resource?.ToString() : key.ToString()) ?? string.Empty;
 
     public override string? ToString() => Resolve(Key);
 }
@@ -195,7 +196,7 @@ public class JsonDynamicResourceKey : Dictionary<string, string>, IObservable<ob
     public IDisposable Subscribe(IObserver<object?> observer)
     {
         LocaleManager.LocaleChanged += HandleLocaleChanged;
-        PostValue(LocaleManager.CurrentLocale ?? "default");
+        PostValue(LocaleManager.CurrentLocale);
 
         return new AnonymousDisposable(() =>
         {
@@ -229,11 +230,4 @@ public class JsonDynamicResourceKey : Dictionary<string, string>, IObservable<ob
 public class DynamicResourceKeyAttribute(string key) : Attribute
 {
     public string Key { get; } = key;
-}
-
-public static class DynamicResourceKeyExtension
-{
-    public static string I18N(this string key) => DynamicResourceKey.Resolve(key);
-
-    public static string I18N(this string key, params DynamicResourceKeyBase[] args) => new FormattedDynamicResourceKey(key, args).ToString();
 }

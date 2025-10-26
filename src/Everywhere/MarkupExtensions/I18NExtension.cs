@@ -23,6 +23,12 @@ public class I18NExtension : MarkupExtension
 
     public CultureInfo? ConverterCulture { get; set; }
 
+    /// <summary>
+    /// Whether to resolve the resource key immediately. If true, the extension will return the resolved value directly.
+    /// If false, it will return a binding that resolves the value at runtime.
+    /// </summary>
+    public bool Resolve { get; set; }
+
     public I18NExtension() { }
 
     [SetsRequiredMembers]
@@ -37,7 +43,7 @@ public class I18NExtension : MarkupExtension
             return new MultiBinding
             {
                 Bindings = [binding],
-                Converter = new BindingResolver(target)
+                Converter = Resolve ? null : new BindingResolver(target) // only use BindingResolver when not resolving immediately
             };
         }
 
@@ -53,7 +59,8 @@ public class I18NExtension : MarkupExtension
                 }).ToList()),
             _ => new DynamicResourceKey(Key)
         };
-        return target?.TargetProperty is AvaloniaProperty ?
+        return Resolve ?
+            dynamicResourceKey.ToString() ?? string.Empty :
             new Binding
             {
                 Path = $"{nameof(DynamicResourceKeyBase.Self)}^",
@@ -61,8 +68,7 @@ public class I18NExtension : MarkupExtension
                 Converter = Converter,
                 ConverterParameter = ConverterParameter,
                 ConverterCulture = ConverterCulture,
-            } :
-            dynamicResourceKey.ToString() ?? string.Empty; // Only AvaloniaProperty can resolve binding, otherwise return resolved string
+            };
     }
 
     private sealed class BindingResolver : IObserver<object?>, IMultiValueConverter
