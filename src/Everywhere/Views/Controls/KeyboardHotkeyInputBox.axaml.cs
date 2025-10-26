@@ -50,7 +50,6 @@ public partial class KeyboardHotkeyInputBox : UserControl
 
         if (_hotkeyScope is not null) return;
 
-        // 改变水印文本为"设置中"
         HotKeyTextBox.Watermark = LocaleKey.KeyboardHotkeyInputBox_SettingWatermark.I18N();
 
         _hotkeyScope = ServiceLocator.Resolve<IHotkeyListener>().StartCaptureKeyboardHotkey();
@@ -71,7 +70,6 @@ public partial class KeyboardHotkeyInputBox : UserControl
     {
         base.OnLostFocus(e);
 
-        // 恢复原始水印文本
         HotKeyTextBox.Watermark = LocaleKey.KeyboardHotkeyInputBox_Watermark.I18N();
 
         TopLevel.GetTopLevel(this)?.Focus(); // Ensure the focus is moved away from this control.
