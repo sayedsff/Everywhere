@@ -14,8 +14,8 @@
 public readonly record struct FileRecord(
     string FullPath,
     long BytesSize,
-    DateTime Created,
-    DateTime Modified,
+    DateTime? Created,
+    DateTime? Modified,
     FileAttributes Attributes
 )
 {
@@ -42,5 +42,7 @@ public readonly record struct FileRecord(
         return $"{len:0.##} {sizes[order]}";
     }
 
-    public override string ToString() => $"{FullPath}\t{HumanizedSize}\t{Created:G}\t{Modified:G}\t{Attributes}";
+    private static string HumanizeDate(DateTime? date) => date?.ToString("G") ?? "N/A";
+
+    public override string ToString() => $"{FullPath}\t{HumanizedSize}\t{HumanizeDate(Created)}\t{HumanizeDate(Modified)}\t{Attributes}";
 }

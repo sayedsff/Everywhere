@@ -1264,4 +1264,7 @@ Placeholders can be used within the prompt, enclosed in {}, and will be replaced
     <data name="NativeChatPlugin_VisualTree_ExecuteVisualActionQueue_Header" xml:space="preserve">
         <value>Operate UI elements</value>
     </data>
+    <data name="NativeChatPlugin_Everything_SearchFiles_Header" xml:space="preserve">
+        <value>Search Files via Everything</value>
+    </data>
 </root>

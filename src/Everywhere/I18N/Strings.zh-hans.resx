@@ -50,7 +50,7 @@
         <value>快捷键</value>
     </data>
     <data name="Settings_ChatWindow_Shortcut_Description" xml:space="preserve">
-        <value>设置一个快捷键，在任何时候按下即可唤出聊天悬浮窗。</value>
+        <value>设置一个快捷键，在任何时候按下即可唤出聊天窗口。</value>
     </data>
     <data name="SettingsCategory_Model_Header" xml:space="preserve">
         <value>AI 设置</value>
@@ -1247,5 +1247,8 @@
     </data>
     <data name="NativeChatPlugin_VisualTree_ExecuteVisualActionQueue_Header" xml:space="preserve">
         <value>操作 UI 元素</value>
+    </data>
+    <data name="NativeChatPlugin_Everything_SearchFiles_Header" xml:space="preserve">
+        <value>使用 Everything 搜索文件</value>
     </data>
 </root>

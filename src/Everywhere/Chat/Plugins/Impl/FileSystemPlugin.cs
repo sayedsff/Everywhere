@@ -89,13 +89,9 @@ public class FileSystemPlugin : BuiltInChatPlugin
         ExpandFullPath(ref path);
         var query = EnsureDirectoryInfo(path)
             .EnumerateFileSystemInfos("*", SearchOption.AllDirectories)
-            .Where(info => regex.IsMatch(info.Name))
-            .Select(info => new FileRecord(
-                info.Name,
-                info is FileInfo file ? file.Length : -1,
-                info.CreationTime,
-                info.LastWriteTime,
-                info.Attributes));
+            .Select(TryCreateFileRecord)
+            .Where(r => r.HasValue) // filter out nulls
+            .Select(r => r!.Value);
 
         query = orderBy switch
         {
@@ -107,6 +103,26 @@ public class FileSystemPlugin : BuiltInChatPlugin
         };
 
         return new FileRecords(query.Skip(skip).Take(maxCount)).ToString();
+
+        // Use try...catch to avoid issues with inaccessible files which can break the whole enumeration
+        FileRecord? TryCreateFileRecord(FileSystemInfo info)
+        {
+            try
+            {
+                if (!regex.IsMatch(info.Name)) return null;
+
+                return new FileRecord(
+                    info.Name,
+                    info is FileInfo file ? file.Length : -1,
+                    info.CreationTime,
+                    info.LastWriteTime,
+                    info.Attributes);
+            }
+            catch
+            {
+                return null;
+            }
+        }
     }
 
     [KernelFunction("get_file_info")]

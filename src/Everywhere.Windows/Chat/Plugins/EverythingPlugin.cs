@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using EverythingNet.Core;
+using EverythingNet.Interfaces;
 using Everywhere.Chat.Permissions;
 using Everywhere.Chat.Plugins;
 using Everywhere.I18N;
@@ -29,7 +30,7 @@ public class EverythingPlugin : BuiltInChatPlugin
 
         _functions.Add(
             new NativeChatFunction(
-                SearchAsync,
+                SearchFilesAsync,
                 ChatFunctionPermissions.FileRead));
     }
 
@@ -53,7 +54,8 @@ public class EverythingPlugin : BuiltInChatPlugin
 
     [KernelFunction("search_files")]
     [Description("Search files using Everything search engine.")]
-    private async Task<string> SearchAsync(
+    [DynamicResourceKey(LocaleKey.NativeChatPlugin_Everything_SearchFiles_Header)]
+    private async Task<string> SearchFilesAsync(
         [Description("Standard search pattern in Everything search engine.")] string searchPattern,
         [Description("Maximum number of results to return. Default is 50 and will be limited to 1000.")] int maxResults = 50,
         CancellationToken cancellationToken = default)
@@ -72,15 +74,29 @@ public class EverythingPlugin : BuiltInChatPlugin
                     var results = everything
                         .SendSearch(searchPattern, default)
                         .Take(Math.Min(maxResults, 1000))
-                        .Select(r => new FileRecord(
-                            r.FullPath,
-                            r.IsFile ? r.Size : -1,
-                            r.Created,
-                            r.Modified,
-                            (int)r.Attributes == -1 ? FileAttributes.None : (FileAttributes)r.Attributes));
+                        .Select(CreateFileRecord);
                     return new FileRecords(results, everything.Count).ToString();
                 },
                 cancellationToken)
             .WaitAsync(TimeSpan.FromSeconds(10), cancellationToken);
+
+        static FileRecord CreateFileRecord(ISearchResult result)
+        {
+            var fullPath = result.FullPath;
+            var bytesSize = result.IsFile ? result.Size : -1;
+
+            try
+            {
+                var created = result.Created;
+                var modified = result.Modified;
+                var attributes = (int)result.Attributes == -1 ? FileAttributes.None : (FileAttributes)result.Attributes;
+                return new FileRecord(fullPath, bytesSize, created, modified, attributes);
+            }
+            catch
+            {
+                // use default values if any exception occurs
+                return new FileRecord(fullPath, bytesSize, null, null, FileAttributes.None);
+            }
+        }
     }
 }
