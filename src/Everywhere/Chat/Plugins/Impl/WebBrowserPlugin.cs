@@ -167,7 +167,8 @@ public partial class WebBrowserPlugin : BuiltInChatPlugin
     /// Only use this method if you are aware of the potential risks and have validated the input to prevent security vulnerabilities.
     /// </remarks>
     [KernelFunction("web_search")]
-    [Description("Perform a web search and return the results as a json array of web pages. " +
+    [Description(
+        "Perform a web search and return the results as a json array of web pages. " +
         "You can use the results to answer user questions with up-to-date information.")] // TODO: index
     [DynamicResourceKey(LocaleKey.NativeChatPlugin_WebBrowser_WebSearch_Header)]
     private async Task<string> WebSearchAsync(
@@ -323,16 +324,12 @@ public partial class WebBrowserPlugin : BuiltInChatPlugin
 
                 var node = await page.Accessibility.SnapshotAsync();
                 var json = JsonSerializer.Serialize(
-                    new
-                    {
+                    new WebSnapshotResult(
                         node.Name,
-                        Elements = node.Children.Select(n => new
-                        {
+                        node.Children.Select(n => new WebSnapshotElement(
                             n.Name,
                             n.Description,
-                            n.Role
-                        })
-                    },
+                            n.Role))),
                     _jsonSerializerOptions);
 
                 return json;
@@ -353,9 +350,22 @@ public partial class WebBrowserPlugin : BuiltInChatPlugin
         [property: JsonPropertyName("index")] int Index,
         [property: JsonPropertyName("name")] string Name,
         [property: JsonPropertyName("url")] string Url,
-        [property: JsonPropertyName("snippet")] string Snippet);
+        [property: JsonPropertyName("snippet")] string Snippet
+    );
+
+    private sealed record WebSnapshotResult(
+        [property: JsonPropertyName("name")] string? Name,
+        [property: JsonPropertyName("elements")] IEnumerable<WebSnapshotElement> Elements
+    );
+
+    private sealed record WebSnapshotElement(
+        [property: JsonPropertyName("name")] string? Name,
+        [property: JsonPropertyName("description")] string? Description,
+        [property: JsonPropertyName("role")] string Role
+    );
 
     [JsonSerializable(typeof(List<IndexedWebPage>))]
+    [JsonSerializable(typeof(WebSnapshotResult))]
     private partial class GeneratedJsonSerializationContext : JsonSerializerContext;
 
     private class TavilyConnector(string apiKey, Uri? uri, ILoggerFactory? loggerFactory) : IWebSearchEngineConnector
