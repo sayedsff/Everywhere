@@ -355,8 +355,8 @@ public record ModelProviderTemplate
                 {
                     Id = "deepseek-chat",
                     ModelId = "deepseek-chat",
-                    DisplayName = "DeepSeek V3",
-                    MaxTokens = 64_000,
+                    DisplayName = "DeepSeek V3.2 Exp (Non-thinking Mode)",
+                    MaxTokens = 128_000,
                     IsImageInputSupported = false,
                     IsFunctionCallingSupported = true,
                     IsDeepThinkingSupported = false,
@@ -366,8 +366,8 @@ public record ModelProviderTemplate
                 {
                     Id = "deepseek-reasoner",
                     ModelId = "deepseek-reasoner",
-                    DisplayName = "DeepSeek R1",
-                    MaxTokens = 64_000,
+                    DisplayName = "DeepSeek V3.2 Exp (Thinking Mode)",
+                    MaxTokens = 128_000,
                     IsImageInputSupported = false,
                     IsFunctionCallingSupported = true,
                     IsDeepThinkingSupported = true,
