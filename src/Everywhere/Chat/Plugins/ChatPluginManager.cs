@@ -82,13 +82,15 @@ public class ChatPluginManager : IChatPluginManager
 
     public IChatPluginScope CreateScope(ChatContext chatContext, CustomAssistant customAssistant)
     {
+        // Ensure that functions in the scope do not have the same name.
+        var functionNames = new HashSet<string>();
         return new ChatPluginScope(
             _builtInPlugins
                 .AsValueEnumerable()
                 .Cast<ChatPlugin>()
                 .Concat(_mcpPlugins)
                 .Where(p => p.IsEnabled)
-                .Select(p => new ChatPluginSnapshot(p, chatContext, customAssistant))
+                .Select(p => new ChatPluginSnapshot(p, chatContext, customAssistant, functionNames))
                 .ToList());
     }
 
@@ -130,12 +132,31 @@ public class ChatPluginManager : IChatPluginManager
         public ChatPluginSnapshot(
             ChatPlugin originalChatPlugin,
             ChatContext chatContext,
-            CustomAssistant customAssistant
-        ) : base(originalChatPlugin.Name)
+            CustomAssistant customAssistant,
+            HashSet<string> functionNames) : base(originalChatPlugin.Name)
         {
             _originalChatPlugin = originalChatPlugin;
             AllowedPermissions = originalChatPlugin.AllowedPermissions.ActualValue;
-            _functions.AddRange(originalChatPlugin.SnapshotFunctions(chatContext, customAssistant));
+            _functions.AddRange(
+                originalChatPlugin
+                    .SnapshotFunctions(chatContext, customAssistant)
+                    .Select(EnsureUniqueFunctionName));
+
+            ChatFunction EnsureUniqueFunctionName(ChatFunction function)
+            {
+                var metadata = function.KernelFunction.Metadata;
+                if (functionNames.Add(metadata.Name)) return function;
+
+                var postfix = 1;
+                string newName;
+                do
+                {
+                    newName = $"{metadata.Name}_{postfix++}";
+                }
+                while (!functionNames.Add(newName));
+                metadata.Name = newName;
+                return function;
+            }
         }
     }
 }

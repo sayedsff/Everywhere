@@ -24,6 +24,7 @@ public interface IChatPluginManager
     /// <summary>
     /// Creates a new scope for available chat plugins and their functions.
     /// This method should be lightweight and fast, as it is called frequently.
+    /// Functions in the scope must not have the same name.
     /// </summary>
     /// <returns></returns>
     IChatPluginScope CreateScope(ChatContext chatContext, CustomAssistant customAssistant);
