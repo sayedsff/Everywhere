@@ -1,3 +1,22 @@
+## [v0.4.1](https://github.com/DearVa/Everywhere/releases/tag/v0.4.1) - 2025-10-27
+
+### ⚠️ BREAKING CHANGE: Chat window shortcut will reset to `Ctrl+Shift+E` due to renaming "Hotkey" to "Shortcut".
+
+### 🚀 Improvements
+- Renamed DeepSeek models to their new official names
+- I18N: Changed "Hotkey" to "Shortcut"
+- Refactored "operate UI elements" chat function for better stability
+
+### 🐛 Bug Fixes
+- Fixed window cannot maximize when clicking the maximize button
+- Fixed "Web snapshot" chat function not working
+- Fixed "everything" chat function cannot work when "file system" chat function is enabled
+- Fixed token counting may be bigger than actual usage in some cases
+
+**Full Changelog**: https://github.com/DearVa/Everywhere/compare/v0.4.0...v0.4.1
+
+
+
 ## [v0.4.0](https://github.com/DearVa/Everywhere/releases/tag/v0.4.0) - 2025-10-26
 
 ### ✨ Features
