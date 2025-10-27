@@ -1253,7 +1253,7 @@ Placeholders can be used within the prompt, enclosed in {}, and will be replaced
         <value>{0} Urls</value>
     </data>
     <data name="NativeChatPlugin_PowerShell_ExecuteScript_ScriptConsent_Header" xml:space="preserve">
-        <value>The following terminal commands will be executed</value>
+        <value>The following terminal script will be executed</value>
     </data>
     <data name="NativeChatPlugin_VisualTree_CaptureVisualElementById_Header" xml:space="preserve">
         <value>Capture UI Element</value>
@@ -1266,5 +1266,8 @@ Placeholders can be used within the prompt, enclosed in {}, and will be replaced
     </data>
     <data name="NativeChatPlugin_Everything_SearchFiles_Header" xml:space="preserve">
         <value>Search Files via Everything</value>
+    </data>
+    <data name="NativeChatPlugin_PowerShell_ExecuteScript_Header" xml:space="preserve">
+        <value>Execute Script</value>
     </data>
 </root>

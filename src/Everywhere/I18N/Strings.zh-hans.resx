@@ -1237,7 +1237,7 @@
         <value>{0} 个链接</value>
     </data>
     <data name="NativeChatPlugin_PowerShell_ExecuteScript_ScriptConsent_Header" xml:space="preserve">
-        <value>即将执行下列终端命令</value>
+        <value>即将执行下列终端脚本</value>
     </data>
     <data name="NativeChatPlugin_VisualTree_CaptureVisualElementById_Header" xml:space="preserve">
         <value>UI 元素截图</value>
@@ -1250,5 +1250,8 @@
     </data>
     <data name="NativeChatPlugin_Everything_SearchFiles_Header" xml:space="preserve">
         <value>使用 Everything 搜索文件</value>
+    </data>
+    <data name="NativeChatPlugin_PowerShell_ExecuteScript_Header" xml:space="preserve">
+        <value>执行脚本</value>
     </data>
 </root>

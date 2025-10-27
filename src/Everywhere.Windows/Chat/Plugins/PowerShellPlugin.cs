@@ -51,6 +51,7 @@ public class PowerShellPlugin : BuiltInChatPlugin
 
     [KernelFunction("execute_script")]
     [Description("Execute PowerShell script and obtain its output.")]
+    [DynamicResourceKey(LocaleKey.NativeChatPlugin_PowerShell_ExecuteScript_Header)]
     private async Task<string> ExecuteScriptAsync(
         [FromKernelServices] IChatPluginUserInterface userInterface,
         [Description("A concise description for user, explaining what you are doing")] string description,

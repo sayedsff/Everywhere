@@ -218,7 +218,12 @@ public class JsonDynamicResourceKey : Dictionary<string, string>, IObservable<ob
 }
 
 [AttributeUsage(AttributeTargets.All)]
-public class DynamicResourceKeyAttribute(string key) : Attribute
+public class DynamicResourceKeyAttribute(string headerKey, string? descriptionKey = null) : Attribute
 {
-    public string Key { get; } = key;
+    public string HeaderKey { get; } = headerKey;
+
+    /// <summary>
+    /// The optional description key.
+    /// </summary>
+    public string? DescriptionKey { get; } = descriptionKey;
 }

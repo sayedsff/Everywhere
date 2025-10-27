@@ -29,7 +29,7 @@ public class DynamicResourceKeyConverter : IValueConverter
             attribute = type.GetCustomAttributes<DynamicResourceKeyAttribute>(true).FirstOrDefault();
         }
 
-        return attribute is null ? null : new DynamicResourceKey(attribute.Key);
+        return attribute is null ? null : new DynamicResourceKey(attribute.HeaderKey);
     }
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

@@ -249,7 +249,7 @@ public class SettingsSelectionItem(string name) : SettingsItem(name)
                 if (Enum.GetName(enumType, x) is { } enumName &&
                     enumType.GetField(enumName)?.GetCustomAttribute<DynamicResourceKeyAttribute>() is { } ppAttribute)
                 {
-                    return new Item(new DynamicResourceKey(ppAttribute.Key), x, null);
+                    return new Item(new DynamicResourceKey(ppAttribute.HeaderKey), x, null);
                 }
 
                 return new Item(new DirectResourceKey(x), x, null);
