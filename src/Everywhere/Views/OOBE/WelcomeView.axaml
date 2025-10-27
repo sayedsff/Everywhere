@@ -155,15 +155,15 @@
         </ListBox>
 
         <ListBox Classes="AssistantMessage">
-          <TextBlock Text="{I18N {x:Static LocaleKey.WelcomeView_HotkeyStep_Message1}}"/>
-          <v:KeyboardHotkeyInputBox
+          <TextBlock Text="{I18N {x:Static LocaleKey.WelcomeView_ShortcutStep_Message1}}"/>
+          <v:KeyboardShortcutInputBox
             MinWidth="160" MinHeight="32"
             Margin="-10,-6" Background="Transparent"
             BorderThickness="0"
-            Hotkey="{Binding Settings.ChatWindow.Hotkey, Mode=TwoWay}"/>
+            Shortcut="{Binding Settings.ChatWindow.Shortcut, Mode=TwoWay}"/>
           <TextBlock
             Classes="Muted"
-            Text="{I18N {x:Static LocaleKey.WelcomeView_HotkeyStep_Message2}}"/>
+            Text="{I18N {x:Static LocaleKey.WelcomeView_ShortcutStep_Message2}}"/>
         </ListBox>
 
         <ListBox Classes="AssistantMessage">
@@ -259,7 +259,7 @@
           <Button
             Classes="Primary" Grid.Row="1"
             Grid.Column="1"
-            Command="{Binding GoToHotkeyStepCommand}"
+            Command="{Binding GoToShortcutStepCommand}"
             Content="{I18N {x:Static LocaleKey.WelcomeView_NextStepButton_Content}}"
             IsVisible="{Binding IsApiKeyValid}"/>
           <Button
@@ -297,7 +297,7 @@
       HorizontalAlignment="Right" VerticalAlignment="Top"
       Command="{Binding CloseCommand}"
       Content="{I18N {x:Static LocaleKey.WelcomeView_SkipButton_Content}}"
-      IsVisible="{Binding CurrentStep, Converter={x:Static ObjectConverters.NotEqual}, ConverterParameter={x:Static vm:WelcomeViewModel+Step.Hotkey}}"/>
+      IsVisible="{Binding CurrentStep, Converter={x:Static ObjectConverters.NotEqual}, ConverterParameter={x:Static vm:WelcomeViewModel+Step.Shortcut}}"/>
 
     <v:ConfettiEffect
       x:Name="ConfettiEffect" Grid.Row="0"

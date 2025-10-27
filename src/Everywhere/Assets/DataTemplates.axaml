@@ -26,15 +26,15 @@
     <TextBlock Text="{Binding DisplayName, FallbackValue={x:Null}}"/>
   </DataTemplate>
 
-  <DataTemplate x:Key="{x:Type interop:KeyboardHotkey}">
+  <DataTemplate x:Key="{x:Type interop:KeyboardShortcut}">
     <DataTemplate.DataType>
       <x:Type
-        x:TypeArguments="interop:KeyboardHotkey" TypeName="c:SettingsTypedItem"/>
+        x:TypeArguments="interop:KeyboardShortcut" TypeName="c:SettingsTypedItem"/>
     </DataTemplate.DataType>
-    <v:KeyboardHotkeyInputBox
+    <v:KeyboardShortcutInputBox
       MinWidth="160" MinHeight="32"
       HorizontalAlignment="Left"
-      Hotkey="{Binding Value, Mode=TwoWay}"/>
+      Shortcut="{Binding Value, Mode=TwoWay}"/>
   </DataTemplate>
 
   <DataTemplate x:Key="{x:Type common:ColoredIcon}">

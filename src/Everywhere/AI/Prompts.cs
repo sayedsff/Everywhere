@@ -34,6 +34,7 @@ public static partial class Prompts
         2. Guess my intentions
         
         After analyzing the visual tree, prepare a reply that addresses my mission after <mission-start> tag.
+        Note that the visual tree may not include all elements on the screen and may be truncated for brevity.
         
         ```xml
         {VisualTree}

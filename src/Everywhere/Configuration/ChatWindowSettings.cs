@@ -13,7 +13,7 @@ public partial class ChatWindowSettings : SettingsCategory
     public override LucideIconKind Icon => LucideIconKind.MessageCircle;
 
     [ObservableProperty]
-    public partial KeyboardHotkey Hotkey { get; set; } = new(Key.E, KeyModifiers.Control | KeyModifiers.Shift);
+    public partial KeyboardShortcut Shortcut { get; set; } = new(Key.E, KeyModifiers.Control | KeyModifiers.Shift);
 
     [ObservableProperty]
     public partial ChatWindowPinMode WindowPinMode { get; set; }

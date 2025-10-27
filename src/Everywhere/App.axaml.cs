@@ -48,7 +48,7 @@ public class App : Application
 
                     .AddSingleton<IRuntimeConstantProvider, DesignTimeRuntimeConstantProvider>()
                     .AddSingleton<IVisualElementContext, DesignTimeVisualElementContext>()
-                    .AddSingleton<IHotkeyListener, DesignTimeHotkeyListener>()
+                    .AddSingleton<IShortcutListener, DesignTimeShortcutListener>()
                     .AddSingleton<INativeHelper, DesignTimeNativeHelper>()
                     .AddSingleton<Settings>()
 
@@ -96,7 +96,7 @@ public class App : Application
                 NativeMessageBoxIcon.Error);
         }
 
-        Log.Logger.Information("Application started");
+        Log.ForContext<App>().Information("Application started");
     }
 
     public override void OnFrameworkInitializationCompleted()
@@ -213,11 +213,11 @@ file class DesignTimeVisualElementContext : IVisualElementContext
     public Task<IVisualElement?> PickElementAsync(PickElementMode mode) => Task.FromResult<IVisualElement?>(null);
 }
 
-file class DesignTimeHotkeyListener : IHotkeyListener
+file class DesignTimeShortcutListener : IShortcutListener
 {
-    public IDisposable Register(KeyboardHotkey hotkey, Action handler) => throw new NotSupportedException();
-    public IDisposable Register(MouseHotkey hotkey, Action handler) => throw new NotSupportedException();
-    public IKeyboardHotkeyScope StartCaptureKeyboardHotkey() => throw new NotSupportedException();
+    public IDisposable Register(KeyboardShortcut shortcut, Action handler) => throw new NotSupportedException();
+    public IDisposable Register(MouseShortcut shortcut, Action handler) => throw new NotSupportedException();
+    public IKeyboardShortcutScope StartCaptureKeyboardShortcut() => throw new NotSupportedException();
 }
 
 file class DesignTimeNativeHelper : INativeHelper

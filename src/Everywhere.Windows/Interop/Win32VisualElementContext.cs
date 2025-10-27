@@ -1,37 +1,36 @@
 ﻿using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
+using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Windows.Win32.UI.WindowsAndMessaging;
 using Avalonia;
-using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Input;
 using Avalonia.Platform;
 using Avalonia.Threading;
 using Everywhere.Common;
 using Everywhere.Extensions;
 using Everywhere.I18N;
 using Everywhere.Interop;
+using Everywhere.Windows.Extensions;
 using FlaUI.Core;
 using FlaUI.Core.AutomationElements;
 using FlaUI.Core.Definitions;
-using FlaUI.Core.Input;
-using FlaUI.Core.WindowsAPI;
 using FlaUI.Core.Patterns.Infrastructure;
 using FlaUI.UIA3;
 using Microsoft.Extensions.Logging;
-using ZLinq;
-using Application = Avalonia.Application;
 using Bitmap = Avalonia.Media.Imaging.Bitmap;
+using IDataObject = System.Windows.IDataObject;
+using INPUT = Windows.Win32.UI.Input.KeyboardAndMouse.INPUT;
+using KEYBDINPUT = Windows.Win32.UI.Input.KeyboardAndMouse.KEYBDINPUT;
 using PixelFormat = System.Drawing.Imaging.PixelFormat;
 using Point = System.Drawing.Point;
 using Size = System.Drawing.Size;
 using Vector = Avalonia.Vector;
-using WindowState = Avalonia.Controls.WindowState;
 
 namespace Everywhere.Windows.Interop;
 
@@ -397,58 +396,26 @@ public partial class Win32VisualElementContext : IVisualElementContext
             }
         }
 
-        private static IEnumerable<VirtualKeyShort> MapModifiers(VirtualKey modifiers)
+        public void Invoke()
         {
-            if (modifiers.HasFlag(VirtualKey.Control)) yield return VirtualKeyShort.CONTROL;
-            if (modifiers.HasFlag(VirtualKey.Shift)) yield return VirtualKeyShort.SHIFT;
-            if (modifiers.HasFlag(VirtualKey.Alt)) yield return VirtualKeyShort.LMENU;
-            if (modifiers.HasFlag(VirtualKey.Windows)) yield return VirtualKeyShort.LWIN;
-        }
-
-        private static VirtualKeyShort MapVirtualKey(VirtualKey key) => key switch
-        {
-            VirtualKey.Enter => VirtualKeyShort.RETURN,
-            VirtualKey.Backspace => VirtualKeyShort.BACK,
-            VirtualKey.Tab => VirtualKeyShort.TAB,
-            VirtualKey.Escape => VirtualKeyShort.ESC,
-            VirtualKey.Space => VirtualKeyShort.SPACE,
-            VirtualKey.Left => VirtualKeyShort.LEFT,
-            VirtualKey.Up => VirtualKeyShort.UP,
-            VirtualKey.Right => VirtualKeyShort.RIGHT,
-            VirtualKey.Down => VirtualKeyShort.DOWN,
-            VirtualKey.Delete => VirtualKeyShort.DELETE,
-            VirtualKey.A => VirtualKeyShort.KEY_A,
-            VirtualKey.B => VirtualKeyShort.KEY_B,
-            VirtualKey.C => VirtualKeyShort.KEY_C,
-            VirtualKey.V => VirtualKeyShort.KEY_V,
-            VirtualKey.X => VirtualKeyShort.KEY_X,
-            VirtualKey.Y => VirtualKeyShort.KEY_Y,
-            VirtualKey.Z => VirtualKeyShort.KEY_Z,
-            _ => (VirtualKeyShort)((int)key & 0x00FF)
-        };
-
-        public Task InvokeAsync(CancellationToken cancellationToken = default)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
             try
             {
                 if (element.Patterns.Invoke.TryGetPattern() is { } invokePattern)
                 {
                     invokePattern.Invoke();
-                    return Task.CompletedTask;
+                    return;
                 }
 
                 if (element.Patterns.Toggle.TryGetPattern() is { } togglePattern)
                 {
                     togglePattern.Toggle();
-                    return Task.CompletedTask;
+                    return;
                 }
 
                 if (element.Patterns.SelectionItem.TryGetPattern() is { } selectionItemPattern)
                 {
                     selectionItemPattern.Select();
-                    return Task.CompletedTask;
+                    return;
                 }
 
                 if (element.Patterns.ExpandCollapse.TryGetPattern() is { } expandCollapsePattern)
@@ -463,13 +430,12 @@ public partial class Win32VisualElementContext : IVisualElementContext
                         expandCollapsePattern.Collapse();
                     }
 
-                    return Task.CompletedTask;
+                    return;
                 }
 
                 if (element.Patterns.LegacyIAccessible.TryGetPattern() is { } legacyPattern)
                 {
                     legacyPattern.DoDefaultAction();
-                    return Task.CompletedTask;
                 }
             }
             catch (COMException ex)
@@ -484,11 +450,8 @@ public partial class Win32VisualElementContext : IVisualElementContext
             throw new NotSupportedException("The target element does not expose an invoke-capable automation pattern.");
         }
 
-        public Task SetTextAsync(string text, CancellationToken cancellationToken = default)
+        public void SetText(string text)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            text ??= string.Empty;
-
             try
             {
                 if (element.Patterns.Value.TryGetPattern() is { } valuePattern)
@@ -499,8 +462,7 @@ public partial class Win32VisualElementContext : IVisualElementContext
                     }
 
                     element.Focus();
-                    valuePattern.SetValue(text);
-                    return Task.CompletedTask;
+                    new TextBox(element.FrameworkAutomationElement).Text = text;
                 }
             }
             catch (COMException ex)
@@ -515,38 +477,55 @@ public partial class Win32VisualElementContext : IVisualElementContext
             throw new NotSupportedException("The target element does not support programmatic text input.");
         }
 
-        public Task SendShortcutAsync(VisualElementShortcut shortcut, CancellationToken cancellationToken = default)
+        public void SendShortcut(KeyboardShortcut shortcut)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            if (shortcut.Key == VirtualKey.None)
-            {
-                throw new ArgumentException("Shortcut key cannot be None.", nameof(shortcut));
-            }
-
             EnsureFocusable();
 
-            try
-            {
-                var modifiers = MapModifiers(shortcut.Modifiers).ToList();
-                foreach (var modifier in modifiers)
-                {
-                    Keyboard.Press(modifier);
-                }
+            // Use PInvoke.SendInput to send the shortcut to the focused element.
+            var inputs = new List<INPUT>();
+            if (shortcut.Modifiers.HasFlag(KeyModifiers.Control)) MakeInputs(VIRTUAL_KEY.VK_CONTROL);
+            if (shortcut.Modifiers.HasFlag(KeyModifiers.Alt)) MakeInputs(VIRTUAL_KEY.VK_MENU);
+            if (shortcut.Modifiers.HasFlag(KeyModifiers.Shift)) MakeInputs(VIRTUAL_KEY.VK_SHIFT);
+            if (shortcut.Modifiers.HasFlag(KeyModifiers.Meta)) MakeInputs(VIRTUAL_KEY.VK_LWIN);
+            MakeInputs(shortcut.Key.ToVirtualKey());
 
-                Keyboard.Type(MapVirtualKey(shortcut.Key));
-
-                foreach (var modifier in Enumerable.Reverse(modifiers))
-                {
-                    Keyboard.Release(modifier);
-                }
-            }
-            catch (Exception ex) when (IsAutomationException(ex))
+            var result = PInvoke.SendInput(CollectionsMarshal.AsSpan(inputs), Marshal.SizeOf<INPUT>());
+            if (result == 0)
             {
-                throw new InvalidOperationException("Failed to send shortcut through UI Automation.", ex);
+                throw new Win32Exception(Marshal.GetLastWin32Error(), "Failed to send keyboard input to the target element.");
             }
 
-            return Task.CompletedTask;
+            void MakeInputs(VIRTUAL_KEY vk)
+            {
+                inputs.InsertRange(
+                    inputs.Count / 2,
+                    [
+                        new INPUT
+                        {
+                            type = INPUT_TYPE.INPUT_KEYBOARD,
+                            Anonymous = new INPUT._Anonymous_e__Union
+                            {
+                                ki = new KEYBDINPUT
+                                {
+                                    wVk = vk,
+                                    dwFlags = 0,
+                                }
+                            }
+                        },
+                        new INPUT
+                        {
+                            type = INPUT_TYPE.INPUT_KEYBOARD,
+                            Anonymous = new INPUT._Anonymous_e__Union
+                            {
+                                ki = new KEYBDINPUT
+                                {
+                                    wVk = vk,
+                                    dwFlags = KEYBD_EVENT_FLAGS.KEYEVENTF_KEYUP,
+                                }
+                            }
+                        },
+                    ]);
+            }
         }
 
         public string? GetSelectionText()
@@ -855,14 +834,11 @@ public partial class Win32VisualElementContext : IVisualElementContext
 
         public string? GetText(int maxLength = -1) => null;
 
-        public Task InvokeAsync(CancellationToken cancellationToken = default) =>
-            Task.FromException(new NotSupportedException("Screen elements do not support invocation."));
+        public void Invoke() { } // no-op
 
-        public Task SetTextAsync(string text, CancellationToken cancellationToken = default) =>
-            Task.FromException(new NotSupportedException("Screen elements do not support text input."));
+        public void SetText(string text) { } // no-op
 
-        public Task SendShortcutAsync(VisualElementShortcut shortcut, CancellationToken cancellationToken = default) =>
-            Task.FromException(new NotSupportedException("Screen elements do not support shortcut input."));
+        public void SendShortcut(KeyboardShortcut shortcut) { } // no-op
 
         public string? GetSelectionText() => null;
 

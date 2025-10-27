@@ -7,4 +7,4 @@ namespace Everywhere.Interop;
 /// </summary>
 /// <param name="Key"></param>
 /// <param name="Delay"></param>
-public readonly record struct MouseHotkey(MouseButton Key, TimeSpan Delay);
+public readonly record struct MouseShortcut(MouseButton Key, TimeSpan Delay);

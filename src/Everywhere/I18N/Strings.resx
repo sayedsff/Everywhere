@@ -58,11 +58,11 @@
     <data name="SettingsCategory_ChatWindow_Header" xml:space="preserve">
         <value>Chat Settings</value>
     </data>
-    <data name="Settings_ChatWindow_Hotkey_Header" xml:space="preserve">
-        <value>Hotkey</value>
+    <data name="Settings_ChatWindow_Shortcut_Header" xml:space="preserve">
+        <value>Shortcut</value>
     </data>
-    <data name="Settings_ChatWindow_Hotkey_Description" xml:space="preserve">
-        <value>Set a hotkey to invoke the chat window at any time.</value>
+    <data name="Settings_ChatWindow_Shortcut_Description" xml:space="preserve">
+        <value>Set a shortcut to invoke the chat window at any time.</value>
     </data>
     <data name="SettingsCategory_Model_Header" xml:space="preserve">
         <value>AI Settings</value>
@@ -197,10 +197,10 @@
     <data name="ChatWindow_Title" xml:space="preserve">
         <value>How can I assist you?</value>
     </data>
-    <data name="KeyboardHotkeyInputBox_Watermark" xml:space="preserve">
-        <value>Click to set a hotkey</value>
+    <data name="KeyboardShortcutInputBox_Watermark" xml:space="preserve">
+        <value>Click to set a shortcut</value>
     </data>
-    <data name="KeyboardHotkeyInputBox_SettingWatermark" xml:space="preserve">
+    <data name="KeyboardShortcutInputBox_SettingWatermark" xml:space="preserve">
         <value>Setting...</value>
     </data>
     <data name="ChatContext_Metadata_Title_Default" xml:space="preserve">
@@ -697,7 +697,7 @@
         <value>Visual Tree</value>
     </data>
     <data name="NativeChatPlugin_VisualTree_Description" xml:space="preserve">
-        <value>Provide the ability to perceive and manipulate elements on the screen.</value>
+        <value>Provide the ability to perceive and manipulate UI elements on the screen.</value>
     </data>
     <data name="ChangeLogView_ViewOnGitHubHyperlinkButton_Content" xml:space="preserve">
         <value>View on GitHub</value>
@@ -804,10 +804,10 @@ My intelligence comes from powerful Large language models (LLMs), which are prov
     <data name="WelcomeView_EnterApiKeyStep_Message6" xml:space="preserve">
         <value>🎉 Verify successful! Let's move on to the final step!</value>
     </data>
-    <data name="WelcomeView_HotkeyStep_Message1" xml:space="preserve">
+    <data name="WelcomeView_ShortcutStep_Message1" xml:space="preserve">
         <value>Congratulations! Everything is complete. You can wake me up anytime using the shortcut key below.</value>
     </data>
-    <data name="WelcomeView_HotkeyStep_Message2" xml:space="preserve">
+    <data name="WelcomeView_ShortcutStep_Message2" xml:space="preserve">
         <value>If there's no response, it might be occupied by other software. You can click to change the shortcut key.</value>
     </data>
     <data name="FriendlyExceptionMessage_Authentication" xml:space="preserve">
@@ -1254,5 +1254,14 @@ Placeholders can be used within the prompt, enclosed in {}, and will be replaced
     </data>
     <data name="NativeChatPlugin_PowerShell_ExecuteScript_ScriptConsent_Header" xml:space="preserve">
         <value>The following terminal commands will be executed</value>
+    </data>
+    <data name="NativeChatPlugin_VisualTree_CaptureVisualElementById_Header" xml:space="preserve">
+        <value>Capture UI Element</value>
+    </data>
+    <data name="NativeChatPlugin_VisualTree_CaptureFullScreen_Header" xml:space="preserve">
+        <value>Caoture Full Screen</value>
+    </data>
+    <data name="NativeChatPlugin_VisualTree_ExecuteVisualActionQueue_Header" xml:space="preserve">
+        <value>Operate UI elements</value>
     </data>
 </root>

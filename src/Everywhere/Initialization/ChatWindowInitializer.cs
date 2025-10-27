@@ -11,12 +11,12 @@ namespace Everywhere.Initialization;
 /// Initializes the chat window hotkey listener and preloads the chat window.
 /// </summary>
 /// <param name="settings"></param>
-/// <param name="hotkeyListener"></param>
+/// <param name="shortcutListener"></param>
 /// <param name="visualElementContext"></param>
 /// <param name="logger"></param>
 public class ChatWindowInitializer(
     Settings settings,
-    IHotkeyListener hotkeyListener,
+    IShortcutListener shortcutListener,
     IVisualElementContext visualElementContext,
     ILogger<ChatWindowInitializer> logger
 ) : IAsyncInitializer
@@ -25,20 +25,20 @@ public class ChatWindowInitializer(
 
     private readonly Lock _syncLock = new();
 
-    private IDisposable? _chatHotkeySubscription;
+    private IDisposable? _chatShortcutSubscription;
 
     public Task InitializeAsync()
     {
         // initialize hotkey listener
         settings.ChatWindow.PropertyChanged += (_, args) =>
         {
-            if (args.PropertyName == nameof(settings.ChatWindow.Hotkey))
+            if (args.PropertyName == nameof(settings.ChatWindow.Shortcut))
             {
-                HandleChatHotkeyChanged(settings.ChatWindow.Hotkey);
+                HandleChatShortcutChanged(settings.ChatWindow.Shortcut);
             }
         };
 
-        HandleChatHotkeyChanged(settings.ChatWindow.Hotkey);
+        HandleChatShortcutChanged(settings.ChatWindow.Shortcut);
 
         Dispatcher.UIThread.Invoke(() =>
         {
@@ -51,15 +51,15 @@ public class ChatWindowInitializer(
         return Task.CompletedTask;
     }
 
-    private void HandleChatHotkeyChanged(KeyboardHotkey hotkey)
+    private void HandleChatShortcutChanged(KeyboardShortcut shortcut)
     {
         using var _ = _syncLock.EnterScope();
 
-        _chatHotkeySubscription?.Dispose();
-        if (!hotkey.IsValid) return;
+        _chatShortcutSubscription?.Dispose();
+        if (!shortcut.IsValid) return;
 
-        _chatHotkeySubscription = hotkeyListener.Register(
-            hotkey,
+        _chatShortcutSubscription = shortcutListener.Register(
+            shortcut,
             () => ThreadPool.QueueUserWorkItem(_ =>
             {
                 var element = visualElementContext.KeyboardFocusedElement ??

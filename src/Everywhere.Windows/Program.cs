@@ -35,7 +35,7 @@ public static class Program
                     .AddFilter<SerilogLoggerProvider>("Microsoft.EntityFrameworkCore", LogLevel.Warning))
                 .AddSingleton<IRuntimeConstantProvider, RuntimeConstantProvider>()
                 .AddSingleton<IVisualElementContext, Win32VisualElementContext>()
-                .AddSingleton<IHotkeyListener, Win32HotkeyListener>()
+                .AddSingleton<IShortcutListener, Win32ShortcutListener>()
                 .AddSingleton<INativeHelper, Win32NativeHelper>()
                 .AddSingleton<IWindowHelper, Win32WindowHelper>()
                 .AddSingleton<ISoftwareUpdater, SoftwareUpdater>()

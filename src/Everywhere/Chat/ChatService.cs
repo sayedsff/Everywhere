@@ -556,9 +556,9 @@ public class ChatService(
         // Finally, add the assistant message to the chat history.
         if (assistantContentBuilder.Length > 0) chatHistory.AddAssistantMessage(assistantContentBuilder.ToString());
 
-        assistantChatMessage.InputTokenCount += inputTokenCount;
-        assistantChatMessage.OutputTokenCount += outputTokenCount;
-        assistantChatMessage.TotalTokenCount += totalTokenCount;
+        assistantChatMessage.InputTokenCount = inputTokenCount;
+        assistantChatMessage.OutputTokenCount = outputTokenCount;
+        assistantChatMessage.TotalTokenCount = totalTokenCount;
 
         var functionCallContents = functionCallContentBuilder.Build();
 

@@ -4,7 +4,12 @@ using Avalonia.Input;
 
 namespace Everywhere.Interop;
 
-public readonly record struct KeyboardHotkey(Key Key, KeyModifiers Modifiers)
+/// <summary>
+/// Represents a keyboard shortcut consisting of a key and modifier keys.
+/// </summary>
+/// <param name="Key"></param>
+/// <param name="Modifiers"></param>
+public readonly record struct KeyboardShortcut(Key Key, KeyModifiers Modifiers)
 {
     [JsonIgnore]
     public bool IsEmpty => Key == Key.None && Modifiers == KeyModifiers.None;

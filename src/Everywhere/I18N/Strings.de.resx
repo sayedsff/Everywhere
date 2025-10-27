@@ -46,10 +46,10 @@
     <data name="SettingsCategory_ChatWindow_Header" xml:space="preserve">
         <value>Chat-Einstellungen</value>
     </data>
-    <data name="Settings_ChatWindow_Hotkey_Header" xml:space="preserve">
+    <data name="Settings_ChatWindow_Shortcut_Header" xml:space="preserve">
         <value>Tastenkombination</value>
     </data>
-    <data name="Settings_ChatWindow_Hotkey_Description" xml:space="preserve">
+    <data name="Settings_ChatWindow_Shortcut_Description" xml:space="preserve">
         <value>Legen Sie eine Tastenkombination fest, um das Chatfenster jederzeit aufzurufen.</value>
     </data>
     <data name="SettingsCategory_Model_Header" xml:space="preserve">
@@ -172,10 +172,10 @@
     <data name="ChatWindow_Title" xml:space="preserve">
         <value>Wie kann ich Ihnen helfen?</value>
     </data>
-    <data name="KeyboardHotkeyInputBox_Watermark" xml:space="preserve">
+    <data name="KeyboardShortcutInputBox_Watermark" xml:space="preserve">
         <value>Klicken Sie, um eine Tastenkombination festzulegen</value>
     </data>
-    <data name="KeyboardHotkeyInputBox_SettingWatermark" xml:space="preserve">
+    <data name="KeyboardShortcutInputBox_SettingWatermark" xml:space="preserve">
         <value>Einstellung...</value>
     </data>
     <data name="ChatContext_Metadata_Title_Default" xml:space="preserve">
@@ -453,15 +453,6 @@
     </data>
     <data name="ChatWindowPinMode_PinOnInput" xml:space="preserve">
         <value>Beim Eingeben anheften</value>
-    </data>
-    <data name="VisualTreeXmlDetailLevel_Detailed" xml:space="preserve">
-        <value>Detailliert</value>
-    </data>
-    <data name="VisualTreeXmlDetailLevel_Compact" xml:space="preserve">
-        <value>Kompakt</value>
-    </data>
-    <data name="VisualTreeXmlDetailLevel_Minimal" xml:space="preserve">
-        <value>Minimal</value>
     </data>
     <data name="Settings_ChatWindow_WindowPinMode_Header" xml:space="preserve">
         <value>Fenster-Pin-Modus</value>
@@ -763,10 +754,10 @@
     <data name="WelcomeView_EnterApiKeyStep_Message6" xml:space="preserve">
         <value>🎉 Verifizierung erfolgreich! Lassen Sie uns zum letzten Schritt übergehen!</value>
     </data>
-    <data name="WelcomeView_HotkeyStep_Message1" xml:space="preserve">
+    <data name="WelcomeView_ShortcutStep_Message1" xml:space="preserve">
         <value>Herzlichen Glückwunsch! Alles ist abgeschlossen. Sie können mich jederzeit mit der unten angegebenen Tastenkombination aufwecken.</value>
     </data>
-    <data name="WelcomeView_HotkeyStep_Message2" xml:space="preserve">
+    <data name="WelcomeView_ShortcutStep_Message2" xml:space="preserve">
         <value>Falls keine Reaktion erfolgt, könnte die Tastenkombination von anderer Software belegt sein. Klicken Sie, um die Tastenkombination zu ändern.</value>
     </data>
     <data name="FriendlyExceptionMessage_Authentication" xml:space="preserve">

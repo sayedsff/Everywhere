@@ -46,10 +46,10 @@
     <data name="SettingsCategory_ChatWindow_Header" xml:space="preserve">
         <value>聊天窗口设置</value>
     </data>
-    <data name="Settings_ChatWindow_Hotkey_Header" xml:space="preserve">
+    <data name="Settings_ChatWindow_Shortcut_Header" xml:space="preserve">
         <value>快捷键</value>
     </data>
-    <data name="Settings_ChatWindow_Hotkey_Description" xml:space="preserve">
+    <data name="Settings_ChatWindow_Shortcut_Description" xml:space="preserve">
         <value>设置一个快捷键，在任何时候按下即可唤出聊天悬浮窗。</value>
     </data>
     <data name="SettingsCategory_Model_Header" xml:space="preserve">
@@ -181,10 +181,10 @@
     <data name="ChatWindow_Title" xml:space="preserve">
         <value>有什么可以帮忙的？</value>
     </data>
-    <data name="KeyboardHotkeyInputBox_Watermark" xml:space="preserve">
+    <data name="KeyboardShortcutInputBox_Watermark" xml:space="preserve">
         <value>点击设置快捷键</value>
     </data>
-    <data name="KeyboardHotkeyInputBox_SettingWatermark" xml:space="preserve">
+    <data name="KeyboardShortcutInputBox_SettingWatermark" xml:space="preserve">
         <value>设置中</value>
     </data>
     <data name="ChatContext_Metadata_Title_Default" xml:space="preserve">
@@ -686,7 +686,7 @@
         <value>视觉树</value>
     </data>
     <data name="NativeChatPlugin_VisualTree_Description" xml:space="preserve">
-        <value>提供屏幕内元素的感知和操作能力。</value>
+        <value>提供屏幕内 UI 元素的感知和操作能力。</value>
     </data>
     <data name="ChangeLogView_ViewOnGitHubHyperlinkButton_Content" xml:space="preserve">
         <value>访问 GitHub</value>
@@ -787,10 +787,10 @@
     <data name="WelcomeView_EnterApiKeyStep_Message6" xml:space="preserve">
         <value>🎉 验证成功！让我们进入最后一步吧！</value>
     </data>
-    <data name="WelcomeView_HotkeyStep_Message1" xml:space="preserve">
+    <data name="WelcomeView_ShortcutStep_Message1" xml:space="preserve">
         <value>恭喜！全部完成了。你可以随时按下面的快捷键唤醒我。</value>
     </data>
-    <data name="WelcomeView_HotkeyStep_Message2" xml:space="preserve">
+    <data name="WelcomeView_ShortcutStep_Message2" xml:space="preserve">
         <value>如果没反应，可能是被其他软件占用，可以点击换一个快捷键哦。</value>
     </data>
     <data name="FriendlyExceptionMessage_Authentication" xml:space="preserve">
@@ -1238,5 +1238,14 @@
     </data>
     <data name="NativeChatPlugin_PowerShell_ExecuteScript_ScriptConsent_Header" xml:space="preserve">
         <value>即将执行下列终端命令</value>
+    </data>
+    <data name="NativeChatPlugin_VisualTree_CaptureVisualElementById_Header" xml:space="preserve">
+        <value>UI 元素截图</value>
+    </data>
+    <data name="NativeChatPlugin_VisualTree_CaptureFullScreen_Header" xml:space="preserve">
+        <value>全屏截图</value>
+    </data>
+    <data name="NativeChatPlugin_VisualTree_ExecuteVisualActionQueue_Header" xml:space="preserve">
+        <value>操作 UI 元素</value>
     </data>
 </root>

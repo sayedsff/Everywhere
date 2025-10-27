@@ -8,19 +8,19 @@ using Everywhere.Windows.Extensions;
 
 namespace Everywhere.Windows.Interop;
 
-public unsafe class Win32HotkeyListener : IHotkeyListener
+public unsafe class Win32ShortcutListener : IShortcutListener
 {
     private static HWND HWnd => Win32MessageWindow.Shared.HWnd;
 
     // Unique id generator for RegisterHotKey
     private static int _nextId = 1;
 
-    // OS-registered keyboard hotkeys: hotkey -> registration bundle (id + handlers)
-    private static readonly Dictionary<KeyboardHotkey, OsReg> OsRegs = new();
+    // OS-registered keyboard hotkeys: shortcut -> registration bundle (id + handlers)
+    private static readonly Dictionary<KeyboardShortcut, OsReg> OsRegs = new();
     private static readonly Dictionary<int, OsReg> IdToOsReg = new();
 
     // Fallback keyboard hotkeys (when RegisterHotKey fails): (mods,key) -> handlers
-    private static readonly Dictionary<HotkeySig, HandlerList> HookKbHandlers = new();
+    private static readonly Dictionary<ShortcutSignature, HandlerList> HookKbHandlers = new();
 
     // Mouse hotkeys: per-button registrations (each has its own delay/handler/timer)
     private static readonly Dictionary<MouseButton, List<MouseRegistration>> MouseRegs = new()
@@ -39,12 +39,12 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
     // Inject sentinel to ignore self-injected events
     private const nuint InjectExtra = 0x0d000721;
 
-    // Concurrency: light lock for hotkey maps
+    // Concurrency: light lock for shortcut maps
     private static readonly Lock SyncLock = new();
 
-    private static IKeyboardHotkeyScope? _currentKeyboardHotkeyScope;
+    private static IKeyboardShortcutScope? _currentKeyboardShortcutScope;
 
-    static Win32HotkeyListener()
+    static Win32ShortcutListener()
     {
         Win32MessageWindow.Shared.AddHandler(
             (uint)WINDOW_MESSAGE.WM_HOTKEY,
@@ -57,48 +57,48 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
             });
     }
 
-    public IKeyboardHotkeyScope StartCaptureKeyboardHotkey()
+    public IKeyboardShortcutScope StartCaptureKeyboardShortcut()
     {
         lock (SyncLock)
         {
-            if (_currentKeyboardHotkeyScope is not { IsDisposed: false }) _currentKeyboardHotkeyScope = new KeyboardHotkeyScopeImpl();
-            return _currentKeyboardHotkeyScope;
+            if (_currentKeyboardShortcutScope is not { IsDisposed: false }) _currentKeyboardShortcutScope = new KeyboardShortcutScopeImpl();
+            return _currentKeyboardShortcutScope;
         }
     }
 
-    public IDisposable Register(KeyboardHotkey hotkey, Action handler)
+    public IDisposable Register(KeyboardShortcut shortcut, Action handler)
     {
-        if (hotkey.Key == Key.None || hotkey.Modifiers == KeyModifiers.None)
-            throw new ArgumentException("Invalid keyboard hotkey.", nameof(hotkey));
+        if (shortcut.Key == Key.None || shortcut.Modifiers == KeyModifiers.None)
+            throw new ArgumentException("Invalid keyboard shortcut.", nameof(shortcut));
         ArgumentNullException.ThrowIfNull(handler);
 
         lock (SyncLock)
         {
-            // If there is already an OS registration for this hotkey, reuse id and append handler.
-            if (OsRegs.TryGetValue(hotkey, out var reg))
+            // If there is already an OS registration for this shortcut, reuse id and append handler.
+            if (OsRegs.TryGetValue(shortcut, out var reg))
             {
                 reg.Handlers.Add(handler);
-                return new Disposer(() => UnregisterKeyboardHandlerOs(hotkey, handler));
+                return new Disposer(() => UnregisterKeyboardHandlerOs(shortcut, handler));
             }
 
             // Try OS registration (incl. MOD_WIN).
             var mods = HOT_KEY_MODIFIERS.MOD_NOREPEAT;
-            if (hotkey.Modifiers.HasFlag(KeyModifiers.Control)) mods |= HOT_KEY_MODIFIERS.MOD_CONTROL;
-            if (hotkey.Modifiers.HasFlag(KeyModifiers.Shift)) mods |= HOT_KEY_MODIFIERS.MOD_SHIFT;
-            if (hotkey.Modifiers.HasFlag(KeyModifiers.Alt)) mods |= HOT_KEY_MODIFIERS.MOD_ALT;
-            if (hotkey.Modifiers.HasFlag(KeyModifiers.Meta)) mods |= HOT_KEY_MODIFIERS.MOD_WIN;
+            if (shortcut.Modifiers.HasFlag(KeyModifiers.Control)) mods |= HOT_KEY_MODIFIERS.MOD_CONTROL;
+            if (shortcut.Modifiers.HasFlag(KeyModifiers.Shift)) mods |= HOT_KEY_MODIFIERS.MOD_SHIFT;
+            if (shortcut.Modifiers.HasFlag(KeyModifiers.Alt)) mods |= HOT_KEY_MODIFIERS.MOD_ALT;
+            if (shortcut.Modifiers.HasFlag(KeyModifiers.Meta)) mods |= HOT_KEY_MODIFIERS.MOD_WIN;
 
             var id = _nextId++;
-            if (PInvoke.RegisterHotKey(HWnd, id, mods, (uint)hotkey.Key.ToVirtualKey()))
+            if (PInvoke.RegisterHotKey(HWnd, id, mods, (uint)shortcut.Key.ToVirtualKey()))
             {
                 var bundle = new OsReg(id, new List<Action> { handler });
-                OsRegs[hotkey] = bundle;
+                OsRegs[shortcut] = bundle;
                 IdToOsReg[id] = bundle;
-                return new Disposer(() => UnregisterKeyboardHandlerOs(hotkey, handler));
+                return new Disposer(() => UnregisterKeyboardHandlerOs(shortcut, handler));
             }
 
             // Fallback to LL keyboard hook with Win suppression/compensation.
-            var sig = new HotkeySig(hotkey.Modifiers, hotkey.Key);
+            var sig = new ShortcutSignature(shortcut.Modifiers, shortcut.Key);
             if (!HookKbHandlers.TryGetValue(sig, out var list))
             {
                 list = new HandlerList();
@@ -111,14 +111,14 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
         }
     }
 
-    public IDisposable Register(MouseHotkey hotkey, Action handler)
+    public IDisposable Register(MouseShortcut shortcut, Action handler)
     {
         if (handler is null) throw new ArgumentNullException(nameof(handler));
 
         lock (SyncLock)
         {
-            var reg = new MouseRegistration(hotkey, handler);
-            MouseRegs[hotkey.Key].Add(reg);
+            var reg = new MouseRegistration(shortcut, handler);
+            MouseRegs[shortcut.Key].Add(reg);
             EnsureMouseHook();
             return new Disposer(() => UnregisterMouseHandler(reg));
         }
@@ -196,9 +196,9 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
         var vk = (VIRTUAL_KEY)lParam.vkCode;
         var key = vk.ToAvaloniaKey();
 
-        // Build hotkey signature and lookup handlers
+        // Build shortcut signature and lookup handlers
         List<Action>? handlers = null;
-        var sig = new HotkeySig(mods, key);
+        var sig = new ShortcutSignature(mods, key);
 
         lock (SyncLock)
         {
@@ -336,21 +336,21 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
 
     // ---------- unregister helpers ----------
 
-    private static void UnregisterKeyboardHandlerOs(KeyboardHotkey hotkey, Action handler)
+    private static void UnregisterKeyboardHandlerOs(KeyboardShortcut shortcut, Action handler)
     {
         lock (SyncLock)
         {
-            if (!OsRegs.TryGetValue(hotkey, out var bundle)) return;
+            if (!OsRegs.TryGetValue(shortcut, out var bundle)) return;
             bundle.Handlers.Remove(handler);
             if (bundle.Handlers.Count > 0) return;
 
-            OsRegs.Remove(hotkey);
+            OsRegs.Remove(shortcut);
             IdToOsReg.Remove(bundle.Id);
             PInvoke.UnregisterHotKey(HWnd, bundle.Id);
         }
     }
 
-    private static void UnregisterKeyboardHandlerHook(HotkeySig sig, Action handler)
+    private static void UnregisterKeyboardHandlerHook(ShortcutSignature sig, Action handler)
     {
         lock (SyncLock)
         {
@@ -369,7 +369,7 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
     {
         lock (SyncLock)
         {
-            if (MouseRegs.TryGetValue(reg.Hotkey.Key, out var list))
+            if (MouseRegs.TryGetValue(reg.Shortcut.Key, out var list))
             {
                 list.Remove(reg);
                 reg.CancelTimer();
@@ -395,12 +395,12 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
         public List<Action> Handlers { get; } = handlers;
     }
 
-    private readonly struct HotkeySig(KeyModifiers modifiers, Key key) : IEquatable<HotkeySig>
+    private readonly struct ShortcutSignature(KeyModifiers modifiers, Key key) : IEquatable<ShortcutSignature>
     {
         public KeyModifiers Modifiers { get; } = modifiers;
         public Key Key { get; } = key;
-        public bool Equals(HotkeySig other) => Modifiers == other.Modifiers && Key == other.Key;
-        public override bool Equals(object? obj) => obj is HotkeySig o && Equals(o);
+        public bool Equals(ShortcutSignature other) => Modifiers == other.Modifiers && Key == other.Key;
+        public override bool Equals(object? obj) => obj is ShortcutSignature o && Equals(o);
         public override int GetHashCode() => ((int)Modifiers << 16) ^ (int)Key;
     }
 
@@ -414,9 +414,9 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
     }
 
     // Per-registration mouse state (timer lifecycle)
-    private sealed class MouseRegistration(MouseHotkey hotkey, Action handler)
+    private sealed class MouseRegistration(MouseShortcut shortcut, Action handler)
     {
-        public MouseHotkey Hotkey { get; } = hotkey;
+        public MouseShortcut Shortcut { get; } = shortcut;
         public Action Handler { get; } = handler;
         private Timer? _timer;
         private int _armed; // 1 when button is considered pressed/pending
@@ -426,7 +426,7 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
             // mark pressed
             Interlocked.Exchange(ref _armed, 1);
 
-            if (Hotkey.Delay <= TimeSpan.Zero)
+            if (Shortcut.Delay <= TimeSpan.Zero)
             {
                 SafeInvoke();
                 return;
@@ -442,7 +442,7 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
                     }
                 },
                 null,
-                Hotkey.Delay,
+                Shortcut.Delay,
                 Timeout.InfiniteTimeSpan);
         }
 
@@ -467,21 +467,21 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
         }
     }
 
-    private sealed class KeyboardHotkeyScopeImpl : IKeyboardHotkeyScope
+    private sealed class KeyboardShortcutScopeImpl : IKeyboardShortcutScope
     {
-        public KeyboardHotkey PressingHotkey { get; private set; }
+        public KeyboardShortcut PressingShortcut { get; private set; }
 
         public bool IsDisposed { get; private set; }
 
-        public event IKeyboardHotkeyScope.PressingHotkeyChangedHandler? PressingHotkeyChanged;
+        public event IKeyboardShortcutScope.PressingShortcutChangedHandler? PressingShortcutChanged;
 
-        public event IKeyboardHotkeyScope.HotkeyFinishedHandler? HotkeyFinished;
+        public event IKeyboardShortcutScope.ShortcutFinishedHandler? ShortcutFinished;
 
         private readonly LowLevelKeyboardHook _hook;
 
         private KeyModifiers _pressedKeyModifiers = KeyModifiers.None;
 
-        public KeyboardHotkeyScopeImpl()
+        public KeyboardShortcutScopeImpl()
         {
             _hook = new LowLevelKeyboardHook(KeyboardHookCallback);
         }
@@ -503,15 +503,15 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
             {
                 case true when keyModifiers == KeyModifiers.None:
                 {
-                    PressingHotkey = PressingHotkey with { Key = virtualKey.ToAvaloniaKey() };
-                    PressingHotkeyChanged?.Invoke(this, PressingHotkey);
+                    PressingShortcut = PressingShortcut with { Key = virtualKey.ToAvaloniaKey() };
+                    PressingShortcutChanged?.Invoke(this, PressingShortcut);
                     break;
                 }
                 case true:
                 {
                     _pressedKeyModifiers |= keyModifiers;
-                    PressingHotkey = PressingHotkey with { Modifiers = _pressedKeyModifiers };
-                    PressingHotkeyChanged?.Invoke(this, PressingHotkey);
+                    PressingShortcut = PressingShortcut with { Modifiers = _pressedKeyModifiers };
+                    PressingShortcutChanged?.Invoke(this, PressingShortcut);
                     break;
                 }
                 case false:
@@ -519,19 +519,19 @@ public unsafe class Win32HotkeyListener : IHotkeyListener
                     _pressedKeyModifiers &= ~keyModifiers;
                     if (_pressedKeyModifiers == KeyModifiers.None)
                     {
-                        if (PressingHotkey.Modifiers != KeyModifiers.None && PressingHotkey.Key == Key.None)
+                        if (PressingShortcut.Modifiers != KeyModifiers.None && PressingShortcut.Key == Key.None)
                         {
-                            PressingHotkey = default; // modifiers only hotkey, reset it
+                            PressingShortcut = default; // modifiers only shortcut, reset it
                         }
 
-                        if (PressingHotkey.Modifiers == KeyModifiers.None)
+                        if (PressingShortcut.Modifiers == KeyModifiers.None)
                         {
-                            PressingHotkey = default; // no modifiers, reset it
+                            PressingShortcut = default; // no modifiers, reset it
                         }
 
                         // system key is all released, capture is done
-                        PressingHotkeyChanged?.Invoke(this, PressingHotkey);
-                        HotkeyFinished?.Invoke(this, PressingHotkey);
+                        PressingShortcutChanged?.Invoke(this, PressingShortcut);
+                        ShortcutFinished?.Invoke(this, PressingShortcut);
                     }
                     break;
                 }

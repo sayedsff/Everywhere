@@ -34,7 +34,7 @@ public partial class VisualTreeDebugger : UserControl
 #endif
 
     public VisualTreeDebugger(
-        IHotkeyListener hotkeyListener,
+        IShortcutListener shortcutListener,
         IVisualElementContext visualElementContext)
     {
         _visualElementContext = visualElementContext;
@@ -44,7 +44,7 @@ public partial class VisualTreeDebugger : UserControl
         VisualTreeView.ItemsSource = _rootElements;
         PropertyItemsControl.ItemsSource = _properties;
 
-        hotkeyListener.Register(new KeyboardHotkey(Key.C, KeyModifiers.Control | KeyModifiers.Shift), () =>
+        shortcutListener.Register(new KeyboardShortcut(Key.C, KeyModifiers.Control | KeyModifiers.Shift), () =>
         {
             _rootElements.Clear();
             var element = visualElementContext.ElementFromPointer();

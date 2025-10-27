@@ -21,9 +21,9 @@ public partial class WelcomeViewModel : BusyViewModelBase
         /// </summary>
         EnterApiKey = 2,
         /// <summary>
-        /// Teach hotkey
+        /// Teach shortcut
         /// </summary>
-        Hotkey = 3,
+        Shortcut = 3,
         /// <summary>
         /// Select telemetry preference
         /// </summary>
@@ -82,7 +82,7 @@ public partial class WelcomeViewModel : BusyViewModelBase
     }
 
     [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(GoToHotkeyStepCommand))]
+    [NotifyCanExecuteChangedFor(nameof(GoToShortcutStepCommand))]
     public partial bool IsApiKeyValid { get; private set; }
 
     public event Action? ApiKeyValidated;
@@ -170,7 +170,7 @@ public partial class WelcomeViewModel : BusyViewModelBase
     });
 
     [RelayCommand(CanExecute = nameof(IsApiKeyValid))]
-    private void GoToHotkeyStep() => CurrentStep = Step.Hotkey;
+    private void GoToShortcutStep() => CurrentStep = Step.Shortcut;
 
     [RelayCommand]
     private void GoToTelemetryStep() => CurrentStep = Step.Telemetry;
