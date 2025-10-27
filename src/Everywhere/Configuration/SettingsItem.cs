@@ -253,7 +253,7 @@ public class SettingsSelectionItem(string name) : SettingsItem(name)
                 }
 
                 return new Item(new DirectResourceKey(x), x, null);
-            }).ToArray()
+            }).ToList()
         };
     }
 }

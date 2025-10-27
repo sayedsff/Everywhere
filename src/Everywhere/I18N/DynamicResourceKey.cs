@@ -127,7 +127,7 @@ public partial class FormattedDynamicResourceKey(object key, params IReadOnlyLis
         var resolvedKey = Resolve(Key);
         return string.IsNullOrEmpty(resolvedKey) ?
             string.Empty :
-            string.Format(resolvedKey, Args.AsValueEnumerable().Select(a => a.ToString()).ToArray());
+            string.Format(resolvedKey, Args.AsValueEnumerable().Select(a => a.ToString()).ToList().AsSpan());
     }
 }
 

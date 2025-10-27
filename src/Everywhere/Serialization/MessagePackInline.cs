@@ -35,10 +35,10 @@ public partial class MessagePackRun : MessagePackInline
     /// Gets or sets the text content of the run.
     /// </summary>
     [Key(0)]
-    public string? Text { get; set; }
+    private string? Text { get; set; }
 
     [Key(1)]
-    public TextDecorationLocation[]? TextDecorationLocations { get; set; }
+    private List<TextDecorationLocation>? TextDecorationLocations { get; set; }
 
     [SerializationConstructor]
     private MessagePackRun() { }
@@ -46,7 +46,7 @@ public partial class MessagePackRun : MessagePackInline
     public MessagePackRun(Run run)
     {
         Text = run.Text;
-        TextDecorationLocations = run.TextDecorations?.Select(td => td.Location).ToArray();
+        TextDecorationLocations = run.TextDecorations?.Select(td => td.Location).ToList();
     }
 
     /// <summary>

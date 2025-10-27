@@ -114,7 +114,7 @@ public class SettingsInitializer : IAsyncInitializer
 
     private static void ApplySearchEngineProviders(IList<WebSearchEngineProvider> srcList, ObservableCollection<WebSearchEngineProvider> dstList)
     {
-        var propertyCache = new Dictionary<Type, PropertyInfo[]>();
+        var propertyCache = new Dictionary<Type, IReadOnlyList<PropertyInfo>>();
 
         foreach (var src in srcList)
         {
@@ -140,7 +140,7 @@ public class SettingsInitializer : IAsyncInitializer
         }
     }
 
-    private static void ApplyProperties(object src, object dst, Dictionary<Type, PropertyInfo[]> propertyCache)
+    private static void ApplyProperties(object src, object dst, Dictionary<Type, IReadOnlyList<PropertyInfo>> propertyCache)
     {
         var srcType = src.GetType();
         var dstType = dst.GetType();
@@ -153,7 +153,7 @@ public class SettingsInitializer : IAsyncInitializer
                 .GetProperties(BindingFlags.Public | BindingFlags.Instance)
                 .Where(p => p is { CanRead: true, CanWrite: true })
                 .Where(p => p.GetCustomAttribute<IgnoreDataMemberAttribute>() is null)
-                .ToArray();
+                .ToList();
             propertyCache[srcType] = properties;
         }
 

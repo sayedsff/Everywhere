@@ -116,7 +116,7 @@ public class App : Application
     {
         // Get an array of plugins to remove
         var dataValidationPluginsToRemove =
-            BindingPlugins.DataValidators.OfType<DataAnnotationsValidationPlugin>().ToArray();
+            BindingPlugins.DataValidators.OfType<DataAnnotationsValidationPlugin>().ToList();
 
         // remove each entry found
         foreach (var plugin in dataValidationPluginsToRemove)

@@ -90,14 +90,14 @@ public class SettingsItems : AvaloniaList<SettingsItem>
                             return enumerable
                                 .AsValueEnumerable()
                                 .Select(k => new SettingsSelectionItem.Item(new DirectResourceKey(k), k, contentTemplate))
-                                .ToArray();
+                                .ToList();
                         }
 
                         var keyPrefix = $"{nameof(SettingsSelectionItem)}_{ownerName}{bindingPath.Replace('.', '_')}_{itemPropertyInfo.Name}";
                         return enumerable
                             .AsValueEnumerable()
                             .Select(k => new SettingsSelectionItem.Item(new DynamicResourceKey($"{keyPrefix}_{k}"), k, contentTemplate))
-                            .ToArray();
+                            .ToList();
                     }))
             };
         }

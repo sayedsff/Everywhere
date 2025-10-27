@@ -18,9 +18,9 @@ public delegate void ObjectObserverChangedEventHandler(in ObjectObserverChangedE
 /// </summary>
 public class ObjectObserver(ObjectObserverChangedEventHandler handler) : IDisposable
 {
-    private readonly ConcurrentDictionary<Type, PropertyInfo[]> _cachedProperties = [];
+    private readonly ConcurrentDictionary<Type, IReadOnlyList<PropertyInfo>> _cachedProperties = [];
 
-    private PropertyInfo[] GetPropertyInfos(Type type) =>
+    private IReadOnlyList<PropertyInfo> GetPropertyInfos(Type type) =>
         _cachedProperties.GetOrAdd(
             type,
             t => t.GetProperties(BindingFlags.Public | BindingFlags.Instance)
@@ -30,7 +30,7 @@ public class ObjectObserver(ObjectObserverChangedEventHandler handler) : IDispos
                     p.PropertyType.IsAssignableTo(typeof(INotifyPropertyChanged)))
                 .Where(p => p.GetMethod?.GetParameters() is { Length: 0 }) // Ignore
                 .Where(p => p.GetCustomAttribute<JsonIgnoreAttribute>() is null)
-                .ToArray());
+                .ToList());
 
     private PropertyInfo? GetPropertyInfo(Type type, string propertyName) =>
         GetPropertyInfos(type).AsValueEnumerable().FirstOrDefault(p => p.Name == propertyName);

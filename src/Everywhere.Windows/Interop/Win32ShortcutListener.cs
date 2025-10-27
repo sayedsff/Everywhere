@@ -157,7 +157,7 @@ public unsafe class Win32ShortcutListener : IShortcutListener
     private static void InvokeHandlers(List<Action> handlers)
     {
         // Execute handlers safely; avoid holding locks while invoking.
-        foreach (var handler in handlers.ToArray())
+        foreach (var handler in handlers.ToList())
         {
             try
             {

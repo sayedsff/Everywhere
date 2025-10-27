@@ -572,8 +572,8 @@ public static class TextDifferenceBuilder
         var a = SplitLines(original);
         var b = SplitLines(updated);
 
-        var aLines = a.Select(l => l.Text).ToArray();
-        var bLines = b.Select(l => l.Text).ToArray();
+        var aLines = a.Select(l => l.Text).ToList();
+        var bLines = b.Select(l => l.Text).ToList();
 
         var edits = new List<MyersDifference.Edit>();
         foreach (var edit in MyersDifference.Diff(aLines, bLines).OrderBy(e => e.AStart))
