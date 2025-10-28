@@ -46,6 +46,8 @@ public class ChatWindowInitializer(
             var chatWindow = ServiceLocator.Resolve<ChatWindow>();
             chatWindow.ViewModel.IsOpened = true;
             chatWindow.ViewModel.IsOpened = false;
+            chatWindow.ShowActivated = true;
+            chatWindow.Topmost = true;
         });
 
         return Task.CompletedTask;

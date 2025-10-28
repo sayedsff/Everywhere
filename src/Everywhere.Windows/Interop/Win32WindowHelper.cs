@@ -140,26 +140,11 @@ public class Win32WindowHelper : IWindowHelper
         var hWnd = (HWND)handle.Handle;
         if (cloaked)
         {
-            cloaked = Cloak(hWnd);
+            Cloak(hWnd);
 
             // Then hide our HWND, to make sure that the OS gives the FG / focus back to another app
             // (there's no way for us to guess what the right hwnd might be, only the OS can do it right)
             PInvoke.ShowWindow(hWnd, SHOW_WINDOW_CMD.SW_HIDE);
-
-            if (cloaked)
-            {
-                // TRICKY: show our HWND again. This will trick XAML into painting our
-                // HWND again, so that we avoid the "flicker" caused by a WinUI3 app
-                // window being first shown
-                // SW_SHOWNA will prevent us for trying to fight the focus back
-                PInvoke.ShowWindow(hWnd, SHOW_WINDOW_CMD.SW_SHOWNA);
-
-                // Intentionally leave the window cloaked. So our window is "visible",
-                // but also cloaked, so you can't see it.
-
-                // If the window was not cloaked, then leave it hidden.
-                // Sure, it's not ideal, but at least it's not visible.
-            }
         }
         else
         {
@@ -178,6 +163,7 @@ public class Win32WindowHelper : IWindowHelper
 
             // Just to be sure, SHOW our hwnd.
             window.Show();
+            if (window.IsLoaded) PInvoke.ShowWindow(hWnd, SHOW_WINDOW_CMD.SW_SHOWNA);
 
             // Once we're done, uncloak to avoid all animations
             Uncloak(hWnd);
@@ -192,7 +178,7 @@ public class Win32WindowHelper : IWindowHelper
         }
     }
 
-    private static bool Cloak(HWND hWnd)
+    private static void Cloak(HWND hWnd)
     {
         bool wasCloaked;
         unsafe
@@ -209,7 +195,6 @@ public class Win32WindowHelper : IWindowHelper
             PInvoke.SetWindowPos(hWnd, HWND.HWND_BOTTOM, 0, 0, 0, 0, SET_WINDOW_POS_FLAGS.SWP_NOMOVE | SET_WINDOW_POS_FLAGS.SWP_NOSIZE);
         }
 
-        return wasCloaked;
     }
 
     private unsafe static void Uncloak(HWND hWnd)

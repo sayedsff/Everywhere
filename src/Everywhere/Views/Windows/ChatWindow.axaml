@@ -3,22 +3,19 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:at="clr-namespace:Everywhere.AttachedProperties"
   xmlns:be="clr-namespace:Everywhere.Behaviors" xmlns:chat="clr-namespace:Everywhere.Chat"
   xmlns:common="clr-namespace:Everywhere.Common" xmlns:interop="clr-namespace:Everywhere.Interop"
-  xmlns:md="clr-namespace:LiveMarkdown.Avalonia;assembly=LiveMarkdown.Avalonia" xmlns:plugins="clr-namespace:Everywhere.Chat.Plugins"
-  xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI" xmlns:sys="clr-namespace:System;assembly=System.Runtime"
-  xmlns:themes="clr-namespace:ShadUI.Themes;assembly=ShadUI" xmlns:v="clr-namespace:Everywhere.Views"
-  xmlns:vc="clr-namespace:Everywhere.ValueConverters" xmlns:vm="clr-namespace:Everywhere.ViewModels"
-  MinWidth="400" MinHeight="144.8"
-  x:DataType="vm:ChatWindowViewModel" x:TypeArguments="vm:ChatWindowViewModel"
-  Background="Transparent" ExtendClientAreaChromeHints="NoChrome"
-  ExtendClientAreaToDecorationsHint="True"
+  xmlns:md="clr-namespace:LiveMarkdown.Avalonia;assembly=LiveMarkdown.Avalonia" xmlns:shadui="clr-namespace:ShadUI.Controls;assembly=ShadUI"
+  xmlns:sys="clr-namespace:System;assembly=System.Runtime" xmlns:themes="clr-namespace:ShadUI.Themes;assembly=ShadUI"
+  xmlns:v="clr-namespace:Everywhere.Views" xmlns:vc="clr-namespace:Everywhere.ValueConverters"
+  xmlns:vm="clr-namespace:Everywhere.ViewModels" MinWidth="400"
+  MinHeight="144.8" x:DataType="vm:ChatWindowViewModel"
+  x:TypeArguments="vm:ChatWindowViewModel" Background="Transparent"
+  ExtendClientAreaChromeHints="NoChrome" ExtendClientAreaToDecorationsHint="True"
   IsOpened="{Binding IsOpened, Mode=OneWayToSource}"
   IsTitleBarVisible="False"
   RequestedThemeVariant="{x:Static themes:ThemeVariants.Acrylic}"
-  ShowActivated="True" SizeToContent="WidthAndHeight"
-  SystemDecorations="BorderOnly"
+  SizeToContent="WidthAndHeight" SystemDecorations="BorderOnly"
   TargetBoundingRect="{Binding TargetBoundingRect}"
-  Topmost="True" TransparencyLevelHint="AcrylicBlur"
-  WindowStartupLocation="Manual">
+  TransparencyLevelHint="AcrylicBlur" WindowStartupLocation="Manual">
 
   <v:ReactiveShadWindow.Hosts>
     <shadui:DialogHost
