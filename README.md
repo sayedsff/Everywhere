@@ -224,6 +224,12 @@ Distributed under the Apache 2.0 License. See [LICENSE](LICENSE) for more inform
 
 Third-Party Licenses: See [ThirdPartyNotices.txt](ThirdPartyNotices.txt) for details.
 
+## 💖 Sponsor
+
+![302.ai](https://raw.githubusercontent.com/DearVa/Everywhere/refs/heads/main/img/Sponsors/301-ai-en.jpg)
+
+[302.AI](https://302.ai) is a pay-as-you-go enterprise AI resource hub that offers the latest and most comprehensive AI models and APIs on the market, along with a variety of ready-to-use online AI applications.
+
 ## 🤩 Special Thanks
 
 The Code Signing Certificate for this project is sponsored by [Certum China](https://www.certumcodesign.cn/), which continues to contribute to the open-source community.
