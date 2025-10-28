@@ -172,20 +172,35 @@ public partial class ChatWindowViewModel : BusyViewModelBase, IEventSubscriber<C
         {
             if (_chatAttachments.Any(a => a is ChatVisualElementAttachment vea && Equals(vea.Element?.Target, targetElement)))
             {
+                // Toggle the chat window visibility
                 IsOpened = true;
                 return;
             }
 
             TargetBoundingRect = default;
-            if (targetElement == null) return;
+            if (targetElement == null)
+            {
+                IsOpened = false;
+                return;
+            }
 
             var createElement = Settings.ChatWindow.AutomaticallyAddElement;
             var (boundingRect, attachment) = await Task
                 .Run(() => (targetElement.BoundingRectangle, createElement ? CreateFromVisualElement(targetElement) : null), cancellationToken)
                 .WaitAsync(TimeSpan.FromSeconds(1), cancellationToken);
             TargetBoundingRect = boundingRect;
-            _chatAttachments.Clear();
-            if (attachment is not null) _chatAttachments.Add(attachment.With(a => a.IsFocusedElement = true));
+            if (attachment is not null)
+            {
+                if (_chatAttachments is [ChatVisualElementAttachment { IsFocusedElement: true }, ..])
+                {
+                    _chatAttachments[0] = attachment.With(a => a.IsFocusedElement = true);
+                }
+                else
+                {
+                    _chatAttachments.Insert(0, attachment.With(a => a.IsFocusedElement = true));
+                }
+            }
+
             IsOpened = true;
         }
         catch (Exception ex)

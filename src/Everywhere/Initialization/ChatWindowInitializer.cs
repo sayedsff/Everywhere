@@ -74,7 +74,7 @@ public class ChatWindowInitializer(
                 Dispatcher.UIThread.Invoke(() =>
                 {
                     var chatWindow = ServiceLocator.Resolve<ChatWindow>();
-                    if (hWnd == chatWindow.TryGetPlatformHandle()?.Handle) return;
+                    if (hWnd == chatWindow.TryGetPlatformHandle()?.Handle) element = null; // Avoid focusing to itself
 
                     chatWindow.ViewModel.TryFloatToTargetElementAsync(element).Detach(logger.ToExceptionHandler());
                 });
