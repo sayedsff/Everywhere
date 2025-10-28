@@ -226,9 +226,9 @@ Third-Party Licenses: See [ThirdPartyNotices.txt](ThirdPartyNotices.txt) for det
 
 ## 💖 Sponsor
 
-![302.ai](https://raw.githubusercontent.com/DearVa/Everywhere/refs/heads/main/img/Sponsors/302-ai-en.jpg)
+[![302.ai](https://raw.githubusercontent.com/DearVa/Everywhere/refs/heads/main/img/Sponsors/302-ai-en.jpg)](https://share.302.ai/5rzmPr)
 
-[302.AI](https://302.ai) is a pay-as-you-go enterprise AI resource hub that offers the latest and most comprehensive AI models and APIs on the market, along with a variety of ready-to-use online AI applications.
+[302.AI](https://share.302.ai/5rzmPr) is a pay-as-you-go enterprise AI resource hub that offers the latest and most comprehensive AI models and APIs on the market, along with a variety of ready-to-use online AI applications.
 
 ## 🤩 Special Thanks
 

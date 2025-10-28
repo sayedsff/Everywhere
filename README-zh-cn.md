@@ -225,9 +225,9 @@
 
 ## 💖 赞助
 
-![302.ai](https://raw.githubusercontent.com/DearVa/Everywhere/refs/heads/main/img/Sponsors/302-ai-zh.jpg)
+[![302.ai](https://raw.githubusercontent.com/DearVa/Everywhere/refs/heads/main/img/Sponsors/302-ai-zh.jpg)](https://share.302.ai/5rzmPr)
 
-[302.AI](https://302.ai) 是一个按用量付费的企业级AI资源平台，提供市场上最新、最全面的AI模型和API，以及多种开箱即用的在线AI应用
+[302.AI](https://share.302.ai/5rzmPr) 是一个按用量付费的企业级AI资源平台，提供市场上最新、最全面的AI模型和API，以及多种开箱即用的在线AI应用
 
 ## 🤩 鸣谢
 
