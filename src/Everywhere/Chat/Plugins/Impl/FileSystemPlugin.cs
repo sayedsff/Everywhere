@@ -65,7 +65,9 @@ public class FileSystemPlugin : BuiltInChatPlugin
 
     [KernelFunction("search_files")]
     [Description(
-        "Search for files and directories in a specified path matching the given search pattern. This tool may slow; avoid using it to enumerate large numbers of files.")]
+        "Search for files and directories in a specified path matching the given search pattern. " +
+        "This tool may slow; avoid using it to enumerate large numbers of files. " +
+        "DO NOT specify the value of `orderBy` when dealing with a large number of files.")]
     [DynamicResourceKey(LocaleKey.NativeChatPlugin_FileSystem_SearchFiles_Header)]
     [FriendlyFunctionCallContentRenderer(typeof(FileRenderer))]
     private string SearchFiles(
@@ -73,7 +75,8 @@ public class FileSystemPlugin : BuiltInChatPlugin
         [Description("Regex search pattern to match file and directory names.")] string filePattern = ".*",
         int skip = 0,
         [Description("Maximum number of results to return. Max is 1000.")] int maxCount = 100,
-        FilesOrderBy orderBy = FilesOrderBy.Default)
+        FilesOrderBy orderBy = FilesOrderBy.Default,
+        CancellationToken cancellationToken = default)
     {
         if (skip < 0) skip = 0;
         if (maxCount < 0) maxCount = 0;
@@ -90,6 +93,7 @@ public class FileSystemPlugin : BuiltInChatPlugin
         var regex = new Regex(filePattern, RegexOptions.IgnoreCase | RegexOptions.Compiled, RegexTimeout);
         ExpandFullPath(ref path);
         var query = new RegexFileSystemInfoEnumerable(EnsureDirectoryInfo(path).FullName, regex, true)
+            .WithCancellation(cancellationToken)
             .OfType<FileSystemInfo>()
             .Select(i => new FileRecord(
                 i.Name,
@@ -168,7 +172,9 @@ public class FileSystemPlugin : BuiltInChatPlugin
         var filesToSearch = fileSystemInfo switch
         {
             FileInfo fileInfo when fileRegex.IsMatch(fileInfo.Name) => [fileInfo],
-            DirectoryInfo directoryInfo => new RegexFileSystemInfoEnumerable(directoryInfo.FullName, fileRegex, true).OfType<FileInfo>(),
+            DirectoryInfo directoryInfo => new RegexFileSystemInfoEnumerable(directoryInfo.FullName, fileRegex, true)
+                .WithCancellation(cancellationToken)
+                .OfType<FileInfo>(),
             _ => []
         };
 
@@ -180,7 +186,7 @@ public class FileSystemPlugin : BuiltInChatPlugin
             if (file.Length > maxSearchFileSize) continue;
 
             await using var stream = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.Read);
-            if (await EncodingDetector.DetectEncodingAsync(stream) is null)
+            if (await EncodingDetector.DetectEncodingAsync(stream, cancellationToken: cancellationToken) is null)
             {
                 continue;
             }
@@ -248,7 +254,7 @@ public class FileSystemPlugin : BuiltInChatPlugin
         }
 
         var stringBuilder = new StringBuilder();
-        if (await EncodingDetector.DetectEncodingAsync(stream) is not { } encoding)
+        if (await EncodingDetector.DetectEncodingAsync(stream, cancellationToken: cancellationToken) is not { } encoding)
         {
             stream.Seek(startBytes, SeekOrigin.Begin);
 
@@ -386,7 +392,9 @@ public class FileSystemPlugin : BuiltInChatPlugin
             case DirectoryInfo directoryInfo:
             {
                 var regex = new Regex(filePattern, RegexOptions.IgnoreCase | RegexOptions.Compiled, RegexTimeout);
-                infosToDelete = new RegexFileSystemInfoEnumerable(directoryInfo.FullName, regex, true).OfType<FileSystemInfo>();
+                infosToDelete = new RegexFileSystemInfoEnumerable(directoryInfo.FullName, regex, true)
+                    .WithCancellation(cancellationToken)
+                    .OfType<FileSystemInfo>();
                 break;
             }
             default:
@@ -511,7 +519,7 @@ public class FileSystemPlugin : BuiltInChatPlugin
         }
 
         await using var stream = new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
-        if (await EncodingDetector.DetectEncodingAsync(stream) is not { } encoding)
+        if (await EncodingDetector.DetectEncodingAsync(stream, cancellationToken: cancellationToken) is not { } encoding)
         {
             throw new InvalidOperationException("Cannot replace content in a binary file.");
         }

@@ -32,8 +32,9 @@ public static class EncodingDetector
     /// </summary>
     /// <param name="stream">The stream to analyze. Must be readable and seekable.</param>
     /// <param name="bufferSize">The number of bytes to read for detection. Default is 4096.</param>
+    /// <param name="cancellationToken"></param>
     /// <returns>The detected Encoding, or null if it's binary or undetermined.</returns>
-    public static async Task<Encoding?> DetectEncodingAsync(Stream stream, int bufferSize = 4096)
+    public static async Task<Encoding?> DetectEncodingAsync(Stream stream, int bufferSize = 4096, CancellationToken cancellationToken = default)
     {
         if (!stream.CanRead) throw new ArgumentException("Stream must be readable.", nameof(stream));
         if (!stream.CanSeek) throw new ArgumentException("Stream must be seekable.", nameof(stream));
@@ -45,7 +46,7 @@ public static class EncodingDetector
 
         try
         {
-            var bytesRead = await stream.ReadAsync(buffer.AsMemory(0, bufferSize));
+            var bytesRead = await stream.ReadAsync(buffer.AsMemory(0, bufferSize), cancellationToken);
 
             if (bytesRead == 0)
             {

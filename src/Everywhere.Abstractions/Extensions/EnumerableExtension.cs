@@ -250,10 +250,26 @@ public static class EnumerableExtension
     
     public static void RemoveRange<T>(this IList<T> list, int index, int count)
     {
-        // 从后往前删除，避免频繁移动元素
+        // Delete from back to front to avoid frequent element shifting
         for (var i = index + count - 1; i >= index; i--)
         {
             list.RemoveAt(i);
+        }
+    }
+
+    /// <summary>
+    /// Throws if the cancellation token is cancelled during enumeration
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="cancellationToken"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static IEnumerable<T> WithCancellation<T>(this IEnumerable<T> source, CancellationToken cancellationToken)
+    {
+        foreach (var item in source)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            yield return item;
         }
     }
 }

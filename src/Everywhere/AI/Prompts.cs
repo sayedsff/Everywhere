@@ -46,9 +46,13 @@ public static partial class Prompts
         """;
 
     // from: https://github.com/lobehub/lobe-chat/blob/main/src/chains/summaryTitle.ts#L4
-    public const string TitleGeneratorPrompt =
+    public const string TitleGeneratorSystemPrompt = "You are a conversation assistant named Everywhere.";
+
+    public const string TitleGeneratorUserPrompt =
         """
-        You are a conversation assistant named Everywhere. You need to summarize the user's conversation into a topic of 10 words or fewer.
+        Generate a concise and descriptive title for the following conversation.
+        The title should accurately reflect the main topic or purpose of the conversation in a few words.
+        Avoid using generic titles like "Chat" or "Conversation".
         
         User:
         ```markdown

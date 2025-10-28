@@ -38,21 +38,12 @@ public sealed class OpenAIKernelMixin : KernelMixinBase
         ).AsChatCompletionService();
     }
 
-    public override PromptExecutionSettings? GetPromptExecutionSettings(FunctionChoiceBehavior? functionChoiceBehavior = null)
+    public override PromptExecutionSettings GetPromptExecutionSettings(FunctionChoiceBehavior? functionChoiceBehavior = null)
     {
         double? temperature = _customAssistant.Temperature.IsCustomValueSet ? _customAssistant.Temperature.ActualValue : null;
         double? topP = _customAssistant.TopP.IsCustomValueSet ? _customAssistant.TopP.ActualValue : null;
         double? presencePenalty = _customAssistant.PresencePenalty.IsCustomValueSet ? _customAssistant.PresencePenalty.ActualValue : null;
         double? frequencyPenalty = _customAssistant.FrequencyPenalty.IsCustomValueSet ? _customAssistant.FrequencyPenalty.ActualValue : null;
-
-        if (temperature is null &&
-            topP is null &&
-            presencePenalty is null &&
-            frequencyPenalty is null &&
-            functionChoiceBehavior is null)
-        {
-            return null;
-        }
 
         return new OpenAIPromptExecutionSettings
         {
@@ -103,12 +94,13 @@ public sealed class OpenAIKernelMixin : KernelMixinBase
         private static PropertyInfo? _choiceDeltaProperty;
         private static PropertyInfo? _deltaRawDataProperty;
 
-        public Task<ChatResponse> GetResponseAsync(
+        public async Task<ChatResponse> GetResponseAsync(
             IEnumerable<ChatMessage> messages,
             ChatOptions? options = null,
             CancellationToken cancellationToken = default)
         {
-            return client.GetResponseAsync(messages, options, cancellationToken);
+            var res = await client.GetResponseAsync(messages, options, cancellationToken);
+            return res;
         }
 
         public async IAsyncEnumerable<ChatResponseUpdate> GetStreamingResponseAsync(

@@ -980,8 +980,11 @@ public class ChatService(
             {
                 new ChatMessageContent(
                     AuthorRole.System,
+                    Prompts.TitleGeneratorSystemPrompt),
+                new ChatMessageContent(
+                    AuthorRole.User,
                     Prompts.RenderPrompt(
-                        Prompts.TitleGeneratorPrompt,
+                        Prompts.TitleGeneratorUserPrompt,
                         new Dictionary<string, Func<string>>
                         {
                             { "UserMessage", () => userMessage.SafeSubstring(0, 2048) },
