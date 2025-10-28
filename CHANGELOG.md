@@ -5,10 +5,12 @@
 
 ### 🚀 Improvements
 - Chat window can be closed when press shortcut again
+- Optimized encoding handling in "File system" chat plugin
 
 ### 🐛 Bug Fixes
+- Fixed chat topic may not generate correctly for some models
 - Fixed "Web search" chat tool may report `count out of range` error
-- Fixed "Scroll to end" button in chat window mistakenly get focused 
+- Fixed "Scroll to end" button in chat window mistakenly get focused
 - (Windows) Fixed missing `Everything.dll`
 - (Windows) Fixed chat window still appears in `Alt+Tab` list when closed
 - (Windows) Fixed chat window disappears when picking a file
