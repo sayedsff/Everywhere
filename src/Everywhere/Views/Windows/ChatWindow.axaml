@@ -13,7 +13,8 @@
   IsOpened="{Binding IsOpened, Mode=OneWayToSource}"
   IsTitleBarVisible="False"
   RequestedThemeVariant="{x:Static themes:ThemeVariants.Acrylic}"
-  SizeToContent="WidthAndHeight" SystemDecorations="BorderOnly"
+  ShowActivated="False" SizeToContent="WidthAndHeight"
+  SystemDecorations="BorderOnly"
   TargetBoundingRect="{Binding TargetBoundingRect}"
   TransparencyLevelHint="AcrylicBlur" WindowStartupLocation="Manual">
 

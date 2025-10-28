@@ -40,15 +40,8 @@ public class ChatWindowInitializer(
 
         HandleChatShortcutChanged(settings.ChatWindow.Shortcut);
 
-        Dispatcher.UIThread.Invoke(() =>
-        {
-            // Preload ChatWindow to avoid delay on first open
-            var chatWindow = ServiceLocator.Resolve<ChatWindow>();
-            chatWindow.ViewModel.IsOpened = true;
-            chatWindow.ViewModel.IsOpened = false;
-            chatWindow.ShowActivated = true;
-            chatWindow.Topmost = true;
-        });
+        // Preload ChatWindow to avoid delay on first open
+        Dispatcher.UIThread.Invoke(() => ServiceLocator.Resolve<ChatWindow>().Initialize());
 
         return Task.CompletedTask;
     }
@@ -74,9 +67,14 @@ public class ChatWindowInitializer(
                 Dispatcher.UIThread.Invoke(() =>
                 {
                     var chatWindow = ServiceLocator.Resolve<ChatWindow>();
-                    if (hWnd == chatWindow.TryGetPlatformHandle()?.Handle) element = null; // Avoid focusing to itself
-
-                    chatWindow.ViewModel.TryFloatToTargetElementAsync(element).Detach(logger.ToExceptionHandler());
+                    if (hWnd == chatWindow.TryGetPlatformHandle()?.Handle)
+                    {
+                        chatWindow.ViewModel.IsOpened = false; // Hide chat window if it's already focused
+                    }
+                    else
+                    {
+                        chatWindow.ViewModel.TryFloatToTargetElementAsync(element).Detach(logger.ToExceptionHandler());
+                    }
                 });
             }));
     }

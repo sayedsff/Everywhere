@@ -175,17 +175,15 @@ public partial class ChatWindowViewModel : BusyViewModelBase, IEventSubscriber<C
 
         try
         {
-            if (_chatAttachments.Any(a => a is ChatVisualElementAttachment vea && Equals(vea.Element?.Target, targetElement)))
-            {
-                // Toggle the chat window visibility
-                IsOpened = true;
-                return;
-            }
+            IsOpened = true;
+
+            // Avoid adding duplicate attachments
+            if (_chatAttachments.Any(a => a is ChatVisualElementAttachment vea && Equals(vea.Element?.Target, targetElement))) return;
 
             TargetBoundingRect = default;
             if (targetElement == null)
             {
-                IsOpened = false;
+                if (_chatAttachments is [ChatVisualElementAttachment { IsFocusedElement: true }, ..]) _chatAttachments.RemoveAt(0);
                 return;
             }
 
@@ -205,8 +203,6 @@ public partial class ChatWindowViewModel : BusyViewModelBase, IEventSubscriber<C
                     _chatAttachments.Insert(0, attachment.With(a => a.IsFocusedElement = true));
                 }
             }
-
-            IsOpened = true;
         }
         catch (Exception ex)
         {
