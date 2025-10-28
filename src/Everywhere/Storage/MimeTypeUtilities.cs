@@ -96,4 +96,11 @@ public static class MimeTypeUtilities
     {
         return mimeType.StartsWith("audio/", StringComparison.OrdinalIgnoreCase);
     }
+
+    public static IEnumerable<string> GetExtensionsForMimeTypePrefix(string prefix)
+    {
+        return SupportedMimeTypes
+            .Where(kv => kv.Value.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+            .Select(kv => kv.Key);
+    }
 }

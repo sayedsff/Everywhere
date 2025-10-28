@@ -208,9 +208,22 @@
                     Background="{DynamicResource CardBackgroundColor}"
                     CornerRadius="4">
 
-                    <StackPanel
-                      Margin="6,0,4,0" Orientation="Horizontal"
-                      Spacing="4">
+                    <DockPanel
+                      Margin="6,0,4,0" HorizontalSpacing="4"
+                      LastChildFill="True">
+                      <Button
+                        DockPanel.Dock="Right" Padding="1"
+                        VerticalAlignment="Center" Background="Transparent"
+                        BorderThickness="0"
+                        Command="{Binding $parent[v:ChatInputBox].RemoveAttachmentCommand}"
+                        CommandParameter="{Binding}"
+                        Focusable="False"
+                        ToolTip.Tip="{I18N {x:Static LocaleKey.ChatAttachment_RemoveButton_ToolTip}}">
+                        <LucideIcon
+                          Foreground="{DynamicResource MutedColor}"
+                          Kind="X" Size="12"/>
+                      </Button>
+
                       <Image
                         MaxWidth="24" MaxHeight="24"
                         Margin="0,4" VerticalAlignment="Center"
@@ -221,32 +234,20 @@
                         </ToolTip.Tip>
                       </Image>
 
-                      <StackPanel
-                        Margin="6,0"
+                      <DockPanel
+                        HorizontalSpacing="4"
                         IsVisible="{Binding !IsImage}"
-                        Orientation="Horizontal" Spacing="4"
                         ToolTip.Tip="{Binding FilePath}">
                         <LucideIcon
-                          VerticalAlignment="Center"
+                          DockPanel.Dock="Left" VerticalAlignment="Center"
                           Kind="{Binding Icon}"
                           Size="14"/>
                         <TextBlock
                           VerticalAlignment="Center" FontSize="12"
-                          Text="{Binding HeaderKey^}"/>
-                      </StackPanel>
-
-                      <Button
-                        Padding="1" VerticalAlignment="Center"
-                        Background="Transparent" BorderThickness="0"
-                        Command="{Binding $parent[v:ChatInputBox].RemoveAttachmentCommand}"
-                        CommandParameter="{Binding}"
-                        Focusable="False"
-                        ToolTip.Tip="{I18N {x:Static LocaleKey.ChatAttachment_RemoveButton_ToolTip}}">
-                        <LucideIcon
-                          Foreground="{DynamicResource MutedColor}"
-                          Kind="X" Size="12"/>
-                      </Button>
-                    </StackPanel>
+                          Text="{Binding HeaderKey^}"
+                          TextTrimming="{x:Static TextTrimming.PrefixCharacterEllipsis}"/>
+                      </DockPanel>
+                    </DockPanel>
                   </Border>
                 </DataTemplate>
 
@@ -256,19 +257,16 @@
                     Background="{DynamicResource CardBackgroundColor}"
                     Classes.FocusedElement="{Binding IsFocusedElement}"
                     CornerRadius="4">
-                    <StackPanel
-                      Margin="6,0,4,0" Orientation="Horizontal"
-                      Spacing="4">
+                    <DockPanel
+                      Margin="6,0,4,0" HorizontalSpacing="4">
                       <LucideIcon
-                        VerticalAlignment="Center"
+                        DockPanel.Dock="Left" VerticalAlignment="Center"
                         Kind="{Binding Icon}"
                         Size="14"/>
-                      <TextBlock
-                        VerticalAlignment="Center" FontSize="12"
-                        Text="{Binding HeaderKey^}"/>
                       <Button
-                        Padding="1" VerticalAlignment="Center"
-                        Background="Transparent" BorderThickness="0"
+                        DockPanel.Dock="Right" Padding="1"
+                        VerticalAlignment="Center" Background="Transparent"
+                        BorderThickness="0"
                         Command="{Binding $parent[v:ChatInputBox].RemoveAttachmentCommand}"
                         CommandParameter="{Binding}"
                         Focusable="False"
@@ -277,7 +275,11 @@
                           Foreground="{DynamicResource MutedColor}"
                           Kind="X" Size="12"/>
                       </Button>
-                    </StackPanel>
+                      <TextBlock
+                        VerticalAlignment="Center" FontSize="12"
+                        Text="{Binding HeaderKey^}"
+                        TextTrimming="{x:Static TextTrimming.PrefixCharacterEllipsis}"/>
+                    </DockPanel>
                   </Border>
                 </DataTemplate>
 
@@ -286,19 +288,17 @@
                     Height="24"
                     Background="{DynamicResource CardBackgroundColor}"
                     CornerRadius="4">
-                    <StackPanel
-                      Margin="6,0,4,0" Orientation="Horizontal"
-                      Spacing="4">
+                    <DockPanel
+                      Margin="6,0,4,0" HorizontalSpacing="4"
+                      LastChildFill="True">
                       <LucideIcon
-                        VerticalAlignment="Center"
+                        DockPanel.Dock="Left" VerticalAlignment="Center"
                         Kind="{Binding Icon}"
                         Size="14"/>
-                      <TextBlock
-                        VerticalAlignment="Center" FontSize="12"
-                        Text="{Binding HeaderKey^}"/>
                       <Button
-                        Padding="1" VerticalAlignment="Center"
-                        Background="Transparent" BorderThickness="0"
+                        DockPanel.Dock="Right" Padding="1"
+                        VerticalAlignment="Center" Background="Transparent"
+                        BorderThickness="0"
                         Command="{Binding $parent[v:ChatInputBox].RemoveAttachmentCommand}"
                         CommandParameter="{Binding}"
                         Focusable="False"
@@ -307,7 +307,11 @@
                           Foreground="{DynamicResource MutedColor}"
                           Kind="X" Size="12"/>
                       </Button>
-                    </StackPanel>
+                      <TextBlock
+                        VerticalAlignment="Center" FontSize="12"
+                        Text="{Binding HeaderKey^}"
+                        TextTrimming="{x:Static TextTrimming.PrefixCharacterEllipsis}"/>
+                    </DockPanel>
                   </Border>
                 </DataTemplate>
               </ItemsControl.DataTemplates>

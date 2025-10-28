@@ -303,9 +303,27 @@ public partial class ChatWindowViewModel : BusyViewModelBase, IEventSubscriber<C
                     AllowMultiple = true,
                     FileTypeFilter =
                     [
+                        new FilePickerFileType("Supported Files")
+                        {
+                            Patterns = MimeTypeUtilities.SupportedMimeTypes.Keys
+                                .AsValueEnumerable()
+                                .Select(x => '*' + x)
+                                .ToList()
+                        },
                         new FilePickerFileType("Images")
                         {
-                            Patterns = ["*.png", "*.jpg", "*.jpeg", "*.gif", "*.bmp", "*.webp"]
+                            Patterns = MimeTypeUtilities.GetExtensionsForMimeTypePrefix("image/")
+                                .AsValueEnumerable()
+                                .Select(x => '*' + x)
+                                .ToList()
+                        },
+                        new FilePickerFileType("Documents")
+                        {
+                            Patterns = MimeTypeUtilities.GetExtensionsForMimeTypePrefix("application/")
+                                .AsValueEnumerable()
+                                .Concat(MimeTypeUtilities.GetExtensionsForMimeTypePrefix("text/"))
+                                .Select(x => '*' + x)
+                                .ToList()
                         },
                         new FilePickerFileType("All Files")
                         {
@@ -339,19 +357,7 @@ public partial class ChatWindowViewModel : BusyViewModelBase, IEventSubscriber<C
 
         try
         {
-            var attachment = await ChatFileAttachment.CreateAsync(filePath);
-
-            if (!attachment.IsImage)
-            {
-                return; // TODO: 0.3.0
-            }
-
-            if (Settings.Model.SelectedCustomAssistant?.IsImageInputSupported.ActualValue is not true)
-            {
-                return;
-            }
-
-            _chatAttachments.Add(attachment);
+            _chatAttachments.Add(await ChatFileAttachment.CreateAsync(filePath));
         }
         catch (Exception ex)
         {
