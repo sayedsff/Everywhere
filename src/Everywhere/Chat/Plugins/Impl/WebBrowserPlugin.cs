@@ -47,6 +47,7 @@ public partial class WebBrowserPlugin : BuiltInChatPlugin
     private readonly SemaphoreSlim _browserLock = new(1, 1);
 
     private IWebSearchEngineConnector? _connector;
+    private int _maxSearchCount;
     private IBrowser? _browser;
     private Process? _browserProcess;
 
@@ -131,21 +132,21 @@ public partial class WebBrowserPlugin : BuiltInChatPlugin
         // Extract only the base URI without query parameters
         uri = new UriBuilder(uri) { Query = string.Empty }.Uri;
 
-        _connector = provider.Id.ToLower() switch
+        (_connector, _maxSearchCount) = provider.Id.ToLower() switch
         {
-            "google" => new GoogleConnector(
+            "google" => (new GoogleConnector(
                 new BaseClientService.Initializer
                 {
                     ApiKey = EnsureApiKey(provider.ApiKey),
                     BaseUri = uri.AbsoluteUri,
                 },
                 provider.SearchEngineId ?? throw new UnauthorizedAccessException("Search Engine ID is not set."),
-                _loggerFactory),
-            "tavily" => new TavilyConnector(EnsureApiKey(provider.ApiKey), uri, _loggerFactory),
-            "brave" => new BraveConnector(EnsureApiKey(provider.ApiKey), new Uri(uri, "?q"), _loggerFactory),
-            "bocha" => new BoChaConnector(EnsureApiKey(provider.ApiKey), uri, _loggerFactory),
-            "jina" => new JinaConnector(EnsureApiKey(provider.ApiKey), new Uri(uri, "?q"), _loggerFactory),
-            "searxng" => new SearxngConnector(uri, _loggerFactory),
+                _loggerFactory) as IWebSearchEngineConnector, 10),
+            "tavily" => (new TavilyConnector(EnsureApiKey(provider.ApiKey), uri, _loggerFactory), 20),
+            "brave" => (new BraveConnector(EnsureApiKey(provider.ApiKey), new Uri(uri, "?q"), _loggerFactory), 20),
+            "bocha" => (new BoChaConnector(EnsureApiKey(provider.ApiKey), uri, _loggerFactory), 50),
+            "jina" => (new JinaConnector(EnsureApiKey(provider.ApiKey), new Uri(uri, "?q"), _loggerFactory), 50),
+            "searxng" => (new SearxngConnector(uri, _loggerFactory), 50),
             _ => throw new NotSupportedException($"Web search engine provider '{provider.Id}' is not supported.")
         };
 
@@ -158,8 +159,7 @@ public partial class WebBrowserPlugin : BuiltInChatPlugin
     /// </summary>
     /// <param name="userInterface"></param>
     /// <param name="query">The text to search for.</param>
-    /// <param name="count">The number of results to return. Default is 1.</param>
-    /// <param name="offset">The number of results to skip. Default is 0.</param>
+    /// <param name="count">The number of results to return. Default is 10.</param>
     /// <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>
     /// <returns>A task that represents the asynchronous operation. The value of the TResult parameter contains the search results as a string.</returns>
     /// <remarks>
@@ -169,16 +169,15 @@ public partial class WebBrowserPlugin : BuiltInChatPlugin
     [KernelFunction("web_search")]
     [Description(
         "Perform a web search and return the results as a json array of web pages. " +
-        "You can use the results to answer user questions with up-to-date information.")] // TODO: index
+        "You can use the results to answer user questions with up-to-date information.")] // TODO: index (chat scope)
     [DynamicResourceKey(LocaleKey.NativeChatPlugin_WebBrowser_WebSearch_Header)]
     private async Task<string> WebSearchAsync(
         [FromKernelServices] IChatPluginUserInterface userInterface,
         [Description("Search query")] string query,
-        [Description("Number of results")] int count = 20,
-        [Description("Number of results to skip")] int offset = 0,
-        CancellationToken cancellationToken = default)
+        [Description("Number of results")] int count = 10,
+        CancellationToken cancellationToken = default) // TODO: Offset is not well supported.
     {
-        _logger.LogDebug("Performing web search with query: {Query}, count: {Count}, offset: {Offset}", query, count, offset);
+        _logger.LogDebug("Performing web search with query: {Query}, count: {Count}", query, count);
 
         userInterface.RequestDisplaySink().AppendDynamicResourceKey(
             new FormattedDynamicResourceKey(
@@ -186,12 +185,13 @@ public partial class WebBrowserPlugin : BuiltInChatPlugin
                 new DirectResourceKey(query)));
 
         EnsureConnector();
+        count = Math.Clamp(count, 1, _maxSearchCount);
 
-        var results = await _connector.SearchAsync<WebPage>(query, count, offset, cancellationToken).ConfigureAwait(false);
+        var results = await _connector.SearchAsync<WebPage>(query, count, 0, cancellationToken).ConfigureAwait(false);
         var indexedResults = results
             .AsValueEnumerable()
             .Select((r, i) => new IndexedWebPage(
-                Index: offset + i + 1,
+                Index: i + 1,
                 Name: r.Name,
                 Url: r.Url,
                 Snippet: r.Snippet))
@@ -375,9 +375,9 @@ public partial class WebBrowserPlugin : BuiltInChatPlugin
 
         public async Task<IEnumerable<T>> SearchAsync<T>(string query, int count = 1, int offset = 0, CancellationToken cancellationToken = default)
         {
-            if (count is <= 0 or >= 50)
+            if (count is <= 0 or >= 21)
             {
-                throw new ArgumentOutOfRangeException(nameof(count), count, $"{nameof(count)} value must be greater than 0 and less than 50.");
+                throw new ArgumentOutOfRangeException(nameof(count), count, $"{nameof(count)} value must be greater than 0 and less than 21.");
             }
 
             _logger.LogDebug("Sending request");
@@ -560,9 +560,9 @@ public partial class WebBrowserPlugin : BuiltInChatPlugin
         /// <inheritdoc/>
         public async Task<IEnumerable<T>> SearchAsync<T>(string query, int count = 1, int offset = 0, CancellationToken cancellationToken = default)
         {
-            if (count is <= 0 or >= 50)
+            if (count is <= 0 or >= 51)
             {
-                throw new ArgumentOutOfRangeException(nameof(count), count, $"{nameof(count)} value must be greater than 0 and less than 50.");
+                throw new ArgumentOutOfRangeException(nameof(count), count, $"{nameof(count)} value must be greater than 0 and less than 51.");
             }
 
             _logger.LogDebug("Sending request: {Uri}", _uri);
