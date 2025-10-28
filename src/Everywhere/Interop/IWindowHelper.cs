@@ -34,4 +34,11 @@ public interface IWindowHelper
     /// <param name="window"></param>
     /// <param name="cloaked"></param>
     void SetCloaked(Window window, bool cloaked);
+
+    /// <summary>
+    /// Get whether any dialog is opened on the given window. (e.g. MessageBox, OpenFileDialog, etc.)
+    /// </summary>
+    /// <param name="window"></param>
+    /// <returns></returns>
+    bool AnyModelDialogOpened(Window window);
 }

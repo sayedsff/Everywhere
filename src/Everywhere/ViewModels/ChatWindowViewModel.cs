@@ -52,6 +52,11 @@ public partial class ChatWindowViewModel : BusyViewModelBase, IEventSubscriber<C
     [ObservableProperty]
     public partial PixelRect TargetBoundingRect { get; private set; }
 
+    /// <summary>
+    /// Indicates whether the file picker is currently open.
+    /// </summary>
+    public bool IsPickingFiles { get; set; }
+
     [field: AllowNull, MaybeNull]
     public NotifyCollectionChangedSynchronizedViewList<ChatAttachment> ChatAttachments =>
         field ??= _chatAttachments.ToNotifyCollectionChangedSlim(SynchronizationContextCollectionEventDispatcher.Current);
@@ -294,7 +299,7 @@ public partial class ChatWindowViewModel : BusyViewModelBase, IEventSubscriber<C
         if (_chatAttachments.Count >= Settings.Internal.MaxChatAttachmentCount) return;
 
         IReadOnlyList<IStorageFile> files;
-        IsOpened = false;
+        IsPickingFiles = true;
         try
         {
             files = await StorageProvider.OpenFilePickerAsync(
@@ -303,21 +308,21 @@ public partial class ChatWindowViewModel : BusyViewModelBase, IEventSubscriber<C
                     AllowMultiple = true,
                     FileTypeFilter =
                     [
-                        new FilePickerFileType("Supported Files")
+                        new FilePickerFileType(LocaleKey.ChatWindowViewModel_AddFile_FilePickerFileType_SupportedFiles.I18N())
                         {
                             Patterns = MimeTypeUtilities.SupportedMimeTypes.Keys
                                 .AsValueEnumerable()
                                 .Select(x => '*' + x)
                                 .ToList()
                         },
-                        new FilePickerFileType("Images")
+                        new FilePickerFileType(LocaleKey.ChatWindowViewModel_AddFile_FilePickerFileType_Images.I18N())
                         {
                             Patterns = MimeTypeUtilities.GetExtensionsForMimeTypePrefix("image/")
                                 .AsValueEnumerable()
                                 .Select(x => '*' + x)
                                 .ToList()
                         },
-                        new FilePickerFileType("Documents")
+                        new FilePickerFileType(LocaleKey.ChatWindowViewModel_AddFile_FilePickerFileType_Documents.I18N())
                         {
                             Patterns = MimeTypeUtilities.GetExtensionsForMimeTypePrefix("application/")
                                 .AsValueEnumerable()
@@ -325,7 +330,7 @@ public partial class ChatWindowViewModel : BusyViewModelBase, IEventSubscriber<C
                                 .Select(x => '*' + x)
                                 .ToList()
                         },
-                        new FilePickerFileType("All Files")
+                        new FilePickerFileType(LocaleKey.ChatWindowViewModel_AddFile_FilePickerFileType_AllFiles.I18N())
                         {
                             Patterns = ["*"]
                         }
@@ -334,7 +339,7 @@ public partial class ChatWindowViewModel : BusyViewModelBase, IEventSubscriber<C
         }
         finally
         {
-            IsOpened = true;
+            IsPickingFiles = false;
         }
 
         if (files.Count <= 0) return;

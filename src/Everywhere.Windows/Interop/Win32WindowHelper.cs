@@ -178,6 +178,33 @@ public class Win32WindowHelper : IWindowHelper
         }
     }
 
+    public bool AnyModelDialogOpened(Window window)
+    {
+        if (window.TryGetPlatformHandle() is not { } handle) return false;
+        var ownerHwnd = (HWND)handle.Handle;
+        var dialogFound = false;
+
+        // This is a quick check. When a modal dialog is open, its owner window is usually disabled.
+        // If the window is still enabled, then it's likely that there's no modal dialog.
+        if (PInvoke.IsWindowEnabled(ownerHwnd))
+        {
+            return false;
+        }
+
+        // Enumerate all top-level windows to find any owned by our window.
+        PInvoke.EnumWindows((hwnd, _) =>
+        {
+            if (PInvoke.GetWindow(hwnd, GET_WINDOW_CMD.GW_OWNER) != ownerHwnd ||
+                !PInvoke.IsWindowVisible(hwnd) ||
+                !PInvoke.IsWindowEnabled(hwnd)) return true;
+
+            dialogFound = true;
+            return false;
+        }, 0);
+
+        return dialogFound;
+    }
+
     private static void Cloak(HWND hWnd)
     {
         bool wasCloaked;

@@ -11,6 +11,7 @@ using Everywhere.Chat;
 using Everywhere.Common;
 using Everywhere.Configuration;
 using Everywhere.Interop;
+using Everywhere.Utilities;
 using LiveMarkdown.Avalonia;
 using Microsoft.Extensions.Logging;
 using ShadUI;
@@ -189,13 +190,26 @@ public partial class ChatWindow : ReactiveShadWindow<ChatWindowViewModel>, IReac
         return new Size(width, height);
     }
 
-    protected override void OnLostFocus(RoutedEventArgs e)
-    {
-        base.OnLostFocus(e);
+    private readonly ReusableCancellationTokenSource _lostFocusCts = new();
 
-        if (!IsActive && !IsWindowPinned)
+    protected override async void OnLostFocus(RoutedEventArgs e)
+    {
+        try
         {
-            IsOpened = false;
+            base.OnLostFocus(e);
+
+            // leave some time for focus to move to another element within the window
+            _lostFocusCts.Cancel();
+            await Task.Delay(200, _lostFocusCts.Token);
+
+            if (!ViewModel.IsPickingFiles && !IsActive && !IsWindowPinned && !_windowHelper.AnyModelDialogOpened(this))
+            {
+                IsOpened = false;
+            }
+        }
+        catch
+        {
+            // Ignore
         }
     }
 

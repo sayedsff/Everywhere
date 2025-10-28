@@ -1270,4 +1270,16 @@ Placeholders can be used within the prompt, enclosed in {}, and will be replaced
     <data name="NativeChatPlugin_PowerShell_ExecuteScript_Header" xml:space="preserve">
         <value>Execute Script</value>
     </data>
+    <data name="ChatWindowViewModel_AddFile_FilePickerFileType_Documents" xml:space="preserve">
+        <value>Document</value>
+    </data>
+    <data name="ChatWindowViewModel_AddFile_FilePickerFileType_SupportedFiles" xml:space="preserve">
+        <value>Supported Files</value>
+    </data>
+    <data name="ChatWindowViewModel_AddFile_FilePickerFileType_Images" xml:space="preserve">
+        <value>Images</value>
+    </data>
+    <data name="ChatWindowViewModel_AddFile_FilePickerFileType_AllFiles" xml:space="preserve">
+        <value>All Files</value>
+    </data>
 </root>

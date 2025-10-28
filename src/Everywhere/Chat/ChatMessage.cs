@@ -338,6 +338,10 @@ public partial class FunctionCallChatMessage : ChatMessage, IChatMessageWithAtta
     [Key(10)]
     public ObservableCollection<ChatPluginDisplayBlock> DisplayBlocks { get; set; } = [];
 
+    [Key(11)]
+    [ObservableProperty]
+    public partial bool IsExpanded { get; set; } = true;
+
     [IgnoreMember]
     [JsonIgnore]
     public bool IsWaitingForUserInput => DisplayBlocks.Any(db => db.IsWaitingForUserInput);
