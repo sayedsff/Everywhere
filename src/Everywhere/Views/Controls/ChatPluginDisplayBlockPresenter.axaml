@@ -61,7 +61,8 @@
         </DataTemplate>
         <DataTemplate DataType="plugins:ChatPluginFileReferencesDisplayBlock">
           <StackPanel Spacing="4">
-            <TextBlock Classes="Muted">
+            <TextBlock
+              Classes="Muted" FontSize="12">
               <TextBlock.Text>
                 <I18N Key="{x:Static LocaleKey.ChatPluginDisplayBlockPresenter_FileReferences_TotalCountTextBlock_Text}">
                   <Binding Path="TotalReferenceCount"/>
@@ -88,7 +89,7 @@
               </ItemsControl.ItemTemplate>
             </ItemsControl>
             <TextBlock
-              Classes="Muted"
+              Classes="Muted" FontSize="12"
               IsVisible="{Binding HasMoreReferences}"
               Text="{I18N {x:Static LocaleKey.ChatPluginDisplayBlockPresenter_FileReferences_HasMoreReferencesTextBlock_Text}}"/>
           </StackPanel>
@@ -100,7 +101,8 @@
         </DataTemplate>
         <DataTemplate DataType="plugins:ChatPluginUrlsDisplayBlock">
           <StackPanel Spacing="4">
-            <TextBlock Classes="Muted">
+            <TextBlock
+              Classes="Muted" FontSize="12">
               <TextBlock.Text>
                 <I18N Key="{x:Static LocaleKey.ChatPluginDisplayBlockPresenter_Urls_TotalCountTextBlock_Text}">
                   <Binding Path="Urls.Count"/>

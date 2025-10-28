@@ -1,12 +1,13 @@
 ﻿using System.Buffers;
 using System.ComponentModel;
+using System.IO.Enumeration;
 using System.Text;
 using System.Text.RegularExpressions;
 using Everywhere.Chat.Permissions;
+using Everywhere.Utilities;
 using Lucide.Avalonia;
 using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
-using ZLinq;
 
 namespace Everywhere.Chat.Plugins;
 
@@ -63,7 +64,8 @@ public class FileSystemPlugin : BuiltInChatPlugin
     }
 
     [KernelFunction("search_files")]
-    [Description("Search for files and directories in a specified path matching the given search pattern.")]
+    [Description(
+        "Search for files and directories in a specified path matching the given search pattern. This tool may slow; avoid using it to enumerate large numbers of files.")]
     [DynamicResourceKey(LocaleKey.NativeChatPlugin_FileSystem_SearchFiles_Header)]
     [FriendlyFunctionCallContentRenderer(typeof(FileRenderer))]
     private string SearchFiles(
@@ -87,11 +89,14 @@ public class FileSystemPlugin : BuiltInChatPlugin
 
         var regex = new Regex(filePattern, RegexOptions.IgnoreCase | RegexOptions.Compiled, RegexTimeout);
         ExpandFullPath(ref path);
-        var query = EnsureDirectoryInfo(path)
-            .EnumerateFileSystemInfos("*", SearchOption.AllDirectories)
-            .Select(TryCreateFileRecord)
-            .Where(r => r.HasValue) // filter out nulls
-            .Select(r => r!.Value);
+        var query = new RegexFileSystemInfoEnumerable(EnsureDirectoryInfo(path).FullName, regex, true)
+            .OfType<FileSystemInfo>()
+            .Select(i => new FileRecord(
+                i.Name,
+                i is FileInfo file ? file.Length : -1,
+                i.CreationTime,
+                i.LastWriteTime,
+                i.Attributes));
 
         query = orderBy switch
         {
@@ -103,26 +108,6 @@ public class FileSystemPlugin : BuiltInChatPlugin
         };
 
         return new FileRecords(query.Skip(skip).Take(maxCount)).ToString();
-
-        // Use try...catch to avoid issues with inaccessible files which can break the whole enumeration
-        FileRecord? TryCreateFileRecord(FileSystemInfo info)
-        {
-            try
-            {
-                if (!regex.IsMatch(info.Name)) return null;
-
-                return new FileRecord(
-                    info.Name,
-                    info is FileInfo file ? file.Length : -1,
-                    info.CreationTime,
-                    info.LastWriteTime,
-                    info.Attributes);
-            }
-            catch
-            {
-                return null;
-            }
-        }
     }
 
     [KernelFunction("get_file_info")]
@@ -180,14 +165,10 @@ public class FileSystemPlugin : BuiltInChatPlugin
         const int maxCollectedLines = 2000;
         const long maxSearchFileSize = 10 * 1024 * 1024; // 10 MB
 
-        IEnumerable<FileInfo> filesToSearch = fileSystemInfo switch
+        var filesToSearch = fileSystemInfo switch
         {
             FileInfo fileInfo when fileRegex.IsMatch(fileInfo.Name) => [fileInfo],
-            DirectoryInfo directoryInfo => directoryInfo
-                .EnumerateFiles("*", SearchOption.AllDirectories)
-                .AsValueEnumerable()
-                .Where(file => fileRegex.IsMatch(file.Name))
-                .ToList(),
+            DirectoryInfo directoryInfo => new RegexFileSystemInfoEnumerable(directoryInfo.FullName, fileRegex, true).OfType<FileInfo>(),
             _ => []
         };
 
@@ -199,7 +180,7 @@ public class FileSystemPlugin : BuiltInChatPlugin
             if (file.Length > maxSearchFileSize) continue;
 
             await using var stream = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.Read);
-            if (await IsBinaryFileAsync(stream))
+            if (await EncodingDetector.DetectEncodingAsync(stream) is null)
             {
                 continue;
             }
@@ -245,17 +226,13 @@ public class FileSystemPlugin : BuiltInChatPlugin
         string path,
         long startBytes = 0L,
         long maxReadBytes = 10240L,
-        [Description("Text encoding name for `System.Text.Encoding.GetEncoding`")] string encoding = "utf-8",
         CancellationToken cancellationToken = default)
     {
         _logger.LogDebug(
-            "Reading text file at path: {Path}, startBytes: {StartBytes}, maxReadBytes: {MaxReadBytes}, encoding: {Encoding}",
+            "Reading text file at path: {Path}, startBytes: {StartBytes}, maxReadBytes: {MaxReadBytes}",
             path,
             startBytes,
-            maxReadBytes,
-            encoding);
-
-        var enc = Encoding.GetEncoding(encoding);
+            maxReadBytes);
 
         ExpandFullPath(ref path);
         var fileInfo = EnsureFileInfo(path);
@@ -271,7 +248,7 @@ public class FileSystemPlugin : BuiltInChatPlugin
         }
 
         var stringBuilder = new StringBuilder();
-        if (await IsBinaryFileAsync(stream))
+        if (await EncodingDetector.DetectEncodingAsync(stream) is not { } encoding)
         {
             stream.Seek(startBytes, SeekOrigin.Begin);
 
@@ -294,7 +271,7 @@ public class FileSystemPlugin : BuiltInChatPlugin
         }
 
         stream.Seek(startBytes, SeekOrigin.Begin);
-        using var reader = new StreamReader(stream, enc);
+        using var reader = new StreamReader(stream, encoding);
         var readBuffer = ArrayPool<char>.Shared.Rent(1024);
         try
         {
@@ -302,10 +279,10 @@ public class FileSystemPlugin : BuiltInChatPlugin
             long totalBytesRead = 0;
             while ((charsRead = await reader.ReadAsync(readBuffer.AsMemory(), cancellationToken)) > 0)
             {
-                var bytesRead = enc.GetByteCount(readBuffer, 0, charsRead);
+                var bytesRead = encoding.GetByteCount(readBuffer, 0, charsRead);
                 if (totalBytesRead + bytesRead > maxReadBytes)
                 {
-                    var allowedChars = enc.GetMaxCharCount((int)(maxReadBytes - totalBytesRead));
+                    var allowedChars = encoding.GetMaxCharCount((int)(maxReadBytes - totalBytesRead));
                     stringBuilder.Append(readBuffer, 0, allowedChars);
                     break;
                 }
@@ -398,7 +375,7 @@ public class FileSystemPlugin : BuiltInChatPlugin
             throw new UnauthorizedAccessException("Cannot delete system files or directories.");
         }
 
-        List<FileSystemInfo> infosToDelete;
+        IEnumerable<FileSystemInfo> infosToDelete;
         switch (fileSystemInfo)
         {
             case FileInfo fileInfo:
@@ -409,7 +386,7 @@ public class FileSystemPlugin : BuiltInChatPlugin
             case DirectoryInfo directoryInfo:
             {
                 var regex = new Regex(filePattern, RegexOptions.IgnoreCase | RegexOptions.Compiled, RegexTimeout);
-                infosToDelete = directoryInfo.EnumerateFileSystemInfos("*").AsValueEnumerable().Where(i => regex.IsMatch(i.Name)).ToList();
+                infosToDelete = new RegexFileSystemInfoEnumerable(directoryInfo.FullName, regex, true).OfType<FileSystemInfo>();
                 break;
             }
             default:
@@ -458,7 +435,7 @@ public class FileSystemPlugin : BuiltInChatPlugin
         }
 
         return errorCount == 0 ?
-            $"{infosToDelete.Count} files/directories were deleted successfully." :
+            $"{successCount} files/directories were deleted successfully." :
             $"{successCount} files/directories were deleted successfully, {errorCount} errors occurred.";
     }
 
@@ -481,19 +458,18 @@ public class FileSystemPlugin : BuiltInChatPlugin
     private async Task WriteToFileAsync(
         string path,
         string? content,
-        [Description("Text encoding name for `System.Text.Encoding.GetEncoding`")] string encoding = "utf-8",
         bool append = false)
     {
-        _logger.LogDebug("Writing text file at {Path}, encoding: {Encoding}, append: {Append}", path, encoding, append);
+        _logger.LogDebug("Writing text file at {Path}, append: {Append}", path, append);
 
         ExpandFullPath(ref path);
         await using var stream = new FileStream(path, append ? FileMode.Append : FileMode.Create, FileAccess.ReadWrite, FileShare.None);
-        if (await IsBinaryFileAsync(stream))
+        if (await EncodingDetector.DetectEncodingAsync(stream) is not { } encoding)
         {
             throw new InvalidOperationException("Cannot write to a binary file.");
         }
 
-        await using var writer = new StreamWriter(stream, Encoding.GetEncoding(encoding));
+        await using var writer = new StreamWriter(stream, encoding);
         await writer.WriteAsync(content);
         await writer.FlushAsync();
     }
@@ -508,16 +484,14 @@ public class FileSystemPlugin : BuiltInChatPlugin
         [Description("Regex patterns to search for within the file.")] IReadOnlyList<string> patterns,
         [Description("Replacement strings that march patterns.")] IReadOnlyList<string> replacements,
         bool ignoreCase = false,
-        [Description("Text encoding name for `System.Text.Encoding.GetEncoding`")] string encoding = "utf-8",
         CancellationToken cancellationToken = default)
     {
         _logger.LogDebug(
-            "Replacing file content at {Path} with patterns: {Patterns}, replacements: {Replacements}, ignoreCase: {IgnoreCase}, encoding: {Encoding}",
+            "Replacing file content at {Path} with patterns: {Patterns}, replacements: {Replacements}, ignoreCase: {IgnoreCase}",
             path,
             patterns,
             replacements,
-            ignoreCase,
-            encoding);
+            ignoreCase);
 
         if (patterns.Count == 0)
         {
@@ -537,13 +511,13 @@ public class FileSystemPlugin : BuiltInChatPlugin
         }
 
         await using var stream = new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
-        if (await IsBinaryFileAsync(stream))
+        if (await EncodingDetector.DetectEncodingAsync(stream) is not { } encoding)
         {
             throw new InvalidOperationException("Cannot replace content in a binary file.");
         }
 
         stream.Seek(0, SeekOrigin.Begin);
-        using var reader = new StreamReader(stream, Encoding.GetEncoding(encoding));
+        using var reader = new StreamReader(stream, encoding);
         var fileContent = await reader.ReadToEndAsync(cancellationToken);
 
         var regexOptions = RegexOptions.Compiled | RegexOptions.Multiline;
@@ -576,7 +550,7 @@ public class FileSystemPlugin : BuiltInChatPlugin
         replacedContent = difference.Apply(fileContent);
         stream.SetLength(0);
         stream.Seek(0, SeekOrigin.Begin);
-        await using var writer = new StreamWriter(stream, Encoding.GetEncoding(encoding));
+        await using var writer = new StreamWriter(stream, encoding);
         await writer.WriteAsync(replacedContent);
         await writer.FlushAsync(cancellationToken);
 
@@ -655,23 +629,35 @@ public class FileSystemPlugin : BuiltInChatPlugin
         throw new FileNotFoundException("The specified path does not exist as a file or directory.");
     }
 
-    private static async ValueTask<bool> IsBinaryFileAsync(Stream stream)
-    {
-        // Check if the file is binary by reading the first few bytes
-        const int bufferSize = 1024;
-        var buffer = ArrayPool<byte>.Shared.Rent(bufferSize);
-        try
+    /// <summary>
+    /// An enumerable that filters FileSystemInfo objects based on a regex pattern.
+    /// </summary>
+    /// <param name="directory"></param>
+    /// <param name="regex"></param>
+    /// <param name="recurseSubdirectories"></param>
+    private class RegexFileSystemInfoEnumerable(string directory, Regex regex, bool recurseSubdirectories) : FileSystemEnumerable<FileSystemInfo?>(
+        directory,
+        (ref entry) =>
         {
-            var bytesRead = await stream.ReadAsync(buffer.AsMemory(0, bufferSize));
-            return bytesRead > 0 && buffer.Take(bytesRead).Any(b => b == 0);
-        }
-        finally
+            try
+            {
+                return !regex.IsMatch(entry.FileName) ? null : entry.ToFileSystemInfo();
+            }
+            catch
+            {
+                return null;
+            }
+        },
+        new EnumerationOptions
         {
-            ArrayPool<byte>.Shared.Return(buffer);
-        }
-    }
+            IgnoreInaccessible = true,
+            MatchType = MatchType.Simple,
+            ReturnSpecialDirectories = false,
+            MaxRecursionDepth = 32,
+            RecurseSubdirectories = recurseSubdirectories
+        });
 
-    private class FileRenderer : IFriendlyFunctionCallContentRenderer
+    private sealed class FileRenderer : IFriendlyFunctionCallContentRenderer
     {
         public ChatPluginDisplayBlock? Render(KernelArguments arguments)
         {

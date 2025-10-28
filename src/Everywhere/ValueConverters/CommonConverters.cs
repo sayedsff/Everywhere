@@ -22,7 +22,7 @@ public static class CommonConverters
         );
 
     public static IValueConverter FullPathToFileName { get; } = new FuncValueConverter<string, string?>(
-        convert: Path.GetFileName
+        convert: x => Path.GetFileName(x) is { Length: > 0 } fileName ? fileName : x // return original if no file name found (e.g. Path root)
     );
 
     public static IMultiValueConverter DefaultMultiValue { get; } = new DefaultMultiValueConverter();
