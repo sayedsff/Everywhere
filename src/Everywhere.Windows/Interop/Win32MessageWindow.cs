@@ -2,6 +2,7 @@
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
 using Everywhere.Extensions;
+using Everywhere.Utilities;
 
 namespace Everywhere.Windows.Interop;
 
@@ -42,7 +43,7 @@ internal sealed class Win32MessageWindow
             }
             list.Add(handler);
         }
-        return new Disposer(() => RemoveHandler(message, handler));
+        return new AnonymousDisposable(() => RemoveHandler(message, handler));
     }
 
     private void RemoveHandler(uint message, MessageHandler handler)
@@ -93,12 +94,5 @@ internal sealed class Win32MessageWindow
             PInvoke.TranslateMessage(&msg);
             PInvoke.DispatchMessage(&msg);
         }
-    }
-
-    private readonly struct Disposer : IDisposable
-    {
-        private readonly Action _dispose;
-        public Disposer(Action dispose) { _dispose = dispose; }
-        public void Dispose() => _dispose?.Invoke();
     }
 }

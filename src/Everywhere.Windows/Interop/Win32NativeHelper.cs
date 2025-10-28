@@ -212,19 +212,22 @@ public class Win32NativeHelper : INativeHelper
 
     public void ShowDesktopNotification(string message, string? title)
     {
-        const string ModelId = "Everywhere-{FF7A2913-28D0-4BC2-A5BC-F2CF62FF6F1F}";
         var registryKey = Registry.CurrentUser.CreateSubKey(@"Software\Classes\AppUserModelId");
-        var subKey = registryKey.CreateSubKey(ModelId);
-        subKey.SetValue("DisplayName", "Everywhere");
+        const string ModelId = "{D66EA41B-8DEB-4E5A-9D32-AB4F8305F664}/Everywhere";
+        var tempFilePath = Path.Combine(Path.GetTempPath(), "D66EA41B-8DEB-4E5A-9D32-AB4F8305F664-Everywhere.ico");
 
-        var iconResource = AssetLoader.Open(new Uri("avares://Everywhere/Assets/Everywhere.ico"));
-        var tempFilePath = Path.Combine(Path.GetTempPath(), $"{ModelId}.ico");
-        using (var fs = File.Create(tempFilePath))
+        using (var subKey = registryKey.CreateSubKey(ModelId))
         {
-            iconResource.CopyTo(fs);
-        }
+            subKey.SetValue("DisplayName", "Everywhere");
 
-        subKey.SetValue("IconUri", tempFilePath);
+            var iconResource = AssetLoader.Open(new Uri("avares://Everywhere/Assets/Everywhere.ico"));
+            using (var fs = File.Create(tempFilePath))
+            {
+                iconResource.CopyTo(fs);
+            }
+
+            subKey.SetValue("IconUri", tempFilePath);
+        }
 
         var xml =
             $"""
@@ -248,6 +251,7 @@ public class Win32NativeHelper : INativeHelper
             try
             {
                 registryKey.DeleteSubKey(ModelId);
+                registryKey.Dispose();
                 File.Delete(tempFilePath);
             }
             catch
@@ -262,10 +266,5 @@ public class Win32NativeHelper : INativeHelper
         if (fullPath.IsNullOrWhiteSpace()) return;
         var args = $"/e,/select,\"{fullPath}\"";
         Process.Start(new ProcessStartInfo("explorer.exe", args) { UseShellExecute = true });
-    }
-
-    private record CompositionContext(Compositor Compositor, Visual RootVisual)
-    {
-        public CompositionClip? Clip { get; set; }
     }
 }
