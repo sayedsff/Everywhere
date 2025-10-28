@@ -1,16 +1,36 @@
+## [v0.4.2](https://github.com/DearVa/Everywhere/releases/tag/v0.4.2) - 2025-10-28
+
+### ✨ Features
+- Now you can upload documents (PDF, Word, Text, etc.) directly in the chat window as attachments for context (⚠️ only supported by models that allow file inputs)
+
+### 🚀 Improvements
+- Chat window can be closed when press shortcut again
+
+### 🐛 Bug Fixes
+- Fixed "Web search" chat tool may report `count out of range` error
+- Fixed "Scroll to end" button in chat window mistakenly get focused 
+- (Windows) Fixed missing `Everything.dll`
+- (Windows) Fixed chat window still appears in `Alt+Tab` list when closed
+- (Windows) Fixed chat window disappears when picking a file
+- (Windows) Fixed icon & title of update notify is missing
+
+**Full Changelog**: https://github.com/DearVa/Everywhere/compare/v0.4.1...v0.4.2
+
+
+
 ## [v0.4.1](https://github.com/DearVa/Everywhere/releases/tag/v0.4.1) - 2025-10-27
 
 ### ⚠️ BREAKING CHANGE: Chat window shortcut will reset to `Ctrl+Shift+E` due to renaming "Hotkey" to "Shortcut".
-
+️
 ### 🚀 Improvements
 - Renamed DeepSeek models to their new official names
 - I18N: Changed "Hotkey" to "Shortcut"
-- Refactored "operate UI elements" chat function for better stability
+- Refactored "operate UI elements" chat tool for better stability
 
 ### 🐛 Bug Fixes
 - Fixed window cannot maximize when clicking the maximize button
-- Fixed "Web snapshot" chat function not working
-- Fixed "everything" chat function cannot work when "file system" chat function is enabled
+- Fixed "Web snapshot" chat tool not working
+- Fixed "everything" chat tool cannot work when "file system" chat tool is enabled
 - Fixed token counting may be bigger than actual usage in some cases
 
 **Full Changelog**: https://github.com/DearVa/Everywhere/compare/v0.4.0...v0.4.1
